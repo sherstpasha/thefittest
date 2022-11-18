@@ -5,16 +5,16 @@ with open('README.md', 'r') as fh:
 
 
 setuptools.setup(
-    name = 'package_ga',
+    name = 'thefittest',
     packages = ['SelfCEA'],
     version = '1.0.0',
     license='MIT',
-    description = 'aaaa',
+    description = 'Implementation of data mining methods that use evolutionary algorithms',
     long_description = long_description,
     long_description_content_type='text/markdown',
     author = 'Pavel Sherstnev',
     author_email = 'sherstpasha99@gmail.com',
-    url = '',
+    url = 'https://github.com/sherstpasha/thefittest',
     download_url = '',
     keywords = ['genetic algorithm', 'machine learning', "optimization"],
     install_requires = ['numpy'],
