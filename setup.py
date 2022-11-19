@@ -6,7 +6,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name = 'thefittest',
-    packages = ['SelfCEA'],
+    #packages = ['SelfCEA'],
     version = '1.0.0',
     license='MIT',
     description = 'Implementation of data mining methods that use evolutionary algorithms',
