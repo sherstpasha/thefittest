@@ -94,11 +94,11 @@ class SamplingGrid:
 
 class SelfCGeneticAlgorithm:
 
-    def __init__(self, fitness_function, genotype_to_phenotype, iters: int,
-                 pop_size: int, str_len: int, K: float = 2.,
-                 threshold: float = 0.05,
-                 optimal_value: float = None,
-                  no_increase_num: int = None):
+    def __init__(self, fitness_function, genotype_to_phenotype, iters,
+                 pop_size, str_len, K = 2.,
+                 threshold = 0.05,
+                 optimal_value = None,
+                 no_increase_num = None):
         self.fitness_function = fitness_function
         self.genotype_to_phenotype = genotype_to_phenotype
         self.iters = iters
@@ -255,9 +255,9 @@ class SelfCGeneticAlgorithm:
         proba = proba.clip(self.threshold, 1)
         return proba/proba.sum()
 
-    def operators_selector(self, select_opers: list[str],
-                           crossover_opers: list[str],
-                           mutation_opers: list[str]):
+    def operators_selector(self, select_opers,
+                           crossover_opers,
+                           mutation_opers):
 
         s_sets = {}
         c_sets = {}
