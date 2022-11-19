@@ -97,8 +97,8 @@ class SelfCGeneticAlgorithm:
     def __init__(self, fitness_function, genotype_to_phenotype, iters: int,
                  pop_size: int, str_len: int, K: float = 2.,
                  threshold: float = 0.05,
-                 optimal_value: float|None = None,
-                  no_increase_num: int|None = None):
+                 optimal_value: float = None,
+                  no_increase_num: int = None):
         self.fitness_function = fitness_function
         self.genotype_to_phenotype = genotype_to_phenotype
         self.iters = iters
