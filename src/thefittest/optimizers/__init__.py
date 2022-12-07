@@ -1,1 +1,1 @@
-
+from .selfcgeneticalgorithm import SelfCGeneticAlgorithm
