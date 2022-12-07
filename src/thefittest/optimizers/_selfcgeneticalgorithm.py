@@ -1,6 +1,7 @@
 import numpy as np
 from functools import partial
-
+from ._transformations import rank_scale_data, scale_data, SamplingGrid
+from .units import TheFittest, Statictic
 
 class SelfCGeneticAlgorithm:
 
