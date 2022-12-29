@@ -219,4 +219,4 @@ class SelfCGA:
         self.remains = (self.pop_size + (self.iters-1)
                         * (self.pop_size-1)) - calls
         self.calls = calls
-        return (self.thefittest, self.stats)
+        return self.thefittest
