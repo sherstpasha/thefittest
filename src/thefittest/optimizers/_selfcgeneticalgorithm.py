@@ -22,6 +22,7 @@ class SelfCGA:
                  pop_size, str_len, tour_size=2, K=2.,
                  threshold=0.05,
                  optimal_value=None,
+                 termination_error_value=0.,
                  no_increase_num=None,
                  show_progress_each=None,
                  keep_history=False):
@@ -33,6 +34,7 @@ class SelfCGA:
         self.K = K
         self.threshold = threshold
         self.optimal_value = optimal_value
+        self.termination_error_value = termination_error_value
         self.no_increase_num = no_increase_num
         self.show_progress_each = show_progress_each
         self.keep_history = keep_history
@@ -168,7 +170,12 @@ class SelfCGA:
             if self.show_progress_each is not None:
                 if i % self.show_progress_each == 0:
                     print(f'{i} iterstion with fitness = {self.thefittest.fitness}')
-            find_opt = self.thefittest.fitness <= self.optimal_value
+            if self.optimal_value is not None:
+                find_opt = self.thefittest.fitness <=\
+                     self.optimal_value + self.termination_error_value
+
+            
+            
             no_increase_cond = no_increase == self.no_increase_num
 
             if find_opt or no_increase_cond:
