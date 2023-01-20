@@ -4,42 +4,60 @@ import os
 path = os.path.dirname(__file__) + '/shifts_data/'
 
 fbias_data = np.loadtxt(path+'fbias_data.txt')
+# 1
 sphere_func_data = np.loadtxt(path+'sphere_func_data.txt')
+# 2
+schwefel_102_data = np.loadtxt(path+'schwefel_102_data.txt')
+# 3
 high_cond_elliptic_rot_data = np.loadtxt(path
                                          + 'high_cond_elliptic_rot_data.txt')[:50]
 elliptic_M_D2 = np.loadtxt(path+'elliptic_M_D2.txt')
 elliptic_M_D10 = np.loadtxt(path+'elliptic_M_D10.txt')
 elliptic_M_D30 = np.loadtxt(path+'elliptic_M_D30.txt')
 elliptic_M_D50 = np.loadtxt(path+'elliptic_M_D50.txt')
-schwefel_102_data = np.loadtxt(path+'schwefel_102_data.txt')
+# 5
 schwefel_206_data = np.loadtxt(path+'schwefel_206_data.txt')
 o_206 = schwefel_206_data[0]
 A_206 = schwefel_206_data[1:]
+# 6
 rosenbrock_func_data = np.loadtxt(path+'rosenbrock_func_data.txt')
-rastrigin_func_data = np.loadtxt(path+'rastrigin_func_data.txt')[:50]
-rastrigin_M_D2 = np.loadtxt(path+'rastrigin_M_D2.txt')
-rastrigin_M_D10 = np.loadtxt(path+'rastrigin_M_D10.txt')
-rastrigin_M_D30 = np.loadtxt(path+'rastrigin_M_D30.txt')
-rastrigin_M_D50 = np.loadtxt(path+'rastrigin_M_D50.txt')
+# 7
 griewank_func_data = np.loadtxt(path+'griewank_func_data.txt')[:50]
 griewank_M_D2 = np.loadtxt(path+'griewank_M_D2.txt')
 griewank_M_D10 = np.loadtxt(path+'griewank_M_D10.txt')
 griewank_M_D30 = np.loadtxt(path+'griewank_M_D30.txt')
 griewank_M_D50 = np.loadtxt(path+'griewank_M_D50.txt')
+# 8
+ackley_func_data = np.loadtxt(path+'ackley_func_data.txt')[:50]
 ackley_M_D2 = np.loadtxt(path+'ackley_M_D2.txt')
 ackley_M_D10 = np.loadtxt(path+'ackley_M_D10.txt')
 ackley_M_D30 = np.loadtxt(path+'ackley_M_D30.txt')
 ackley_M_D50 = np.loadtxt(path+'ackley_M_D50.txt')
-ackley_func_data = np.loadtxt(path+'ackley_func_data.txt')[:50]
+# 9-10
+rastrigin_func_data = np.loadtxt(path+'rastrigin_func_data.txt')[:50]
+rastrigin_M_D2 = np.loadtxt(path+'rastrigin_M_D2.txt')
+rastrigin_M_D10 = np.loadtxt(path+'rastrigin_M_D10.txt')
+rastrigin_M_D30 = np.loadtxt(path+'rastrigin_M_D30.txt')
+rastrigin_M_D50 = np.loadtxt(path+'rastrigin_M_D50.txt')
+# 11
 weierstrass_M_D2 = np.loadtxt(path+'weierstrass_M_D2.txt')
 weierstrass_M_D10 = np.loadtxt(path+'weierstrass_M_D10.txt')
 weierstrass_M_D30 = np.loadtxt(path+'weierstrass_M_D30.txt')
 weierstrass_M_D50 = np.loadtxt(path+'weierstrass_M_D50.txt')
 weierstrass_data = np.loadtxt(path+'weierstrass_data.txt')[:50]
+# 12
 schwefel_213_data = np.loadtxt(path+'schwefel_213_data.txt')
+# 13
+EF8F2_func_data = np.loadtxt(path+'EF8F2_func_data.txt')
 a_213 = schwefel_213_data[:100]
 b_213 = schwefel_213_data[100:200]
 alpha_213 = schwefel_213_data[-1]
+# 14
+E_ScafferF6_func_data = np.loadtxt(path+'E_ScafferF6_func_data.txt')[:50]
+E_ScafferF6_M_D2 = np.loadtxt(path+'E_ScafferF6_M_D2.txt')
+E_ScafferF6_M_D10 = np.loadtxt(path+'E_ScafferF6_M_D10.txt')
+E_ScafferF6_M_D30 = np.loadtxt(path+'E_ScafferF6_M_D30.txt')
+E_ScafferF6_M_D50 = np.loadtxt(path+'E_ScafferF6_M_D50.txt')
 
 
 class TestFunction:
@@ -435,3 +453,64 @@ class Schwefel2_13(TestFunction):
         fx = np.sum((A[np.newaxis:,] - B)**2, axis=-1)
 
         return fx + self.global_optimum
+
+
+# CEC05 #13
+class ShiftedExpandedGriewankRosenbrock(TestShiftedFunction):
+    def __init__(self):
+        TestShiftedFunction.__init__(self, global_optimum=fbias_data[12],
+                                     fixed_accuracy=1e-2,
+                                     x_optimum=EF8F2_func_data)
+        self.rosenbrock_f = Rosenbrock()
+        self.griewank_f = Griewank()
+
+    def shift(self, x):
+        shape = x.shape
+        axis = [1]*(len(shape)-1) + [-1]
+        return x - self.x_optimum[:shape[-1]].reshape(axis) + 1
+
+    def f(self, x):
+        indexes = np.kron(
+            np.arange(1, x.shape[1]-1, dtype=np.int64), np.array([1, 1]))
+        indexes = np.insert(indexes, [0], [0])
+        indexes = np.append(indexes, x.shape[1]-1)
+        x_indexes = x[:, indexes]
+
+        vertical_X = x_indexes.reshape(-1, 2)
+        F2 = self.rosenbrock_f(vertical_X)
+        F8 = self.griewank_f(F2.reshape(-1, 1))
+        horizontal_X = F8.reshape(x.shape[0], -1)
+
+        return np.sum(horizontal_X, axis=-1)
+
+
+# CEC05 #14
+class ShiftedRotatedExpandedScaffes_F6(TestShiftedRotatedFunction):
+    def __init__(self):
+        TestShiftedRotatedFunction.__init__(self, global_optimum=fbias_data[13],
+                                            fixed_accuracy=1e-2,
+                                            x_optimum=E_ScafferF6_func_data,
+                                            rotate_M_D2=E_ScafferF6_M_D2,
+                                            rotate_M_D10=E_ScafferF6_M_D10,
+                                            rotate_M_D30=E_ScafferF6_M_D30,
+                                            rotate_M_D50=E_ScafferF6_M_D50)
+
+    def Scaffes_F6(self, x):
+        sum_of_power = x[:,0]**2 + x[:,1]**2
+        up = np.sin(np.sqrt(sum_of_power))**2 - 0.5
+        down = (1 + 0.001*(sum_of_power))**2
+        return 0.5 + up/down
+
+
+    def f(self, x):
+        indexes = np.kron(
+            np.arange(1, x.shape[1]-1, dtype=np.int64), np.array([1, 1]))
+        indexes = np.insert(indexes, [0], [0])
+        indexes = np.append(indexes, x.shape[1]-1)
+        x_indexes = x[:, indexes]
+
+        vertical_X = x_indexes.reshape(-1, 2)
+        F = self.Scaffes_F6(vertical_X)
+        horizontal_X = F.reshape(x.shape[0], -1)
+
+        return np.sum(horizontal_X, axis=-1)

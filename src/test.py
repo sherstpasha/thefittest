@@ -6,7 +6,7 @@ from thefittest.testfuncs import Sphere
 from thefittest.tools import SamplingGrid
 from thefittest.tools import GrayCode
 
-n = 100
+n = 10
 left = np.full(n, -100, dtype=np.float64)
 right = np.full(n, 100, dtype=np.float64)
 
@@ -17,14 +17,14 @@ grid = GrayCode(fit_by='h').fit(left=left, right=right, arg=h)
 parts = grid.parts
 
 
-problem = CEC2005.ShiftedSphere()
+problem = CEC2005.ShiftedRotatedExpandedScaffes_F6()
 model = SelfCGA(
     problem,
-    grid.transform, 300, 300, np.sum(parts),
-    tour_size=25,
-    show_progress_each=99,
+    grid.transform, 500, 500, np.sum(parts),
+    tour_size=5,
+    show_progress_each=10,
     optimal_value=problem.global_optimum,
-    termination_error_value=problem.fixed_accuracy,
+    termination_error_value=10e-8,
     minimization=True)
 
 model.operators_selector(crossover_opers=['one_point',
@@ -39,6 +39,6 @@ model.operators_selector(crossover_opers=['one_point',
                                           'uniform_tour7'])
 
 
-print(CEC2005.evaluation(model, 25))
-# fittest = model.fit()
-# print(fittest.fitness)
+# print(CEC2005.evaluation(model, 25))
+fittest = model.fit()
+print(fittest.fitness)
