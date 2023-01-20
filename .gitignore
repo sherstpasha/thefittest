@@ -1,0 +1,23 @@
+# folders to ignore
+build/
+dist/
+doc/_build/
+.vscode/
+.pytest_cache/
+__pycache__/
+env/
+*.egg-info/
+
+# files to ignore
+MANIFEST
+
+# file patterns to ignore
+*.pyc
+*.pyo
+*.orig
+.DS_Store
+*.so
+
+# IDE stuff
+.idea
+.vscode
