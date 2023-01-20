@@ -1,6 +1,7 @@
 import numpy as np
 from functools import partial
 from ..tools import scale_data
+from ..tools import rank_data
 from ._units import TheFittest
 from ._units import Statictic
 from ._selections import proportional_selection
@@ -14,16 +15,18 @@ from ._crossovers import uniform_prop_crossover
 from ._crossovers import uniform_rank_crossover
 from ._crossovers import uniform_tour_crossover
 from ._mutations import flip_mutation
+import copy
 
 
 class SelfCGA:
 
-    def __init__(self, fitness_function, genotype_to_phenotype, iters,
-                 pop_size, str_len, tour_size=2, K=2.,
+    def __init__(self, fitness_function, genotype_to_phenotype,
+                 iters, pop_size, str_len, tour_size=2, K=2.,
                  threshold=0.05,
                  optimal_value=None,
                  termination_error_value=0.,
                  no_increase_num=None,
+                 minimization=None,
                  show_progress_each=None,
                  keep_history=False):
         self.fitness_function = fitness_function
@@ -36,6 +39,7 @@ class SelfCGA:
         self.optimal_value = optimal_value
         self.termination_error_value = termination_error_value
         self.no_increase_num = no_increase_num
+        self.minimization = minimization
         self.show_progress_each = show_progress_each
         self.keep_history = keep_history
         self.remains: int = 0
@@ -68,25 +72,32 @@ class SelfCGA:
         self.m_sets = dict
         self.c_sets = dict
 
-        self.operators_selector(select_opers=['proportional',
-                                              'rank',
-                                              'tournament'],
-                                crossover_opers=['one_point',
-                                                 'two_point',
-                                                 'uniform2'],
-                                mutation_opers=['weak',
-                                                'average',
-                                                'strong'])
+        self.operators_selector(select_opers=[
+            'proportional',
+            'rank',
+            'tournament'],
+            crossover_opers=['one_point',
+                             'two_point',
+                             'uniform2'],
+            mutation_opers=['weak',
+                            'average',
+                            'strong'])
 
-    def create_offs(self, popuation, fitness,
+    def evaluate(self, population_ph):
+        if self.minimization:
+            return -self.fitness_function(population_ph)
+
+    def create_offs(self, popuation, fitness, ranks,
                     selection, crossover, mutation):
         crossover_func, quantity = self.c_sets[crossover]
         selection_func, tour_size = self.s_sets[selection]
         mutation_func, proba = self.m_sets[mutation]
-        indexes = selection_func(popuation, fitness, tour_size, quantity)
+        indexes = selection_func(fitness, ranks,
+                                 tour_size, quantity)
         parents = popuation[indexes].copy()
         fitness_p = fitness[indexes].copy()
-        offspring_no_mutated = crossover_func(parents, fitness_p)
+        ranks_p = ranks[indexes].copy()
+        offspring_no_mutated = crossover_func(parents, fitness_p, ranks_p)
         return mutation_func(offspring_no_mutated, proba)
 
     def choice_operators(self, operators, proba):
@@ -101,7 +112,7 @@ class SelfCGA:
         groups = np.split(operators_fitness[:, 1].astype(float), cut_index)[1:]
         mean_fit = np.array(list(map(np.mean, groups)))
 
-        return keys[np.argmin(mean_fit)]
+        return keys[np.argmax(mean_fit)]
 
     def update_proba(self, proba, z, index):
         proba[index] += self.K/self.iters
@@ -118,21 +129,21 @@ class SelfCGA:
             for operator_name in select_opers:
                 value = self.s_pool[operator_name]
                 s_sets[operator_name] = value
-            self.s_sets = s_sets
+            self.s_sets = dict(sorted(s_sets.items()))
 
         if crossover_opers is not None:
             c_sets = {}
             for operator_name in crossover_opers:
                 value = self.c_pool[operator_name]
                 c_sets[operator_name] = value
-            self.c_sets = c_sets
+            self.c_sets = dict(sorted(c_sets.items()))
 
         if mutation_opers is not None:
             m_sets = {}
             for operator_name in mutation_opers:
                 value = self.m_pool[operator_name]
                 m_sets[operator_name] = value
-            self.m_sets = m_sets
+            self.m_sets = dict(sorted(m_sets.items()))
 
     def fit(self, initial_population=None):
         calls = 0
@@ -151,15 +162,16 @@ class SelfCGA:
         else:
             population_g = initial_population
         population_ph = self.genotype_to_phenotype(population_g)
-        fitness = self.fitness_function(population_ph)
+        fitness = self.evaluate(population_ph)
         calls += len(population_ph)
         fitness_scale = scale_data(fitness)
+        fitness_rank = rank_data(fitness)
 
         self.thefittest = TheFittest(
-            genotype=population_g[np.argmin(fitness)].copy(),
-            phenotype=population_ph[np.argmin(fitness)].copy(),
-            fitness=fitness[np.argmin(fitness)].copy())
-        last_best = fitness[np.argmin(fitness)].copy()
+            genotype=population_g[np.argmax(fitness)].copy(),
+            phenotype=population_ph[np.argmax(fitness)].copy(),
+            fitness=fitness[np.argmax(fitness)].copy())
+        last_best = fitness[np.argmax(fitness)].copy()
         if self.keep_history:
             self.stats = Statictic().update(population_g, fitness,
                                             s_proba, c_proba, m_proba)
@@ -167,15 +179,21 @@ class SelfCGA:
             self.stats = None
 
         for i in range(self.iters-1):
+
             if self.show_progress_each is not None:
                 if i % self.show_progress_each == 0:
                     print(f'{i} iterstion with fitness = {self.thefittest.fitness}')
             if self.optimal_value is not None:
-                find_opt = self.thefittest.fitness <=\
-                     self.optimal_value + self.termination_error_value
+                if self.minimization:
+                    aim = -(self.optimal_value) - self.termination_error_value
+                else:
+                    aim = self.optimal_value - self.termination_error_value
 
-            
-            
+                find_opt = self.thefittest.fitness >= aim
+
+            else:
+                find_opt = False
+
             no_increase_cond = no_increase == self.no_increase_num
 
             if find_opt or no_increase_cond:
@@ -186,11 +204,14 @@ class SelfCGA:
             m_operators = self.choice_operators(self.m_sets.keys(), m_proba)
 
             create_offs = partial(
-                self.create_offs, population_g.copy(), fitness_scale.copy())
+                self.create_offs, population_g.copy(),
+                fitness_scale.copy(), fitness_rank.copy())
+
             population_g[:-1] = np.array(list(map(create_offs, s_operators,
                                                   c_operators, m_operators)))
             population_ph[:-1] = self.genotype_to_phenotype(population_g[:-1])
-            fitness[:-1] = self.fitness_function(population_ph[:-1])
+
+            fitness[:-1] = self.evaluate(population_ph[:-1])
             calls += len(population_ph[:-1])
 
             s_fittest_operator = self.find_fittest_operator(
@@ -210,6 +231,7 @@ class SelfCGA:
 
             population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
             fitness_scale = scale_data(fitness)
+            fitness_rank = rank_data(fitness)
 
             self.thefittest.update(population_g, population_ph, fitness)
 
@@ -226,4 +248,6 @@ class SelfCGA:
         self.remains = (self.pop_size + (self.iters-1)
                         * (self.pop_size-1)) - calls
         self.calls = calls
+        if self.minimization:
+            self.thefittest.fitness = (-1)*self.thefittest.fitness
         return self.thefittest

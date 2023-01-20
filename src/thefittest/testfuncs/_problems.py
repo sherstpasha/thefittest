@@ -115,7 +115,7 @@ class TestShiftedRotatedFunction:
 
 
 # Test Functions
-class OneMin(TestFunction):
+class OneMax(TestFunction):
     def __init__(self):
         TestFunction.__init__(self,
                               global_optimum=100,

@@ -1,13 +1,12 @@
 import numpy as np
 from ..tools import protect_norm
-from ..tools import rank_data
 
 
 def empty_crossover(individs, fitness):
     return individs[0]
 
 
-def one_point_crossover(individs, fitness):
+def one_point_crossover(individs, fitness, rank):
     cross_point = np.random.randint(0, len(individs[0]))
     if np.random.random() > 0.5:
         offspring = individs[0].copy()
@@ -18,7 +17,7 @@ def one_point_crossover(individs, fitness):
     return offspring
 
 
-def two_point_crossover(individs, fitness):
+def two_point_crossover(individs, fitness, rank):
     c_point_1, c_point_2 = np.sort(np.random.choice(range(len(individs[0])),
                                                     size=2,
                                                     replace=False))
@@ -34,14 +33,14 @@ def two_point_crossover(individs, fitness):
     return offspring
 
 
-def uniform_crossover(individs, fitness):
+def uniform_crossover(individs, fitness, rank):
     choosen = np.random.choice(range(len(individs)),
                                size=len(individs[0]))
     diag = range(len(individs[0]))
     return individs[choosen, diag]
 
 
-def uniform_prop_crossover(individs, fitness):
+def uniform_prop_crossover(individs, fitness, rank):
     probability = protect_norm(fitness)
     choosen = np.random.choice(range(len(individs)),
                                size=len(individs[0]), p=probability)
@@ -50,9 +49,8 @@ def uniform_prop_crossover(individs, fitness):
     return individs[choosen, diag]
 
 
-def uniform_rank_crossover(individs, fitness):
-    ranks = rank_data(fitness)
-    probability = ranks/np.sum(ranks)
+def uniform_rank_crossover(individs, fitness, rank):
+    probability = protect_norm(rank)
     choosen = np.random.choice(range(len(individs)),
                                size=len(individs[0]), p=probability)
 
@@ -60,7 +58,7 @@ def uniform_rank_crossover(individs, fitness):
     return individs[choosen, diag]
 
 
-def uniform_tour_crossover(individs, fitness):
+def uniform_tour_crossover(individs, fitness, rank):
     tournament = np.random.choice(range(len(individs)), 2*len(individs[0]))
     tournament = tournament.reshape(-1, 2)
 

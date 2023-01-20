@@ -8,9 +8,9 @@ class TheFittest:
         self.fitness = fitness
 
     def update(self, population_g, population_ph, fitness):
-        temp_best_id = np.argmin(fitness)
+        temp_best_id = np.argmax(fitness)
         temp_best_fitness = fitness[temp_best_id].copy()
-        if temp_best_fitness < self.fitness:
+        if temp_best_fitness > self.fitness:
             self.genotype = population_g[temp_best_id].copy()
             self.phenotype = population_ph[temp_best_id].copy()
             self.fitness = temp_best_fitness
