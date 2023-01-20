@@ -26,7 +26,7 @@ class SelfCGA:
                  optimal_value=None,
                  termination_error_value=0.,
                  no_increase_num=None,
-                 minimization=None,
+                 minimization=False,
                  show_progress_each=None,
                  keep_history=False):
         self.fitness_function = fitness_function
@@ -86,6 +86,8 @@ class SelfCGA:
     def evaluate(self, population_ph):
         if self.minimization:
             return -self.fitness_function(population_ph)
+        else:
+            return self.fitness_function(population_ph)
 
     def create_offs(self, popuation, fitness, ranks,
                     selection, crossover, mutation):
@@ -249,5 +251,5 @@ class SelfCGA:
                         * (self.pop_size-1)) - calls
         self.calls = calls
         if self.minimization:
-            self.thefittest.fitness = (-1)*self.thefittest.fitness
+            self.thefittest.fitness = -self.thefittest.fitness
         return self.thefittest

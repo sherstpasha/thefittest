@@ -40,7 +40,7 @@ def evaluation(opt_model, n_runs):
     calls = np.zeros(n_runs)
 
     for i in range(n_runs):
-        fittest, _ = opt_model.fit()
+        fittest = opt_model.fit()
         errors[i] = fittest.fitness - global_opt
         success[i] = (fittest.fitness - global_opt) <= fixed_opt
         calls[i] = opt_model.calls
