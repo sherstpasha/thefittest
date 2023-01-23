@@ -54,7 +54,7 @@ parts = np.full(n_variables, 16, dtype=np.int64)
 
 gray_code_to_float = GrayCode(fit_by='parts').fit(left=left, right=right, arg=parts)
 
-problem = CEC2005.HybridCompositionFunction1()
+problem = CEC2005.RotatedHybridCompositionFunctionNarrowBasin()
 model = SelfCGA(fitness_function = problem,
                 genotype_to_phenotype = gray_code_to_float.transform,
                 iters = 300,
@@ -66,5 +66,6 @@ model = SelfCGA(fitness_function = problem,
 
 solution = model.fit()
 stats = model.stats
+print(solution.fitness)
 
 print_population_by_time(stats.population, gray_code_to_float, problem)

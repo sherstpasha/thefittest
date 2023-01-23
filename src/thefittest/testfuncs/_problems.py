@@ -62,10 +62,17 @@ E_ScafferF6_M_D30 = np.loadtxt(path+'E_ScafferF6_M_D30.txt')
 E_ScafferF6_M_D50 = np.loadtxt(path+'E_ScafferF6_M_D50.txt')
 # 15
 hybrid_func1_data = np.loadtxt(path+'hybrid_func1_data.txt')
-# hybrid_func1_M_D2 = np.vstack([np.eye(2) for i in range(10)])
-# hybrid_func1_M_D10 = np.vstack([np.eye(10) for i in range(10)])
-# hybrid_func1_M_D30 = np.vstack([np.eye(30) for i in range(10)])
-# hybrid_func1_M_D50 = np.vstack([np.eye(50) for i in range(10)])
+# 16
+hybrid_func1_M_D2 = np.loadtxt(path+'hybrid_func1_M_D2.txt')
+hybrid_func1_M_D10 = np.loadtxt(path+'hybrid_func1_M_D10.txt')
+hybrid_func1_M_D30 = np.loadtxt(path+'hybrid_func1_M_D30.txt')
+hybrid_func1_M_D50 = np.loadtxt(path+'hybrid_func1_M_D50.txt')
+# 18
+hybrid_func2_data = np.loadtxt(path+'hybrid_func2_data.txt')
+hybrid_func2_M_D2 = np.loadtxt(path+'hybrid_func2_M_D2.txt')
+hybrid_func2_M_D10 = np.loadtxt(path+'hybrid_func2_M_D10.txt')
+hybrid_func2_M_D30 = np.loadtxt(path+'hybrid_func2_M_D30.txt')
+hybrid_func2_M_D50 = np.loadtxt(path+'hybrid_func2_M_D50.txt')
 
 
 class TestFunction:
@@ -574,10 +581,10 @@ class SampleHybridCompositionFunction():
             [0, 100, 200, 300, 400, 500, 600, 700, 800, 900], dtype=np.float64)
         self.C = 2000
 
-    def shift(self, x, shift_i):
+    def shift(self, x, i):
         shape = x.shape
         axis = [1]*(len(shape)-1) + [-1]
-        return x - shift_i[:shape[-1]].reshape(axis)
+        return x - self.x_optimum[i][:shape[-1]].reshape(axis)
 
     def rotate(self, x, M_D2, M_D10, M_D30, M_D50):
         if x.shape[1] == 2:
@@ -590,9 +597,9 @@ class SampleHybridCompositionFunction():
             z = x@M_D50
         return z
 
-    def calc_w(self, x, shift_i, sigma_i):
+    def calc_w(self, x, shift_i, sigma_i, i):
         D = x.shape[1]
-        shift_x = self.shift(x, shift_i)
+        shift_x = self.shift(x, i)
 
         up = np.sum(shift_x**2, axis=-1)
         down = 2*D*(sigma_i*sigma_i)
@@ -602,9 +609,9 @@ class SampleHybridCompositionFunction():
         return w_i, shift_x
 
     def procces_i_function(self, x, func_i, sigma_i, lambda_i, shift_i,
-                           M_D2i, M_D10i, M_D30i, M_D50i):
+                           M_D2i, M_D10i, M_D30i, M_D50i, i):
         y = np.full(shape=x.shape, fill_value=5)
-        w_i, shift_x = self.calc_w(x, shift_i, sigma_i)
+        w_i, shift_x = self.calc_w(x, shift_i, sigma_i, i)
 
         arg1 = self.rotate(shift_x/lambda_i,  M_D2i, M_D10i, M_D30i, M_D50i)
         fit_i = func_i()(arg1)
@@ -618,10 +625,10 @@ class SampleHybridCompositionFunction():
 
     def __call__(self, x):
         result = tuple(self.procces_i_function(x, func_i, sigma_i, lambda_i, shift_i,
-                                               M_D2i, M_D10i, M_D30i, M_D50i)
+                                               M_D2i, M_D10i, M_D30i, M_D50i, i)
                        for func_i, sigma_i, lambda_i, shift_i,
-                       M_D2i, M_D10i, M_D30i, M_D50i in zip(self.basic_functions, self.sigmas, self.lambdas, self.x_optimum,
-                                                            self.M_D2, self.M_D10, self.M_D30, self.M_D50))
+                       M_D2i, M_D10i, M_D30i, M_D50i, i in zip(self.basic_functions, self.sigmas, self.lambdas, self.x_optimum,
+                                                               self.M_D2, self.M_D10, self.M_D30, self.M_D50, range(len(self.M_D50))))
         w_i, fit_i = list(zip(*result))
         w_i = np.array(w_i, np.float64).T
         fit_i = np.array(fit_i, np.float64).T
@@ -685,25 +692,144 @@ class HybridCompositionFunction1(SampleHybridCompositionFunction):
 
 
 # CEC05 #16
-# class RotatedVersionHybridCompositionFunction(SampleHybridCompositionFunction):
-#     def __init__(self):
-#         SampleHybridCompositionFunction.__init__(self, basic_functions=(Rastrigin,
-#                                                                         Rastrigin,
-#                                                                         Weierstrass,
-#                                                                         Weierstrass,
-#                                                                         Griewank,
-#                                                                         Griewank,
-#                                                                         Ackley,
-#                                                                         Ackley,
-#                                                                         Sphere,
-#                                                                         Sphere),
-#                                                  sigmas=np.ones(10),
-#                                                  lambdas=np.array(
-#                                                      [1, 1, 10, 10, 5/60, 5/60, 5/32, 5/32, 5/100, 5/100], dtype=np.float64),
-#                                                  global_optimum=fbias_data[14],
-#                                                  x_optimum=hybrid_func1_data,
-#                                                  fixed_accuracy=1e-2,
-#                                                  M_D2=,
-#                                                  M_D10=,
-#                                                  M_D30=,
-#                                                  M_D50=)
+class RotatedVersionHybridCompositionFunction1(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self, basic_functions=(Rastrigin,
+                                                                        Rastrigin,
+                                                                        Weierstrass,
+                                                                        Weierstrass,
+                                                                        Griewank,
+                                                                        Griewank,
+                                                                        Ackley,
+                                                                        Ackley,
+                                                                        Sphere,
+                                                                        Sphere),
+                                                 sigmas=np.ones(10),
+                                                 lambdas=np.array(
+                                                     [1, 1, 10, 10, 5/60, 5/60, 5/32, 5/32, 5/100, 5/100], dtype=np.float64),
+                                                 global_optimum=fbias_data[15],
+                                                 x_optimum=hybrid_func1_data,
+                                                 fixed_accuracy=1e-2,
+                                                 M_D2=hybrid_func1_M_D2,
+                                                 M_D10=hybrid_func1_M_D10,
+                                                 M_D30=hybrid_func1_M_D30,
+                                                 M_D50=hybrid_func1_M_D50)
+
+
+# CEC05 #17
+class RotatedVersionHybridCompositionFunction1Noise(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self, basic_functions=(Rastrigin,
+                                                                        Rastrigin,
+                                                                        Weierstrass,
+                                                                        Weierstrass,
+                                                                        Griewank,
+                                                                        Griewank,
+                                                                        Ackley,
+                                                                        Ackley,
+                                                                        Sphere,
+                                                                        Sphere),
+                                                 sigmas=np.ones(10),
+                                                 lambdas=np.array(
+                                                     [1, 1, 10, 10, 5/60, 5/60, 5/32, 5/32, 5/100, 5/100], dtype=np.float64),
+                                                 global_optimum=fbias_data[16],
+                                                 x_optimum=hybrid_func1_data,
+                                                 fixed_accuracy=1e-1,
+                                                 M_D2=hybrid_func1_M_D2,
+                                                 M_D10=hybrid_func1_M_D10,
+                                                 M_D30=hybrid_func1_M_D30,
+                                                 M_D50=hybrid_func1_M_D50)
+
+    def __call__(self, x):
+        G_x = RotatedVersionHybridCompositionFunction1()(x) - fbias_data[15]
+        noise = np.abs(np.random.normal(size=G_x.shape))
+        return G_x*(1 + 0.2*noise) + fbias_data[16]
+
+
+# CEC05 #18
+class RotatedHybridCompositionFunction(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self, basic_functions=(Ackley,
+                                                                        Ackley,
+                                                                        Rastrigin,
+                                                                        Rastrigin,
+                                                                        Sphere,
+                                                                        Sphere,
+                                                                        Weierstrass,
+                                                                        Weierstrass,
+                                                                        Griewank,
+                                                                        Griewank),
+                                                 sigmas=np.array(
+                                                     [1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float64),
+                                                 lambdas=np.array(
+                                                     [2*(5/32), 5/32, 2*1, 1, 2*(5/100), 5/100, 2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
+                                                 global_optimum=fbias_data[17],
+                                                 x_optimum=hybrid_func2_data,
+                                                 fixed_accuracy=1e-1,
+                                                 M_D2=hybrid_func2_M_D2,
+                                                 M_D10=hybrid_func2_M_D10,
+                                                 M_D30=hybrid_func2_M_D30,
+                                                 M_D50=hybrid_func2_M_D50)
+        self.x_optimum[9] = 0
+
+
+# CEC05 #19
+class RotatedHybridCompositionFunctionNarrowBasin(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self, basic_functions=(Ackley,
+                                                                        Ackley,
+                                                                        Rastrigin,
+                                                                        Rastrigin,
+                                                                        Sphere,
+                                                                        Sphere,
+                                                                        Weierstrass,
+                                                                        Weierstrass,
+                                                                        Griewank,
+                                                                        Griewank),
+                                                 sigmas=np.array(
+                                                     [0.1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float64),
+                                                 lambdas=np.array(
+                                                     [0.1*(5/32), 5/32, 2*1, 1, 2*(5/100), 5/100, 2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
+                                                 global_optimum=fbias_data[17],
+                                                 x_optimum=hybrid_func2_data,
+                                                 fixed_accuracy=1e-1,
+                                                 M_D2=hybrid_func2_M_D2,
+                                                 M_D10=hybrid_func2_M_D10,
+                                                 M_D30=hybrid_func2_M_D30,
+                                                 M_D50=hybrid_func2_M_D50)
+        self.x_optimum[9] = 0
+
+
+# CEC05 #20
+class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self, basic_functions=(Ackley,
+                                                                        Ackley,
+                                                                        Rastrigin,
+                                                                        Rastrigin,
+                                                                        Sphere,
+                                                                        Sphere,
+                                                                        Weierstrass,
+                                                                        Weierstrass,
+                                                                        Griewank,
+                                                                        Griewank),
+                                                 sigmas=np.array(
+                                                     [1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float64),
+                                                 lambdas=np.array(
+                                                     [2*(5/32), 5/32, 2*1, 1, 2*(5/100), 5/100, 2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
+                                                 global_optimum=fbias_data[17],
+                                                 x_optimum=hybrid_func2_data,
+                                                 fixed_accuracy=1e-1,
+                                                 M_D2=hybrid_func2_M_D2,
+                                                 M_D10=hybrid_func2_M_D10,
+                                                 M_D30=hybrid_func2_M_D30,
+                                                 M_D50=hybrid_func2_M_D50)
+        
+        self.x_optimum[9] = 0
+
+    def shift(self, x, i):
+        if i == 0:
+            self.x_optimum[i][:int(x.shape[1]/2)][::2] = 5
+        shape = x.shape
+        axis = [1]*(len(shape)-1) + [-1]
+        return x - self.x_optimum[i][:shape[-1]].reshape(axis)
