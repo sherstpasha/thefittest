@@ -98,6 +98,19 @@ class TestShiftedFunction:
         z = self.shift(x)
         return self.f(z) + self.global_optimum
 
+    def test(self):
+        y = self(self.x_optimum.reshape(1, -1))
+        return y - self.global_optimum < self.fixed_accuracy
+
+    def build_grid(self, x, y):
+        x1, y1 = np.meshgrid(x, y)
+        xy = np.concatenate(
+            [x1[:, :, np.newaxis], y1[:, :, np.newaxis]], axis=2)
+        z = np.zeros(shape=xy.shape[:-1])
+        for i, x_i in enumerate(xy):
+            z[i] = self(x_i)
+        return z
+
 
 class TestShiftedRotatedFunction:
     def __init__(self, global_optimum, fixed_accuracy, x_optimum,
@@ -130,6 +143,19 @@ class TestShiftedRotatedFunction:
         z = self.shift(x)
         z_rotated = self.rotate(z)
         return self.f(z_rotated) + self.global_optimum
+
+    def test(self):
+        y = self(self.x_optimum.reshape(1, -1))
+        return y - self.global_optimum < self.fixed_accuracy
+
+    def build_grid(self, x, y):
+        x1, y1 = np.meshgrid(x, y)
+        xy = np.concatenate(
+            [x1[:, :, np.newaxis], y1[:, :, np.newaxis]], axis=2)
+        z = np.zeros(shape=xy.shape[:-1])
+        for i, x_i in enumerate(xy):
+            z[i] = self(x_i)
+        return z
 
 
 # Test Functions
@@ -473,15 +499,16 @@ class ShiftedExpandedGriewankRosenbrock(TestShiftedFunction):
         indexes = np.kron(
             np.arange(1, x.shape[1]-1, dtype=np.int64), np.array([1, 1]))
         indexes = np.insert(indexes, [0], [0])
-        indexes = np.append(indexes, x.shape[1]-1)
+        indexes = np.append(indexes, np.array([x.shape[1]-1, x.shape[1]-1, 0]))
+
         x_indexes = x[:, indexes]
 
         vertical_X = x_indexes.reshape(-1, 2)
         F2 = self.rosenbrock_f(vertical_X)
         F8 = self.griewank_f(F2.reshape(-1, 1))
         horizontal_X = F8.reshape(x.shape[0], -1)
-
         return np.sum(horizontal_X, axis=-1)
+
 
 
 # CEC05 #14
@@ -506,7 +533,7 @@ class ShiftedRotatedExpandedScaffes_F6(TestShiftedRotatedFunction):
         indexes = np.kron(
             np.arange(1, x.shape[1]-1, dtype=np.int64), np.array([1, 1]))
         indexes = np.insert(indexes, [0], [0])
-        indexes = np.append(indexes, x.shape[1]-1)
+        indexes = np.append(indexes, np.array([x.shape[1]-1, x.shape[1]-1, 0]))
         x_indexes = x[:, indexes]
 
         vertical_X = x_indexes.reshape(-1, 2)
@@ -514,3 +541,7 @@ class ShiftedRotatedExpandedScaffes_F6(TestShiftedRotatedFunction):
         horizontal_X = F.reshape(x.shape[0], -1)
 
         return np.sum(horizontal_X, axis=-1)
+
+
+# CEC05 #15
+# class HybridCompositionFunction()
