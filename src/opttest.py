@@ -3,14 +3,14 @@ import optproblems
 from thefittest.testfuncs import CEC2005
 import numpy as np
 
-D = 50
-x = np.random.uniform(-100, 100, size = (1000, D))
+D = 2
+x = np.random.uniform(-5, 5, size = (10, D))
 
 def phenome(x):
     return x
 
-other = cec.F14(D)
-my = CEC2005.ShiftedRotatedExpandedScaffes_F6()
+other = cec.F15(D)
+my = CEC2005.HybridCompositionFunction1()
 
 def eval(func, x):
     res = []

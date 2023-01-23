@@ -1,5 +1,7 @@
 import numpy as np
 import os
+import math
+
 
 path = os.path.dirname(__file__) + '/shifts_data/'
 
@@ -58,6 +60,12 @@ E_ScafferF6_M_D2 = np.loadtxt(path+'E_ScafferF6_M_D2.txt')
 E_ScafferF6_M_D10 = np.loadtxt(path+'E_ScafferF6_M_D10.txt')
 E_ScafferF6_M_D30 = np.loadtxt(path+'E_ScafferF6_M_D30.txt')
 E_ScafferF6_M_D50 = np.loadtxt(path+'E_ScafferF6_M_D50.txt')
+# 15
+hybrid_func1_data = np.loadtxt(path+'hybrid_func1_data.txt')
+# hybrid_func1_M_D2 = np.vstack([np.eye(2) for i in range(10)])
+# hybrid_func1_M_D10 = np.vstack([np.eye(10) for i in range(10)])
+# hybrid_func1_M_D30 = np.vstack([np.eye(30) for i in range(10)])
+# hybrid_func1_M_D50 = np.vstack([np.eye(50) for i in range(10)])
 
 
 class TestFunction:
@@ -510,7 +518,6 @@ class ShiftedExpandedGriewankRosenbrock(TestShiftedFunction):
         return np.sum(horizontal_X, axis=-1)
 
 
-
 # CEC05 #14
 class ShiftedRotatedExpandedScaffes_F6(TestShiftedRotatedFunction):
     def __init__(self):
@@ -523,11 +530,10 @@ class ShiftedRotatedExpandedScaffes_F6(TestShiftedRotatedFunction):
                                             rotate_M_D50=E_ScafferF6_M_D50)
 
     def Scaffes_F6(self, x):
-        sum_of_power = x[:,0]**2 + x[:,1]**2
+        sum_of_power = x[:, 0]**2 + x[:, 1]**2
         up = np.sin(np.sqrt(sum_of_power))**2 - 0.5
         down = (1 + 0.001*(sum_of_power))**2
         return 0.5 + up/down
-
 
     def f(self, x):
         indexes = np.kron(
@@ -543,5 +549,161 @@ class ShiftedRotatedExpandedScaffes_F6(TestShiftedRotatedFunction):
         return np.sum(horizontal_X, axis=-1)
 
 
+class SampleHybridCompositionFunction():
+    def __init__(self, basic_functions, sigmas, lambdas,
+                 global_optimum,
+                 fixed_accuracy,
+                 x_optimum,
+                 M_D2, M_D10, M_D30, M_D50):
+        self.basic_functions = basic_functions
+        self.sigmas = sigmas
+        self.lambdas = lambdas
+        self.M_D2 = np.split(M_D2, range(
+            M_D2.shape[1], M_D2.shape[0], M_D2.shape[1]))
+        self.M_D10 = np.split(M_D10, range(
+            M_D10.shape[1], M_D10.shape[0], M_D10.shape[1]))
+        self.M_D30 = np.split(M_D30, range(
+            M_D30.shape[1], M_D30.shape[0], M_D30.shape[1]))
+        self.M_D50 = np.split(M_D50, range(
+            M_D50.shape[1], M_D50.shape[0], M_D50.shape[1]))
+        self.global_optimum = global_optimum
+        self.fixed_accuracy = fixed_accuracy
+        self.x_optimum = x_optimum
+
+        self.bias = np.array(
+            [0, 100, 200, 300, 400, 500, 600, 700, 800, 900], dtype=np.float64)
+        self.C = 2000
+
+    def shift(self, x, shift_i):
+        shape = x.shape
+        axis = [1]*(len(shape)-1) + [-1]
+        return x - shift_i[:shape[-1]].reshape(axis)
+
+    def rotate(self, x, M_D2, M_D10, M_D30, M_D50):
+        if x.shape[1] == 2:
+            z = x@M_D2
+        elif x.shape[1] == 10:
+            z = x@M_D10
+        elif x.shape[1] == 30:
+            z = x@M_D30
+        elif x.shape[1] == 50:
+            z = x@M_D50
+        return z
+
+    def calc_w(self, x, shift_i, sigma_i):
+        D = x.shape[1]
+        shift_x = self.shift(x, shift_i)
+
+        up = np.sum(shift_x**2, axis=-1)
+        down = 2*D*(sigma_i*sigma_i)
+
+        w_i = np.exp(-(up/down))
+
+        return w_i, shift_x
+
+    def procces_i_function(self, x, func_i, sigma_i, lambda_i, shift_i,
+                           M_D2i, M_D10i, M_D30i, M_D50i):
+        y = np.full(shape=x.shape, fill_value=5)
+        w_i, shift_x = self.calc_w(x, shift_i, sigma_i)
+
+        arg1 = self.rotate(shift_x/lambda_i,  M_D2i, M_D10i, M_D30i, M_D50i)
+        fit_i = func_i()(arg1)
+
+        arg2 = self.rotate(y/lambda_i,  M_D2i, M_D10i, M_D30i, M_D50i)
+        f_max_i = func_i()(arg2)
+
+        fit_i = self.C*fit_i/f_max_i
+
+        return w_i, fit_i
+
+    def __call__(self, x):
+        result = tuple(self.procces_i_function(x, func_i, sigma_i, lambda_i, shift_i,
+                                               M_D2i, M_D10i, M_D30i, M_D50i)
+                       for func_i, sigma_i, lambda_i, shift_i,
+                       M_D2i, M_D10i, M_D30i, M_D50i in zip(self.basic_functions, self.sigmas, self.lambdas, self.x_optimum,
+                                                            self.M_D2, self.M_D10, self.M_D30, self.M_D50))
+        w_i, fit_i = list(zip(*result))
+        w_i = np.array(w_i, np.float64).T
+        fit_i = np.array(fit_i, np.float64).T
+        max_w = np.max(w_i, axis=1)
+
+        for i, w_i_j in enumerate(w_i.T):
+            cond = w_i_j != max_w
+            w_i[:, i][cond] = w_i[:, i][cond]*(1.0 - max_w[cond]**10)
+
+        w_i = w_i/np.sum(w_i, axis=-1)[:, np.newaxis]
+
+        return np.sum(w_i*(fit_i + self.bias), axis=-1) + self.global_optimum
+
+    def test(self):
+        y = self(self.x_optimum.reshape(1, -1))
+        return y - self.global_optimum < self.fixed_accuracy
+
+    def build_grid(self, x, y):
+        x1, y1 = np.meshgrid(x, y)
+        xy = np.concatenate(
+            [x1[:, :, np.newaxis], y1[:, :, np.newaxis]], axis=2)
+        z = np.zeros(shape=xy.shape[:-1])
+        for i, x_i in enumerate(xy):
+            z[i] = self(x_i)
+        return z
+
+
 # CEC05 #15
-# class HybridCompositionFunction()
+class HybridCompositionFunction1(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self,
+                                                 basic_functions=(Rastrigin,
+                                                                  Rastrigin,
+                                                                  Weierstrass,
+                                                                  Weierstrass,
+                                                                  Griewank,
+                                                                  Griewank,
+                                                                  Ackley,
+                                                                  Ackley,
+                                                                  Sphere,
+                                                                  Sphere),
+
+                                                 sigmas=np.ones(10),
+                                                 lambdas=np.array(
+                                                     [1, 1, 10, 10, 5/60, 5/60, 5/32, 5/32, 5/100, 5/100], dtype=np.float64),
+                                                 global_optimum=fbias_data[14],
+                                                 x_optimum=hybrid_func1_data,
+                                                 fixed_accuracy=1e-2,
+                                                 M_D2=np.vstack(
+                                                     [np.eye(2) for i in range(10)]),
+                                                 M_D10=np.vstack(
+                                                     [np.eye(10) for i in range(10)]),
+                                                 M_D30=np.vstack(
+                                                     [np.eye(30) for i in range(10)]),
+                                                 M_D50=np.vstack([np.eye(50) for i in range(10)]))
+
+    def rotate(self, x, M_D2, M_D10, M_D30, M_D50):
+        D = x.shape[1]
+        M_D = np.eye(D)
+        return x@M_D
+
+
+# CEC05 #16
+# class RotatedVersionHybridCompositionFunction(SampleHybridCompositionFunction):
+#     def __init__(self):
+#         SampleHybridCompositionFunction.__init__(self, basic_functions=(Rastrigin,
+#                                                                         Rastrigin,
+#                                                                         Weierstrass,
+#                                                                         Weierstrass,
+#                                                                         Griewank,
+#                                                                         Griewank,
+#                                                                         Ackley,
+#                                                                         Ackley,
+#                                                                         Sphere,
+#                                                                         Sphere),
+#                                                  sigmas=np.ones(10),
+#                                                  lambdas=np.array(
+#                                                      [1, 1, 10, 10, 5/60, 5/60, 5/32, 5/32, 5/100, 5/100], dtype=np.float64),
+#                                                  global_optimum=fbias_data[14],
+#                                                  x_optimum=hybrid_func1_data,
+#                                                  fixed_accuracy=1e-2,
+#                                                  M_D2=,
+#                                                  M_D10=,
+#                                                  M_D30=,
+#                                                  M_D50=)

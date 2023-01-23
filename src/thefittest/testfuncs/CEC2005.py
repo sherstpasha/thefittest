@@ -18,7 +18,7 @@ from ._problems import Schwefel2_13  # 12
 from ._problems import ShiftedExpandedGriewankRosenbrock  # 13
 from ._problems import ShiftedRotatedExpandedScaffes_F6# 14
 # Hybrid Composition Functions (11)
-# 15
+from ._problems import HybridCompositionFunction1 # 15
 # 16
 # 17
 # 18

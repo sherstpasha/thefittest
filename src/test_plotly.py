@@ -46,15 +46,15 @@ def print_population_by_time(population_3d, grid_model, function):
 
 n_variables = 2
 
-left = np.full(n_variables, -100, dtype=np.float64)
-right = np.full(n_variables, 100, dtype=np.float64)
+left = np.full(n_variables, -5, dtype=np.float64)
+right = np.full(n_variables, 5, dtype=np.float64)
 # right = np.array([-100, -40], dtype = np.float64)
 # left = np.array([-50, 0], dtype = np.float64)
 parts = np.full(n_variables, 16, dtype=np.int64)
 
 gray_code_to_float = GrayCode(fit_by='parts').fit(left=left, right=right, arg=parts)
 
-problem = CEC2005.ShiftedRotatedExpandedScaffes_F6()
+problem = CEC2005.HybridCompositionFunction1()
 model = SelfCGA(fitness_function = problem,
                 genotype_to_phenotype = gray_code_to_float.transform,
                 iters = 300,
