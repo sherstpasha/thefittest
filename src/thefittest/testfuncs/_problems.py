@@ -304,6 +304,55 @@ class Weierstrass(TestFunction):
         return left_sum - D*right_sum
 
 
+class F8F2(TestFunction):
+    def __init__(self):
+        TestFunction.__init__(self, global_optimum=0,
+                              fixed_accuracy=1e-2,
+                              x_optimum=np.zeros((100), dtype=np.float64))
+        self.rosenbrock_f = Rosenbrock()
+        self.griewank_f = Griewank()
+
+    def f(self, x):
+        indexes = np.kron(
+            np.arange(1, x.shape[1]-1, dtype=np.int64), np.array([1, 1]))
+        indexes = np.insert(indexes, [0], [0])
+        indexes = np.append(indexes, np.array([x.shape[1]-1, x.shape[1]-1, 0]))
+
+        x_indexes = x[:, indexes]
+
+        vertical_X = x_indexes.reshape(-1, 2)
+        F2 = self.rosenbrock_f(vertical_X)
+        F8 = self.griewank_f(F2.reshape(-1, 1))
+        horizontal_X = F8.reshape(x.shape[0], -1)
+        return np.sum(horizontal_X, axis=-1)
+
+
+class ExpandedScaffers_F6(TestFunction):
+    def __init__(self):
+        TestFunction.__init__(self, global_optimum=0,
+                              fixed_accuracy=1e-2,
+                              x_optimum=np.zeros((100), dtype=np.float64))
+
+    def Scaffes_F6(self, x):
+        sum_of_power = x[:, 0]**2 + x[:, 1]**2
+        up = np.sin(np.sqrt(sum_of_power))**2 - 0.5
+        down = (1 + 0.001*(sum_of_power))**2
+        return 0.5 + up/down
+
+    def f(self, x):
+        indexes = np.kron(
+            np.arange(1, x.shape[1]-1, dtype=np.int64), np.array([1, 1]))
+        indexes = np.insert(indexes, [0], [0])
+        indexes = np.append(indexes, np.array([x.shape[1]-1, x.shape[1]-1, 0]))
+        x_indexes = x[:, indexes]
+
+        vertical_X = x_indexes.reshape(-1, 2)
+        F = self.Scaffes_F6(vertical_X)
+        horizontal_X = F.reshape(x.shape[0], -1)
+
+        return np.sum(horizontal_X, axis=-1)
+
+
 # CEC05 #1
 class ShiftedSphere(TestShiftedFunction, Sphere):
     def __init__(self):
@@ -823,7 +872,7 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
                                                      [1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float64),
                                                  lambdas=np.array(
                                                      [2*(5/32), 5/32, 2*1, 1, 2*(5/100), 5/100, 2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
-                                                 global_optimum=fbias_data[17],
+                                                 global_optimum=fbias_data[19],
                                                  x_optimum=hybrid_func2_data,
                                                  fixed_accuracy=1e-1,
                                                  M_D2=hybrid_func2_M_D2,
@@ -839,3 +888,29 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
         shape = x.shape
         axis = [1]*(len(shape)-1) + [-1]
         return x - self.x_optimum[i][:shape[-1]].reshape(axis)
+
+
+# CEC05 #21
+class HybridCompositionFunction3(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self, basic_functions=(ExpandedScaffers_F6,
+                                                                        ExpandedScaffers_F6,
+                                                                        Rastrigin,
+                                                                        Rastrigin,
+                                                                        F8F2,
+                                                                        F8F2,
+                                                                        Weierstrass,
+                                                                        Weierstrass,
+                                                                        Griewank,
+                                                                        Griewank),
+                                                 sigmas=np.array(
+                                                     [1., 1., 1., 1., 1., 2., 2., 2., 2., 2.], dtype=np.float64),
+                                                 lambdas=np.array(
+            [5*5/100, 5/100, 5*1, 1, 5*1, 1, 5*10, 10, 5*5/200, 5/200], dtype=np.float64),
+            global_optimum=fbias_data[20],
+            fixed_accuracy=1e-1,
+            x_optimum=hybrid_func3_data,
+            M_D2=hybrid_func3_M_D2,
+            M_D10=hybrid_func3_M_D10,
+            M_D30=hybrid_func3_M_D30,
+            M_D50=hybrid_func3_M_D50)

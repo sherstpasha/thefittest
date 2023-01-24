@@ -9,8 +9,8 @@ x = np.random.uniform(-5, 5, size = (10, D))
 def phenome(x):
     return x
 
-other = cec.F20(D)
-my = CEC2005.RotatedHybridCompositionFunctionOptimalBounds()
+other = cec.F21(D)
+my = CEC2005.HybridCompositionFunction3()
 
 def eval(func, x):
     res = []

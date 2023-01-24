@@ -27,8 +27,8 @@ def print_population_by_time(population_3d, grid_model, function):
 
     xlim = (grid_model.left[0], grid_model.right[0])
     ylim = (grid_model.left[1], grid_model.right[1])
-    x = np.linspace(xlim[0], xlim[1], 500)
-    y = np.linspace(ylim[0], ylim[1], 500)
+    x = np.linspace(xlim[0], xlim[1], 1000)
+    y = np.linspace(ylim[0], ylim[1], 1000)
     z = function.build_grid(x, y)
     zlim = (np.min(z), np.max(z))
 
@@ -54,11 +54,11 @@ parts = np.full(n_variables, 16, dtype=np.int64)
 
 gray_code_to_float = GrayCode(fit_by='parts').fit(left=left, right=right, arg=parts)
 
-problem = CEC2005.RotatedHybridCompositionFunctionNarrowBasin()
+problem = CEC2005.HybridCompositionFunction3()
 model = SelfCGA(fitness_function = problem,
                 genotype_to_phenotype = gray_code_to_float.transform,
                 iters = 300,
-                pop_size = 300,
+                pop_size = 500,
                 str_len = np.sum(parts),
                 show_progress_each = 10,
                 keep_history = True,
