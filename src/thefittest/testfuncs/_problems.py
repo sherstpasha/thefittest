@@ -73,6 +73,12 @@ hybrid_func2_M_D2 = np.loadtxt(path+'hybrid_func2_M_D2.txt')
 hybrid_func2_M_D10 = np.loadtxt(path+'hybrid_func2_M_D10.txt')
 hybrid_func2_M_D30 = np.loadtxt(path+'hybrid_func2_M_D30.txt')
 hybrid_func2_M_D50 = np.loadtxt(path+'hybrid_func2_M_D50.txt')
+# 21
+hybrid_func3_data = np.loadtxt(path+'hybrid_func3_data.txt')
+hybrid_func3_M_D2 = np.loadtxt(path+'hybrid_func3_M_D2.txt')
+hybrid_func3_M_D10 = np.loadtxt(path+'hybrid_func3_M_D10.txt')
+hybrid_func3_M_D30 = np.loadtxt(path+'hybrid_func3_M_D30.txt')
+hybrid_func3_M_D50 = np.loadtxt(path+'hybrid_func3_M_D50.txt')
 
 
 class TestFunction:
@@ -824,7 +830,7 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
                                                  M_D10=hybrid_func2_M_D10,
                                                  M_D30=hybrid_func2_M_D30,
                                                  M_D50=hybrid_func2_M_D50)
-        
+
         self.x_optimum[9] = 0
 
     def shift(self, x, i):
