@@ -3,14 +3,14 @@ import optproblems
 from thefittest.testfuncs import CEC2005
 import numpy as np
 
-D = 2
+D = 50
 x = np.random.uniform(-5, 5, size = (10, D))
 
 def phenome(x):
     return x
 
-other = cec.F22(D)
-my = CEC2005.HybridCompositionFunction3H()
+other = cec.F24(D)
+my = CEC2005.NonContinuousHybridCompositionFunction3()
 
 def eval(func, x):
     res = []

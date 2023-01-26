@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from thefittest.optimizers import SelfCGA
-from thefittest.testfuncs import Rastrigin
+from thefittest.testfuncs._problems import NonContinuosRastrigin
 from thefittest.testfuncs import CEC2005
 from thefittest.tools import GrayCode
 
@@ -30,6 +30,7 @@ def print_population_by_time(population_3d, grid_model, function):
     x = np.linspace(xlim[0], xlim[1], 1000)
     y = np.linspace(ylim[0], ylim[1], 1000)
     z = function.build_grid(x, y)
+    print(np.min(z))
     zlim = (np.min(z), np.max(z))
 
     fig = px.scatter_3d(data, x='x', y='y', z='z',
@@ -54,11 +55,12 @@ parts = np.full(n_variables, 16, dtype=np.int64)
 
 gray_code_to_float = GrayCode(fit_by='parts').fit(left=left, right=right, arg=parts)
 
-problem = CEC2005.HybridCompositionFunction3H()
+problem = CEC2005.NonContinuousHybridCompositionFunction3()
+problem = NonContinuosRastrigin()
 model = SelfCGA(fitness_function = problem,
                 genotype_to_phenotype = gray_code_to_float.transform,
                 iters = 300,
-                pop_size = 500,
+                pop_size = 300,
                 str_len = np.sum(parts),
                 show_progress_each = 10,
                 keep_history = True,

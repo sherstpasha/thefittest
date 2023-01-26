@@ -142,3 +142,4 @@ class GrayCode(SamplingGrid):
         int_array = np.rint(grid_number)
         bit_array = numpy_int_to_bit(int_array)
         return numpy_bit_to_gray(bit_array)
+

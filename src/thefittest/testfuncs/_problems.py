@@ -358,6 +358,16 @@ class ExpandedScaffers_F6(TestFunction):
         return np.sum(horizontal_X, axis=-1)
 
 
+class NonContinuosRastrigin(Rastrigin):
+    def __init__(self):
+        Rastrigin.__init__(self)
+    
+    def __call__(self, x):
+        cond = np.abs(x) >= 0.5
+        x[cond] = (np.round(2*x)/2)[cond]
+        return super().__call__(x)
+
+
 # CEC05 #1
 class ShiftedSphere(TestShiftedFunction, Sphere):
     def __init__(self):
@@ -945,3 +955,37 @@ class HybridCompositionFunction3H(SampleHybridCompositionFunction):
             M_D10=hybrid_func3_HM_D10,
             M_D30=hybrid_func3_HM_D30,
             M_D50=hybrid_func3_HM_D50)
+
+
+# CEC05 #23
+class NonContinuousHybridCompositionFunction3(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self, basic_functions=(ExpandedScaffers_F6,
+                                                                        ExpandedScaffers_F6,
+                                                                        Rastrigin,
+                                                                        Rastrigin,
+                                                                        F8F2,
+                                                                        F8F2,
+                                                                        Weierstrass,
+                                                                        Weierstrass,
+                                                                        Griewank,
+                                                                        Griewank),
+                                                 sigmas=np.array(
+                                                     [1., 1., 1., 1., 1., 2., 2., 2., 2., 2.], dtype=np.float64),
+                                                 lambdas=np.array(
+            [5*5/100, 5/100, 5*1, 1, 5*1, 1, 5*10, 10, 5*5/200, 5/200], dtype=np.float64),
+            global_optimum=fbias_data[22],
+            fixed_accuracy=1e-1,
+            x_optimum=hybrid_func3_data,
+            M_D2=hybrid_func3_M_D2,
+            M_D10=hybrid_func3_M_D10,
+            M_D30=hybrid_func3_M_D30,
+            M_D50=hybrid_func3_M_D50)
+
+    def __call__(self, x):
+        shape = x.shape
+        axis = [1]*(len(shape)-1) + [-1]
+        o = self.x_optimum[0][:shape[-1]].reshape(axis)
+        cond = np.abs(x - o) >= 0.5
+        x[cond] = (np.round(2*x)/2)[cond]
+        return super().__call__(x)
