@@ -79,6 +79,11 @@ hybrid_func3_M_D2 = np.loadtxt(path+'hybrid_func3_M_D2.txt')
 hybrid_func3_M_D10 = np.loadtxt(path+'hybrid_func3_M_D10.txt')
 hybrid_func3_M_D30 = np.loadtxt(path+'hybrid_func3_M_D30.txt')
 hybrid_func3_M_D50 = np.loadtxt(path+'hybrid_func3_M_D50.txt')
+# 22
+hybrid_func3_HM_D2 = np.loadtxt(path+'hybrid_func3_HM_D2.txt')
+hybrid_func3_HM_D10 = np.loadtxt(path+'hybrid_func3_HM_D10.txt')
+hybrid_func3_HM_D30 = np.loadtxt(path+'hybrid_func3_HM_D30.txt')
+hybrid_func3_HM_D50 = np.loadtxt(path+'hybrid_func3_HM_D50.txt')
 
 
 class TestFunction:
@@ -914,3 +919,29 @@ class HybridCompositionFunction3(SampleHybridCompositionFunction):
             M_D10=hybrid_func3_M_D10,
             M_D30=hybrid_func3_M_D30,
             M_D50=hybrid_func3_M_D50)
+
+
+# CEC05 #22
+class HybridCompositionFunction3H(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self, basic_functions=(ExpandedScaffers_F6,
+                                                                        ExpandedScaffers_F6,
+                                                                        Rastrigin,
+                                                                        Rastrigin,
+                                                                        F8F2,
+                                                                        F8F2,
+                                                                        Weierstrass,
+                                                                        Weierstrass,
+                                                                        Griewank,
+                                                                        Griewank),
+                                                 sigmas=np.array(
+                                                     [1., 1., 1., 1., 1., 2., 2., 2., 2., 2.], dtype=np.float64),
+                                                 lambdas=np.array(
+            [5*5/100, 5/100, 5*1, 1, 5*1, 1, 5*10, 10, 5*5/200, 5/200], dtype=np.float64),
+            global_optimum=fbias_data[21],
+            fixed_accuracy=1e-1,
+            x_optimum=hybrid_func3_data,
+            M_D2=hybrid_func3_HM_D2,
+            M_D10=hybrid_func3_HM_D10,
+            M_D30=hybrid_func3_HM_D30,
+            M_D50=hybrid_func3_HM_D50)

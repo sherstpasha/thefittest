@@ -25,7 +25,7 @@ from ._problems import RotatedHybridCompositionFunction # 18
 from ._problems import RotatedHybridCompositionFunctionNarrowBasin # 19
 from ._problems import RotatedHybridCompositionFunctionOptimalBounds # 20
 from ._problems import HybridCompositionFunction3 # 21
-# 22
+from ._problems import HybridCompositionFunction3H # 22
 # 23
 # 24
 # 25
