@@ -5,8 +5,9 @@ from thefittest.testfuncs import CEC2005
 from thefittest.tools import GrayCode
 
 
-
-
+print(CEC2005)
+# for problem_i in CEC2005.problems_dict:
+#     print(problem_i)
 # def evaluation(opt_model, n_runs):
 #     global_opt = opt_model.fitness_function.fbias
 #     fixed_opt = opt_model.fitness_function.fixed_accuracy
