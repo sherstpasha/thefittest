@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from thefittest.optimizers import SelfCGA
-from thefittest.testfuncs._problems import NonContinuosRastrigin
+from thefittest.testfuncs._problems import SphereWithNoise
 from thefittest.testfuncs import CEC2005
 from thefittest.tools import GrayCode
 
@@ -55,12 +55,12 @@ parts = np.full(n_variables, 16, dtype=np.int64)
 
 gray_code_to_float = GrayCode(fit_by='parts').fit(left=left, right=right, arg=parts)
 
-problem = CEC2005.NonContinuousHybridCompositionFunction3()
-problem = NonContinuosRastrigin()
+problem = CEC2005.HybridCompositionFunction4()
+# problem = SphereWithNoise()
 model = SelfCGA(fitness_function = problem,
                 genotype_to_phenotype = gray_code_to_float.transform,
                 iters = 300,
-                pop_size = 300,
+                pop_size = 3000,
                 str_len = np.sum(parts),
                 show_progress_each = 10,
                 keep_history = True,

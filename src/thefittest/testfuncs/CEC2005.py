@@ -21,14 +21,14 @@ from ._problems import ShiftedRotatedExpandedScaffes_F6  # 14
 from ._problems import HybridCompositionFunction1  # 15
 from ._problems import RotatedVersionHybridCompositionFunction1  # 16
 from ._problems import RotatedVersionHybridCompositionFunction1Noise  # 17
-from ._problems import RotatedHybridCompositionFunction # 18
-from ._problems import RotatedHybridCompositionFunctionNarrowBasin # 19
-from ._problems import RotatedHybridCompositionFunctionOptimalBounds # 20
-from ._problems import HybridCompositionFunction3 # 21
-from ._problems import HybridCompositionFunction3H # 22
-from ._problems import NonContinuousHybridCompositionFunction3# 23
-# 24
-# 25
+from ._problems import RotatedHybridCompositionFunction  # 18
+from ._problems import RotatedHybridCompositionFunctionNarrowBasin  # 19
+from ._problems import RotatedHybridCompositionFunctionOptimalBounds  # 20
+from ._problems import HybridCompositionFunction3  # 21
+from ._problems import HybridCompositionFunction3H  # 22
+from ._problems import NonContinuousHybridCompositionFunction3  # 23
+from ._problems import HybridCompositionFunction4  # 24
+from ._problems import HybridCompositionFunction4withoutbounds  # 25
 
 
 def evaluation(opt_model, n_runs):

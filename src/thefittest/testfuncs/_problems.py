@@ -84,6 +84,12 @@ hybrid_func3_HM_D2 = np.loadtxt(path+'hybrid_func3_HM_D2.txt')
 hybrid_func3_HM_D10 = np.loadtxt(path+'hybrid_func3_HM_D10.txt')
 hybrid_func3_HM_D30 = np.loadtxt(path+'hybrid_func3_HM_D30.txt')
 hybrid_func3_HM_D50 = np.loadtxt(path+'hybrid_func3_HM_D50.txt')
+# 24
+hybrid_func4_data = np.loadtxt(path+'hybrid_func4_data.txt')
+hybrid_func4_M_D2 = np.loadtxt(path+'hybrid_func4_M_D2.txt')
+hybrid_func4_M_D10 = np.loadtxt(path+'hybrid_func4_M_D10.txt')
+hybrid_func4_M_D30 = np.loadtxt(path+'hybrid_func4_M_D30.txt')
+hybrid_func4_M_D50 = np.loadtxt(path+'hybrid_func4_M_D50.txt')
 
 
 class TestFunction:
@@ -361,12 +367,29 @@ class ExpandedScaffers_F6(TestFunction):
 class NonContinuosRastrigin(Rastrigin):
     def __init__(self):
         Rastrigin.__init__(self)
+
+    def __call__(self, x):
+        cond = np.abs(x) >= 0.5
+        x[cond] = (np.round(2*x)/2)[cond]
+        return super().__call__(x)
+
+class NonContinuosExpandedScaffers_F6(ExpandedScaffers_F6):
+    def __init__(self):
+        ExpandedScaffers_F6.__init__(self)
     
     def __call__(self, x):
         cond = np.abs(x) >= 0.5
         x[cond] = (np.round(2*x)/2)[cond]
         return super().__call__(x)
 
+class SphereWithNoise(Sphere):
+    def __init__(self):
+        Sphere.__init__(self)
+    
+    def __call__(self, x):
+        y = super().__call__(x)
+        noise = 1 + 0.1*np.abs(np.random.normal(size=y.shape))
+        return y*noise
 
 # CEC05 #1
 class ShiftedSphere(TestShiftedFunction, Sphere):
@@ -897,12 +920,9 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
 
         self.x_optimum[9] = 0
 
-    def shift(self, x, i):
-        if i == 0:
-            self.x_optimum[i][:int(x.shape[1]/2)][::2] = 5
-        shape = x.shape
-        axis = [1]*(len(shape)-1) + [-1]
-        return x - self.x_optimum[i][:shape[-1]].reshape(axis)
+    def __call__(self, x):
+        self.x_optimum[0][1::2][:int(x.shape[1]/2)] = 5
+        return super().__call__(x)
 
 
 # CEC05 #21
@@ -989,3 +1009,55 @@ class NonContinuousHybridCompositionFunction3(SampleHybridCompositionFunction):
         cond = np.abs(x - o) >= 0.5
         x[cond] = (np.round(2*x)/2)[cond]
         return super().__call__(x)
+
+
+# CEC05 #24
+class HybridCompositionFunction4(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self, basic_functions=(Weierstrass,
+                                                                        ExpandedScaffers_F6,
+                                                                        F8F2,
+                                                                        Ackley,
+                                                                        Rastrigin,
+                                                                        Griewank,
+                                                                        NonContinuosExpandedScaffers_F6,
+                                                                        NonContinuosRastrigin,
+                                                                        HighConditionedElliptic,
+                                                                        SphereWithNoise),
+                                                 sigmas=np.array(
+                                                     [2., 2., 2., 2., 2., 2., 2., 2., 2., 2.], dtype=np.float64),
+                                                 lambdas=np.array(
+            [10, 5/20, 1, 5/32, 1, 5/100, 5/50, 1, 5/100, 5/100], dtype=np.float64),
+            global_optimum=fbias_data[23],
+            fixed_accuracy=1e-1,
+            x_optimum=hybrid_func4_data,
+            M_D2=hybrid_func4_M_D2,
+            M_D10=hybrid_func4_M_D10,
+            M_D30=hybrid_func4_M_D30,
+            M_D50=hybrid_func4_M_D50)
+
+
+# CEC05 #25
+class HybridCompositionFunction4withoutbounds(SampleHybridCompositionFunction):
+    def __init__(self):
+        SampleHybridCompositionFunction.__init__(self, basic_functions=(Weierstrass,
+                                                                        ExpandedScaffers_F6,
+                                                                        F8F2,
+                                                                        Ackley,
+                                                                        Rastrigin,
+                                                                        Griewank,
+                                                                        NonContinuosExpandedScaffers_F6,
+                                                                        NonContinuosRastrigin,
+                                                                        HighConditionedElliptic,
+                                                                        SphereWithNoise),
+                                                 sigmas=np.array(
+                                                     [2., 2., 2., 2., 2., 2., 2., 2., 2., 2.], dtype=np.float64),
+                                                 lambdas=np.array(
+            [10, 5/20, 1, 5/32, 1, 5/100, 5/50, 1, 5/100, 5/100], dtype=np.float64),
+            global_optimum=fbias_data[24],
+            fixed_accuracy=1e-1,
+            x_optimum=hybrid_func4_data,
+            M_D2=hybrid_func4_M_D2,
+            M_D10=hybrid_func4_M_D10,
+            M_D30=hybrid_func4_M_D30,
+            M_D50=hybrid_func4_M_D50)
