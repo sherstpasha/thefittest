@@ -801,7 +801,6 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
     def __call__(self, x):
         D = x.shape[1]
         self.x_shift[0][1:int(D/2):2] = 5
-        print(self.x_shift[0])
         return super().__call__(x)
 
 
