@@ -17,7 +17,7 @@ def create_and_run(some_vars_i, some_max_fes_i, some_problem_i, i):
 
     iters = np.sqrt(some_max_fes_i).astype(np.int64)
     pop_size = (some_max_fes_i/iters).astype(np.int64)
-
+    
     some_model = SelfCGA(fitness_function=some_problem_i['function'](), genotype_to_phenotype=grid.transform,
                          iters=iters, pop_size=pop_size,
                          str_len=np.sum(parts), tour_size=5,
@@ -49,6 +49,7 @@ if __name__ == '__main__':
         columns=list(CEC2005.problems_dict.keys()))
     evaluation_result_srate = pd.DataFrame(
         columns=indexes + ['success_rate', 'success_performance'])
+    errors_for_stats = pd.DataFrame()
 
     for f_number, problem_i in CEC2005.problems_dict.items():
 
@@ -79,7 +80,7 @@ if __name__ == '__main__':
 
                 success_rate = np.mean(success)
                 calls = np.array([result_i.calls for result_i in result])
-                down = np.sum(calls[success])
+                down = np.sum([success])
                 if down == 0:
                     success_perf = 0
                 else:
@@ -88,24 +89,25 @@ if __name__ == '__main__':
                 num_fes = np.zeros(shape=(1, 9))
                 calls_argsort = np.argsort(calls)
                 calls = calls[calls_argsort]
-                # if success_rate < 1:
-                #     calls[:] = 0
 
                 num_fes[:, :7] = np.array([calls[0], calls[6], calls[12], calls[18],
                                            calls[24], np.mean(calls), np.std(calls)])
                 num_fes[:, 7] = success_rate
                 num_fes[:, 8] = success_perf
 
-
                 new_df_srate = pd.DataFrame(data=num_fes,
                                             columns=indexes +
                                             ['success_rate', 'success_performance'],
                                             index=[f_number + '_' + prefix])
+                new_df_error_stats = pd.DataFrame(data=errors.reshape(1, -1), index=[f_number + '_' + prefix])
 
                 temp_series_error = pd.concat(
                     [temp_series_error, new_series_error])
                 evaluation_result_srate = pd.concat(
                     [evaluation_result_srate, new_df_srate])
+
+                errors_for_stats = pd.concat(
+                    [errors_for_stats, new_df_error_stats])
 
         evaluation_result_error[f_number] = temp_series_error
         break
@@ -114,3 +116,5 @@ if __name__ == '__main__':
         'C:/Users/user/Мой диск/evaluation_result_error.xlsx')
     evaluation_result_srate.to_excel(
         'C:/Users/user/Мой диск/evaluation_result_srate.xlsx')
+    errors_for_stats.to_excel(
+        'C:/Users/user/Мой диск/evaluation_result_stats.xlsx')
