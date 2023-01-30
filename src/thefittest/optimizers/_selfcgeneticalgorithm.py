@@ -252,4 +252,4 @@ class SelfCGA:
         self.calls = calls
         if self.minimization:
             self.thefittest.fitness = -self.thefittest.fitness
-        return self.thefittest
+        return self
