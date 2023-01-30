@@ -1,6 +1,5 @@
 # folders to ignore
 build/
-dist/
 doc/_build/
 .vscode/
 .pytest_cache/
