@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: thefittest
+Version: 0.1.4
+Summary: Implementation of data mining methods that use evolutionary algorithms
+Author-email: Pavel Sherstnev <sherstpasha99@gmail.com>
+Project-URL: Homepage, https://github.com/sherstpasha/thefittest
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# thefittest
