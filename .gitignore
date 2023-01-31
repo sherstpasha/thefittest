@@ -1,10 +1,12 @@
 # folders to ignore
+dist/
 build/
 doc/_build/
 .vscode/
 .pytest_cache/
 __pycache__/
 env/
+*.egg-info/
 
 # files to ignore
 MANIFEST
