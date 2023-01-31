@@ -1,1 +1,2 @@
 from ._selfcgeneticalgorithm import SelfCGA
+from ._differentialevolution import DifferentialEvolution

@@ -3,7 +3,7 @@ from functools import partial
 from ..tools import scale_data
 from ..tools import rank_data
 from ._units import TheFittest
-from ._units import Statictic
+from ._units import StaticticSelfCGA
 from ._selections import proportional_selection
 from ._selections import rank_selection
 from ._selections import tournament_selection
@@ -15,7 +15,6 @@ from ._crossovers import uniform_prop_crossover
 from ._crossovers import uniform_rank_crossover
 from ._crossovers import uniform_tour_crossover
 from ._mutations import flip_mutation
-import copy
 
 
 class SelfCGA:
@@ -67,21 +66,20 @@ class SelfCGA:
                        'strong': (flip_mutation, min(1, 3/self.str_len))}
 
         self.thefittest: TheFittest
-        self.stats: Statictic
+        self.stats: StaticticSelfCGA
         self.s_sets: dict
         self.m_sets = dict
         self.c_sets = dict
 
-        self.operators_selector(select_opers=[
-            'proportional',
-            'rank',
-            'tournament'],
-            crossover_opers=['one_point',
-                             'two_point',
-                             'uniform2'],
-            mutation_opers=['weak',
-                            'average',
-                            'strong'])
+        self.set_strategy(select_opers=['proportional',
+                                        'rank',
+                                        'tournament'],
+                          crossover_opers=['one_point',
+                                           'two_point',
+                                           'uniform2'],
+                          mutation_opers=['weak',
+                                          'average',
+                                          'strong'])
 
     def evaluate(self, population_ph):
         if self.minimization:
@@ -122,9 +120,9 @@ class SelfCGA:
         proba = proba.clip(self.threshold, 1)
         return proba/proba.sum()
 
-    def operators_selector(self, select_opers=None,
-                           crossover_opers=None,
-                           mutation_opers=None):
+    def set_strategy(self, select_opers=None,
+                     crossover_opers=None,
+                     mutation_opers=None):
 
         if select_opers is not None:
             s_sets = {}
@@ -175,8 +173,8 @@ class SelfCGA:
             fitness=fitness[np.argmax(fitness)].copy())
         last_best = fitness[np.argmax(fitness)].copy()
         if self.keep_history:
-            self.stats = Statictic().update(population_g, fitness,
-                                            s_proba, c_proba, m_proba)
+            self.stats = StaticticSelfCGA().update(population_g, fitness,
+                                                   s_proba, c_proba, m_proba)
         else:
             self.stats = None
 

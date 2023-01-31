@@ -65,3 +65,12 @@ def uniform_tour_crossover(individs, fitness, rank):
     choosen = np.argmin(fitness[tournament], axis=1)
     diag = range(len(individs[0]))
     return individs[choosen, diag]
+
+
+def binomial(individ, mutant, CR):
+    individ - individ.copy()
+    mask = np.random.random() <= CR
+    j = np.random.choice(range(len(individ)), size=1)[0]
+    individ[mask] = mutant[mask]
+    individ[j] = mutant[j]
+    return individ

@@ -26,7 +26,7 @@ class TheFittest:
         return self.genotype.copy(), self.phenotype.copy(), self.fitness.copy()
 
 
-class Statictic:
+class StaticticSelfCGA:
     def __init__(self):
         self.population = np.array([], dtype=np.byte)
         self.fitness = np.array([], dtype=float)
@@ -46,4 +46,18 @@ class Statictic:
                                   c_proba_i.copy()])
         self.m_proba = np.vstack([self.m_proba.reshape(-1, len(m_proba_i)),
                                   m_proba_i.copy()])
+        return self
+
+
+class StaticticDifferentialEvolution:
+    def __init__(self):
+        self.population = np.array([], dtype=np.byte)
+        self.fitness = np.array([], dtype=float)
+
+    def update(self, population_i, fitness_i):
+        shape = (-1, population_i.shape[0], population_i.shape[1])
+        shape_in = (1, population_i.shape[0], population_i.shape[1])
+        self.population = np.vstack([self.population.reshape(shape),
+                                     population_i.copy().reshape(shape_in)])
+        self.fitness = np.append(self.fitness, np.min(fitness_i))
         return self
