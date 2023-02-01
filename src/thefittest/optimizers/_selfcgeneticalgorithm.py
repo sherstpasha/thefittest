@@ -167,11 +167,12 @@ class SelfCGA:
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
 
+        argmax = np.argmax(fitness)
         self.thefittest = TheFittest(
-            genotype=population_g[np.argmax(fitness)].copy(),
-            phenotype=population_ph[np.argmax(fitness)].copy(),
-            fitness=fitness[np.argmax(fitness)].copy())
-        last_best = fitness[np.argmax(fitness)].copy()
+            genotype=population_g[argmax].copy(),
+            phenotype=population_ph[argmax].copy(),
+            fitness=fitness[argmax].copy())
+        last_best = fitness[argmax].copy()
         if self.keep_history:
             self.stats = StaticticSelfCGA().update(population_g, fitness,
                                                    s_proba, c_proba, m_proba)
