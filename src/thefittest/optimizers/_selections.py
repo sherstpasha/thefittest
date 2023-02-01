@@ -26,11 +26,3 @@ def tournament_selection(fitness, ranks,
     choosen = np.diag(tournament[:, max_fit_id])
     return choosen
 
-
-def selection_de(individ_g_old, individ_ph_old,
-                 individ_g_new, individ_ph_new,
-                 fitness_old, fitness_new):
-    if fitness_new >= fitness_old:
-        return individ_g_new, individ_ph_new, fitness_new
-    else:
-        return individ_g_old, individ_ph_old, fitness_old

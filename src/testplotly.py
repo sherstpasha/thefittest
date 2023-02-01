@@ -50,11 +50,11 @@ def print_population_by_time(population_3d, grid_model, function, left, right):
     fig.write_html("C:/Users/user/Desktop/file1.html")
 
 
-problem = CEC2005.ShiftedRosenbrock()
+problem = CEC2005.HybridCompositionFunction1()
 n_var = 2
 
-left = np.full(n_var, -100)
-right = np.full(n_var, 100)
+left = np.full(n_var, -5)
+right = np.full(n_var, 5)
 
 
 def donothing(x):
@@ -69,12 +69,12 @@ model = DifferentialEvolution(fitness_function=problem,
                               pop_size=300,
                               minimization=True,
                               show_progress_each=10,
-                            #   optimal_value=-450,
-                            #   termination_error_value=0,
+                              optimal_value=120,
+                              termination_error_value=0.0001,
                               keep_history=True)
 
 
-model.set_strategy(mutation_oper='best_2',
+model.set_strategy(mutation_oper='current_to_pbest_1',
                    F_param=0.3,
                    CR_param=0.9)
 
@@ -83,4 +83,4 @@ model.fit()
 print(model.thefittest.fitness)
 stats = model.stats
 
-print_population_by_time(stats.population, None, problem, left = (-100, -100), right = (100, 100))
+print_population_by_time(stats.population, None, problem, left = (-5, -5), right = (5, 5))

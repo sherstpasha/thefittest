@@ -2,7 +2,6 @@ import numpy as np
 from functools import partial
 from ._units import TheFittest
 from ._units import StaticticDifferentialEvolution
-from ._selections import selection_de
 from ._crossovers import binomial
 from ._mutations import best_1
 from ._mutations import best_2
@@ -72,11 +71,21 @@ class DifferentialEvolution:
 
         mutant_cr_g = binomial(individ_g, mutant, CR_i)
         mutant_cr_g = self.bounds_control(mutant_cr_g)
-        mutant_cr_ph = self.genotype_to_phenotype(individ_ph.reshape(1, -1))[0]
+        return mutant_cr_g
 
-        fitness_cr = self.evaluate(mutant_cr_g.reshape(1, -1))[0]
+    def selection(self, mutant_cr_g, popuation_g, popuation_ph, fitness):
+        offspring_g = popuation_g.copy()
+        offspring_ph = popuation_ph.copy()
+        offspring_fit = fitness.copy()
 
-        return selection_de(individ_g, individ_ph, mutant_cr_g, mutant_cr_ph, fitness_i, fitness_cr)
+        mutant_cr_ph = self.genotype_to_phenotype(mutant_cr_g)
+        mutant_cr_fit = self.evaluate(mutant_cr_ph)
+        mask = mutant_cr_fit >= fitness
+        offspring_g[mask] = mutant_cr_g[mask]
+        offspring_ph[mask] = mutant_cr_ph[mask]
+        offspring_fit[mask] = mutant_cr_fit[mask]
+
+        return offspring_g, offspring_ph, offspring_fit
 
     def bounds_control(self, individ_g):
         low_mask = individ_g < self.left
@@ -156,10 +165,13 @@ class DifferentialEvolution:
 
             temp_map = map(create_offs, population_g,
                            population_ph, fitness, F_i, CR_i)
-            next_pop_g, next_pop_ph, next_fit = list(zip(*list(temp_map)))
-            population_g[:-1] = np.array(next_pop_g)
-            population_ph[:-1] = np.array(next_pop_ph)
-            fitness[:-1] = np.array(next_fit)
+            # next_pop_g, next_pop_ph, next_fit = list(zip(*list(temp_map)))
+            mutant_cr_g = np.array(list(temp_map))
+
+            population_g[:-1], population_ph[:-1], fitness[:-1] = self.selection(mutant_cr_g,
+                                                                                 population_g[:-1],
+                                                                                 population_ph[:-1],
+                                                                                 fitness[:-1])
 
             population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
             argsort = np.argsort(fitness)
