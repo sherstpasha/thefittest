@@ -1,6 +1,10 @@
 import numpy as np
 
 
+def lehmer_mean(x: np.ndarray) -> np.ndarray:
+    return np.sum(x**2)/np.sum(x)
+
+
 def rank_data(arr: np.ndarray) -> np.ndarray:
     arr = arr.copy()
     raw_ranks = np.zeros(shape=(arr.shape[0]))
@@ -142,4 +146,3 @@ class GrayCode(SamplingGrid):
         int_array = np.rint(grid_number)
         bit_array = numpy_int_to_bit(int_array)
         return numpy_bit_to_gray(bit_array)
-

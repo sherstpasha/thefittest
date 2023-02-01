@@ -66,7 +66,7 @@ class DifferentialEvolution:
         else:
             return self.fitness_function(population_ph)
 
-    def create_offs(self, popuation_g, fitness, individ_g, individ_ph, fitness_i, F_i, CR_i):
+    def create_offs(self, popuation_g, individ_g, F_i, CR_i):
         mutant = self.m_function(individ_g, popuation_g, F_i)
 
         mutant_cr_g = binomial(individ_g, mutant, CR_i)
@@ -158,14 +158,13 @@ class DifferentialEvolution:
             if find_opt or no_increase_cond:
                 break
 
-            create_offs = partial(self.create_offs, population_g, fitness)
+            create_offs = partial(self.create_offs, population_g)
 
             F_i = np.full(self.pop_size-1, self.F)
-            CR_i = np.full(self.pop_size-1, self.F)
+            CR_i = np.full(self.pop_size-1, self.CR)
 
-            temp_map = map(create_offs, population_g,
-                           population_ph, fitness, F_i, CR_i)
-            # next_pop_g, next_pop_ph, next_fit = list(zip(*list(temp_map)))
+            temp_map = map(create_offs, population_g, F_i, CR_i)
+
             mutant_cr_g = np.array(list(temp_map))
 
             population_g[:-1], population_ph[:-1], fitness[:-1] = self.selection(mutant_cr_g,

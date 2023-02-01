@@ -6,20 +6,18 @@ import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 
-
+from thefittest.optimizers import SelfCGA
 from thefittest.testfuncs._problems import *
 from thefittest.testfuncs import CEC2005
-from thefittest.optimizers import JADE
-from thefittest.optimizers import DifferentialEvolution
+from thefittest.tools import GrayCode
 
-def print_population_by_time(population_3d, grid_model, function, left, right):
+def print_population_by_time(population_3d, grid_model, function):
 
-    array3d = np.array(list(map(donothing, population_3d)))
+    array3d = np.array(list(map(grid_model.transform, population_3d)))
 
     array2d = array3d.reshape(-1, 2)
-    
     index = np.repeat(np.arange(array3d.shape[0]), array3d.shape[1])
-    
+
     fx = function(array2d)
     data = pd.DataFrame({'x': array2d[:, 0],
                          'y': array2d[:, 1],
@@ -27,10 +25,8 @@ def print_population_by_time(population_3d, grid_model, function, left, right):
                          'i': index,
                          'inv_z': -fx})
 
-    # xlim = (grid_model.left[0], grid_model.right[0])
-    # ylim = (grid_model.left[1], grid_model.right[1])
-    xlim = (left[0], right[0])
-    ylim = (left[1], right[1])
+    xlim = (grid_model.left[0], grid_model.right[0])
+    ylim = (grid_model.left[1], grid_model.right[1])
     x = np.linspace(xlim[0], xlim[1], 1000)
     y = np.linspace(ylim[0], ylim[1], 1000)
     z = function.build_grid(x, y)
@@ -49,35 +45,30 @@ def print_population_by_time(population_3d, grid_model, function, left, right):
 
     fig.write_html("C:/Users/user/Desktop/file1.html")
 
+n_variables = 100
+
+left = np.full(n_variables, -100, dtype=np.float64)
+right = np.full(n_variables, 100, dtype=np.float64)
+# right = np.array([-100, -40], dtype = np.float64)
+# left = np.array([-50, 0], dtype = np.float64)
+parts = np.full(n_variables, 16, dtype=np.int64)
+
+gray_code_to_float = GrayCode(fit_by='parts').fit(left=left, right=right, arg=parts)
 
 problem = CEC2005.ShiftedSphere()
-n_var = 100
 
-left = np.full(n_var, -100)
-right = np.full(n_var, 100)
-
-
-def donothing(x):
-    return x
-
-
-model = JADE(fitness_function=problem,
-                              genotype_to_phenotype=donothing,
-                              left=left,
-                              right=right,
-                              iters=300,
-                              pop_size=300,
-                              minimization=True,
-                              show_progress_each=10,
-                              keep_history=True)
-
-# model.set_strategy(F_param=0.7, CR_param=0.5)
-
-
+# problem = HighConditionedElliptic()
+model = SelfCGA(fitness_function = problem,
+                genotype_to_phenotype = gray_code_to_float.transform,
+                iters = 300,
+                pop_size = 300,
+                str_len = np.sum(parts),
+                show_progress_each = 10,
+                keep_history = True,
+                minimization=True)
 
 model.fit()
+stats = model.stats
 print(model.thefittest.fitness)
-# stats = model.stats
 
-# print_population_by_time(stats.population, None, problem, left = (-5, -5), right = (5, 5))
-
+# print_population_by_time(stats.population, gray_code_to_float, problem)
