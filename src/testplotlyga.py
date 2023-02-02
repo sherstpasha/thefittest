@@ -7,9 +7,11 @@ import numpy as np
 import pandas as pd
 
 from thefittest.optimizers import SelfCGA
+from thefittest.optimizers import GeneticAlgorithm
 from thefittest.testfuncs._problems import *
 from thefittest.testfuncs import CEC2005
 from thefittest.tools import GrayCode
+
 
 def print_population_by_time(population_3d, grid_model, function):
 
@@ -45,30 +47,37 @@ def print_population_by_time(population_3d, grid_model, function):
 
     fig.write_html("C:/Users/user/Desktop/file1.html")
 
+
 n_variables = 100
 
 left = np.full(n_variables, -100, dtype=np.float64)
 right = np.full(n_variables, 100, dtype=np.float64)
 # right = np.array([-100, -40], dtype = np.float64)
 # left = np.array([-50, 0], dtype = np.float64)
-parts = np.full(n_variables, 16, dtype=np.int64)
+parts = np.full(n_variables, 32, dtype=np.int64)
 
-gray_code_to_float = GrayCode(fit_by='parts').fit(left=left, right=right, arg=parts)
+gray_code_to_float = GrayCode(fit_by='parts').fit(
+    left=left, right=right, arg=parts)
 
 problem = CEC2005.ShiftedSphere()
 
 # problem = HighConditionedElliptic()
-model = SelfCGA(fitness_function = problem,
-                genotype_to_phenotype = gray_code_to_float.transform,
-                iters = 300,
-                pop_size = 300,
-                str_len = np.sum(parts),
-                show_progress_each = 10,
-                keep_history = True,
+model = SelfCGA(fitness_function=problem,
+                genotype_to_phenotype=gray_code_to_float.transform,
+                iters=100,
+                pop_size=100,
+                str_len=np.sum(parts),
+                show_progress_each=10,
+                optimal_value=-450,
+                termination_error_value=0,
+                keep_history=True,
                 minimization=True)
 
+
+# model.set_strategy(crossover_opers=['uniform2'], tour_size_param=3, select_opers=['tournament'])
 model.fit()
 stats = model.stats
 print(model.thefittest.fitness)
-
-# print_population_by_time(stats.population, gray_code_to_float, problem)
+# print(stats.population_g.shape)
+print(model.get_remains_calls())
+# print_population_by_time(stats.population_g, gray_code_to_float, problem)

@@ -2,7 +2,7 @@ import numpy as np
 from ..tools import protect_norm
 
 
-def empty_crossover(individs, fitness):
+def empty_crossover(individs, fitness, rank):
     return individs[0]
 
 
