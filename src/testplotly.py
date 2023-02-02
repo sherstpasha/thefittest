@@ -9,7 +9,7 @@ import pandas as pd
 
 from thefittest.testfuncs._problems import *
 from thefittest.testfuncs import CEC2005
-from thefittest.optimizers import JADE
+# from thefittest.optimizers import JADE
 from thefittest.optimizers import DifferentialEvolution
 
 def print_population_by_time(population_3d, grid_model, function, left, right):
@@ -51,7 +51,7 @@ def print_population_by_time(population_3d, grid_model, function, left, right):
 
 
 problem = CEC2005.ShiftedSphere()
-n_var = 100
+n_var = 2
 
 left = np.full(n_var, -100)
 right = np.full(n_var, 100)
@@ -61,23 +61,23 @@ def donothing(x):
     return x
 
 
-model = JADE(fitness_function=problem,
+model = DifferentialEvolution(fitness_function=problem,
                               genotype_to_phenotype=donothing,
                               left=left,
                               right=right,
-                              iters=300,
-                              pop_size=300,
+                              iters=100,
+                              pop_size=100,
                               minimization=True,
                               show_progress_each=10,
                               keep_history=True)
 
-# model.set_strategy(F_param=0.7, CR_param=0.5)
+model.set_strategy(F_param=0.5, CR_param=0.5)
 
 
 
 model.fit()
 print(model.thefittest.fitness)
-# stats = model.stats
+stats = model.stats
 
-# print_population_by_time(stats.population, None, problem, left = (-5, -5), right = (5, 5))
+print_population_by_time(stats.population_g, donothing, problem, left = (left[0], left[1]), right = (right[0], right[1]))
 

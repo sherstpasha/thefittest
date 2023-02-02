@@ -56,9 +56,10 @@ class Statistics:
                population_ph_i: np.ndarray,
                fitness_i: np.ndarray):
 
-        self.population_g = self.append_arr(self.population_g, population_g_i)
-        self.population_ph = self.append_arr(
-            self.population_ph, population_ph_i)
+        self.population_g = self.append_arr(self.population_g,
+                                            population_g_i)
+        self.population_ph = self.append_arr(self.population_ph,
+                                             population_ph_i)
         self.fitness = np.append(self.fitness, np.max(fitness_i))
         return self
 
@@ -124,26 +125,3 @@ class EvolutionaryAlgorithm:
 
     def get_remains_calls(self):
         return (self.pop_size + (self.iters-1)*(self.pop_size-1)) - self.calls
-
-
-# class StaticticSelfCGA:
-#     def __init__(self):
-#         self.population = np.array([], dtype=np.byte)
-#         self.fitness = np.array([], dtype=float)
-#         self.s_proba = np.array([], dtype=float)
-#         self.c_proba = np.array([], dtype=float)
-#         self.m_proba = np.array([], dtype=float)
-
-#     def update(self, population_i, fitness_i, s_proba_i, c_proba_i, m_proba_i):
-#         shape = (-1, population_i.shape[0], population_i.shape[1])
-#         shape_in = (1, population_i.shape[0], population_i.shape[1])
-#         self.population = np.vstack([self.population.reshape(shape),
-#                                      population_i.copy().reshape(shape_in)])
-#         self.fitness = np.append(self.fitness, np.min(fitness_i))
-#         self.s_proba = np.vstack([self.s_proba.reshape(-1, len(s_proba_i)),
-#                                   s_proba_i.copy()])
-#         self.c_proba = np.vstack([self.c_proba.reshape(-1, len(c_proba_i)),
-#                                   c_proba_i.copy()])
-#         self.m_proba = np.vstack([self.m_proba.reshape(-1, len(m_proba_i)),
-#                                   m_proba_i.copy()])
-#         return self
