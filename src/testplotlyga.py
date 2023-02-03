@@ -74,7 +74,7 @@ model = SelfCGA(fitness_function=problem,
                 minimization=True)
 
 
-# model.set_strategy(crossover_opers=['uniform2'], tour_size_param=3, select_opers=['tournament'])
+model.set_strategy(crossover_opers=['uniform_rank16'], tour_size_param=3, select_opers=['tournament'])
 model.fit()
 stats = model.stats
 print(model.thefittest.fitness)

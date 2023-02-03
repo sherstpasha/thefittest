@@ -67,20 +67,29 @@ class Statistics:
 class StaticticSelfCGA(Statistics):
     def __init__(self):
         Statistics.__init__(self)
-        self.s_proba = np.array([], dtype=float)
-        self.c_proba = np.array([], dtype=float)
-        self.m_proba = np.array([], dtype=float)
+        self.s_proba = dict()
+        self.c_proba = dict()
+        self.m_proba = dict()
 
     def update(self, population_g_i: np.ndarray, population_ph_i: np.ndarray, fitness_i: np.ndarray,
                s_proba_i, c_proba_i, m_proba_i):
         super().update(population_g_i, population_ph_i, fitness_i)
-        self.s_proba = np.vstack([self.s_proba.reshape(-1, len(s_proba_i)),
-                                  s_proba_i.copy()])
-        self.c_proba = np.vstack([self.c_proba.reshape(-1, len(c_proba_i)),
-                                  c_proba_i.copy()])
-        self.m_proba = np.vstack([self.m_proba.reshape(-1, len(m_proba_i)),
-                                  m_proba_i.copy()])
+
+        for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
+                                      (self.s_proba, self.c_proba, self.m_proba)):
+            if not len(archive_i):
+                for key, value in proba_i.items():
+                    archive_i[key] = np.array(value)
+            else:
+                for key, value in proba_i.items():
+                    archive_i[key] = np.append(
+                        archive_i[key], np.array(value))
         return self
+
+
+class StaticticSaDE(Statistics):
+    def __init__(self):
+        Statistics.__init__(self)
 
 
 class EvolutionaryAlgorithm:

@@ -9,6 +9,7 @@ from functools import partial
 from ._base import TheFittest
 from ._base import StaticticSelfCGA
 from ._base import LastBest
+from ..tools import numpy_group_by
 
 
 class SelfCGA(GeneticAlgorithm):
@@ -49,6 +50,9 @@ class SelfCGA(GeneticAlgorithm):
                                           'average',
                                           'strong'])
         self.stats: StaticticSelfCGA
+        self.s_sets: dict
+        self.c_sets: dict
+        self.m_sets: dict
 
     def set_strategy(self, select_opers: Optional[list[str]] = None,
                      crossover_opers: Optional[list[str]] = None,
@@ -76,9 +80,12 @@ class SelfCGA(GeneticAlgorithm):
                 value = self.m_pool[operator_name]
                 m_sets[operator_name] = value
             self.m_sets = dict(sorted(m_sets.items()))
+
         if tour_size_param is not None:
             self.tour_size = tour_size_param
+
         self.initial_population = initial_population
+
         return self
 
     def create_offs(self, popuation, fitness, ranks,
@@ -86,40 +93,39 @@ class SelfCGA(GeneticAlgorithm):
         crossover_func, quantity = self.c_sets[crossover]
         selection_func, tour_size = self.s_sets[selection]
         mutation_func, proba = self.m_sets[mutation]
+
         indexes = selection_func(fitness, ranks,
                                  tour_size, quantity)
         parents = popuation[indexes].copy()
         fitness_p = fitness[indexes].copy()
         ranks_p = ranks[indexes].copy()
+
         offspring_no_mutated = crossover_func(parents, fitness_p, ranks_p)
         return mutation_func(offspring_no_mutated, proba)
 
-    def choice_operators(self, operators, proba):
+    def choice_operators(self, proba_dict):
+        operators = list(proba_dict.keys())
+        proba = list(proba_dict.values())
         return np.random.choice(list(operators), self.pop_size - 1, p=proba)
 
-    def update_proba(self, proba, z, index):
-        proba[index] += self.K/self.iters
-        proba -= self.K/(z*self.iters)
-        proba = proba.clip(self.threshold, 1)
-        return proba/proba.sum()
+    def update_proba(self, proba, operator):
+        proba[operator] += self.K/self.iters
+        proba_value = np.array(list(proba.values()))
+        proba_value -= self.K/(len(proba)*self.iters)
+        proba_value = proba_value.clip(self.threshold, 1)
+        proba_value = proba_value/proba_value.sum()
+        return dict(zip(proba.keys(), proba_value))
 
     def find_fittest_operator(self, operators, fitness):
-        operators_fitness = np.vstack([operators, fitness]).T
-        argsort = np.argsort(operators_fitness[:, 0])
-        operators_fitness = operators_fitness[argsort]
-
-        keys, cut_index = np.unique(operators_fitness[:, 0], return_index=True)
-        groups = np.split(operators_fitness[:, 1].astype(float), cut_index)[1:]
+        keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
-
         return keys[np.argmax(mean_fit)]
 
     def fit(self):
-
         z_s, z_c, z_m = list(map(len, (self.s_sets, self.c_sets, self.m_sets)))
-        s_proba = np.full(z_s, 1/z_s)
-        c_proba = np.full(z_c, 1/z_c)
-        m_proba = np.full(z_m, 1/z_m)
+        s_proba = dict(zip(list(self.s_sets.keys()), np.full(z_s, 1/z_s)))
+        c_proba = dict(zip(list(self.c_sets.keys()), np.full(z_c, 1/z_c)))
+        m_proba = dict(zip(list(self.m_sets.keys()), np.full(z_m, 1/z_m)))
 
         population_g = self.generate_init_pop()
         population_ph = self.genotype_to_phenotype(population_g)
@@ -145,15 +151,9 @@ class SelfCGA(GeneticAlgorithm):
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
-                # print(s_proba, self.s_sets.keys())
-                # print(c_proba, self.c_sets.keys())
-                # print(m_proba, self.m_sets.keys())
-                s_operators = self.choice_operators(
-                    self.s_sets.keys(), s_proba)
-                c_operators = self.choice_operators(
-                    self.c_sets.keys(), c_proba)
-                m_operators = self.choice_operators(
-                    self.m_sets.keys(), m_proba)
+                s_operators = self.choice_operators(s_proba)
+                c_operators = self.choice_operators(c_proba)
+                m_operators = self.choice_operators(m_proba)
 
                 create_offs = partial(
                     self.create_offs, population_g.copy(),
@@ -165,20 +165,17 @@ class SelfCGA(GeneticAlgorithm):
                     population_g[:-1])
                 fitness[:-1] = self.evaluate(population_ph[:-1])
 
-                s_fittest_operator = self.find_fittest_operator(
+                s_fittest_oper = self.find_fittest_operator(
                     s_operators, fitness[:-1])
-                s_index = list(self.s_sets.keys()).index(s_fittest_operator)
-                s_proba = self.update_proba(s_proba, z_s, s_index)
+                s_proba = self.update_proba(s_proba, s_fittest_oper)
 
-                c_fittest_operator = self.find_fittest_operator(
+                c_fittest_oper = self.find_fittest_operator(
                     c_operators, fitness[:-1])
-                c_index = list(self.c_sets.keys()).index(c_fittest_operator)
-                c_proba = self.update_proba(c_proba, z_c, c_index)
+                c_proba = self.update_proba(c_proba, c_fittest_oper)
 
-                m_fittest_operator = self.find_fittest_operator(
+                m_fittest_oper = self.find_fittest_operator(
                     m_operators, fitness[:-1])
-                m_index = list(self.m_sets.keys()).index(m_fittest_operator)
-                m_proba = self.update_proba(m_proba, z_m, m_index)
+                m_proba = self.update_proba(m_proba, m_fittest_oper)
 
                 population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
@@ -186,6 +183,7 @@ class SelfCGA(GeneticAlgorithm):
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
+
                 if self.keep_history:
                     self.stats.update(population_g,
                                       population_ph,

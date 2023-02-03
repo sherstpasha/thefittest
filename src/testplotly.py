@@ -9,8 +9,8 @@ import pandas as pd
 
 from thefittest.testfuncs._problems import *
 from thefittest.testfuncs import CEC2005
-# from thefittest.optimizers import JADE
-from thefittest.optimizers import DifferentialEvolution
+from thefittest.optimizers import SaDE
+
 
 def print_population_by_time(population_3d, grid_model, function, left, right):
 
@@ -61,17 +61,17 @@ def donothing(x):
     return x
 
 
-model = DifferentialEvolution(fitness_function=problem,
+model = SaDE(fitness_function=problem,
                               genotype_to_phenotype=donothing,
                               left=left,
                               right=right,
                               iters=100,
                               pop_size=100,
                               minimization=True,
-                              show_progress_each=10,
+                              show_progress_each=100,
                               keep_history=True)
 
-model.set_strategy(F_param=0.5, CR_param=0.5)
+# model.set_strategy(F_param=0.5, CR_param=0.5)
 
 
 
