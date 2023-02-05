@@ -55,13 +55,13 @@ class jDE(DifferentialEvolution):
                      F_right_param: Optional[float] = None,
                      t_f_param: Optional[float] = None,
                      t_cr_param: Optional[float] = None):
-        if self.F_left_param is not None:
+        if F_left_param is not None:
             self.F_left = F_left_param
-        if self.F_right_param is not None:
+        if F_right_param is not None:
             self.F_right = F_right_param
-        if self.t_f_param is not None:
+        if t_f_param is not None:
             self.t_f = t_cr_param
-        if self.t_cr is not None:
+        if t_cr_param is not None:
             self.t_cr = t_f_param
 
     def mutation_and_crossover(self, popuation_g, individ_g, F_i, CR_i):
@@ -82,7 +82,7 @@ class jDE(DifferentialEvolution):
         offspring_g[mask] = mutant_cr_g[mask]
         offspring_ph[mask] = mutant_cr_ph[mask]
         offspring_fit[mask] = mutant_cr_fit[mask]
-        return offspring_g, offspring_ph, offspring_fit
+        return offspring_g, offspring_ph, offspring_fit, mask
 
     def bounds_control(self, individ_g):
         low_mask = individ_g < self.left
@@ -91,6 +91,16 @@ class jDE(DifferentialEvolution):
         individ_g[low_mask] = self.left[low_mask]
         individ_g[high_mask] = self.right[high_mask]
         return individ_g
+
+    def regenerate_F(self, F_i):
+        mask = np.random.random(size = len(F_i)) < self.t_f
+        F_i[mask] = self.F_left + np.random.random(size = np.sum(mask))*self.F_right
+        return F_i
+
+    def regenerate_CR(self, CR_i):
+        mask = np.random.random(size = len(CR_i)) < self.t_cr
+        CR_i[mask] = np.random.random(size = np.sum(mask))
+        return CR_i
 
     def fit(self):
         population_g = self.generate_init_pop()
@@ -111,25 +121,34 @@ class jDE(DifferentialEvolution):
         #                                      population_ph,
         #                                      fitness)
 
+        F_i = np.full(self.pop_size-1, 0.5)
+        CR_i = np.full(self.pop_size-1, 0.9)
+
         for i in range(self.iters-1):
             self.show_progress(i)
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
-                F_i = np.full(self.pop_size-1, self.F)
-                CR_i = np.full(self.pop_size-1, self.CR)
+
+                F_i_new = self.regenerate_F(F_i.copy())
+                CR_i_new = self.regenerate_CR(CR_i.copy())
 
                 partial_mut_and_cross = partial(self.mutation_and_crossover,
                                                 population_g)
                 mutant_cr_g = np.array(list(map(partial_mut_and_cross,
                                                 population_g[:-1],
-                                                F_i, CR_i)))
+                                                F_i_new, CR_i_new)))
 
                 stack = self.evaluate_and_selection(mutant_cr_g,
                                                     population_g[:-1],
                                                     population_ph[:-1],
                                                     fitness[:-1])
-                population_g[:-1], population_ph[:-1], fitness[:-1] = stack
+                population_g[:-1], population_ph[:-1], fitness[:-1] = stack[:-1]
+                succeses = stack[-1]
+                F_i[succeses] = F_i_new[succeses]
+                CR_i[succeses] = CR_i_new[succeses]
+                # print(succeses)
+                # print(F_i)
 
                 population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 argsort = np.argsort(fitness)
@@ -139,9 +158,9 @@ class jDE(DifferentialEvolution):
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
-                if self.keep_history:
-                    self.stats.update(population_g,
-                                      population_ph,
-                                      fitness)
+                # if self.keep_history:
+                #     self.stats.update(population_g,
+                #                       population_ph,
+                #                       fitness)
         return self
 

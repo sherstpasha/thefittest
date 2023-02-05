@@ -51,7 +51,8 @@ def print_population_by_time(population_3d, grid_model, function, left, right):
 
 
 problem = CEC2005.ShiftedSphere()
-n_var = 10
+problem = Sphere()
+n_var = 30
 
 left = np.full(n_var, -100)
 right = np.full(n_var, 100)
@@ -65,12 +66,14 @@ model = jDE(fitness_function=problem,
              genotype_to_phenotype=donothing,
              left=left,
              right=right,
-             iters=100,
+             iters=1500,
              pop_size=100,
              minimization=True,
              show_progress_each=20,
              keep_history=True)
 
+
+model.set_strategy(t_f_param=0.1, t_cr_param=0.1)
 
 model.fit()
 print(model.thefittest.fitness)

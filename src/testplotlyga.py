@@ -48,7 +48,7 @@ def print_population_by_time(population_3d, grid_model, function):
     fig.write_html("C:/Users/user/Desktop/file1.html")
 
 
-n_variables = 10
+n_variables = 30
 
 left = np.full(n_variables, -100, dtype=np.float64)
 right = np.full(n_variables, 100, dtype=np.float64)
@@ -60,15 +60,16 @@ gray_code_to_float = GrayCode(fit_by='parts').fit(
     left=left, right=right, arg=parts)
 
 problem = CEC2005.ShiftedSphere()
+problem = Sphere()
 
 # problem = HighConditionedElliptic()
 model = SelfCGA(fitness_function=problem,
                 genotype_to_phenotype=gray_code_to_float.transform,
-                iters=100,
+                iters=15000,
                 pop_size=100,
                 str_len=np.sum(parts),
                 show_progress_each=10,
-                # optimal_value=-450,
+                optimal_value=0,
                 # termination_error_value=0,
                 # keep_history=True,
                 minimization=True)
