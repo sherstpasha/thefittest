@@ -9,7 +9,7 @@ import pandas as pd
 
 from thefittest.testfuncs._problems import *
 from thefittest.testfuncs import CEC2005
-from thefittest.optimizers import SaDE
+from thefittest.optimizers import SaDE_old, DifferentialEvolution, jDE
 
 
 def print_population_by_time(population_3d, grid_model, function, left, right):
@@ -17,9 +17,9 @@ def print_population_by_time(population_3d, grid_model, function, left, right):
     array3d = np.array(list(map(donothing, population_3d)))
 
     array2d = array3d.reshape(-1, 2)
-    
+
     index = np.repeat(np.arange(array3d.shape[0]), array3d.shape[1])
-    
+
     fx = function(array2d)
     data = pd.DataFrame({'x': array2d[:, 0],
                          'y': array2d[:, 1],
@@ -51,7 +51,7 @@ def print_population_by_time(population_3d, grid_model, function, left, right):
 
 
 problem = CEC2005.ShiftedSphere()
-n_var = 2
+n_var = 10
 
 left = np.full(n_var, -100)
 right = np.full(n_var, 100)
@@ -61,23 +61,20 @@ def donothing(x):
     return x
 
 
-model = SaDE(fitness_function=problem,
-                              genotype_to_phenotype=donothing,
-                              left=left,
-                              right=right,
-                              iters=100,
-                              pop_size=100,
-                              minimization=True,
-                              show_progress_each=100,
-                              keep_history=True)
-
-# model.set_strategy(F_param=0.5, CR_param=0.5)
-
+model = jDE(fitness_function=problem,
+             genotype_to_phenotype=donothing,
+             left=left,
+             right=right,
+             iters=100,
+             pop_size=100,
+             minimization=True,
+             show_progress_each=20,
+             keep_history=True)
 
 
 model.fit()
 print(model.thefittest.fitness)
-stats = model.stats
+# stats = model.stats
 
-print_population_by_time(stats.population_g, donothing, problem, left = (left[0], left[1]), right = (right[0], right[1]))
-
+# print_population_by_time(stats.population_g, donothing, problem, left=(
+#     left[0], left[1]), right=(right[0], right[1]))

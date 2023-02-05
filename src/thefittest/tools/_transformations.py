@@ -15,15 +15,6 @@ def numpy_group_by(group: np.ndarray, by: np.ndarray):
     groups = np.split(group, cut_index)[1:]
     return keys, groups
 
-    # # col_indexes = np.arange(arr.shape[1])
-    # # remain_indexes = np.setdiff1d(col_indexes, index_col_by)
-    # argsort = np.argsort(arr[:, index_col_by])
-    # arr = arr[argsort]
-
-    # keys, cut_index = np.unique(arr[:, index_col_by], return_index=True)
-    # groups = np.split(arr[:, remain_indexes], cut_index)[1:]
-    # return keys, groups
-
 
 def lehmer_mean(x: np.ndarray, power=2) -> np.ndarray:
     x_up = np.power(x, power)

@@ -1,4 +1,5 @@
 from ._geneticalgorithm import GeneticAlgorithm
-from ._selfcgeneticalgorithm import SelfCGA
+from ._selfcga import SelfCGA
 from ._differentialevolution import DifferentialEvolution
-from ._sade import SaDE
+from ._sade_old import SaDE_old
+from ._jde import jDE

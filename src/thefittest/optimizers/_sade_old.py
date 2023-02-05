@@ -10,11 +10,10 @@ from ._differentialevolution import DifferentialEvolution
 from ._crossovers import binomial
 from ._mutations import rand_1
 from ._mutations import current_to_best_1
-from ._mutations import rand_2
-from ._mutations import current_to_rand_1
+from ..tools import numpy_group_by
 
 
-class SaDE(DifferentialEvolution):
+class SaDE_old(DifferentialEvolution):
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
                  genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
@@ -44,26 +43,34 @@ class SaDE(DifferentialEvolution):
             keep_history=keep_history)
 
         self.m_sets = {'rand_1': rand_1,
-                       'current_to_best_1': current_to_best_1,
-                       'rand_2': rand_2,
-                       'current_to_rand_1': current_to_rand_1}
+                       'current_to_best_1': current_to_best_1}
         self.m_sets = dict(sorted(self.m_sets.items()))
+        self.m_sets_keys = list(self.m_sets.keys())
 
         self.thefittest: TheFittest
         self.stats: StaticticSaDE
-        self.m_learning_period = 20
+        self.m_learning_period = 50
         self.CR_update_timer = 5
-        self.CR_m_learning_period = 20
+        self.CR_m_learning_period = 25
+        self.threshold = 0.1
 
     def set_strategy(self, m_learning_period_param: Optional[int] = None,
                      CR_update_timer_param: Optional[int] = None,
-                     CR_m_learning_period_param: Optional[int] = None):
+                     CR_m_learning_period_param: Optional[int] = None,
+                     threshold_params: Optional[float] = None):
+
         if m_learning_period_param is not None:
             self.m_learning_period = m_learning_period_param
+
         if CR_update_timer_param is not None:
             self.CR_update_timer = CR_update_timer_param
+
         if CR_m_learning_period_param is not None:
             self.CR_m_learning_period = CR_m_learning_period_param
+
+        if threshold_params is not None:
+            self.threshold = threshold_params
+
         return self
 
     def mutation_and_crossover(self, popuation_g, individ_g,
@@ -87,45 +94,70 @@ class SaDE(DifferentialEvolution):
         offspring_fit[mask] = mutant_cr_fit[mask]
         return offspring_g, offspring_ph, offspring_fit, mask
 
-    def choice_operators(self, operators, proba):
+    def choice_operators(self, proba_dict):
+        operators = list(proba_dict.keys())
+        proba = list(proba_dict.values())
         return np.random.choice(list(operators), self.pop_size - 1, p=proba)
 
-    def sum_and_diff(self, group_i):
-        sum_ = np.sum(group_i)
-        return sum_, len(group_i) - sum_
+    def succeses_to_ns(self, succeses):
+        return np.sum(succeses)
 
-    def groupy_by_ns_nf(self, operators, succeses):
-        operators_succeses = np.vstack([operators, succeses.astype(int)]).T
-        argsort = np.argsort(operators_succeses[:, 0])
-        operators_succeses = operators_succeses[argsort]
+    def succeses_to_nf(self, succeses):
+        return np.sum(~succeses)
 
-        keys, cut_index = np.unique(
-            operators_succeses[:, 0], return_index=True)
-        groups = np.split(
-            operators_succeses[:, 1].astype(float), cut_index)[1:]
-        stack = list(map(self.sum_and_diff, groups))
-        ns, nf = list(zip(*stack))
-        
-        ind = [list(self.m_sets.keys()).index(key) for key in keys]
+    def update_ns_nf(self, operators, succeses, ns_i, nf_i):
+        grouped = dict(zip(*numpy_group_by(group=succeses, by=operators)))
 
-        return np.array(ns), np.array(nf), ind
+        for key in self.m_sets.keys():
+            if key in grouped.keys():
+                ns_i[key] += self.succeses_to_ns(grouped[key])
+                nf_i[key] += self.succeses_to_nf(grouped[key])
+        return ns_i, nf_i
 
     def update_proba(self, ns_i, nf_i):
-        down = (ns_i + nf_i)
-        down[down==0]=1
-        percentage = ns_i/down
 
-        down = np.sum(percentage)
-        if down == 0:
-            proba = 1/len(self.m_sets)
+        percentage = []
+        for key in self.m_sets.keys():
+            down = ns_i[key] + nf_i[key]
+            if down == 0:
+                percentage.append(0)
+            else:
+                percentage.append(ns_i[key]/down)
+
+        percentage = np.array(percentage)
+        percentage_sum = np.sum(percentage)
+        if percentage_sum == 0:
+            z_m = len(self.m_sets)
+            proba = dict(zip(self.m_sets_keys, np.full(z_m, 1/z_m)))
         else:
-            proba = percentage/down
+            proba = percentage/percentage_sum
+            # proba = proba.clip(self.threshold, 1)
+            proba = proba/np.sum(proba)
+            proba = dict(zip(self.m_sets_keys, proba))
         return proba
+
+    def generate_F(self, size):
+        value = np.random.normal(0.5, 0.3, size)
+        mask = (value <= 0) | (value > 2)
+        while np.any(mask):
+            value[mask] = np.random.normal(0.5, 0.3, len(value[mask]))
+            mask = (value <= 0) | (value > 2)
+        return value
+
+    def generate_CR(self, size, CRm):
+        value = np.random.normal(CRm, 0.1, size)
+        value = np.clip(value, 1e-6, 1)
+        return value
 
     def fit(self):
 
         z_m = len(self.m_sets)
-        m_proba = np.full(z_m, 1/z_m)
+        m_proba = dict(zip(self.m_sets_keys, np.full(z_m, 1/z_m)))
+        learning_period_counter = 0
+        CR_update_timer_counter = 0
+        CR_m_learning_period_counter = 0
+        CRm = 0.5
+        CR_i = self.generate_CR(self.pop_size-1, CRm)
 
         population_g = self.generate_init_pop()
         population_ph = self.genotype_to_phenotype(population_g)
@@ -144,20 +176,19 @@ class SaDE(DifferentialEvolution):
             self.stats = StaticticSaDE().update(population_g,
                                                 population_ph,
                                                 fitness)
-        ns = np.zeros(z_m)
-        nf = np.zeros(z_m)
-        ns_nf_counter = 0
-        for i in range(self.iters-1):
 
+        ns = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
+        nf = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
+        CR_s_pool = np.array([], dtype=float)
+
+        for i in range(self.iters-1):
             self.show_progress(i)
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
+                m_operators = self.choice_operators(m_proba)
 
-                m_operators = self.choice_operators(
-                    self.m_sets.keys(), m_proba)
-                F_i = np.full(self.pop_size-1, self.F)
-                CR_i = np.full(self.pop_size-1, self.CR)
+                F_i = self.generate_F(self.pop_size-1)
 
                 partial_mut_and_cross = partial(self.mutation_and_crossover,
                                                 population_g)
@@ -172,12 +203,6 @@ class SaDE(DifferentialEvolution):
                                                     fitness[:-1])
                 population_g[:-1], population_ph[:-
                                                  1], fitness[:-1] = stack[:-1]
-                successes = stack[-1]
-
-                ns_i, nf_i, ind = self.groupy_by_ns_nf(m_operators, successes)
-                ns[ind] += ns_i
-                nf[ind] += nf_i
-                ns_nf_counter += 1
 
                 population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 argsort = np.argsort(fitness)
@@ -192,11 +217,28 @@ class SaDE(DifferentialEvolution):
                                       population_ph,
                                       fitness)
 
-                m_proba = self.update_proba(ns, nf)
-                print(ns_nf_counter)
-                if ns_nf_counter == 20:
-                    ns_nf_counter = 0
-                    ns = np.zeros(z_m)
-                    nf = np.zeros(z_m)
+                successes = stack[-1]
+                ns, nf = self.update_ns_nf(m_operators, successes, ns, nf)
+                CR_s_pool = np.append(CR_s_pool, CR_i[successes])
+
+                learning_period_counter += 1
+                CR_update_timer_counter += 1
+                CR_m_learning_period_counter += 1
+
+                if learning_period_counter == self.m_learning_period:
+                    m_proba = self.update_proba(ns, nf)
+                    learning_period_counter = 0
+                    ns = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
+                    nf = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
+
+                if CR_update_timer_counter == self.CR_update_timer:
+                    CR_i = self.generate_CR(self.pop_size-1, CRm)
+                    CR_update_timer_counter = 0
+
+                if CR_m_learning_period_counter == self.CR_m_learning_period:
+                    CR_m_learning_period_counter = 0
+                    if len(CR_s_pool):
+                        CRm = np.mean(CR_s_pool)
+                    CR_s_pool = np.array([], dtype=float)
 
         return self

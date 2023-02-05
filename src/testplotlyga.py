@@ -48,7 +48,7 @@ def print_population_by_time(population_3d, grid_model, function):
     fig.write_html("C:/Users/user/Desktop/file1.html")
 
 
-n_variables = 100
+n_variables = 10
 
 left = np.full(n_variables, -100, dtype=np.float64)
 right = np.full(n_variables, 100, dtype=np.float64)
@@ -68,16 +68,16 @@ model = SelfCGA(fitness_function=problem,
                 pop_size=100,
                 str_len=np.sum(parts),
                 show_progress_each=10,
-                optimal_value=-450,
-                termination_error_value=0,
-                keep_history=True,
+                # optimal_value=-450,
+                # termination_error_value=0,
+                # keep_history=True,
                 minimization=True)
 
 
-model.set_strategy(crossover_opers=['uniform_rank16'], tour_size_param=3, select_opers=['tournament'])
+model.set_strategy(crossover_opers=['uniform2'], tour_size_param=3, select_opers=['tournament'])
 model.fit()
-stats = model.stats
+# stats = model.stats
 print(model.thefittest.fitness)
 # print(stats.population_g.shape)
-print(model.get_remains_calls())
+# print(model.get_remains_calls())
 # print_population_by_time(stats.population_g, gray_code_to_float, problem)
