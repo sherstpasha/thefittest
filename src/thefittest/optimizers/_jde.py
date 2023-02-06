@@ -30,6 +30,10 @@ class StatisticsjDE(Statistics):
 
 
 class jDE(DifferentialEvolution):
+    '''Brest, Janez & Greiner, Sao & Bošković, Borko & Mernik, Marjan & Zumer, Viljem. (2007).
+    Self-Adapting Control Parameters in Differential Evolution: A Comparative Study on Numerical
+    Benchmark Problems. Evolutionary Computation, IEEE Transactions on. 10. 646 - 657. 10.1109/TEVC.2006.872133. '''
+
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
                  genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
