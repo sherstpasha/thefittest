@@ -13,7 +13,11 @@ from ._mutations import current_to_best_1
 from ..tools import numpy_group_by
 
 
-class SaDE_old(DifferentialEvolution):
+class SaDE2005(DifferentialEvolution):
+    '''Qin, Kai & Suganthan, Ponnuthurai. (2005). Self-adaptive differential evolution
+    algorithm for numerical optimization. 2005 IEEE Congress on Evolutionary Computation,
+    IEEE CEC 2005. Proceedings. 2. 1785-1791. 10.1109/CEC.2005.1554904'''
+
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
                  genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
@@ -54,6 +58,10 @@ class SaDE_old(DifferentialEvolution):
         self.CR_m_learning_period = 25
         self.threshold = 0.1
 
+        self.Fm = 0.5
+        self.F_sigma = 0.3
+        self.CR_sigma = 0.1
+
     def set_strategy(self, m_learning_period_param: Optional[int] = None,
                      CR_update_timer_param: Optional[int] = None,
                      CR_m_learning_period_param: Optional[int] = None,
@@ -74,7 +82,8 @@ class SaDE_old(DifferentialEvolution):
         return self
 
     def mutation_and_crossover(self, popuation_g, individ_g,
-                               mutation_type, F_i, CR_i):
+                               mutation_type, CR_i):
+        F_i = np.random.normal(self.Fm, self.F_sigma)
         mutant = self.m_sets[mutation_type](individ_g, popuation_g, F_i)
 
         mutant_cr_g = binomial(individ_g, mutant, CR_i)
@@ -92,7 +101,7 @@ class SaDE_old(DifferentialEvolution):
         offspring_g[mask] = mutant_cr_g[mask]
         offspring_ph[mask] = mutant_cr_ph[mask]
         offspring_fit[mask] = mutant_cr_fit[mask]
-        return offspring_g, offspring_ph, offspring_fit, mask
+        return (offspring_g, offspring_ph, offspring_fit, mask)
 
     def choice_operators(self, proba_dict):
         operators = list(proba_dict.keys())
@@ -115,47 +124,24 @@ class SaDE_old(DifferentialEvolution):
         return ns_i, nf_i
 
     def update_proba(self, ns_i, nf_i):
+        up = ns_i['rand_1']*(ns_i['current_to_best_1'] +
+                             nf_i['current_to_best_1'])
+        down = ns_i['current_to_best_1']*(ns_i['rand_1'] + nf_i['rand_1']) + up
 
-        percentage = []
-        for key in self.m_sets.keys():
-            down = ns_i[key] + nf_i[key]
-            if down == 0:
-                percentage.append(0)
-            else:
-                percentage.append(ns_i[key]/down)
-
-        percentage = np.array(percentage)
-        percentage_sum = np.sum(percentage)
-        if percentage_sum == 0:
-            z_m = len(self.m_sets)
-            proba = dict(zip(self.m_sets_keys, np.full(z_m, 1/z_m)))
-        else:
-            proba = percentage/percentage_sum
-            # proba = proba.clip(self.threshold, 1)
-            proba = proba/np.sum(proba)
-            proba = dict(zip(self.m_sets_keys, proba))
-        return proba
-
-    def generate_F(self, size):
-        value = np.random.normal(0.5, 0.3, size)
-        mask = (value <= 0) | (value > 2)
-        while np.any(mask):
-            value[mask] = np.random.normal(0.5, 0.3, len(value[mask]))
-            mask = (value <= 0) | (value > 2)
-        return value
+        p1 = up/down
+        return {'rand_1': p1, 'current_to_best_1': 1 - p1}
 
     def generate_CR(self, size, CRm):
-        value = np.random.normal(CRm, 0.1, size)
+        value = np.random.normal(CRm, self.CR_sigma, size)
         value = np.clip(value, 1e-6, 1)
         return value
 
-    def fit(self):
+    def if_period_ended(self, i, period):
+        return i % period == 0 and i != 0
 
+    def fit(self):
         z_m = len(self.m_sets)
         m_proba = dict(zip(self.m_sets_keys, np.full(z_m, 1/z_m)))
-        learning_period_counter = 0
-        CR_update_timer_counter = 0
-        CR_m_learning_period_counter = 0
         CRm = 0.5
         CR_i = self.generate_CR(self.pop_size-1, CRm)
 
@@ -175,12 +161,13 @@ class SaDE_old(DifferentialEvolution):
         if self.keep_history:
             self.stats = StaticticSaDE().update(population_g,
                                                 population_ph,
-                                                fitness)
+                                                fitness,
+                                                m_proba,
+                                                CRm)
 
         ns = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
         nf = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
         CR_s_pool = np.array([], dtype=float)
-
         for i in range(self.iters-1):
             self.show_progress(i)
             if self.termitation_check(lastbest.no_increase):
@@ -188,21 +175,20 @@ class SaDE_old(DifferentialEvolution):
             else:
                 m_operators = self.choice_operators(m_proba)
 
-                F_i = self.generate_F(self.pop_size-1)
-
                 partial_mut_and_cross = partial(self.mutation_and_crossover,
                                                 population_g)
                 mutant_cr_g = np.array(list(map(partial_mut_and_cross,
                                                 population_g[:-1],
-                                                m_operators,
-                                                F_i, CR_i)))
+                                                m_operators, CR_i)))
 
                 stack = self.evaluate_and_selection(mutant_cr_g,
                                                     population_g[:-1],
                                                     population_ph[:-1],
                                                     fitness[:-1])
-                population_g[:-1], population_ph[:-
-                                                 1], fitness[:-1] = stack[:-1]
+
+                population_g[:-1] = stack[0]
+                population_ph[:-1] = stack[1]
+                fitness[:-1] = stack[2]
 
                 population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 argsort = np.argsort(fitness)
@@ -215,30 +201,22 @@ class SaDE_old(DifferentialEvolution):
                 if self.keep_history:
                     self.stats.update(population_g,
                                       population_ph,
-                                      fitness)
-
+                                      fitness,
+                                      m_proba,
+                                      CRm)
                 successes = stack[-1]
                 ns, nf = self.update_ns_nf(m_operators, successes, ns, nf)
                 CR_s_pool = np.append(CR_s_pool, CR_i[successes])
 
-                learning_period_counter += 1
-                CR_update_timer_counter += 1
-                CR_m_learning_period_counter += 1
-
-                if learning_period_counter == self.m_learning_period:
+                if self.if_period_ended(i, self.m_learning_period):
                     m_proba = self.update_proba(ns, nf)
-                    learning_period_counter = 0
                     ns = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
                     nf = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
 
-                if CR_update_timer_counter == self.CR_update_timer:
+                if self.if_period_ended(i, self.CR_update_timer):
                     CR_i = self.generate_CR(self.pop_size-1, CRm)
-                    CR_update_timer_counter = 0
-
-                if CR_m_learning_period_counter == self.CR_m_learning_period:
-                    CR_m_learning_period_counter = 0
-                    if len(CR_s_pool):
-                        CRm = np.mean(CR_s_pool)
-                    CR_s_pool = np.array([], dtype=float)
-
+                    if self.if_period_ended(i, self.CR_m_learning_period):
+                        if len(CR_s_pool):
+                            CRm = np.mean(CR_s_pool)
+                        CR_s_pool = np.array([], dtype=float)
         return self

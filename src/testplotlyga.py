@@ -65,20 +65,21 @@ problem = Sphere()
 # problem = HighConditionedElliptic()
 model = SelfCGA(fitness_function=problem,
                 genotype_to_phenotype=gray_code_to_float.transform,
-                iters=15000,
+                iters=100,
                 pop_size=100,
                 str_len=np.sum(parts),
                 show_progress_each=10,
                 optimal_value=0,
                 # termination_error_value=0,
-                # keep_history=True,
+                keep_history=True,
                 minimization=True)
 
 
 model.set_strategy(crossover_opers=['uniform2'], tour_size_param=3, select_opers=['tournament'])
 model.fit()
-# stats = model.stats
-print(model.thefittest.fitness)
+stats = model.stats
+print(stats.m_proba)
+# print(model.thefittest.fitness)
 # print(stats.population_g.shape)
 # print(model.get_remains_calls())
 # print_population_by_time(stats.population_g, gray_code_to_float, problem)

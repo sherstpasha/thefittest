@@ -102,6 +102,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         return offspring_g, offspring_ph, offspring_fit
 
     def bounds_control(self, individ_g):
+        individ_g = individ_g.copy()
         low_mask = individ_g < self.left
         high_mask = individ_g > self.right
 

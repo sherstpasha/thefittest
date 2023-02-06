@@ -1,5 +1,5 @@
 from ._geneticalgorithm import GeneticAlgorithm
 from ._selfcga import SelfCGA
 from ._differentialevolution import DifferentialEvolution
-from ._sade_old import SaDE_old
+from ._sade2005 import SaDE2005
 from ._jde import jDE
