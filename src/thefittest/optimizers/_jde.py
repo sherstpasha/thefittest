@@ -83,6 +83,7 @@ class jDE(DifferentialEvolution):
             self.t_f = t_cr_param
         if t_cr_param is not None:
             self.t_cr = t_f_param
+        return self
 
     def mutation_and_crossover(self, popuation_g, individ_g, F_i, CR_i):
         mutant = self.m_function(individ_g, popuation_g, F_i)
@@ -166,9 +167,11 @@ class jDE(DifferentialEvolution):
                                                     population_g[:-1],
                                                     population_ph[:-1],
                                                     fitness[:-1])
-                population_g[:-1], population_ph[:-
-                                                 1], fitness[:-1] = stack[:-1]
-                succeses = stack[-1]
+                population_g[:-1] = stack[0]
+                population_ph[:-1] = stack[1]
+                fitness[:-1] = stack[2]
+
+                succeses = stack[3]
                 F_i[succeses] = F_i_new[succeses]
                 CR_i[succeses] = CR_i_new[succeses]
 

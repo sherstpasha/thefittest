@@ -9,3 +9,5 @@ from ._transformations import donothing
 from ._transformations import numpy_group_by
 from ._transformations import SamplingGrid
 from ._transformations import GrayCode
+from ._generators import cauchy_distribution
+from ._transformations import lehmer_mean

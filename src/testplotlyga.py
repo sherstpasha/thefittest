@@ -59,17 +59,17 @@ parts = np.full(n_variables, 32, dtype=np.int64)
 gray_code_to_float = GrayCode(fit_by='parts').fit(
     left=left, right=right, arg=parts)
 
-problem = CEC2005.ShiftedSphere()
+# problem = CEC2005.ShiftedSphere()
 problem = Sphere()
 
 # problem = HighConditionedElliptic()
 model = SelfCGA(fitness_function=problem,
                 genotype_to_phenotype=gray_code_to_float.transform,
-                iters=100,
+                iters=1500,
                 pop_size=100,
                 str_len=np.sum(parts),
                 show_progress_each=10,
-                optimal_value=0,
+                # optimal_value=0,
                 # termination_error_value=0,
                 keep_history=True,
                 minimization=True)
@@ -78,7 +78,7 @@ model = SelfCGA(fitness_function=problem,
 model.set_strategy(crossover_opers=['uniform2'], tour_size_param=3, select_opers=['tournament'])
 model.fit()
 stats = model.stats
-print(stats.m_proba)
+# print(stats.m_proba)
 # print(model.thefittest.fitness)
 # print(stats.population_g.shape)
 # print(model.get_remains_calls())

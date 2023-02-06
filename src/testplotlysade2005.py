@@ -50,9 +50,9 @@ def print_population_by_time(population_3d, grid_model, function, left, right):
     fig.write_html("C:/Users/user/Desktop/file1.html")
 
 
-problem = CEC2005.ShiftedSphere()
-# problem = Sphere()
-n_var = 10
+# problem = CEC2005.ShiftedSphere()
+problem = Sphere()
+n_var = 30
 
 left = np.full(n_var, -100)
 right = np.full(n_var, 100)
@@ -66,7 +66,7 @@ model = SaDE2005(fitness_function=problem,
              genotype_to_phenotype=donothing,
              left=left,
              right=right,
-             iters=100,
+             iters=1500,
              pop_size=100,
              minimization=True,
              show_progress_each=20,
@@ -77,6 +77,6 @@ model = SaDE2005(fitness_function=problem,
 model.fit()
 print(model.thefittest.fitness)
 stats = model.stats
-print(stats.m_proba)
+# print(stats.m_proba)
 # print_population_by_time(stats.population_g, donothing, problem, left=(
 #     left[0], left[1]), right=(right[0], right[1]))

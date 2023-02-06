@@ -80,6 +80,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             self.F = F_param
         if CR_param is not None:
             self.CR = CR_param
+        return self
 
     def mutation_and_crossover(self, popuation_g, individ_g, F_i, CR_i):
         mutant = self.m_function(individ_g, popuation_g, F_i)

@@ -9,7 +9,7 @@ import pandas as pd
 
 from thefittest.testfuncs._problems import *
 from thefittest.testfuncs import CEC2005
-from thefittest.optimizers import jDE
+from thefittest.optimizers import JADE
 
 
 def print_population_by_time(population_3d, grid_model, function, left, right):
@@ -62,7 +62,7 @@ def donothing(x):
     return x
 
 
-model = jDE(fitness_function=problem,
+model = JADE(fitness_function=problem,
              genotype_to_phenotype=donothing,
              left=left,
              right=right,
@@ -77,5 +77,7 @@ model = jDE(fitness_function=problem,
 model.fit()
 print(model.thefittest.fitness)
 stats = model.stats
+print(stats.u_CR)
+print(stats.u_F)
 # print_population_by_time(stats.population_g, donothing, problem, left=(
 #     left[0], left[1]), right=(right[0], right[1]))
