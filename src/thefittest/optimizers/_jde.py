@@ -3,14 +3,30 @@ from typing import Optional
 from typing import Callable
 from typing import Any
 from ._base import TheFittest
-from ._base import StaticticSaDE
+from ._base import Statistics
 from ._base import LastBest
 from functools import partial
 from ._differentialevolution import DifferentialEvolution
 from ._crossovers import binomial
-from ._mutations import rand_1
-from ._mutations import current_to_best_1
-from ..tools import numpy_group_by
+
+
+class StatisticsjDE(Statistics):
+    def __init__(self):
+        Statistics.__init__(self)
+        self.F = np.array([], dtype=float)
+        self.CR = np.array([], dtype=float)
+
+    def update(self, population_g_i: np.ndarray, population_ph_i: np.ndarray, fitness_i: np.ndarray,
+               F_i, CR_i):
+        super().update(population_g_i, population_ph_i, fitness_i)
+
+        if not len(self.F):
+            self.F = F_i.copy().reshape(1, -1)
+            self.CR = CR_i.copy().reshape(1, -1)
+        else:
+            self.F = np.append(self.F, F_i.copy().reshape(1, -1), axis=0)
+            self.CR = np.append(self.CR, CR_i.copy().reshape(1, -1), axis=0)
+        return self
 
 
 class jDE(DifferentialEvolution):
@@ -43,7 +59,7 @@ class jDE(DifferentialEvolution):
             keep_history=keep_history)
 
         self.thefittest: TheFittest
-        self.stats: StaticticSaDE
+        self.stats: StatisticsjDE
         self.m_function = self.m_pool['rand_1']
         self.F_left = 0.1
         self.F_right = 0.9
@@ -93,13 +109,14 @@ class jDE(DifferentialEvolution):
         return individ_g
 
     def regenerate_F(self, F_i):
-        mask = np.random.random(size = len(F_i)) < self.t_f
-        F_i[mask] = self.F_left + np.random.random(size = np.sum(mask))*self.F_right
+        mask = np.random.random(size=len(F_i)) < self.t_f
+        F_i[mask] = self.F_left + \
+            np.random.random(size=np.sum(mask))*self.F_right
         return F_i
 
     def regenerate_CR(self, CR_i):
-        mask = np.random.random(size = len(CR_i)) < self.t_cr
-        CR_i[mask] = np.random.random(size = np.sum(mask))
+        mask = np.random.random(size=len(CR_i)) < self.t_cr
+        CR_i[mask] = np.random.random(size=np.sum(mask))
         return CR_i
 
     def fit(self):
@@ -112,17 +129,19 @@ class jDE(DifferentialEvolution):
         population_ph = population_ph[argsort]
         fitness = fitness[argsort]
 
+        F_i = np.full(self.pop_size-1, 0.5)
+        CR_i = np.full(self.pop_size-1, 0.9)
+
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        # if self.keep_history:
-        #     self.stats = Statistics().update(population_g,
-        #                                      population_ph,
-        #                                      fitness)
-
-        F_i = np.full(self.pop_size-1, 0.5)
-        CR_i = np.full(self.pop_size-1, 0.9)
+        if self.keep_history:
+            self.stats = StatisticsjDE().update(population_g,
+                                                population_ph,
+                                                fitness,
+                                                F_i,
+                                                CR_i)
 
         for i in range(self.iters-1):
             self.show_progress(i)
@@ -143,12 +162,11 @@ class jDE(DifferentialEvolution):
                                                     population_g[:-1],
                                                     population_ph[:-1],
                                                     fitness[:-1])
-                population_g[:-1], population_ph[:-1], fitness[:-1] = stack[:-1]
+                population_g[:-1], population_ph[:-
+                                                 1], fitness[:-1] = stack[:-1]
                 succeses = stack[-1]
                 F_i[succeses] = F_i_new[succeses]
                 CR_i[succeses] = CR_i_new[succeses]
-                # print(succeses)
-                # print(F_i)
 
                 population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 argsort = np.argsort(fitness)
@@ -158,9 +176,10 @@ class jDE(DifferentialEvolution):
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
-                # if self.keep_history:
-                #     self.stats.update(population_g,
-                #                       population_ph,
-                #                       fitness)
+                if self.keep_history:
+                    self.stats.update(population_g,
+                                      population_ph,
+                                      fitness,
+                                      F_i,
+                                      CR_i)
         return self
-

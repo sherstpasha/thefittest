@@ -3,7 +3,7 @@ from typing import Optional
 from typing import Callable
 from typing import Any
 from ._base import TheFittest
-from ._base import StaticticSaDE
+from ._base import Statistics
 from ._base import LastBest
 from functools import partial
 from ._differentialevolution import DifferentialEvolution
@@ -12,6 +12,25 @@ from ._mutations import rand_1
 from ._mutations import current_to_best_1
 from ..tools import numpy_group_by
 
+
+class StaticticSaDE(Statistics):
+    def __init__(self):
+        Statistics.__init__(self)
+        self.m_proba = dict()
+        self.CRm = np.array([], dtype=float)
+
+    def update(self, population_g_i: np.ndarray, population_ph_i: np.ndarray, fitness_i: np.ndarray,
+               m_proba_i, CRm_i):
+        super().update(population_g_i, population_ph_i, fitness_i)
+        if not len(self.m_proba):
+            for key, value in m_proba_i.items():
+                self.m_proba[key] = np.array(value)
+        else:
+            for key, value in m_proba_i.items():
+                self.m_proba[key] = np.append(
+                    self.m_proba[key], np.array(value))
+        self.CRm = np.append(self.CRm, CRm_i)
+        return self
 
 class SaDE2005(DifferentialEvolution):
     '''Qin, Kai & Suganthan, Ponnuthurai. (2005). Self-adaptive differential evolution

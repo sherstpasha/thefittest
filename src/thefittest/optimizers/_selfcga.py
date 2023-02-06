@@ -7,9 +7,32 @@ from ..tools import scale_data
 from ..tools import rank_data
 from functools import partial
 from ._base import TheFittest
-from ._base import StaticticSelfCGA
+from ._base import Statistics
 from ._base import LastBest
 from ..tools import numpy_group_by
+
+
+class StaticticSelfCGA(Statistics):
+    def __init__(self):
+        Statistics.__init__(self)
+        self.s_proba = dict()
+        self.c_proba = dict()
+        self.m_proba = dict()
+
+    def update(self, population_g_i: np.ndarray, population_ph_i: np.ndarray, fitness_i: np.ndarray,
+               s_proba_i, c_proba_i, m_proba_i):
+        super().update(population_g_i, population_ph_i, fitness_i)
+
+        for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
+                                      (self.s_proba, self.c_proba, self.m_proba)):
+            if not len(archive_i):
+                for key, value in proba_i.items():
+                    archive_i[key] = np.array(value)
+            else:
+                for key, value in proba_i.items():
+                    archive_i[key] = np.append(
+                        archive_i[key], np.array(value))
+        return self
 
 
 class SelfCGA(GeneticAlgorithm):

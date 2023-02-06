@@ -64,49 +64,6 @@ class Statistics:
         return self
 
 
-class StaticticSelfCGA(Statistics):
-    def __init__(self):
-        Statistics.__init__(self)
-        self.s_proba = dict()
-        self.c_proba = dict()
-        self.m_proba = dict()
-
-    def update(self, population_g_i: np.ndarray, population_ph_i: np.ndarray, fitness_i: np.ndarray,
-               s_proba_i, c_proba_i, m_proba_i):
-        super().update(population_g_i, population_ph_i, fitness_i)
-
-        for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
-                                      (self.s_proba, self.c_proba, self.m_proba)):
-            if not len(archive_i):
-                for key, value in proba_i.items():
-                    archive_i[key] = np.array(value)
-            else:
-                for key, value in proba_i.items():
-                    archive_i[key] = np.append(
-                        archive_i[key], np.array(value))
-        return self
-
-
-class StaticticSaDE(Statistics):
-    def __init__(self):
-        Statistics.__init__(self)
-        self.m_proba = dict()
-        self.CRm = np.array([], dtype=float)
-
-    def update(self, population_g_i: np.ndarray, population_ph_i: np.ndarray, fitness_i: np.ndarray,
-               m_proba_i, CRm_i):
-        super().update(population_g_i, population_ph_i, fitness_i)
-        if not len(self.m_proba):
-            for key, value in m_proba_i.items():
-                self.m_proba[key] = np.array(value)
-        else:
-            for key, value in m_proba_i.items():
-                self.m_proba[key] = np.append(
-                    self.m_proba[key], np.array(value))
-        self.CRm = np.append(self.CRm, CRm_i)
-        return self
-
-
 class EvolutionaryAlgorithm:
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
