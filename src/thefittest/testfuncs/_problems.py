@@ -439,9 +439,10 @@ class ShiftedSchwefe1_2WithNoise(TestShiftedFunction, Schwefe1_2):
                                      x_shift=schwefel_102_data)
 
     def __call__(self, x):
-        y = super().__call__(x)
+        z = self.shift(x)
+        y = self.f(z)
         noise = 1 + 0.4*np.abs(np.random.normal(size=y.shape))
-        return y*noise
+        return y*noise + self.fbias
 
 
 # CEC05 #5
