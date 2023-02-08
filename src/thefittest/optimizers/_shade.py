@@ -93,8 +93,7 @@ class SHADE(DifferentialEvolution):
         return current + F_value*(best - current) + F_value*(population[r1] - pop_archive[r2])
 
     def set_strategy(self):
-        # размер H
-        pass
+        return self
 
     def mutation_and_crossover(self, popuation_g, popuation_g_archive, individ_g, F_i, CR_i):
         mutant = self.current_to_pbest_1_archive(individ_g, popuation_g, F_i,

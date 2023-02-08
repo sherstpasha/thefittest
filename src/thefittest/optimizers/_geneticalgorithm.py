@@ -49,7 +49,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             keep_history=keep_history)
 
         self.str_len = str_len
-        self.tour_size = 3
+        self.tour_size = 2
         self.initial_population = None
         self.thefittest: TheFittest
         self.stats: Statistics

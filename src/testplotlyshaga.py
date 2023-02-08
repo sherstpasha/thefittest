@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 
-from thefittest.optimizers import SelfCGA
+from thefittest.optimizers import SHAGA
 from thefittest.optimizers import GeneticAlgorithm
 from thefittest.testfuncs._problems import *
 from thefittest.testfuncs import CEC2005
@@ -65,31 +65,23 @@ problem = Sphere()
 # problem = OneMax()
 
 # problem = HighConditionedElliptic()
-model = SelfCGA(fitness_function=problem,
+model = SHAGA(fitness_function=problem,
                 genotype_to_phenotype=gray_code_to_float.transform,
                 # genotype_to_phenotype=donothing,
                 iters=1500,
                 pop_size=100,
                 str_len=np.sum(parts),
-                # str_len=3000,
+                # str_len=10000,
+
                 show_progress_each=20,
                 # optimal_value=0,
                 # termination_error_value=0,
                 # keep_history=True,
                 minimization=True)
 
-# model.set_strategy(crossover_opers=['two_point'], select_opers=['tournament'], mutation_opers= ['weak'])
 
-# model.set_strategy(crossover_opers=['uniform2',
-#                                     'uniform7',
-#                                     'uniform_prop2',
-#                                     'uniform_prop7',
-#                                     'uniform_rank2',
-#                                     'uniform_rank7',
-#                                     'uniform_tour3',
-#                                     'uniform_tour7'])
 model.fit()
-stats = model.stats
+# stats = model.stats
 # print(stats.m_proba)
 print(model.thefittest.fitness)
 # print(stats.population_g.shape)

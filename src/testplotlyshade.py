@@ -50,8 +50,8 @@ def print_population_by_time(population_3d, grid_model, function, left, right):
     fig.write_html("C:/Users/user/Desktop/file1.html")
 
 
-problem = CEC2005.problems_dict['F1']['function']()
-# problem = Sphere()
+# problem = CEC2005.problems_dict['F1']['function']()
+problem = Sphere()
 n_var = 30
 
 left = np.full(n_var, -100)
@@ -74,10 +74,10 @@ model = SHADE(fitness_function=problem,
 
 
 model.fit()
-print(model.sign*model.thefittest.fitness - CEC2005.problems_dict['F1']['optimum'])
-stats = model.stats
+# print(model.sign*model.thefittest.fitness - CEC2005.problems_dict['F1']['optimum'])
+# stats = model.stats
 
-print(stats.H_CR)
-print(stats.H_F)
+# print(stats.H_CR)
+# print(stats.H_F)
 # print_population_by_time(stats.population_g, donothing, problem, left=(
 #     left[0], left[1]), right=(right[0], right[1]))

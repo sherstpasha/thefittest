@@ -23,15 +23,15 @@ class StaticticSelfCGA(Statistics):
                s_proba_i, c_proba_i, m_proba_i):
         super().update(population_g_i, population_ph_i, fitness_i)
 
-        for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
-                                      (self.s_proba, self.c_proba, self.m_proba)):
-            if not len(archive_i):
-                for key, value in proba_i.items():
-                    archive_i[key] = np.array(value)
-            else:
-                for key, value in proba_i.items():
-                    archive_i[key] = np.append(
-                        archive_i[key], np.array(value))
+        # for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
+        #                               (self.s_proba, self.c_proba, self.m_proba)):
+        #     if not len(archive_i):
+        #         for key, value in proba_i.items():
+        #             archive_i[key] = np.array(value)
+        #     else:
+        #         for key, value in proba_i.items():
+        #             archive_i[key] = np.append(
+        #                 archive_i[key], np.array(value))
         return self
 
 
@@ -61,7 +61,7 @@ class SelfCGA(GeneticAlgorithm):
                                   show_progress_each=show_progress_each,
                                   keep_history=keep_history)
 
-        self.K = 2
+        self.K = 0.5
         self.threshold = 0.05
         self.set_strategy(select_opers=['proportional',
                                         'rank',
