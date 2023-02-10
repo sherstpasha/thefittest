@@ -7,9 +7,9 @@ from ._base import Statistics
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
 from ..tools import cauchy_distribution
+
 from ._selections import tournament_selection
 from ._crossovers import binomial
-
 from ._mutations import flip_mutation
 from functools import partial
 
@@ -119,10 +119,10 @@ class SHAGA(EvolutionaryAlgorithm):
 
     def randc(self, u, scale):
         value = cauchy_distribution(loc=u, scale=scale)[0]
-        while value <= 0:
+        while value <= 0 or value > 3/self.str_len:
             value = cauchy_distribution(loc=u, scale=scale)[0]
-        if value > 5/self.str_len:
-            value = 5/self.str_len
+        # if value > 5/self.str_len:
+        #     value = 5/self.str_len
         return value
 
     def randn(self, u, scale):
@@ -147,7 +147,7 @@ class SHAGA(EvolutionaryAlgorithm):
         return u
 
     def fit(self):
-        H_MR = np.full(self.H_size, 3/self.str_len)
+        H_MR = np.full(self.H_size, 1/(self.str_len))
         H_CR = np.full(self.H_size, 0.5)
         k = 0
         next_k = 1

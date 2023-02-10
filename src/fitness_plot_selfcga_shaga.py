@@ -10,9 +10,9 @@ from thefittest.tools import donothing
 
 
 problem = OneMax()
-iters = 100
-pop_size = 100
-str_len = 100
+iters = 1000
+pop_size = 1000
+str_len = 3000
 
 model_selfcga = SelfCGA(fitness_function=problem,
                         genotype_to_phenotype=donothing,
@@ -21,16 +21,17 @@ model_selfcga = SelfCGA(fitness_function=problem,
                         str_len=str_len,
                         show_progress_each=20,
                         minimization=False,
-                        keep_history=True)
+                        keep_history=False)
 
+model_selfcga.set_strategy(crossover_opers = ['empty'], select_opers=['rank'])
 # model_selfcga.set_strategy(crossover_opers=['uniform2',
-#                                     'uniform7',
-#                                     'uniform_prop2',
-#                                     'uniform_prop7',
-#                                     'uniform_rank2',
-#                                     'uniform_rank7',
-#                                     'uniform_tour3',
-#                                     'uniform_tour7'])
+#                                             'uniform7',
+#                                             'uniform_prop2',
+#                                             'uniform_prop7',
+#                                             'uniform_rank2',
+#                                             'uniform_rank7',
+#                                             'uniform_tour3',
+#                                             'uniform_tour7'])
 
 model_shaga = SHAGA(fitness_function=problem,
                     genotype_to_phenotype=donothing,
@@ -46,42 +47,42 @@ model_shaga.fit()
 fitness_selfcga = model_selfcga.stats.fitness
 fitness_shaga = model_shaga.stats.fitness
 
-for i in range(30):
+# for i in range(1):
 
-    model_selfcga = SelfCGA(fitness_function=problem,
-                            genotype_to_phenotype=donothing,
-                            iters=iters,
-                            pop_size=pop_size,
-                            str_len=str_len,
-                            show_progress_each=20,
-                            minimization=False,
-                            keep_history=True)
+#     model_selfcga = SelfCGA(fitness_function=problem,
+#                             genotype_to_phenotype=donothing,
+#                             iters=iters,
+#                             pop_size=pop_size,
+#                             str_len=str_len,
+#                             show_progress_each=20,
+#                             minimization=False,
+#                             keep_history=True)
 
-    # model_selfcga.set_strategy(crossover_opers=['uniform2',
-    #                                 'uniform7',
-    #                                 'uniform_prop2',
-    #                                 'uniform_prop7',
-    #                                 'uniform_rank2',
-    #                                 'uniform_rank7',
-    #                                 'uniform_tour3',
-    #                                 'uniform_tour7'])
+#     # model_selfcga.set_strategy(crossover_opers=['uniform2',
+#     #                                             'uniform7',
+#     #                                             'uniform_prop2',
+#     #                                             'uniform_prop7',
+#     #                                             'uniform_rank2',
+#     #                                             'uniform_rank7',
+#                                                 # 'uniform_tour3',
+#                                                 # 'uniform_tour7'])
 
-    model_shaga = SHAGA(fitness_function=problem,
-                        genotype_to_phenotype=donothing,
-                        iters=iters,
-                        pop_size=pop_size,
-                        str_len=str_len,
-                        show_progress_each=20,
-                        minimization=False,
-                        keep_history=True)
-    model_selfcga.fit()
-    model_shaga.fit()
+#     model_shaga = SHAGA(fitness_function=problem,
+#                         genotype_to_phenotype=donothing,
+#                         iters=iters,
+#                         pop_size=pop_size,
+#                         str_len=str_len,
+#                         show_progress_each=20,
+#                         minimization=False,
+#                         keep_history=True)
+#     model_selfcga.fit()
+#     model_shaga.fit()
 
-    fitness_selfcga += model_selfcga.stats.fitness
-    fitness_shaga += model_shaga.stats.fitness
+#     fitness_selfcga += model_selfcga.stats.fitness
+#     fitness_shaga += model_shaga.stats.fitness
 
-fitness_selfcga = fitness_selfcga/31
-fitness_shaga = fitness_shaga/31
+# fitness_selfcga = fitness_selfcga/6
+# fitness_shaga = fitness_shaga/6
 # print('done')
 # time.sleep(3)
 x = np.arange(len(fitness_selfcga))

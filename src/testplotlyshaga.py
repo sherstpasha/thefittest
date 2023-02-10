@@ -62,22 +62,22 @@ gray_code_to_float = GrayCode(fit_by='parts').fit(
 
 # problem = CEC2005.ShiftedSphere()
 problem = Sphere()
-# problem = OneMax()
+problem = OneMax()
 
 # problem = HighConditionedElliptic()
 model = SHAGA(fitness_function=problem,
-                genotype_to_phenotype=gray_code_to_float.transform,
-                # genotype_to_phenotype=donothing,
-                iters=1500,
+                # genotype_to_phenotype=gray_code_to_float.transform,
+                genotype_to_phenotype=donothing,
+                iters=100,
                 pop_size=100,
-                str_len=np.sum(parts),
-                # str_len=10000,
+                # str_len=np.sum(parts),
+                str_len=100,
 
-                show_progress_each=20,
+                show_progress_each=5,
                 # optimal_value=0,
                 # termination_error_value=0,
                 # keep_history=True,
-                minimization=True)
+                minimization=False)
 
 
 model.fit()
@@ -87,3 +87,4 @@ print(model.thefittest.fitness)
 # print(stats.population_g.shape)
 # print(model.get_remains_calls())
 # print_population_by_time(stats.population_g, gray_code_to_float, problem)
+input('')

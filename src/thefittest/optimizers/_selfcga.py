@@ -66,7 +66,8 @@ class SelfCGA(GeneticAlgorithm):
         self.set_strategy(select_opers=['proportional',
                                         'rank',
                                         'tournament'],
-                          crossover_opers=['one_point',
+                          crossover_opers=['empty',
+                                           'one_point',
                                            'two_point',
                                            'uniform2'],
                           mutation_opers=['weak',
@@ -147,8 +148,12 @@ class SelfCGA(GeneticAlgorithm):
     def fit(self):
         z_s, z_c, z_m = list(map(len, (self.s_sets, self.c_sets, self.m_sets)))
         s_proba = dict(zip(list(self.s_sets.keys()), np.full(z_s, 1/z_s)))
-        c_proba = dict(zip(list(self.c_sets.keys()), np.full(z_c, 1/z_c)))
         m_proba = dict(zip(list(self.m_sets.keys()), np.full(z_m, 1/z_m)))
+        if 'empty' in self.c_sets.keys():
+            c_proba = dict(zip(list(self.c_sets.keys()), np.full(z_c, 0.9/(z_c-1))))
+            c_proba['empty'] = 0.1
+        else:
+            c_proba = dict(zip(list(self.c_sets.keys()), np.full(z_c, 1/z_c)))
 
         population_g = self.generate_init_pop()
         population_ph = self.genotype_to_phenotype(population_g)
@@ -200,7 +205,7 @@ class SelfCGA(GeneticAlgorithm):
                     m_operators, fitness[:-1])
                 m_proba = self.update_proba(m_proba, m_fittest_oper)
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                # population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
 
