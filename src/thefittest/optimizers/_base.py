@@ -2,6 +2,8 @@ import numpy as np
 from typing import Optional
 from typing import Callable
 from typing import Any
+import random
+from inspect import signature
 
 
 class LastBest:
@@ -106,3 +108,139 @@ class EvolutionaryAlgorithm:
 
     def get_remains_calls(self):
         return (self.pop_size + (self.iters-1)*(self.pop_size-1)) - self.calls
+
+
+class Tree:
+    def __init__(self, nodes, levels):
+        self.nodes = nodes
+        self.levels = levels
+
+    def subtree(self, index: int):
+        n_index = index + 1
+        possible_steps = self.nodes[index].n_args
+        while possible_steps:
+            possible_steps += self.nodes[n_index].n_args - 1
+            n_index += 1
+        return index, n_index
+
+    def compile(self):
+        # может считать с конца просто?
+        reverse_nodes = self.nodes[::-1].copy()
+        pack = []
+        for node in reverse_nodes:
+            args = []
+            for _ in range(node.n_args):
+                args.append(pack.pop())
+            if type(node) == TerminalNode:
+                pack.append(node.value)
+            else:
+                pack.append(node.value(*args))
+        return pack[0]
+
+    def __str__(self):
+        # может считать с конца просто?
+        reverse_nodes = self.nodes[::-1].copy()
+        pack = []
+        for node in reverse_nodes:
+            args = []
+            for _ in range(node.n_args):
+                args.append(pack.pop())
+            if type(node) == TerminalNode:
+                pack.append(node.name)
+            else:
+                pack.append(node.value.write(*args))
+        return pack[0]
+
+    def get_levels(self, origin=0):
+        d_i = origin-1
+        s = [1]
+        d = [origin-1]
+        result_list = []
+        for node in self.nodes:
+            s[-1] = s[-1] - 1
+            if s[-1] == 0:
+                s.pop()
+                d_i = d.pop() + 1
+            else:
+                d_i = d[-1] + 1
+            result_list.append(d_i)
+            if node.n_args > 0:
+                s.append(node.n_args)
+                d.append(d_i)
+        return result_list
+
+    def concat(self, index, some_tree):
+        left, right = self.subtree(index)
+        levels = some_tree.get_levels(origin=self.levels[left])
+
+        new_nodes = self.nodes[:left].copy()
+        new_levels = self.levels[:left].copy()
+
+        new_nodes += some_tree.nodes.copy()
+        new_levels += levels
+
+        new_nodes += self.nodes[right:].copy()
+        new_levels += self.levels[right:].copy()
+        to_return = Tree(new_nodes, new_levels)
+        return to_return
+
+
+class FunctionalNode:
+    def __init__(self, value):
+        self.value = value
+        self.args = None
+        self.name = value.__name__
+        self.sign = value.sign
+        self.n_args = len(signature(value).parameters)
+
+
+class TerminalNode:
+    def __init__(self, value, name):
+        self.value = value
+        self.name = name
+        self.sign = name
+        self.n_args = 0
+
+
+class UniversalSet:
+    def __init__(self, functional_set, terminal_set):
+        functional_set = set(map(FunctionalNode, functional_set))
+        terminal_set = set(TerminalNode(value, key)
+                           for key, value in terminal_set.items())
+        self.functional_set = {}
+        for unit in functional_set:
+            n_args = unit.n_args
+            if n_args not in self.functional_set:
+                self.functional_set[n_args] = {unit}
+            else:
+                self.functional_set[n_args] =\
+                    self.functional_set[n_args].union({unit})
+        self.functional_set['any'] = functional_set
+        self.terminal_set = terminal_set
+        self.union = self.functional_set['any'].union(terminal_set)
+
+    def choice_terminal(self):
+        return random.choice(list(self.terminal_set))
+
+    def choice_functional(self, n_args='any'):
+        return random.choice(list(self.functional_set[n_args]))
+
+    def choice_universal(self):
+        return random.choice(list(self.union))
+
+    def mutate_terminal(self, terminal):
+        if len(self.terminal_set) > 1:
+            remains = self.terminal_set - {terminal}
+            to_return = random.choice(list(remains))
+        else:
+            to_return = list(self.terminal_set)[0]
+        return to_return
+
+    def mutate_functional(self, functional):
+        n_args = functional.n_args
+        if len(self.functional_set[n_args]) > 1:
+            remains = self.functional_set[n_args] - {functional}
+            to_return = random.choice(list(remains))
+        else:
+            to_return = list(self.functional_set[n_args])[0]
+        return to_return

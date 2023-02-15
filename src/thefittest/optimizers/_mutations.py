@@ -1,4 +1,6 @@
 import numpy as np
+from ._base import Tree
+from ._base import TerminalNode
 
 
 def flip_mutation(individ, proba):
@@ -64,3 +66,36 @@ def current_to_rand_1(current, population, F_value):
     r1, r2, r3 = np.random.choice(
         range(len(population)), size=3, replace=False)
     return population[r1] + F_value*(population[r3] - current) + F_value*(population[r1] - population[r2])
+
+
+def point_mutation(some_tree, uniset,
+                   proba_down, growing_method):
+    nodes = some_tree.nodes.copy()
+    levels = some_tree.levels.copy()
+
+    proba = proba_down/len(nodes)
+    for i, node in enumerate(nodes):
+        if np.random.random() < proba:
+            if type(node) == TerminalNode:
+                new_node = uniset.mutate_terminal(node)
+            else:
+                new_node = uniset.mutate_functional(node)
+            nodes[i] = new_node
+
+    new_tree = Tree(nodes, levels)
+    return new_tree
+
+
+def growing_mutation(some_tree, uniset,
+                     proba_down, growing_method):
+    proba = proba_down/len(some_tree.nodes)
+    for i in range(1, len(some_tree.nodes)):
+        if np.random.random() < proba:
+            # второй раз выполняется может можно как-то один раз оставить?
+            left, right = some_tree.subtree(i)
+            max_level = some_tree.levels[left:right][-1] - \
+                some_tree.levels[left:right][0]
+            new_tree = growing_method(uniset, max_level)
+            mutated = some_tree.concat(i, new_tree)
+            return mutated
+    return some_tree

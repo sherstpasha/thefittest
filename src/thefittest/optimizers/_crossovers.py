@@ -1,5 +1,6 @@
 import numpy as np
 from ..tools import protect_norm
+from ._base import Tree
 
 
 def empty_crossover(individs, fitness, rank):
@@ -75,3 +76,24 @@ def binomial(individ, mutant, CR):
     mask_union = mask_random | mask_j
     individ[mask_union] = mutant[mask_union].copy()
     return individ
+
+
+def standart_crossover(individs):
+    individ_1 = individs[0]
+    individ_2 = individs[1]
+    firts_point = np.random.randint(1,  len(individ_1.nodes))
+    second_point = np.random.randint(1,  len(individ_2.nodes))
+
+    if np.random.random() < 0.5:
+        print(1, firts_point, second_point)
+        left, right = individ_1.subtree(firts_point)
+        first_subtree = Tree(individ_1.nodes[left:right],
+                             individ_1.levels[left:right])
+        offspring = individ_2.concat(second_point, first_subtree)
+    else:
+        print(2, firts_point, second_point)
+        left, right = individ_2.subtree(second_point)
+        second_subtree = Tree(individ_2.nodes[left:right],
+                              individ_2.levels[left:right])
+        offspring = individ_1.concat(firts_point, second_subtree)
+    return offspring
