@@ -11,7 +11,7 @@ from ._base import UniversalSet
 from ._selections import proportional_selection
 from ._selections import rank_selection
 from ._selections import tournament_selection
-from ._crossovers import one_point_crossover
+from ._crossovers import one_point_crossoverGP
 from ._crossovers import standart_crossover
 from ._mutations import point_mutation
 from ._mutations import growing_mutation
@@ -50,7 +50,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
         self.uniset = uniset
         self.tour_size = 2
-        self.max_level = 10
+        self.max_level = 15
         self.initial_population = None
         self.thefittest: TheFittest
         self.stats: Statistics
@@ -59,18 +59,18 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'rank': (rank_selection, None),
                        'tournament': (tournament_selection, self.tour_size)}
 
-        self.c_pool = {'standart': (standart_crossover, None),
-                       'one_point': (one_point_crossover, None)}
+        self.c_pool = {'standart': (standart_crossover, 2),
+                       'one_point': (one_point_crossoverGP, 2)}
 
         self.m_pool = {'weak_point': (point_mutation, 0.25),
                        'average_point': (point_mutation, 1),
                        'strong_point': (point_mutation, 4),
-                       'weak_grow': (growing_mutation, 0.25),
+                       'weak_grow': (growing_mutation, 0),
                        'average_grow': (growing_mutation, 1),
                        'strong_grow': (growing_mutation, 4)}
         
         self.s_set = self.s_pool['tournament']
-        self.c_set = self.c_pool['standart']
+        self.c_set = self.c_pool['one_point']
         self.m_set = self.m_pool['weak_grow']
 
 #добавить сюда max_level
@@ -91,8 +91,26 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         self.initial_population = initial_population
         return self
     
-    def create_offspring(self):
-        pass
+    def create_offspring(self, population_g, fitness_scale, fitness_rank, _):
+        crossover_func, quantity = self.c_set
+        selection_func, tour_size = self.s_set
+        mutation_func, proba = self.m_set
+
+        indexes = selection_func(fitness_scale,
+                                 fitness_rank,
+                                 tour_size,
+                                 quantity)
+        
+        parents = population_g[indexes]
+        fitness_scale_p = fitness_scale[indexes]
+        fitness_rank_p = fitness_rank[indexes]
+
+        offspring_no_mutated = crossover_func(parents,
+                                              fitness_scale_p,
+                                              fitness_rank_p)
+        mutant = mutation_func(offspring_no_mutated, self.uniset, proba)
+        return mutant
+
 
 
     def fit(self):
@@ -115,4 +133,22 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
-                pass
+                partial_create_offspring = partial(self.create_offspring,
+                                                   population_g,
+                                                   fitness_scale,
+                                                   fitness_rank)
+                map_ = map(partial_create_offspring, range(self.pop_size-1))
+                population_g[:-1] = np.array(list(map_), dtype=object)
+                fitness[:-1] = self.evaluate(population_ph[:-1])
+
+                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                fitness_scale = scale_data(fitness)
+                fitness_rank = rank_data(fitness)
+
+                self.thefittest.update(population_g, population_ph, fitness)
+                lastbest.update(self.thefittest.fitness)
+                # if self.keep_history:
+                    # self.stats.update(population_g,
+                    #                   population_ph,
+                    #                   fitness)
+        return self

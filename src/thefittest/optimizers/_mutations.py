@@ -78,7 +78,6 @@ def point_mutation(some_tree, uniset,
     for i, node in enumerate(nodes):
         
         if np.random.random() < proba:
-            print(i, type(node))
             if type(node) != FunctionalNode:
                 if np.random.random() < 0.5:
                     new_node = uniset.mutate_terminal(node)

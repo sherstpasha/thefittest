@@ -81,9 +81,61 @@ def binomial(individ, mutant, CR):
 def standart_crossover(individs, fitness, rank):
     individ_1 = individs[0]
     individ_2 = individs[1]
-    first_point = np.random.randint(1,  len(individ_1.nodes))
-    second_point = np.random.randint(1,  len(individ_2.nodes))
+    first_point = np.random.randint(0,  len(individ_1.nodes))
+    second_point = np.random.randint(0,  len(individ_2.nodes))
 
+    if np.random.random() < 0.5:
+        left, right = individ_1.subtree(first_point)
+        first_subtree = Tree(individ_1.nodes[left:right],
+                             individ_1.levels[left:right])
+        offspring = individ_2.concat(second_point, first_subtree)
+    else:
+        left, right = individ_2.subtree(second_point)
+        second_subtree = Tree(individ_2.nodes[left:right],
+                              individ_2.levels[left:right])
+        offspring = individ_1.concat(first_point, second_subtree)
+    return offspring
+
+def common_region(trees):
+    terminate = False
+    indexes = []
+    common_indexes = []
+    for tree in trees:
+        indexes.append(list(range(len(tree.nodes))))
+        common_indexes.append([])
+
+    while not terminate:
+        inner_break = False
+        iters = np.min(list(map(len, indexes)))
+        for i in range(iters):
+            first_n_args = trees[0].nodes[indexes[0][i]].n_args
+            common_indexes[0].append(indexes[0][i])
+            for j in range(1, len(indexes)):
+                common_indexes[j].append(indexes[j][i])
+                if first_n_args != trees[j].nodes[indexes[j][i]].n_args:
+                    inner_break = True
+
+            if inner_break:
+                break
+
+        for j in range(len(indexes)):
+            _, right = trees[j].subtree(common_indexes[j][-1])
+            delete_to = indexes[j].index(right-1) + 1
+            indexes[j] = indexes[j][delete_to:]
+
+            if len(indexes[j]) < 1:
+                terminate = True
+                break
+
+    return common_indexes
+
+def one_point_crossoverGP(individs, fitness, rank):
+    individ_1 = individs[0]
+    individ_2 = individs[1]
+    common_indexes = common_region([individ_1, individ_2])
+    point = np.random.randint(0,  len(common_indexes[0]))
+    first_point = common_indexes[0][point]
+    second_point = common_indexes[1][point]
     if np.random.random() < 0.5:
         left, right = individ_1.subtree(first_point)
         first_subtree = Tree(individ_1.nodes[left:right],

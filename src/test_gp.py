@@ -12,11 +12,10 @@ from thefittest.optimizers._operators import Add
 from thefittest.optimizers._operators import Pow
 from thefittest.optimizers._operators import Cos
 from thefittest.optimizers._operators import Sin
-from thefittest.optimizers._crossovers import standart_crossover
-from thefittest.optimizers._mutations import point_mutation
-from thefittest.optimizers._mutations import growing_mutation
-from thefittest.optimizers._initializations import full_growing_method
-from thefittest.optimizers._initializations import growing_method
+from thefittest.optimizers._operators import Neg
+from thefittest.tools import donothing
+from sklearn.model_selection import train_test_split
+from thefittest.optimizers import GeneticProgramming
 
 
 def graph(some_tree):
@@ -28,7 +27,9 @@ def graph(some_tree):
 
     for i, node in enumerate(reverse_nodes):
         labels[len(reverse_nodes) - i -
-               1] = str(len(reverse_nodes) - i - 1) + '. ' + node.sign  # один раз развернуть или вообще не разворачивать а сразу считать так
+            #    1] = str(len(reverse_nodes) - i - 1) + '. ' + node.sign  # один раз развернуть или вообще не разворачивать а сразу считать так
+               1] = node.sign
+
         nodes.append(len(reverse_nodes) - i - 1)
 
         for _ in range(node.n_args):
@@ -82,107 +83,67 @@ def print_tree(some_tree, fig_name, underline_nodes=[]):
     plt.close()
 
 
-def common_region(trees):
-    terminate = False
-    indexes = []
-    common_indexes = []
+def root_mean_square_error(y_true, y_predict):
+    return np.sqrt(np.mean((y_true - y_predict)**2))
+
+# def problem(x):
+#     return np.cos(x[:, 0]) + 5*x[:, 1]
+
+def problem(x):
+    return 11*np.cos(x[:, 0]) + 5*x[:, 0]
+
+left = -10
+right = 10
+size = 1000
+n_vars = 1
+X = np.random.uniform(left, right, size=(size, n_vars))
+y = problem(X)
+y = y + np.random.uniform(0, 10, len(X))
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.33, random_state=42)
+
+uniset = UniversalSet(functional_set=(Add(),
+                                      Cos(),
+                                      Sin(),
+                                      Mul(),
+                                    #   Neg()
+                                      ),
+                      terminal_set={'x0': X_train[:, 0]},
+                      constant_set=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+
+
+def fitness_function(trees):
+    fitness = []
     for tree in trees:
-        indexes.append(list(range(len(tree.nodes))))
-        common_indexes.append([])
-
-    while not terminate:
-        inner_break = False
-        iters = np.min(list(map(len, indexes)))
-        for i in range(iters):
-            first_n_args = trees[0].nodes[indexes[0][i]].n_args
-            common_indexes[0].append(indexes[0][i])
-            for j in range(1, len(indexes)):
-                common_indexes[j].append(indexes[j][i])
-                if first_n_args != trees[j].nodes[indexes[j][i]].n_args:
-                    inner_break = True
-
-            if inner_break:
-                break
-
-        for j in range(len(indexes)):
-            _, right = trees[j].subtree(common_indexes[j][-1])
-            delete_to = indexes[j].index(right-1) + 1
-            indexes[j] = indexes[j][delete_to:]
-
-            if len(indexes[j]) < 1:
-                terminate = True
-                break
-
-    return common_indexes
+        y_pred = tree.compile()*np.ones(len(y_train))
+        fitness.append(root_mean_square_error(y_train, y_pred))
+    return np.array(fitness)
 
 
-def one_point_crossover(individs, fitness, rank):
-    individ_1 = individs[0]
-    individ_2 = individs[1]
-    common_indexes = common_region([individ_1, individ_2])
-    point = np.random.randint(0,  len(common_indexes[0]))
-    first_point = common_indexes[0][point]
-    second_point = common_indexes[1][point]
-    # print(point, first_point, second_point)
-    if np.random.random() < 0.5:
-        print(1, point, first_point, second_point)
-        left, right = individ_1.subtree(first_point)
-        first_subtree = Tree(individ_1.nodes[left:right],
-                             individ_1.levels[left:right])
-        offspring = individ_2.concat(second_point, first_subtree)
-    else:
-        print(2, point, first_point, second_point)
-        left, right = individ_2.subtree(second_point)
-        second_subtree = Tree(individ_2.nodes[left:right],
-                              individ_2.levels[left:right])
-        offspring = individ_1.concat(first_point, second_subtree)
-    return offspring
+model = GeneticProgramming(fitness_function=fitness_function,
+                           genotype_to_phenotype=donothing,
+                           uniset=uniset,
+                           pop_size=100, iters=100,
+                           show_progress_each=10,
+                           minimization=True)
 
+model.fit()
 
-X = np.arange(0, 5, 0.01).reshape(-1, 1)
-print(X.shape)
-target = np.sin(X[:, 0]) + 0.1*X[:,0]**2
-target = target + np.random.normal(loc=0, scale=0.1, size=len(target))
-functional_set_ = (Mul(),
-                   Add(),
-                #    Add3(),
-                   #    Pow(),
-                   Sin()
-                   )
-terminal_set_ = {'x1': X[:, 0]}
+fittest = model.thefittest.phenotype
 
-constant_set_ = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+print(fittest)
 
+x_plot = np.linspace(left, right, size).reshape(-1, 1)
+y_plot = problem(x_plot)
 
-uniset_ = UniversalSet(functional_set=functional_set_,
-                       terminal_set=terminal_set_,
-                       constant_set=constant_set_)
+y_pred = fittest.compile()*np.ones_like(y_train)
 
-
-def FF(some_tree):
-    y_ = some_tree.compile()
-    y_ = np.ones(len(X))*y_
-    return np.mean((y_ - target)**2)
-
-trees = []
-fitness = []
-for i in range(100000):
-    # print(i)
-    tree1 = growing_method(uniset_, level_max=10)
-    trees.append(tree1.copy())
-    fitness.append(FF(tree1))
-
-
-fitness = np.array(fitness)
-print(fitness)
-argmin = np.argmin(fitness)
-
-y_ = trees[argmin].compile()
-y_ = np.ones(len(X))*y_
-plt.scatter(X[:, 0], target, label='y_true')
-plt.plot(X[:, 0], y_, label='y_tree', color='red')
+plt.plot(x_plot, y_plot, label = 'true', color = 'green')
+plt.scatter(X_train, y_train, label = 'train', color = 'black', alpha=0.3)
+plt.scatter(X_train, y_pred, label = 'pred', color = 'red')
 plt.legend()
 plt.savefig('line1.png')
 plt.close()
-print_tree(trees[argmin], fig_name='tree1.png')
-print(trees[argmin])
+
+print_tree(fittest, 'fittest.png')
