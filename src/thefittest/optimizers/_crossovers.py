@@ -4,7 +4,7 @@ from ._base import Tree
 
 
 def empty_crossover(individs, fitness, rank):
-    return np.random.choice(individs)[0]
+    return individs[0]
 
 
 def one_point_crossover(individs, fitness, rank):
@@ -96,6 +96,7 @@ def standart_crossover(individs, fitness, rank):
         offspring = individ_1.concat(first_point, second_subtree)
     return offspring
 
+
 def common_region(trees):
     terminate = False
     indexes = []
@@ -128,6 +129,7 @@ def common_region(trees):
                 break
 
     return common_indexes
+
 
 def one_point_crossoverGP(individs, fitness, rank):
     individ_1 = individs[0]
