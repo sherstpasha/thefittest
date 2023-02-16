@@ -7,7 +7,7 @@ from ._base import Statistics
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
 from ..tools import cauchy_distribution
-
+from ._initializations import binary_string_population
 from ._selections import tournament_selection
 from ._crossovers import binomial
 from ._mutations import flip_mutation
@@ -78,9 +78,7 @@ class SHAGA(EvolutionaryAlgorithm):
 
     def generate_init_pop(self):
         if self.initial_population is None:
-            population_g = np.random.randint(low=2, size=(self.pop_size,
-                                                          self.str_len),
-                                             dtype=np.byte)
+            population_g = binary_string_population(self.pop_size, self.str_len)
         else:
             population_g = self.initial_population
         return population_g

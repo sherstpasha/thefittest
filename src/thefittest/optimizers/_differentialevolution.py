@@ -15,7 +15,7 @@ from ._mutations import current_to_best_1
 from ._mutations import rand_1
 from ._mutations import current_to_pbest_1
 from ._mutations import rand_2
-
+from ._initializations import float_population
 
 class DifferentialEvolution(EvolutionaryAlgorithm):
     def __init__(self,
@@ -64,8 +64,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
     def generate_init_pop(self):
         if self.initial_population is None:
-            population_g = np.array([np.random.uniform(left_i, right_i, self.pop_size)
-                                     for left_i, right_i in zip(self.left, self.right)]).T
+            population_g = float_population(self.pop_size, self.left, self.right)
         else:
             population_g = self.initial_population
         return population_g

@@ -2,6 +2,19 @@ from ._base import Tree
 import numpy as np
 
 
+def binary_string_population(pop_size: int, str_len: int) -> np.ndarray[np.byte]:
+    return np.random.randint(low=2,
+                             size=(pop_size, str_len),
+                             dtype=np.byte)
+
+
+def float_population(pop_size: int,
+                     left: np.ndarray[float],
+                     right: np.ndarray[float]) -> np.ndarray[float]:
+    return np.array([np.random.uniform(left_i, right_i, pop_size)
+                     for left_i, right_i in zip(left, right)]).T
+
+
 def full_growing_method(uniset, level_max):
     nodes = []
     levels = []
@@ -73,11 +86,4 @@ def half_and_half(pop_size, uniset, level_max):
         population.append(full_growing_method(uniset, level_max))
     for _ in range(second_part):
         population.append(growing_method(uniset, level_max))
-    return np.array(population, dtype = object)
-    
-
-def ga_init():
-    pass
-
-def de_init():
-    pass
+    return np.array(population, dtype=object)

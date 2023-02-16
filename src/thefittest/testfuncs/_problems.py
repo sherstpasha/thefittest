@@ -270,7 +270,7 @@ class SampleHybridCompositionFunction():
 
 class OneMax(TestFunction):
     def f(self, x):
-        return np.ones(x.shape[0])
+        # return np.ones(x.shape[0])
         return np.sum(x, axis=1)
 
 

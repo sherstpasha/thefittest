@@ -16,6 +16,7 @@ from ._crossovers import uniform_crossover
 from ._crossovers import uniform_prop_crossover
 from ._crossovers import uniform_rank_crossover
 from ._crossovers import uniform_tour_crossover
+from ._initializations import binary_string_population
 from ._mutations import flip_mutation
 from ..tools import scale_data
 from ..tools import rank_data
@@ -81,9 +82,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
     def generate_init_pop(self):
         if self.initial_population is None:
-            population_g = np.random.randint(low=2, size=(self.pop_size,
-                                                          self.str_len),
-                                             dtype=np.byte)
+            population_g = binary_string_population(self.pop_size, self.str_len)
         else:
             population_g = self.initial_population
         return population_g
