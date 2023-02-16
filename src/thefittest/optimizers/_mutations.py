@@ -1,6 +1,7 @@
 import numpy as np
 from ._base import Tree
 from ._base import FunctionalNode
+from ._base import TerminalConstantNode
 from ._initializations import growing_method
 
 
@@ -79,10 +80,7 @@ def point_mutation(some_tree, uniset,
         
         if np.random.random() < proba:
             if type(node) != FunctionalNode:
-                if np.random.random() < 0.5:
-                    new_node = uniset.mutate_terminal(node)
-                else:
-                    new_node = uniset.mutate_constant(node)
+                new_node = uniset.mutate_terminal(node)
             else:
                 new_node = uniset.mutate_functional(node)
             nodes[i] = new_node
@@ -90,6 +88,19 @@ def point_mutation(some_tree, uniset,
     new_tree = Tree(nodes, levels)
     return new_tree
 
+def constant_gauss_mutation(some_tree, uniset,
+                   proba_down, growing_method=None):
+    nodes = some_tree.nodes.copy()
+    levels = some_tree.levels.copy()
+
+    proba = proba_down/len(nodes)
+    for i, node in enumerate(nodes):
+        if type(node) == TerminalConstantNode:
+            if np.random.random() < proba:
+                nodes[i] = uniset.mutate_constant(node)
+
+    new_tree = Tree(nodes, levels)
+    return new_tree
 
 def growing_mutation(some_tree, uniset,
                      proba_down, growing_method=growing_method):

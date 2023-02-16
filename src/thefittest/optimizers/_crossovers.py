@@ -81,8 +81,8 @@ def binomial(individ, mutant, CR):
 def standart_crossover(individs, fitness, rank):
     individ_1 = individs[0]
     individ_2 = individs[1]
-    first_point = np.random.randint(0,  len(individ_1.nodes))
-    second_point = np.random.randint(0,  len(individ_2.nodes))
+    first_point = np.random.randint(1,  len(individ_1.nodes))
+    second_point = np.random.randint(1,  len(individ_2.nodes))
 
     if np.random.random() < 0.5:
         left, right = individ_1.subtree(first_point)

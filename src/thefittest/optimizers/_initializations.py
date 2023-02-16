@@ -46,6 +46,11 @@ def growing_method(uniset, level_max):
 
         if level_i == level_max:
             nodes.append(uniset.choice_terminal())
+        elif level_i == 0:
+            nodes.append(uniset.choice_functional())
+            n_i = nodes[-1].n_args
+            possible_steps.append(n_i)
+            previous_levels.append(level_i)
         else:
             if np.random.random() < 0.5:
                 nodes.append(uniset.choice_terminal())

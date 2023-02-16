@@ -94,11 +94,11 @@ def problem(x):
 
 left = -10
 right = 10
-size = 1000
+size = 100
 n_vars = 1
 X = np.random.uniform(left, right, size=(size, n_vars))
 y = problem(X)
-y = y + np.random.uniform(0, 10, len(X))
+# y = y + np.random.uniform(0, 10, len(X))
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.33, random_state=42)
@@ -110,21 +110,26 @@ uniset = UniversalSet(functional_set=(Add(),
                                     #   Neg()
                                       ),
                       terminal_set={'x0': X_train[:, 0]},
-                      constant_set=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+                      constant_set=(range(10)))
 
 
 def fitness_function(trees):
     fitness = []
     for tree in trees:
         y_pred = tree.compile()*np.ones(len(y_train))
-        fitness.append(root_mean_square_error(y_train, y_pred))
+        level = tree.get_max_level()
+        if level > 25:
+            fine = 0.1*level
+        else:
+            fine = 0.
+        fitness.append(root_mean_square_error(y_train, y_pred) + fine)
     return np.array(fitness)
 
 
 model = GeneticProgramming(fitness_function=fitness_function,
                            genotype_to_phenotype=donothing,
                            uniset=uniset,
-                           pop_size=100, iters=100,
+                           pop_size=200, iters=100,
                            show_progress_each=10,
                            minimization=True)
 

@@ -185,6 +185,9 @@ class Tree:
     
     def copy(self):
         return Tree(self.nodes.copy(), self.levels.copy())
+    
+    def get_max_level(self):
+        return np.max(self.levels)
 
 
 class FunctionalNode:
@@ -213,12 +216,11 @@ class TerminalConstantNode:
 
 
 class UniversalSet:
-    def __init__(self, functional_set, terminal_set, constant_set=None):
+    def __init__(self, functional_set, terminal_set, constant_set=[]):
         functional_set = list(map(FunctionalNode, functional_set))
         terminal_set = list(TerminalNode(value, key)
                             for key, value in terminal_set.items())
-        if constant_set is not None:
-            constant_set = list(map(TerminalConstantNode, constant_set))
+        constant_set = list(map(TerminalConstantNode, constant_set))
         self.functional_set = {}
         for unit in functional_set:
             n_args = unit.n_args
@@ -229,36 +231,35 @@ class UniversalSet:
         self.functional_set['any'] = functional_set
         self.terminal_set = terminal_set
         self.constant_set = constant_set
+        self.union_terminal = terminal_set + constant_set
 
     def choice_terminal(self):
-        if self.constant_set is not None:
-            if np.random.random() < 0.5:
-                return random.choice(self.terminal_set)
-            else:
-                return random.choice(self.constant_set)
-        else:
-            return random.choice(self.terminal_set)
+        return random.choice(self.union_terminal)
 
     def choice_functional(self, n_args='any'):
-        return random.choice(list(self.functional_set[n_args]))
+        return random.choice(self.functional_set[n_args])
 
     def mutate_terminal(self, terminal):
-        if len(self.terminal_set) > 1:
+        if len(self.union_terminal) > 1:
             remains = list(filter(lambda x: x != terminal,
-                                  self.terminal_set))
+                                  self.union_terminal))
             to_return = random.choice(remains)
         else:
-            to_return = list(self.terminal_set)[0]
+            to_return = self.union_terminal[0]
         return to_return
 
     def mutate_constant(self, constant):
-        if len(self.constant_set) > 1:
-            remains = list(filter(lambda x: x != constant,
-                                  self.constant_set))
-            to_return = random.choice(remains)
-        else:
-            to_return = list(self.constant_set)[0]
-        return to_return
+        new_value = np.random.normal(constant.value, 1)
+        return TerminalConstantNode(new_value)
+
+    # def mutate_constant(self, constant):
+    #     if len(self.constant_set) > 1:
+    #         remains = list(filter(lambda x: x != constant,
+    #                               self.constant_set))
+    #         to_return = random.choice(remains)
+    #     else:
+    #         to_return = list(self.constant_set)[0]
+    #     return to_return
 
     def mutate_functional(self, functional):
         n_args = functional.n_args
@@ -267,5 +268,5 @@ class UniversalSet:
                                   self.functional_set[n_args]))
             to_return = random.choice(remains)
         else:
-            to_return = list(self.functional_set[n_args])[0]
+            to_return = self.functional_set[n_args][0]
         return to_return

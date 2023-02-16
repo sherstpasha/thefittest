@@ -15,11 +15,42 @@ from ._crossovers import one_point_crossoverGP
 from ._crossovers import standart_crossover
 from ._mutations import point_mutation
 from ._mutations import growing_mutation
+from ._mutations import constant_gauss_mutation
 from ._initializations import half_and_half
 from ..tools import scale_data
 from ..tools import rank_data
 from functools import partial
 
+# class Statistics:
+#     def __init__(self):
+#         self.population_g = np.array([])
+#         self.population_ph = np.array([])
+#         self.fitness = np.array([])
+
+#     def append_arr(self, arr_to, arr_from):
+#         shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
+#         shape_from = (1, arr_from.shape[0], arr_from.shape[1])
+#         result = np.vstack([arr_to.reshape(shape_to),
+#                             arr_from.copy().reshape(shape_from)])
+#         return result
+
+#     def update(self,
+#                population_g_i: np.ndarray,
+#                population_ph_i: np.ndarray,
+#                fitness_i: np.ndarray):
+
+#         self.population_g = self.append_arr(self.population_g,
+#                                             population_g_i)
+#         self.population_ph = self.append_arr(self.population_ph,
+#                                              population_ph_i)
+#         self.fitness = np.append(self.fitness, np.max(fitness_i))
+#         return self
+# class StatisticsGP:
+#     def __init__(self):
+#         self.population_g = np.array([])
+#         self.population_ph = np.array([])
+#         self.fitness = np.array([])
+#         self.
 
 class GeneticProgramming(EvolutionaryAlgorithm):
     def __init__(self,
@@ -49,7 +80,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             keep_history=keep_history)
 
         self.uniset = uniset
-        self.tour_size = 2
+        self.tour_size = 5
         self.max_level = 15
         self.initial_population = None
         self.thefittest: TheFittest
@@ -67,10 +98,13 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'strong_point': (point_mutation, 4),
                        'weak_grow': (growing_mutation, 0),
                        'average_grow': (growing_mutation, 1),
-                       'strong_grow': (growing_mutation, 4)}
+                       'strong_grow': (growing_mutation, 4),
+                       'weak_gauss': (constant_gauss_mutation, 0.25),
+                       'average_gauss': (constant_gauss_mutation, 1),
+                       'strong_gauss': (constant_gauss_mutation, 4)}
         
         self.s_set = self.s_pool['tournament']
-        self.c_set = self.c_pool['one_point']
+        self.c_set = self.c_pool['standart']
         self.m_set = self.m_pool['weak_grow']
 
 #добавить сюда max_level
@@ -130,6 +164,9 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         #                                      fitness)
         for i in range(self.iters-1):
             self.show_progress(i)
+            levels = [tree.get_max_level() for tree in population_g]
+            print('levels', np.max(levels), np.mean(levels))
+            print('fitness', np.max(fitness), np.mean(fitness))
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
