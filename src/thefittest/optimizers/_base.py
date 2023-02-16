@@ -131,21 +131,20 @@ class Tree:
             args = []
             for _ in range(node.n_args):
                 args.append(pack.pop())
-            if type(node) == TerminalNode:
+            if type(node) != FunctionalNode:
                 pack.append(node.value)
             else:
                 pack.append(node.value(*args))
         return pack[0]
 
     def __str__(self):
-        # может считать с конца просто?
         reverse_nodes = self.nodes[::-1].copy()
         pack = []
         for node in reverse_nodes:
             args = []
             for _ in range(node.n_args):
                 args.append(pack.pop())
-            if type(node) == TerminalNode:
+            if type(node) != FunctionalNode:
                 pack.append(node.name)
             else:
                 pack.append(node.value.write(*args))
@@ -183,6 +182,9 @@ class Tree:
         new_levels += self.levels[right:].copy()
         to_return = Tree(new_nodes, new_levels)
         return to_return
+    
+    def copy(self):
+        return Tree(self.nodes.copy(), self.levels.copy())
 
 
 class FunctionalNode:
@@ -202,45 +204,68 @@ class TerminalNode:
         self.n_args = 0
 
 
+class TerminalConstantNode:
+    def __init__(self, value):
+        self.value = value
+        self.name = str(value)
+        self.sign = str(value)
+        self.n_args = 0
+
+
 class UniversalSet:
-    def __init__(self, functional_set, terminal_set):
-        functional_set = set(map(FunctionalNode, functional_set))
-        terminal_set = set(TerminalNode(value, key)
-                           for key, value in terminal_set.items())
+    def __init__(self, functional_set, terminal_set, constant_set=None):
+        functional_set = list(map(FunctionalNode, functional_set))
+        terminal_set = list(TerminalNode(value, key)
+                            for key, value in terminal_set.items())
+        if constant_set is not None:
+            constant_set = list(map(TerminalConstantNode, constant_set))
         self.functional_set = {}
         for unit in functional_set:
             n_args = unit.n_args
             if n_args not in self.functional_set:
-                self.functional_set[n_args] = {unit}
+                self.functional_set[n_args] = [unit]
             else:
-                self.functional_set[n_args] =\
-                    self.functional_set[n_args].union({unit})
+                self.functional_set[n_args].append(unit)
         self.functional_set['any'] = functional_set
         self.terminal_set = terminal_set
-        self.union = self.functional_set['any'].union(terminal_set)
+        self.constant_set = constant_set
 
     def choice_terminal(self):
-        return random.choice(list(self.terminal_set))
+        if self.constant_set is not None:
+            if np.random.random() < 0.5:
+                return random.choice(self.terminal_set)
+            else:
+                return random.choice(self.constant_set)
+        else:
+            return random.choice(self.terminal_set)
 
     def choice_functional(self, n_args='any'):
         return random.choice(list(self.functional_set[n_args]))
 
-    def choice_universal(self):
-        return random.choice(list(self.union))
-
     def mutate_terminal(self, terminal):
         if len(self.terminal_set) > 1:
-            remains = self.terminal_set - {terminal}
-            to_return = random.choice(list(remains))
+            remains = list(filter(lambda x: x != terminal,
+                                  self.terminal_set))
+            to_return = random.choice(remains)
         else:
             to_return = list(self.terminal_set)[0]
+        return to_return
+
+    def mutate_constant(self, constant):
+        if len(self.constant_set) > 1:
+            remains = list(filter(lambda x: x != constant,
+                                  self.constant_set))
+            to_return = random.choice(remains)
+        else:
+            to_return = list(self.constant_set)[0]
         return to_return
 
     def mutate_functional(self, functional):
         n_args = functional.n_args
         if len(self.functional_set[n_args]) > 1:
-            remains = self.functional_set[n_args] - {functional}
-            to_return = random.choice(list(remains))
+            remains = list(filter(lambda x: x != functional,
+                                  self.functional_set[n_args]))
+            to_return = random.choice(remains)
         else:
             to_return = list(self.functional_set[n_args])[0]
         return to_return

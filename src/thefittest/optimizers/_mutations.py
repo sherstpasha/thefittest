@@ -1,6 +1,7 @@
 import numpy as np
 from ._base import Tree
-from ._base import TerminalNode
+from ._base import FunctionalNode
+from ._initializations import growing_method
 
 
 def flip_mutation(individ, proba):
@@ -69,15 +70,20 @@ def current_to_rand_1(current, population, F_value):
 
 
 def point_mutation(some_tree, uniset,
-                   proba_down, growing_method):
+                   proba_down, growing_method=None):
     nodes = some_tree.nodes.copy()
     levels = some_tree.levels.copy()
 
     proba = proba_down/len(nodes)
     for i, node in enumerate(nodes):
+        
         if np.random.random() < proba:
-            if type(node) == TerminalNode:
-                new_node = uniset.mutate_terminal(node)
+            print(i, type(node))
+            if type(node) != FunctionalNode:
+                if np.random.random() < 0.5:
+                    new_node = uniset.mutate_terminal(node)
+                else:
+                    new_node = uniset.mutate_constant(node)
             else:
                 new_node = uniset.mutate_functional(node)
             nodes[i] = new_node
@@ -87,7 +93,7 @@ def point_mutation(some_tree, uniset,
 
 
 def growing_mutation(some_tree, uniset,
-                     proba_down, growing_method):
+                     proba_down, growing_method=growing_method):
     proba = proba_down/len(some_tree.nodes)
     for i in range(1, len(some_tree.nodes)):
         if np.random.random() < proba:

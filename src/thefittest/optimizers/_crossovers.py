@@ -4,7 +4,7 @@ from ._base import Tree
 
 
 def empty_crossover(individs, fitness, rank):
-    return individs[0]
+    return np.random.choice(individs)[0]
 
 
 def one_point_crossover(individs, fitness, rank):
@@ -78,22 +78,20 @@ def binomial(individ, mutant, CR):
     return individ
 
 
-def standart_crossover(individs):
+def standart_crossover(individs, fitness, rank):
     individ_1 = individs[0]
     individ_2 = individs[1]
-    firts_point = np.random.randint(1,  len(individ_1.nodes))
+    first_point = np.random.randint(1,  len(individ_1.nodes))
     second_point = np.random.randint(1,  len(individ_2.nodes))
 
     if np.random.random() < 0.5:
-        print(1, firts_point, second_point)
-        left, right = individ_1.subtree(firts_point)
+        left, right = individ_1.subtree(first_point)
         first_subtree = Tree(individ_1.nodes[left:right],
                              individ_1.levels[left:right])
         offspring = individ_2.concat(second_point, first_subtree)
     else:
-        print(2, firts_point, second_point)
         left, right = individ_2.subtree(second_point)
         second_subtree = Tree(individ_2.nodes[left:right],
                               individ_2.levels[left:right])
-        offspring = individ_1.concat(firts_point, second_subtree)
+        offspring = individ_1.concat(first_point, second_subtree)
     return offspring
