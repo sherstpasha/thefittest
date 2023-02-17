@@ -9,6 +9,8 @@
     * **jDE** (Brest, Janez & Greiner, Sao & Bošković, Borko & Mernik, Marjan & Zumer, Viljem. (2007). Self-Adapting Control Parameters in Differential Evolution: A Comparative Study on Numerical Benchmark Problems. Evolutionary Computation, IEEE Transactions on. 10. 646 - 657. 10.1109/TEVC.2006.872133);
     * **JADE** (Zhang, Jingqiao & Sanderson, A.C.. (2009). JADE: Adaptive Differential Evolution With Optional External Archive. Evolutionary Computation, IEEE Transactions on. 13. 945 - 958. 10.1109/TEVC.2009.2014613);
     * **SHADE** (Tanabe, Ryoji & Fukunaga, Alex. (2013). Success-history based parameter adaptation for Differential Evolution. 2013 IEEE Congress on Evolutionary Computation, CEC 2013. 71-78. 10.1109/CEC.2013.6557555).
-
+* **Genetic programming** (Koza, John R.. “Genetic programming - on the programming of computers by means
+    of natural selection.” Complex Adaptive Systems (1993)):
+    * **Self-configuring genetic programming** (Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm with modified uniform crossover. 1-6. 10.1109/CEC.2012.6256587).
 # benchmarks
 * **CEC2005** (Suganthan, Ponnuthurai & Hansen, Nikolaus & Liang, Jing & Deb, Kalyan & Chen, Ying-ping & Auger, Anne & Tiwari, Santosh. (2005). Problem Definitions and Evaluation Criteria for the CEC 2005 Special Session on Real-Parameter Optimization. Natural Computing. 341-357);
