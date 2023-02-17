@@ -135,6 +135,7 @@ def one_point_crossoverGP(individs, fitness, rank):
     individ_1 = individs[0]
     individ_2 = individs[1]
     common_indexes = common_region([individ_1, individ_2])
+    
     point = np.random.randint(0,  len(common_indexes[0]))
     first_point = common_indexes[0][point]
     second_point = common_indexes[1][point]

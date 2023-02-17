@@ -13,6 +13,7 @@ from ._selections import rank_selection
 from ._selections import tournament_selection
 from ._crossovers import one_point_crossoverGP
 from ._crossovers import standart_crossover
+from ._crossovers import empty_crossover
 from ._mutations import point_mutation
 from ._mutations import growing_mutation
 from ._mutations import constant_gauss_mutation
@@ -52,6 +53,7 @@ from functools import partial
 #         self.fitness = np.array([])
 #         self.
 
+
 class GeneticProgramming(EvolutionaryAlgorithm):
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
@@ -80,8 +82,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             keep_history=keep_history)
 
         self.uniset = uniset
-        self.tour_size = 5
-        self.max_level = 15
+        self.tour_size = 2
+        self.max_level = 10
         self.initial_population = None
         self.thefittest: TheFittest
         self.stats: Statistics
@@ -90,7 +92,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'rank': (rank_selection, None),
                        'tournament': (tournament_selection, self.tour_size)}
 
-        self.c_pool = {'standart': (standart_crossover, 2),
+        self.c_pool = {'empty': (empty_crossover, 1),
+                       'standart': (standart_crossover, 2),
                        'one_point': (one_point_crossoverGP, 2)}
 
         self.m_pool = {'weak_point': (point_mutation, 0.25),
@@ -102,12 +105,12 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'weak_gauss': (constant_gauss_mutation, 0.25),
                        'average_gauss': (constant_gauss_mutation, 1),
                        'strong_gauss': (constant_gauss_mutation, 4)}
-        
+
         self.s_set = self.s_pool['tournament']
         self.c_set = self.c_pool['standart']
         self.m_set = self.m_pool['weak_grow']
 
-#добавить сюда max_level
+# добавить сюда max_level
     def set_strategy(self,
                      selection_oper: Optional[str] = None,
                      crossover_oper: Optional[str] = None,
@@ -124,7 +127,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             self.tour_size = tour_size_param
         self.initial_population = initial_population
         return self
-    
+
     def create_offspring(self, population_g, fitness_scale, fitness_rank, _):
         crossover_func, quantity = self.c_set
         selection_func, tour_size = self.s_set
@@ -134,7 +137,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                                  fitness_rank,
                                  tour_size,
                                  quantity)
-        
+
         parents = population_g[indexes]
         fitness_scale_p = fitness_scale[indexes]
         fitness_rank_p = fitness_rank[indexes]
@@ -145,10 +148,9 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         mutant = mutation_func(offspring_no_mutated, self.uniset, proba)
         return mutant
 
-
-
     def fit(self):
-        population_g = half_and_half(self.pop_size, self.uniset, self.max_level)
+        population_g = half_and_half(
+            self.pop_size, self.uniset, self.max_level)
         population_ph = self.genotype_to_phenotype(population_g)
         fitness = self.evaluate(population_ph)
         fitness_scale = scale_data(fitness)
@@ -185,7 +187,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
                 # if self.keep_history:
-                    # self.stats.update(population_g,
-                    #                   population_ph,
-                    #                   fitness)
+                # self.stats.update(population_g,
+                #                   population_ph,
+                #                   fitness)
         return self

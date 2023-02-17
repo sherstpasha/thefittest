@@ -84,3 +84,17 @@ class Pow(Operator):
 
     def __call__(self, x, y):
         return x**y
+    
+class Div(Operator):
+    def __init__(self):
+        self.formula = '({}/{})'
+        self.__name__ = 'div'
+        self.sign = '/'
+
+    def __call__(self, x, y):
+        if type(y) == np.ndarray:
+            mask = y == 0
+            y[mask] = 1e-6
+        else:
+            y = 1e-6
+        return x/y

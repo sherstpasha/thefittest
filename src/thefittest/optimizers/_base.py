@@ -188,7 +188,15 @@ class Tree:
     
     def get_max_level(self):
         return np.max(self.levels)
-
+    
+    def __eq__(self, other):
+        if len(self.nodes) != len(other.nodes):
+            return False
+        else:
+            for node_1, node_2 in zip(self.nodes, other.nodes):
+                if np.all(node_1.value != node_2.value):
+                    return False
+        return True
 
 class FunctionalNode:
     def __init__(self, value):
@@ -249,17 +257,8 @@ class UniversalSet:
         return to_return
 
     def mutate_constant(self, constant):
-        new_value = np.random.normal(constant.value, 1)
+        new_value = constant.value*np.random.normal(1, 0.1)
         return TerminalConstantNode(new_value)
-
-    # def mutate_constant(self, constant):
-    #     if len(self.constant_set) > 1:
-    #         remains = list(filter(lambda x: x != constant,
-    #                               self.constant_set))
-    #         to_return = random.choice(remains)
-    #     else:
-    #         to_return = list(self.constant_set)[0]
-    #     return to_return
 
     def mutate_functional(self, functional):
         n_args = functional.n_args

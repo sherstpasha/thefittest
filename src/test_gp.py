@@ -13,6 +13,7 @@ from thefittest.optimizers._operators import Pow
 from thefittest.optimizers._operators import Cos
 from thefittest.optimizers._operators import Sin
 from thefittest.optimizers._operators import Neg
+from thefittest.optimizers._operators import Div
 from thefittest.tools import donothing
 from sklearn.model_selection import train_test_split
 from thefittest.optimizers import GeneticProgramming
@@ -27,7 +28,7 @@ def graph(some_tree):
 
     for i, node in enumerate(reverse_nodes):
         labels[len(reverse_nodes) - i -
-            #    1] = str(len(reverse_nodes) - i - 1) + '. ' + node.sign  # один раз развернуть или вообще не разворачивать а сразу считать так
+               #    1] = str(len(reverse_nodes) - i - 1) + '. ' + node.sign  # один раз развернуть или вообще не разворачивать а сразу считать так
                1] = node.sign
 
         nodes.append(len(reverse_nodes) - i - 1)
@@ -89,11 +90,14 @@ def root_mean_square_error(y_true, y_predict):
 # def problem(x):
 #     return np.cos(x[:, 0]) + 5*x[:, 1]
 
-def problem(x):
-    return 11*np.cos(x[:, 0]) + 5*x[:, 0]
 
-left = -10
-right = 10
+def problem(x):
+    # return x[:,0]*x[:,0]
+    return 11*np.cos(x[:, 0]) + 0.5*x[:, 0]*x[:, 0]
+
+
+left = -np.pi
+right = 0
 size = 100
 n_vars = 1
 X = np.random.uniform(left, right, size=(size, n_vars))
@@ -104,13 +108,15 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.33, random_state=42)
 
 uniset = UniversalSet(functional_set=(Add(),
-                                      Cos(),
-                                      Sin(),
+                                      #   Cos(),
+                                      #   Sin(),
+                                      Div(),
                                       Mul(),
-                                    #   Neg()
+                                      Neg()
                                       ),
                       terminal_set={'x0': X_train[:, 0]},
-                      constant_set=(range(10)))
+                      constant_set=(1, 3, 5, 7)
+                      )
 
 
 def fitness_function(trees):
@@ -118,10 +124,10 @@ def fitness_function(trees):
     for tree in trees:
         y_pred = tree.compile()*np.ones(len(y_train))
         level = tree.get_max_level()
-        if level > 25:
+        if level > 50:
             fine = 0.1*level
         else:
-            fine = 0.
+            fine = 0
         fitness.append(root_mean_square_error(y_train, y_pred) + fine)
     return np.array(fitness)
 
@@ -129,9 +135,10 @@ def fitness_function(trees):
 model = GeneticProgramming(fitness_function=fitness_function,
                            genotype_to_phenotype=donothing,
                            uniset=uniset,
-                           pop_size=200, iters=100,
+                           pop_size=1000, iters=1000,
                            show_progress_each=10,
-                           minimization=True)
+                           minimization=True,
+                           no_increase_num=100)
 
 model.fit()
 
@@ -144,9 +151,9 @@ y_plot = problem(x_plot)
 
 y_pred = fittest.compile()*np.ones_like(y_train)
 
-plt.plot(x_plot, y_plot, label = 'true', color = 'green')
-plt.scatter(X_train, y_train, label = 'train', color = 'black', alpha=0.3)
-plt.scatter(X_train, y_pred, label = 'pred', color = 'red')
+plt.plot(x_plot, y_plot, label='true', color='green')
+plt.scatter(X_train, y_train, label='train', color='black', alpha=0.3)
+plt.scatter(X_train, y_pred, label='pred', color='red')
 plt.legend()
 plt.savefig('line1.png')
 plt.close()
