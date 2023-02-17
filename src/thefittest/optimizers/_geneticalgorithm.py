@@ -3,7 +3,6 @@ from typing import Optional
 from typing import Callable
 from typing import Any
 from ._base import TheFittest
-from ._base import Statistics
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
 from ._selections import proportional_selection
@@ -23,6 +22,33 @@ from ..tools import rank_data
 from functools import partial
 
 
+class Statistics:
+    def __init__(self, mode='quick'):
+        self.mode = mode
+        self.population_g = np.array([])
+        self.fitness = np.array([])
+
+    def append_arr(self, arr_to, arr_from):
+        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
+        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
+        result = np.vstack([arr_to.reshape(shape_to),
+                            arr_from.copy().reshape(shape_from)])
+        return result
+
+    def update(self,
+               population_g_i: np.ndarray,
+               fitness_i: np.ndarray):
+        if self.mode == 'quick':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+        elif self.mode == 'full':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            self.population_g = self.append_arr(self.population_g,
+                                                population_g_i)
+        else:
+            raise ValueError('the "mode" must be either "quick" or "full"')
+        return self
+
+
 class GeneticAlgorithm(EvolutionaryAlgorithm):
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
@@ -35,7 +61,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                  no_increase_num: Optional[int] = None,
                  minimization: bool = False,
                  show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+                 keep_history: Optional[str] = None):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -82,7 +108,8 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
     def generate_init_pop(self):
         if self.initial_population is None:
-            population_g = binary_string_population(self.pop_size, self.str_len)
+            population_g = binary_string_population(
+                self.pop_size, self.str_len)
         else:
             population_g = self.initial_population
         return population_g
@@ -136,10 +163,10 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history:
-            self.stats = Statistics().update(population_g,
-                                             population_ph,
-                                             fitness)
+        if self.keep_history is not None:
+            self.stats = Statistics(
+                mode=self.keep_history).update(population_g,
+                                               fitness)
 
         for i in range(self.iters-1):
             self.show_progress(i)
@@ -163,8 +190,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
-                if self.keep_history:
+                if self.keep_history is not None:
                     self.stats.update(population_g,
-                                      population_ph,
                                       fitness)
         return self

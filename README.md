@@ -2,7 +2,8 @@
 
 # the package contains methods
 * **Genetic algorithm** (Holland, J. H. (1992). Genetic algorithms. Scientific American, 267(1), 66-72):
-    * **Self-configuring genetic algorithm** (Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform Crossover Operator. LNCS, 7331, 2012, pp. 414-421).
+    * **Self-configuring genetic algorithm** (Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform Crossover Operator. LNCS, 7331, 2012, pp. 414-421);
+    * **SHAGA** (Stanovov, Vladimir & Akhmedova, Shakhnaz & Semenkin, Eugene. (2019). Genetic Algorithm with Success History based Parameter Adaptation. 180-187. 10.5220/0008071201800187).
 * **Differential evolution** (Storn, Rainer & Price, Kenneth. (1995). Differential Evolution: A Simple and Efficient Adaptive Scheme for Global Optimization Over Continuous Spaces. Journal of Global Optimization. 23):
     * **SaDE** (Qin, Kai & Suganthan, Ponnuthurai. (2005). Self-adaptive differential evolution algorithm for numerical optimization. 2005 IEEE Congress on Evolutionary Computation, IEEE CEC 2005. Proceedings. 2. 1785-1791. 10.1109/CEC.2005.1554904);
     * **jDE** (Brest, Janez & Greiner, Sao & Bošković, Borko & Mernik, Marjan & Zumer, Viljem. (2007). Self-Adapting Control Parameters in Differential Evolution: A Comparative Study on Numerical Benchmark Problems. Evolutionary Computation, IEEE Transactions on. 10. 646 - 657. 10.1109/TEVC.2006.872133);

@@ -40,32 +40,6 @@ class TheFittest:
         return self.genotype.copy(), self.phenotype.copy(), self.fitness.copy()
 
 
-class Statistics:
-    def __init__(self):
-        self.population_g = np.array([])
-        self.population_ph = np.array([])
-        self.fitness = np.array([])
-
-    def append_arr(self, arr_to, arr_from):
-        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
-        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
-        result = np.vstack([arr_to.reshape(shape_to),
-                            arr_from.copy().reshape(shape_from)])
-        return result
-
-    def update(self,
-               population_g_i: np.ndarray,
-               population_ph_i: np.ndarray,
-               fitness_i: np.ndarray):
-
-        self.population_g = self.append_arr(self.population_g,
-                                            population_g_i)
-        self.population_ph = self.append_arr(self.population_ph,
-                                             population_ph_i)
-        self.fitness = np.append(self.fitness, np.max(fitness_i))
-        return self
-
-
 class EvolutionaryAlgorithm:
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
@@ -77,7 +51,7 @@ class EvolutionaryAlgorithm:
                  no_increase_num: Optional[int] = None,
                  minimization: bool = False,
                  show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+                 keep_history: Optional[str] = None):
         self.fitness_function = fitness_function
         self.genotype_to_phenotype = genotype_to_phenotype
         self.iters = iters
@@ -182,13 +156,13 @@ class Tree:
         new_levels += self.levels[right:].copy()
         to_return = Tree(new_nodes, new_levels)
         return to_return
-    
+
     def copy(self):
         return Tree(self.nodes.copy(), self.levels.copy())
-    
+
     def get_max_level(self):
         return np.max(self.levels)
-    
+
     def __eq__(self, other):
         if len(self.nodes) != len(other.nodes):
             return False
@@ -197,6 +171,7 @@ class Tree:
                 if np.all(node_1.value != node_2.value):
                     return False
         return True
+
 
 class FunctionalNode:
     def __init__(self, value):

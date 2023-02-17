@@ -3,7 +3,6 @@ from typing import Optional
 from typing import Callable
 from typing import Any
 from ._base import TheFittest
-from ._base import Statistics
 from ._base import LastBest
 from functools import partial
 from ._differentialevolution import DifferentialEvolution
@@ -12,26 +11,37 @@ from ..tools import cauchy_distribution
 from ..tools import lehmer_mean
 
 
-class StatisticsSHADE(Statistics):
-    def __init__(self):
-        Statistics.__init__(self)
+class StatisticsSHADE:
+    def __init__(self, mode='quick'):
+        self.mode = mode
+        self.population_g = np.array([])
+        self.fitness = np.array([])
         self.H_F = np.array([], dtype=float)
         self.H_CR = np.array([], dtype=float)
 
+    def append_arr(self, arr_to, arr_from):
+        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
+        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
+        result = np.vstack([arr_to.reshape(shape_to),
+                            arr_from.copy().reshape(shape_from)])
+        return result
+
     def update(self,
                population_g_i: np.ndarray,
-               population_ph_i: np.ndarray,
                fitness_i: np.ndarray,
                H_F_i: np.ndarray,
                H_CR_i: np.ndarray):
-        super().update(population_g_i, population_ph_i, fitness_i)
-        if not len(self.H_F):
+        if self.mode == 'quick':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+
+        elif self.mode == 'full':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            self.population_g = self.append_arr(self.population_g,
+                                                population_g_i)
             self.H_F = H_F_i.copy().reshape(1, -1)
             self.H_CR = H_CR_i.copy().reshape(1, -1)
         else:
-            self.H_F = np.append(self.H_F, H_F_i.copy().reshape(1, -1), axis=0)
-            self.H_CR = np.append(
-                self.H_CR, H_CR_i.copy().reshape(1, -1), axis=0)
+            raise ValueError('the "mode" must be either "quick" or "full"')
         return self
 
 
@@ -52,7 +62,7 @@ class SHADE(DifferentialEvolution):
                  no_increase_num: Optional[int] = None,
                  minimization: bool = False,
                  show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+                 keep_history: Optional[str] = None):
         DifferentialEvolution.__init__(
             self,
             fitness_function=fitness_function,
@@ -186,12 +196,12 @@ class SHADE(DifferentialEvolution):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history:
-            self.stats = StatisticsSHADE().update(population_g,
-                                                  population_ph,
-                                                  fitness,
-                                                  H_F,
-                                                  H_CR)
+        if self.keep_history is not None:
+            self.stats = StatisticsSHADE(
+                mode=self.keep_history).update(population_g,
+                                               fitness,
+                                               H_F,
+                                               H_CR)
         for i in range(self.iters-1):
             self.show_progress(i)
             if self.termitation_check(lastbest.no_increase):
@@ -242,9 +252,8 @@ class SHADE(DifferentialEvolution):
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
 
-                if self.keep_history:
+                if self.keep_history is not None:
                     self.stats.update(population_g,
-                                      population_ph,
                                       fitness,
                                       H_F,
                                       H_CR)

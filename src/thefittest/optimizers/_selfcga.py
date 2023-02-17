@@ -7,31 +7,56 @@ from ..tools import scale_data
 from ..tools import rank_data
 from functools import partial
 from ._base import TheFittest
-from ._base import Statistics
 from ._base import LastBest
 from ..tools import numpy_group_by
 
 
-class StaticticSelfCGA(Statistics):
-    def __init__(self):
-        Statistics.__init__(self)
+class StaticticSelfCGA:
+    def __init__(self, mode='quick'):
+        self.mode = mode
+        self.population_g = np.array([])
+        self.fitness = np.array([])
         self.s_proba = dict()
         self.c_proba = dict()
         self.m_proba = dict()
 
-    def update(self, population_g_i: np.ndarray, population_ph_i: np.ndarray, fitness_i: np.ndarray,
-               s_proba_i, c_proba_i, m_proba_i):
-        super().update(population_g_i, population_ph_i, fitness_i)
+    def append_arr(self, arr_to, arr_from):
+        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
+        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
+        result = np.vstack([arr_to.reshape(shape_to),
+                            arr_from.copy().reshape(shape_from)])
+        return result
 
-        # for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
-        #                               (self.s_proba, self.c_proba, self.m_proba)):
-        #     if not len(archive_i):
-        #         for key, value in proba_i.items():
-        #             archive_i[key] = np.array(value)
-        #     else:
-        #         for key, value in proba_i.items():
-        #             archive_i[key] = np.append(
-        #                 archive_i[key], np.array(value))
+    def update(self, population_g_i: np.ndarray,
+               fitness_i: np.ndarray,
+               s_proba_i, c_proba_i, m_proba_i):
+
+        if self.mode == 'quick':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
+                                          (self.s_proba, self.c_proba, self.m_proba)):
+                if not len(archive_i):
+                    for key, value in proba_i.items():
+                        archive_i[key] = np.array(value)
+                else:
+                    for key, value in proba_i.items():
+                        archive_i[key] = np.append(
+                            archive_i[key], np.array(value))
+        elif self.mode == 'full':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
+                                          (self.s_proba, self.c_proba, self.m_proba)):
+                if not len(archive_i):
+                    for key, value in proba_i.items():
+                        archive_i[key] = np.array(value)
+                else:
+                    for key, value in proba_i.items():
+                        archive_i[key] = np.append(
+                            archive_i[key], np.array(value))
+            self.population_g = self.append_arr(self.population_g,
+                                                population_g_i)
+        else:
+            raise ValueError('the "mode" must be either "quick" or "full"')
         return self
 
 
@@ -47,7 +72,7 @@ class SelfCGA(GeneticAlgorithm):
                  no_increase_num: Optional[int] = None,
                  minimization: bool = False,
                  show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+                 keep_history: Optional[str] = None):
         GeneticAlgorithm.__init__(self,
                                   fitness_function=fitness_function,
                                   genotype_to_phenotype=genotype_to_phenotype,
@@ -150,7 +175,8 @@ class SelfCGA(GeneticAlgorithm):
         s_proba = dict(zip(list(self.s_sets.keys()), np.full(z_s, 1/z_s)))
         m_proba = dict(zip(list(self.m_sets.keys()), np.full(z_m, 1/z_m)))
         if 'empty' in self.c_sets.keys():
-            c_proba = dict(zip(list(self.c_sets.keys()), np.full(z_c, 0.9/(z_c-1))))
+            c_proba = dict(zip(list(self.c_sets.keys()),
+                           np.full(z_c, 0.9/(z_c-1))))
             c_proba['empty'] = 0.1
         else:
             c_proba = dict(zip(list(self.c_sets.keys()), np.full(z_c, 1/z_c)))
@@ -166,13 +192,13 @@ class SelfCGA(GeneticAlgorithm):
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
 
-        if self.keep_history:
-            self.stats = StaticticSelfCGA().update(population_g,
-                                                   population_ph,
-                                                   fitness,
-                                                   s_proba,
-                                                   c_proba,
-                                                   m_proba)
+        if self.keep_history is not None:
+            self.stats = StaticticSelfCGA(
+                mode=self.keep_history).update(population_g,
+                                               fitness,
+                                               s_proba,
+                                               c_proba,
+                                               m_proba)
 
         for i in range(self.iters-1):
             self.show_progress(i)
@@ -205,16 +231,15 @@ class SelfCGA(GeneticAlgorithm):
                     m_operators, fitness[:-1])
                 m_proba = self.update_proba(m_proba, m_fittest_oper)
 
-                # population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
 
-                if self.keep_history:
+                if self.keep_history is not None:
                     self.stats.update(population_g,
-                                      population_ph,
                                       fitness,
                                       s_proba,
                                       c_proba,

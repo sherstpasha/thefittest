@@ -3,7 +3,6 @@ from typing import Optional
 from typing import Callable
 from typing import Any
 from ._base import TheFittest
-from ._base import Statistics
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
 from functools import partial
@@ -17,7 +16,38 @@ from ._mutations import current_to_pbest_1
 from ._mutations import rand_2
 from ._initializations import float_population
 
+
+class Statistics:
+    def __init__(self, mode='quick'):
+        self.mode = mode
+        self.population_g = np.array([])
+        self.fitness = np.array([])
+
+    def append_arr(self, arr_to, arr_from):
+        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
+        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
+        result = np.vstack([arr_to.reshape(shape_to),
+                            arr_from.copy().reshape(shape_from)])
+        return result
+
+    def update(self,
+               population_g_i: np.ndarray,
+               fitness_i: np.ndarray):
+        if self.mode == 'quick':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+        elif self.mode == 'full':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            self.population_g = self.append_arr(self.population_g,
+                                                population_g_i)
+        else:
+            raise ValueError('the "mode" must be either "quick" or "full"')
+        return self
+
+
 class DifferentialEvolution(EvolutionaryAlgorithm):
+    '''Storn, Rainer & Price, Kenneth. (1995). Differential Evolution: A Simple and Efficient
+    Adaptive Scheme for Global Optimization Over Continuous Spaces. Journal of Global Optimization. 23'''
+
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
                  genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
@@ -30,7 +60,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                  no_increase_num: Optional[int] = None,
                  minimization: bool = False,
                  show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+                 keep_history: Optional[str] = None):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -64,7 +94,8 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
     def generate_init_pop(self):
         if self.initial_population is None:
-            population_g = float_population(self.pop_size, self.left, self.right)
+            population_g = float_population(
+                self.pop_size, self.left, self.right)
         else:
             population_g = self.initial_population
         return population_g
@@ -124,10 +155,10 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history:
-            self.stats = Statistics().update(population_g,
-                                             population_ph,
-                                             fitness)
+        if self.keep_history is not None:
+            self.stats = Statistics(
+                mode=self.keep_history).update(population_g,
+                                               fitness)
 
         for i in range(self.iters-1):
             self.show_progress(i)
@@ -157,8 +188,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
-                if self.keep_history:
+                if self.keep_history is not None:
                     self.stats.update(population_g,
-                                      population_ph,
                                       fitness)
         return self

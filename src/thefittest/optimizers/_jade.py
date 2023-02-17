@@ -3,7 +3,6 @@ from typing import Optional
 from typing import Callable
 from typing import Any
 from ._base import TheFittest
-from ._base import Statistics
 from ._base import LastBest
 from functools import partial
 from ._differentialevolution import DifferentialEvolution
@@ -12,21 +11,36 @@ from ..tools import cauchy_distribution
 from ..tools import lehmer_mean
 
 
-class StatisticsJADE(Statistics):
-    def __init__(self):
-        Statistics.__init__(self)
+class StatisticsJADE:
+    def __init__(self, mode='quick'):
+        self.mode = mode
+        self.population_g = np.array([])
+        self.fitness = np.array([])
         self.u_F = np.array([], dtype=float)
         self.u_CR = np.array([], dtype=float)
 
+    def append_arr(self, arr_to, arr_from):
+        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
+        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
+        result = np.vstack([arr_to.reshape(shape_to),
+                            arr_from.copy().reshape(shape_from)])
+        return result
+
     def update(self,
                population_g_i: np.ndarray,
-               population_ph_i: np.ndarray,
                fitness_i: np.ndarray,
                u_F_i: np.ndarray,
                U_CR_i: np.ndarray):
-        super().update(population_g_i, population_ph_i, fitness_i)
-        self.u_F = np.append(self.u_F, u_F_i)
-        self.u_CR = np.append(self.u_CR, U_CR_i)
+        if self.mode == 'quick':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+        elif self.mode == 'full':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            self.population_g = self.append_arr(self.population_g,
+                                                population_g_i)
+            self.u_F = np.append(self.u_F, u_F_i)
+            self.u_CR = np.append(self.u_CR, U_CR_i)
+        else:
+            raise ValueError('the "mode" must be either "quick" or "full"')
         return self
 
 
@@ -46,7 +60,7 @@ class JADE(DifferentialEvolution):
                  no_increase_num: Optional[int] = None,
                  minimization: bool = False,
                  show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+                 keep_history: Optional[str] = None):
         DifferentialEvolution.__init__(
             self,
             fitness_function=fitness_function,
@@ -68,6 +82,14 @@ class JADE(DifferentialEvolution):
         self.c = 0.1
         self.p = 0.05
 
+    def set_strategy(self, c_param: Optional[float] = None,
+                     p_param: Optional[float] = None):
+        if c_param is not None:
+            self.c = c_param
+        if p_param is not None:
+            self.p = p_param
+        return self
+
     def current_to_pbest_1_archive(self, current, population, F_value, pop_archive):
         p_i = self.p
         value = int(p_i*len(population))
@@ -79,14 +101,6 @@ class JADE(DifferentialEvolution):
         r2 = np.random.choice(range(len(pop_archive)),
                               size=1, replace=False)[0]
         return current + F_value*(best - current) + F_value*(population[r1] - pop_archive[r2])
-
-    def set_strategy(self, c_param: Optional[float] = None,
-                     p_param: Optional[float] = None):
-        if c_param is not None:
-            self.c = c_param
-        if p_param is not None:
-            self.p = p_param
-        return self
 
     def mutation_and_crossover(self, popuation_g, popuation_g_archive, individ_g, F_i, CR_i):
         mutant = self.current_to_pbest_1_archive(individ_g, popuation_g, F_i,
@@ -167,12 +181,12 @@ class JADE(DifferentialEvolution):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history:
-            self.stats = StatisticsJADE().update(population_g,
-                                                 population_ph,
-                                                 fitness,
-                                                 u_F,
-                                                 u_CR)
+        if self.keep_history is not None:
+            self.stats = StatisticsJADE(
+                mode=self.keep_history).update(population_g,
+                                               fitness,
+                                               u_F,
+                                               u_CR)
 
         for i in range(self.iters-1):
             self.show_progress(i)
@@ -219,9 +233,8 @@ class JADE(DifferentialEvolution):
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
 
-                if self.keep_history:
+                if self.keep_history is not None:
                     self.stats.update(population_g,
-                                      population_ph,
                                       fitness,
                                       u_F,
                                       u_CR)

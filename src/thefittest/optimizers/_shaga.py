@@ -3,7 +3,6 @@ from typing import Optional
 from typing import Callable
 from typing import Any
 from ._base import TheFittest
-from ._base import Statistics
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
 from ..tools import cauchy_distribution
@@ -14,31 +13,50 @@ from ._mutations import flip_mutation
 from functools import partial
 
 
-class StatisticsSHAGA(Statistics):
-    def __init__(self):
-        Statistics.__init__(self)
+class StatisticsSHAGA:
+    def __init__(self, mode='quick'):
+        self.mode = mode
+        self.population_g = np.array([])
+        self.fitness = np.array([])
         self.H_MR = np.array([], dtype=float)
         self.H_CR = np.array([], dtype=float)
 
+    def append_arr(self, arr_to, arr_from):
+        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
+        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
+        result = np.vstack([arr_to.reshape(shape_to),
+                            arr_from.copy().reshape(shape_from)])
+        return result
+
     def update(self,
                population_g_i: np.ndarray,
-               population_ph_i: np.ndarray,
                fitness_i: np.ndarray,
                H_MR_i: np.ndarray,
                H_CR_i: np.ndarray):
-        super().update(population_g_i, population_ph_i, fitness_i)
-        # if not len(self.H_MR):
-        #     self.H_MR = H_MR_i.copy().reshape(1, -1)
-        #     self.H_CR = H_CR_i.copy().reshape(1, -1)
-        # else:
-        #     self.H_MR = np.append(
-        #         self.H_MR, H_MR_i.copy().reshape(1, -1), axis=0)
-        #     self.H_CR = np.append(
-        #         self.H_CR, H_CR_i.copy().reshape(1, -1), axis=0)
+        if self.mode == 'quick':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+        elif self.mode == 'full':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            self.population_g = self.append_arr(self.population_g,
+                                                population_g_i)
+            if not len(self.H_MR):
+                self.H_MR = H_MR_i.copy().reshape(1, -1)
+                self.H_CR = H_CR_i.copy().reshape(1, -1)
+            else:
+                self.H_MR = np.append(
+                    self.H_MR, H_MR_i.copy().reshape(1, -1), axis=0)
+                self.H_CR = np.append(
+                    self.H_CR, H_CR_i.copy().reshape(1, -1), axis=0)
+        else:
+            raise ValueError('the "mode" must be either "quick" or "full"')
         return self
 
 
 class SHAGA(EvolutionaryAlgorithm):
+    '''Stanovov, Vladimir & Akhmedova, Shakhnaz & Semenkin, Eugene. (2019).
+    Genetic Algorithm with Success History based Parameter Adaptation. 180-187.
+    10.5220/0008071201800187. '''
+
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
                  genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
@@ -50,7 +68,7 @@ class SHAGA(EvolutionaryAlgorithm):
                  no_increase_num: Optional[int] = None,
                  minimization: bool = False,
                  show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+                 keep_history: Optional[str] = None):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -78,7 +96,8 @@ class SHAGA(EvolutionaryAlgorithm):
 
     def generate_init_pop(self):
         if self.initial_population is None:
-            population_g = binary_string_population(self.pop_size, self.str_len)
+            population_g = binary_string_population(
+                self.pop_size, self.str_len)
         else:
             population_g = self.initial_population
         return population_g
@@ -158,12 +177,12 @@ class SHAGA(EvolutionaryAlgorithm):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history:
-            self.stats = StatisticsSHAGA().update(population_g,
-                                                  population_ph,
-                                                  fitness,
-                                                  H_MR,
-                                                  H_CR)
+        if self.keep_history is not None:
+            self.stats = StatisticsSHAGA(
+                mode=self.keep_history).update(population_g,
+                                               fitness,
+                                               H_MR,
+                                               H_CR)
         for i in range(self.iters-1):
             self.show_progress(i)
             if self.termitation_check(lastbest.no_increase):
@@ -206,9 +225,8 @@ class SHAGA(EvolutionaryAlgorithm):
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
 
-                if self.keep_history:
+                if self.keep_history is not None:
                     self.stats.update(population_g,
-                                      population_ph,
                                       fitness,
                                       H_MR,
                                       H_CR)
