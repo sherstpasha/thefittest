@@ -15,6 +15,14 @@ class Add(Operator):
     def __call__(self, x, y):
         return x + y
 
+class Sub(Operator):
+    def __init__(self):
+        self.formula = '({} - {})'
+        self.__name__ = 'sub'
+        self.sign = '-'
+
+    def __call__(self, x, y):
+        return x + y
 
 class Add3(Operator):
     def __init__(self):

@@ -7,7 +7,7 @@ from thefittest.optimizers._base import UniversalSet
 from thefittest.optimizers._base import FunctionalNode
 from thefittest.optimizers._base import TerminalNode
 from thefittest.optimizers._operators import Mul
-from thefittest.optimizers._operators import Add3
+from thefittest.optimizers._operators import Sub
 from thefittest.optimizers._operators import Add
 from thefittest.optimizers._operators import Pow
 from thefittest.optimizers._operators import Cos
@@ -16,7 +16,7 @@ from thefittest.optimizers._operators import Neg
 from thefittest.optimizers._operators import Div
 from thefittest.tools import donothing
 from sklearn.model_selection import train_test_split
-from thefittest.optimizers import GeneticProgramming
+from thefittest.optimizers import GeneticProgramming, SelfCGP
 
 
 def graph(some_tree):
@@ -92,13 +92,13 @@ def root_mean_square_error(y_true, y_predict):
 
 
 def problem(x):
-    # return x[:,0]*x[:,0]
+    # return np.sin(x[:,0])
     return 11*np.cos(x[:, 0]) + 0.5*x[:, 0]*x[:, 0]
 
 
-left = -np.pi
-right = 0
-size = 100
+left = -10*np.pi
+right = 10*np.pi
+size = 200
 n_vars = 1
 X = np.random.uniform(left, right, size=(size, n_vars))
 y = problem(X)
@@ -108,14 +108,14 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.33, random_state=42)
 
 uniset = UniversalSet(functional_set=(Add(),
-                                      #   Cos(),
-                                      #   Sin(),
+                                      Cos(),
+                                      Sin(),
                                       Div(),
                                       Mul(),
-                                      Neg()
+                                      Sub(),
                                       ),
                       terminal_set={'x0': X_train[:, 0]},
-                      constant_set=(1, 3, 5, 7)
+                      constant_set=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
                       )
 
 
@@ -124,26 +124,27 @@ def fitness_function(trees):
     for tree in trees:
         y_pred = tree.compile()*np.ones(len(y_train))
         level = tree.get_max_level()
-        if level > 50:
-            fine = 0.1*level
+        if level > 14:
+            fine = len(tree.nodes)
         else:
             fine = 0
         fitness.append(root_mean_square_error(y_train, y_pred) + fine)
     return np.array(fitness)
 
 
-model = GeneticProgramming(fitness_function=fitness_function,
-                           genotype_to_phenotype=donothing,
-                           uniset=uniset,
-                           pop_size=1000, iters=1000,
-                           show_progress_each=10,
-                           minimization=True,
-                           no_increase_num=100)
-
+model = SelfCGP(fitness_function=fitness_function,
+                genotype_to_phenotype=donothing,
+                uniset=uniset,
+                pop_size=1000, iters=2000,
+                show_progress_each=10,
+                minimization=True,
+                no_increase_num=300,
+                keep_history='full')
+model.tour_size = 3
 model.fit()
 
 fittest = model.thefittest.phenotype
-
+stats = model.stats
 print(fittest)
 
 x_plot = np.linspace(left, right, size).reshape(-1, 1)
@@ -159,3 +160,33 @@ plt.savefig('line1.png')
 plt.close()
 
 print_tree(fittest, 'fittest.png')
+
+# print(stats.fitness)
+# print(stats.fittest)
+for f, t in zip(stats.fitness, stats.fittest):
+    print(f, t)
+
+print(stats.m_proba)
+print(stats.c_proba)
+print(stats.s_proba)
+plt.plot(range(len(stats.fitness)), stats.fitness)
+plt.savefig('fitness.png')
+plt.close()
+
+for key, value in stats.m_proba.items():
+    plt.plot(range(len(value)), value, label = key)
+plt.legend()
+plt.savefig('m_proba.png')
+plt.close()
+
+for key, value in stats.c_proba.items():
+    plt.plot(range(len(value)), value, label = key)
+plt.legend()
+plt.savefig('c_proba.png')
+plt.close()
+
+for key, value in stats.s_proba.items():
+    plt.plot(range(len(value)), value, label = key)
+plt.legend()
+plt.savefig('s_proba.png')
+plt.close()

@@ -13,7 +13,51 @@ from ..tools import numpy_group_by
 from ._initializations import half_and_half
 
 
+class StatisticsSelfCGP:
+    def __init__(self, mode='quick'):
+        self.mode = mode
+        self.fittest = np.array([])
+        self.fitness = np.array([])
+        self.s_proba = dict()
+        self.c_proba = dict()
+        self.m_proba = dict()
+
+    def update(self,
+               fittest_i: np.ndarray,
+               fitness_i: np.ndarray,
+               s_proba_i, c_proba_i, m_proba_i):
+        if self.mode == 'quick':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
+                                          (self.s_proba, self.c_proba, self.m_proba)):
+                if not len(archive_i):
+                    for key, value in proba_i.items():
+                        archive_i[key] = np.array(value)
+                else:
+                    for key, value in proba_i.items():
+                        archive_i[key] = np.append(
+                            archive_i[key], np.array(value))
+        elif self.mode == 'full':
+            self.fittest = np.append(self.fittest, fittest_i.copy())
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
+                                          (self.s_proba, self.c_proba, self.m_proba)):
+                if not len(archive_i):
+                    for key, value in proba_i.items():
+                        archive_i[key] = np.array(value)
+                else:
+                    for key, value in proba_i.items():
+                        archive_i[key] = np.append(
+                            archive_i[key], np.array(value))
+        else:
+            raise ValueError('the "mode" must be either "quick" or "full"')
+        return self
+
+
 class SelfCGP(GeneticProgramming):
+    '''Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm 
+    with modified uniform crossover. 1-6. 10.1109/CEC.2012.6256587. '''
+
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
                  genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
@@ -42,20 +86,21 @@ class SelfCGP(GeneticProgramming):
         self.set_strategy(select_opers=['proportional',
                                         'rank',
                                         'tournament'],
-                          crossover_opers=['empty',
-                                           'standart',
-                                           'one_point'],
-                          mutation_opers=['weak_point',
-                                          'average_point',
-                                          'strong_point',
-                                          'weak_grow',
-                                          'average_grow',
-                                          'strong_grow',
-                                          'weak_gauss',
-                                          'average_gauss',
-                                          'strong_gauss'
-                                          ])
-        # self.stats: StaticticSelfCGA
+                          crossover_opers=[
+            # 'empty',
+            'standart',
+            'one_point'],
+            mutation_opers=['weak_point',
+                            'average_point',
+                              'strong_point',
+                            'weak_grow',
+                            'average_grow',
+                              'strong_grow',
+                            # 'weak_gauss',
+                            # 'average_gauss',
+                            #   'strong_gauss'
+                            ])
+        self.stats: StatisticsSelfCGP
         self.s_sets: dict
         self.c_sets: dict
         self.m_sets: dict
@@ -156,10 +201,13 @@ class SelfCGP(GeneticProgramming):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        # if self.keep_history:
-        #     self.stats = Statistics().update(population_g,
-        #                                      population_ph,
-        #                                      fitness)
+        if self.keep_history is not None:
+            self.stats = StatisticsSelfCGP(
+                mode=self.keep_history).update(self.thefittest.genotype,
+                                               fitness,
+                                               s_proba,
+                                               c_proba,
+                                               m_proba)
         for i in range(self.iters-1):
             self.show_progress(i)
             levels = [tree.get_max_level() for tree in population_g]
@@ -206,11 +254,10 @@ class SelfCGP(GeneticProgramming):
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
 
-                # if self.keep_history:
-                #     self.stats.update(population_g,
-                #                       population_ph,
-                #                       fitness,
-                #                       s_proba,
-                #                       c_proba,
-                #                       m_proba)
+                if self.keep_history is not None:
+                    self.stats.update(self.thefittest.genotype,
+                                      fitness,
+                                      s_proba,
+                                      c_proba,
+                                      m_proba)
         return self

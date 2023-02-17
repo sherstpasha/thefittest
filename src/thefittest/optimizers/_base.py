@@ -232,7 +232,7 @@ class UniversalSet:
         return to_return
 
     def mutate_constant(self, constant):
-        new_value = constant.value*np.random.normal(1, 0.1)
+        new_value = constant.value*np.random.normal(1, 0.05)
         return TerminalConstantNode(new_value)
 
     def mutate_functional(self, functional):

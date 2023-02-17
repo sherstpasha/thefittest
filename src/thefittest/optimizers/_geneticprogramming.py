@@ -4,7 +4,6 @@ from typing import Optional
 from typing import Callable
 from typing import Any
 from ._base import TheFittest
-from ._base import Statistics
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
 from ._base import UniversalSet
@@ -22,39 +21,30 @@ from ..tools import scale_data
 from ..tools import rank_data
 from functools import partial
 
-# class Statistics:
-#     def __init__(self):
-#         self.population_g = np.array([])
-#         self.population_ph = np.array([])
-#         self.fitness = np.array([])
 
-#     def append_arr(self, arr_to, arr_from):
-#         shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
-#         shape_from = (1, arr_from.shape[0], arr_from.shape[1])
-#         result = np.vstack([arr_to.reshape(shape_to),
-#                             arr_from.copy().reshape(shape_from)])
-#         return result
+class StatisticsGP:
+    def __init__(self, mode='quick'):
+        self.mode = mode
+        self.fittest = np.array([])
+        self.fitness = np.array([])
 
-#     def update(self,
-#                population_g_i: np.ndarray,
-#                population_ph_i: np.ndarray,
-#                fitness_i: np.ndarray):
-
-#         self.population_g = self.append_arr(self.population_g,
-#                                             population_g_i)
-#         self.population_ph = self.append_arr(self.population_ph,
-#                                              population_ph_i)
-#         self.fitness = np.append(self.fitness, np.max(fitness_i))
-#         return self
-# class StatisticsGP:
-#     def __init__(self):
-#         self.population_g = np.array([])
-#         self.population_ph = np.array([])
-#         self.fitness = np.array([])
-#         self.
+    def update(self,
+               fittest_i: np.ndarray,
+               fitness_i: np.ndarray):
+        if self.mode == 'quick':
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+        elif self.mode == 'full':
+            self.fittest = np.append(self.fittest, fittest_i.copy())
+            self.fitness = np.append(self.fitness, np.max(fitness_i))
+        else:
+            raise ValueError('the "mode" must be either "quick" or "full"')
+        return self
 
 
 class GeneticProgramming(EvolutionaryAlgorithm):
+    '''Koza, John R.. “Genetic programming - on the programming of computers by means
+    of natural selection.” Complex Adaptive Systems (1993)'''
+
     def __init__(self,
                  fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
                  genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
@@ -66,7 +56,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                  no_increase_num: Optional[int] = None,
                  minimization: bool = False,
                  show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+                 keep_history: Optional[str] = None):
 
         EvolutionaryAlgorithm.__init__(
             self,
@@ -86,7 +76,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         self.max_level = 10
         self.initial_population = None
         self.thefittest: TheFittest
-        self.stats: Statistics
+        self.stats: StatisticsGP
 
         self.s_pool = {'proportional': (proportional_selection, None),
                        'rank': (rank_selection, None),
@@ -160,10 +150,10 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        # if self.keep_history:
-        #     self.stats = Statistics().update(population_g,
-        #                                      population_ph,
-        #                                      fitness)
+        if self.keep_history is not None:
+            self.stats = StatisticsGP(
+                mode=self.keep_history).update(self.thefittest.genotype,
+                                               fitness)
         for i in range(self.iters-1):
             self.show_progress(i)
             levels = [tree.get_max_level() for tree in population_g]
@@ -178,6 +168,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                                                    fitness_rank)
                 map_ = map(partial_create_offspring, range(self.pop_size-1))
                 population_g[:-1] = np.array(list(map_), dtype=object)
+                population_ph[:-1] = self.genotype_to_phenotype(
+                    population_g[:-1])
                 fitness[:-1] = self.evaluate(population_ph[:-1])
 
                 population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
@@ -186,8 +178,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
-                # if self.keep_history:
-                # self.stats.update(population_g,
-                #                   population_ph,
-                #                   fitness)
+                if self.keep_history is not None:
+                    self.stats.update(self.thefittest.genotype,
+                                      fitness)
         return self
