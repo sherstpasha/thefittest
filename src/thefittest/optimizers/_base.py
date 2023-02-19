@@ -89,19 +89,21 @@ class Tree:
         self.nodes = nodes
         self.levels = levels
 
-    def subtree(self, index: int):
+    def subtree(self, index: int, return_class=False):
         n_index = index + 1
         possible_steps = self.nodes[index].n_args
         while possible_steps:
             possible_steps += self.nodes[n_index].n_args - 1
             n_index += 1
+        if return_class:
+            new_tree = Tree(self.nodes[index:n_index].copy(), None)
+            new_tree.levels = new_tree.get_levels()
+            return new_tree
         return index, n_index
 
     def compile(self):
-        # может считать с конца просто?
-        reverse_nodes = self.nodes[::-1].copy()
         pack = []
-        for node in reverse_nodes:
+        for node in reversed(self.nodes):
             args = []
             for _ in range(node.n_args):
                 args.append(pack.pop())
@@ -171,6 +173,46 @@ class Tree:
                 if np.all(node_1.value != node_2.value):
                     return False
         return True
+
+    def is_functional(self, node):
+        return type(node) is FunctionalNode
+
+    def is_terminal(self, node):
+        return type(node) is TerminalNode
+
+    def is_contains_terminals(self, i=0):
+        pool = list(map(self.is_terminal, self.nodes))
+        print(pool)
+        return np.any(pool)
+
+    def simplify_by_index(self, index=0):
+        n_index = index + 1
+        possible_steps = self.nodes[index].n_args
+        while possible_steps:
+            if type(self.nodes[n_index]) is TerminalNode:
+                return self, False
+            possible_steps += self.nodes[n_index].n_args - 1
+            n_index += 1
+
+        pack = []
+        for node in reversed(self.nodes[index:n_index]):
+            args = []
+            for _ in range(node.n_args):
+                args.append(pack.pop())
+            if type(node) != FunctionalNode:
+                pack.append(node.value)
+            else:
+                pack.append(node.value(*args))
+
+        value = pack[0]
+        return self.concat(index, Tree([TerminalConstantNode(value)], [0])), True
+    
+    def simplify(self):
+        for i in range(len(self.nodes)-1, -1, -1):
+            if type(self.nodes[i]) is FunctionalNode:
+                self, cond = self.simplify_by_index(index=i)   
+        return self
+
 
 
 class FunctionalNode:

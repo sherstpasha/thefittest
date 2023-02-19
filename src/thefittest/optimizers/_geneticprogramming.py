@@ -15,6 +15,7 @@ from ._crossovers import standart_crossover
 from ._crossovers import empty_crossover
 from ._mutations import point_mutation
 from ._mutations import growing_mutation
+from ._mutations import simplify_mutations
 from ._mutations import constant_gauss_mutation
 from ._initializations import half_and_half
 from ..tools import scale_data
@@ -94,7 +95,10 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'strong_grow': (growing_mutation, 4),
                        'weak_gauss': (constant_gauss_mutation, 0.25),
                        'average_gauss': (constant_gauss_mutation, 1),
-                       'strong_gauss': (constant_gauss_mutation, 4)}
+                       'strong_gauss': (constant_gauss_mutation, 4),
+                       'weak_simplify': (simplify_mutations, 0.25),
+                       'average_simplify': (simplify_mutations, 1),
+                       'strong_simplify': (simplify_mutations, 4)}
 
         self.s_set = self.s_pool['tournament']
         self.c_set = self.c_pool['standart']
@@ -135,7 +139,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         offspring_no_mutated = crossover_func(parents,
                                               fitness_scale_p,
                                               fitness_rank_p)
-        mutant = mutation_func(offspring_no_mutated, self.uniset, proba)
+        mutant = mutation_func(offspring_no_mutated, self.uniset, proba, self.max_level)
         return mutant
 
     def fit(self):

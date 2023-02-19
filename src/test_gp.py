@@ -29,7 +29,7 @@ def graph(some_tree):
     for i, node in enumerate(reverse_nodes):
         labels[len(reverse_nodes) - i -
                #    1] = str(len(reverse_nodes) - i - 1) + '. ' + node.sign  # один раз развернуть или вообще не разворачивать а сразу считать так
-               1] = node.sign
+               1] = node.sign[:7]
 
         nodes.append(len(reverse_nodes) - i - 1)
 
@@ -92,13 +92,13 @@ def root_mean_square_error(y_true, y_predict):
 
 
 def problem(x):
-    # return np.sin(x[:,0])
-    return 11*np.cos(x[:, 0]) + 0.5*x[:, 0]*x[:, 0]
+    # return np.sqrt(x[:,0])
+    return 20*np.cos(2*x[:, 0]) + 0.3*x[:, 0]*x[:, 0]
 
 
-left = -10*np.pi
-right = 10*np.pi
-size = 200
+left = -12
+right = 12
+size = 500
 n_vars = 1
 X = np.random.uniform(left, right, size=(size, n_vars))
 y = problem(X)
@@ -109,8 +109,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 uniset = UniversalSet(functional_set=(Add(),
                                       Cos(),
-                                      Sin(),
-                                      Div(),
+                                    #   Sin(),
+                                    #   Div(),
                                       Mul(),
                                       Sub(),
                                       ),
@@ -124,23 +124,25 @@ def fitness_function(trees):
     for tree in trees:
         y_pred = tree.compile()*np.ones(len(y_train))
         level = tree.get_max_level()
-        if level > 14:
-            fine = len(tree.nodes)
+        if level > 5:
+            # fine = len(tree.nodes)
+            fine = 0
         else:
             fine = 0
         fitness.append(root_mean_square_error(y_train, y_pred) + fine)
-    return np.array(fitness)
+    return 1/(1 + np.array(fitness))
 
 
 model = SelfCGP(fitness_function=fitness_function,
                 genotype_to_phenotype=donothing,
                 uniset=uniset,
-                pop_size=1000, iters=2000,
+                pop_size=250, iters=1500,
                 show_progress_each=10,
-                minimization=True,
+                minimization=False,
                 no_increase_num=300,
                 keep_history='full')
 model.tour_size = 3
+model.max_level = 15
 model.fit()
 
 fittest = model.thefittest.phenotype
@@ -151,10 +153,16 @@ x_plot = np.linspace(left, right, size).reshape(-1, 1)
 y_plot = problem(x_plot)
 
 y_pred = fittest.compile()*np.ones_like(y_train)
+tree_c = fittest.simplify()
+y_predc = tree_c.compile()*np.ones_like(y_train)
+print_tree(tree_c, 'fittest_c.png')
+
+print(np.all(y_pred == y_predc), 'true')
 
 plt.plot(x_plot, y_plot, label='true', color='green')
 plt.scatter(X_train, y_train, label='train', color='black', alpha=0.3)
-plt.scatter(X_train, y_pred, label='pred', color='red')
+plt.scatter(X_train, y_pred, label='pred', color='red', alpha=0.3)
+plt.scatter(X_train, y_predc, label='pred', color='blue', alpha=0.3)
 plt.legend()
 plt.savefig('line1.png')
 plt.close()
@@ -163,15 +171,16 @@ print_tree(fittest, 'fittest.png')
 
 # print(stats.fitness)
 # print(stats.fittest)
-for f, t in zip(stats.fitness, stats.fittest):
-    print(f, t)
+# for f, t in zip(stats.fitness, stats.fittest):
+#     print(f, t)
 
-print(stats.m_proba)
-print(stats.c_proba)
-print(stats.s_proba)
+# print(stats.m_proba)
+# print(stats.c_proba)
+# print(stats.s_proba)
 plt.plot(range(len(stats.fitness)), stats.fitness)
 plt.savefig('fitness.png')
 plt.close()
+
 
 for key, value in stats.m_proba.items():
     plt.plot(range(len(value)), value, label = key)

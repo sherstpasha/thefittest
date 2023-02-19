@@ -71,13 +71,13 @@ def current_to_rand_1(current, population, F_value):
 
 
 def point_mutation(some_tree, uniset,
-                   proba_down, growing_method=None):
+                   proba_down, max_level):
     nodes = some_tree.nodes.copy()
     levels = some_tree.levels.copy()
 
     proba = proba_down/len(nodes)
     for i, node in enumerate(nodes):
-        
+
         if np.random.random() < proba:
             if type(node) != FunctionalNode:
                 new_node = uniset.mutate_terminal(node)
@@ -88,8 +88,9 @@ def point_mutation(some_tree, uniset,
     new_tree = Tree(nodes, levels)
     return new_tree
 
+
 def constant_gauss_mutation(some_tree, uniset,
-                   proba_down, growing_method=None):
+                            proba_down, max_level):
     nodes = some_tree.nodes.copy()
     levels = some_tree.levels.copy()
 
@@ -102,16 +103,31 @@ def constant_gauss_mutation(some_tree, uniset,
     new_tree = Tree(nodes, levels)
     return new_tree
 
+
 def growing_mutation(some_tree, uniset,
-                     proba_down, growing_method=growing_method):
+                     proba_down, max_level):
     proba = proba_down/len(some_tree.nodes)
     for i in range(1, len(some_tree.nodes)):
         if np.random.random() < proba:
-            # второй раз выполняется может можно как-то один раз оставить?
             left, right = some_tree.subtree(i)
-            max_level = some_tree.levels[left:right][-1] - \
-                some_tree.levels[left:right][0]
-            new_tree = growing_method(uniset, max_level)
+            # max_level_i = some_tree.levels[left:right][-1] - \
+            #     some_tree.levels[left:right][0]
+            max_level_i = max_level - some_tree.levels[left:right][0]
+
+            new_tree = growing_method(uniset, max_level_i)
             mutated = some_tree.concat(i, new_tree)
             return mutated
     return some_tree
+
+def simplify_mutations(some_tree, uniset,
+                     proba_down, max_level):
+    proba = proba_down/len(some_tree.nodes)
+    if np.random.random() < proba:
+        for i in range(len(some_tree.nodes)-1, -1, -1):
+            if type(some_tree.nodes[i]) is FunctionalNode:
+                some_tree, cond = some_tree.simplify_by_index(index=i)
+                if cond:
+                    return some_tree
+    return some_tree
+    
+    
