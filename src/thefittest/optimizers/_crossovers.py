@@ -3,7 +3,7 @@ from ..tools import protect_norm
 from ._base import Tree
 
 
-def empty_crossover(individs, fitness, rank):
+def empty_crossover(individs, *args):
     return individs[0]
 
 
@@ -78,7 +78,7 @@ def binomial(individ, mutant, CR):
     return individ
 
 
-def standart_crossover(individs, fitness, rank):
+def standart_crossover(individs, fitness, rank, max_level):
     individ_1 = individs[0].copy()
     individ_2 = individs[1].copy()
     first_point = np.random.randint(0,  len(individ_1.nodes))
@@ -89,11 +89,15 @@ def standart_crossover(individs, fitness, rank):
         first_subtree = Tree(individ_1.nodes[left:right],
                              individ_1.levels[left:right])
         offspring = individ_2.concat(second_point, first_subtree)
+        if offspring.get_max_level() > max_level:
+            offspring = individ_2
     else:
         left, right = individ_2.subtree(second_point)
         second_subtree = Tree(individ_2.nodes[left:right],
                               individ_2.levels[left:right])
         offspring = individ_1.concat(first_point, second_subtree)
+        if offspring.get_max_level() > max_level:
+            offspring = individ_1
     return offspring
 
 
@@ -137,7 +141,7 @@ def common_region(trees):
     return common_indexes, border_indexes
 
 
-def one_point_crossoverGP(individs, fitness, rank):
+def one_point_crossoverGP(individs, fitness, rank, max_level):
     individ_1 = individs[0].copy()
     individ_2 = individs[1].copy()
     common_indexes, _ = common_region([individ_1, individ_2])
@@ -157,7 +161,7 @@ def one_point_crossoverGP(individs, fitness, rank):
         offspring = individ_1.concat(first_point, second_subtree)
     return offspring
 
-def uniform_crossoverGP(individs, fitness, rank):
+def uniform_crossoverGP(individs, fitness, rank, max_level):
     '''Poli, Riccardo & Langdon, W.. (2001). On the Search
     Properties of Different Crossover Operators in Genetic Programming. '''
     new_nodes = []

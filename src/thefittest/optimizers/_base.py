@@ -222,7 +222,7 @@ class Tree:
                         tree_copy.nodes[i] = TerminalNode(value=value,
                                                           name=node.name + '_')
         return tree_copy
-    
+
     def get_args_id(self, index):
         n_args = self.nodes[index].n_args
         args_id = []
@@ -238,8 +238,6 @@ class Tree:
         for id_ in args_id:
             print(self.subtree(id_, return_class=True))
         return args_id
-                
-
 
 
 class FunctionalNode:
