@@ -14,6 +14,8 @@ from thefittest.optimizers._operators import Cos
 from thefittest.optimizers._operators import Sin
 from thefittest.optimizers._operators import Neg
 from thefittest.optimizers._operators import Div
+from thefittest.optimizers._operators import Exp
+from thefittest.optimizers._operators import Sqrt
 from thefittest.tools import donothing
 from sklearn.model_selection import train_test_split
 from thefittest.optimizers import GeneticProgramming, SelfCGP
@@ -92,30 +94,38 @@ def root_mean_square_error(y_true, y_predict):
 
 
 def problem(x):
-    return np.cos(x[:,0])
+    return np.cos(2*x[:,0])
     # return 20*np.cos(2*x[:, 0]) + 0.3*x[:, 0]*x[:, 0]
 
+def problem_1(x):
+    return 0.05*((x[:,0]-1)**2) + (3 - 2.9*np.exp(-2.77257*(x[:,0]**2)))*(1 - np.cos(x[:,0]*(4-50*np.exp(-2.77257*(x[:,0]**2)))))
 
-left = -12
-right = 12
+def problem_2(x):
+    return 1 - 0.5*np.cos(1.5*(10*x[:,0]-0.3))*np.cos(31.4*x[:,0]) + 0.5*np.cos(np.sqrt(5)*10*x[:,0])*np.cos(35*x[:,0])
+
+
+left = 0
+right = 2*np.pi
 size = 500
 n_vars = 1
-X = np.random.uniform(left, right, size=(size, n_vars))
+X = np.random.uniform(left, right, size=(size, n_vars)).astype(np.float64)
 y = problem(X)
-# y = y + np.random.uniform(0, 10, len(X))
+# y = problem + np.random.uniform(0, 10, len(X))
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.33, random_state=42)
 
-uniset = UniversalSet(functional_set=(Add(),
-                                    #   Cos(),
-                                    #   Sin(),
-                                      Div(),
-                                      Mul(),
+uniset = UniversalSet(functional_set=(
+                                      Add(),
                                       Sub(),
+                                    #   Sqrt(),
+                                      Sin(),
+                                    #   Cos(),
+                                      Mul(),
+                                      Div()
                                       ),
                       terminal_set={'x0': X_train[:, 0]},
-                      constant_set=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+                      constant_set=(1,)
                       )
 
 
@@ -124,25 +134,27 @@ def fitness_function(trees):
     for tree in trees:
         y_pred = tree.compile()*np.ones(len(y_train))
         level = tree.get_max_level()
-        if level > 49:
+        if level > 19:
+        #     fine = tree.
             fine = len(tree.nodes)
-            # fine = 0
         else:
             fine = 0
         fitness.append(root_mean_square_error(y_train, y_pred) + fine)
     return 1/(1 + np.array(fitness))
+    # return np.array(fitness)
+
 
 
 model = SelfCGP(fitness_function=fitness_function,
                 genotype_to_phenotype=donothing,
                 uniset=uniset,
-                pop_size=500, iters=1000,
+                pop_size=500, iters=51,
                 show_progress_each=10,
                 minimization=False,
                 no_increase_num=300,
                 keep_history='full')
 model.tour_size = 3
-model.max_level = 15
+model.max_level = 19
 model.fit()
 
 fittest = model.thefittest.phenotype
@@ -162,7 +174,7 @@ y_pred_train = fittest.compile()
 
 plt.plot(x_plot[:,0], y_plot, label='true', color='green')
 plt.scatter(X_train[:,0], y_train, label='train', color='black', alpha=0.3)
-plt.scatter(X_train[:,0], y_pred_train, label='train', color='red', alpha=0.3)
+# plt.scatter(X_train[:,0], y_pred_train, label='train', color='red', alpha=0.3)
 plt.plot(x_plot[:,0], y_pred, color='red')
 plt.legend()
 plt.savefig('line1.png')

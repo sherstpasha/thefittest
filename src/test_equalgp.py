@@ -10,6 +10,7 @@ from thefittest.optimizers._operators import Pow
 from thefittest.optimizers._operators import Cos
 from thefittest.optimizers._operators import Sin
 from thefittest.optimizers._operators import Neg
+from thefittest.optimizers._crossovers import common_region, uniform_crossoverGP
 from thefittest.optimizers._initializations import growing_method, full_growing_method
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,7 +26,9 @@ def graph(some_tree):
 
     for i, node in enumerate(reverse_nodes):
         index = len(reverse_nodes) - i - 1
-        labels[index] = node.sign[:6]
+        labels[index] = labels[len(reverse_nodes) - i -
+                               1] = str(len(reverse_nodes) - i - 1) + '. ' + node.sign  # один раз развернуть или вообще не разворачивать а сразу считать так
+        #    1] = node.sign[:7]
 
         nodes.append(index)
 
@@ -81,43 +84,44 @@ def print_tree(some_tree, fig_name, underline_nodes=[]):
 
 uniset = UniversalSet(functional_set=(Add(),
                                       Cos(),
-                                      #   Sin(),
+                                      Sin(),
                                       Mul(),
-                                    #   Neg()
+                                      #   Neg()
                                       ),
                       terminal_set={'x0': np.array([1, 2, 3]),
                                     'x1': np.array([3, 2, 1])},
                       constant_set=(1, 3, 5, 7))
 
 
-# F1 = FunctionalNode(Add())
+# F1 = FunctionalNode(Add3())
 # F2 = FunctionalNode(Add())
 # F3 = FunctionalNode(Cos())
 # T1 = TerminalConstantNode(11)
 # T2 = TerminalConstantNode(22)
 # F4 = FunctionalNode(Sin())
+# F5 = FunctionalNode(Add())
+# T3 = TerminalConstantNode(42)
+# T4 = TerminalConstantNode(123)
 # X = TerminalNode(np.array([1, 2, 3]), 'X')
 
 
-tree_1 = full_growing_method(uniset, 5)
-# tree_1 = Tree([F1, F2, F3, T1, T2, F4, X],
-#               [0, 1, 2, 3, 2, 1, 2])
-
-# tree_2 = tree_1.simplify()
+tree_1 = full_growing_method(uniset, 3)
 
 
-# print(tree_2)
-
-print_tree(tree_1, 'tree_1.png')
-
-tree_2 = tree_1.change_terminals({'x1': np.array([0, 0, 0])})
+tree_2 = full_growing_method(uniset, 3)
 
 
-print_tree(tree_2, 'tree_2.png')
+test, border = common_region([tree_1, tree_2])
+
+
 print(tree_1)
-print(tree_2)
-print(tree_1.compile())
-print(tree_2.compile())
 
+print_tree(tree_1, 'tree_1.png', test[0])
 
-# print(tree_1.compile(), tree_2.compile())
+print_tree(tree_2, 'tree_2.png', test[1])
+print(test)
+print(border)
+
+tree_3 = uniform_crossoverGP([tree_1, tree_2], 1, 1)
+
+print_tree(tree_3, 'tree_3.png')

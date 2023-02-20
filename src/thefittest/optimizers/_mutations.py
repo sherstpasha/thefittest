@@ -72,6 +72,7 @@ def current_to_rand_1(current, population, F_value):
 
 def point_mutation(some_tree, uniset,
                    proba_down, max_level):
+    some_tree = some_tree.copy()
     nodes = some_tree.nodes.copy()
     levels = some_tree.levels.copy()
 
@@ -91,6 +92,7 @@ def point_mutation(some_tree, uniset,
 
 def constant_gauss_mutation(some_tree, uniset,
                             proba_down, max_level):
+    some_tree = some_tree.copy()
     nodes = some_tree.nodes.copy()
     levels = some_tree.levels.copy()
 
@@ -106,6 +108,7 @@ def constant_gauss_mutation(some_tree, uniset,
 
 def growing_mutation(some_tree, uniset,
                      proba_down, max_level):
+    some_tree = some_tree.copy()
     proba = proba_down/len(some_tree.nodes)
     if np.random.random() < proba:
         i = np.random.randint(0, len(some_tree.nodes))
@@ -121,6 +124,7 @@ def growing_mutation(some_tree, uniset,
 
 def simplify_mutations(some_tree, uniset,
                        proba_down, max_level):
+    some_tree = some_tree.copy()
     proba = proba_down/len(some_tree.nodes)
     if np.random.random() < proba:
         i = np.random.randint(0, len(some_tree.nodes))

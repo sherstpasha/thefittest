@@ -16,7 +16,7 @@ class LastBest:
             self.no_increase += 1
         else:
             self.no_increase = 0
-            self.value = current_value.copy()
+            self.value = current_value
         return self
 
 
@@ -222,6 +222,24 @@ class Tree:
                         tree_copy.nodes[i] = TerminalNode(value=value,
                                                           name=node.name + '_')
         return tree_copy
+    
+    def get_args_id(self, index):
+        n_args = self.nodes[index].n_args
+        args_id = []
+        root_level = self.levels[index]
+        next_level = root_level + 1
+        k = index + 1
+        while n_args:
+            if self.levels[k] == next_level:
+                args_id.append(k)
+                n_args = n_args - 1
+            k = k + 1
+
+        for id_ in args_id:
+            print(self.subtree(id_, return_class=True))
+        return args_id
+                
+
 
 
 class FunctionalNode:

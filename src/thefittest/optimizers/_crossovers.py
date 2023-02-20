@@ -79,8 +79,8 @@ def binomial(individ, mutant, CR):
 
 
 def standart_crossover(individs, fitness, rank):
-    individ_1 = individs[0]
-    individ_2 = individs[1]
+    individ_1 = individs[0].copy()
+    individ_2 = individs[1].copy()
     first_point = np.random.randint(0,  len(individ_1.nodes))
     second_point = np.random.randint(0,  len(individ_2.nodes))
 
@@ -101,13 +101,16 @@ def common_region(trees):
     terminate = False
     indexes = []
     common_indexes = []
+    border_indexes = []
     for tree in trees:
         indexes.append(list(range(len(tree.nodes))))
         common_indexes.append([])
+        border_indexes.append([])
 
     while not terminate:
         inner_break = False
         iters = np.min(list(map(len, indexes)))
+
         for i in range(iters):
             first_n_args = trees[0].nodes[indexes[0][i]].n_args
             common_indexes[0].append(indexes[0][i])
@@ -115,8 +118,11 @@ def common_region(trees):
                 common_indexes[j].append(indexes[j][i])
                 if first_n_args != trees[j].nodes[indexes[j][i]].n_args:
                     inner_break = True
+                    
 
             if inner_break:
+                for j in range(0, len(indexes)):
+                    border_indexes[j].append(indexes[j][i])
                 break
 
         for j in range(len(indexes)):
@@ -128,13 +134,13 @@ def common_region(trees):
                 terminate = True
                 break
 
-    return common_indexes
+    return common_indexes, border_indexes
 
 
 def one_point_crossoverGP(individs, fitness, rank):
-    individ_1 = individs[0]
-    individ_2 = individs[1]
-    common_indexes = common_region([individ_1, individ_2])
+    individ_1 = individs[0].copy()
+    individ_2 = individs[1].copy()
+    common_indexes, _ = common_region([individ_1, individ_2])
     
     point = np.random.randint(0,  len(common_indexes[0]))
     first_point = common_indexes[0][point]
@@ -150,3 +156,41 @@ def one_point_crossoverGP(individs, fitness, rank):
                               individ_2.levels[left:right])
         offspring = individ_1.concat(first_point, second_subtree)
     return offspring
+
+def uniform_crossoverGP(individs, fitness, rank):
+    '''Poli, Riccardo & Langdon, W.. (2001). On the Search
+    Properties of Different Crossover Operators in Genetic Programming. '''
+    new_nodes = []
+    individ_1 = individs[0].copy()
+    individ_2 = individs[1].copy()
+    common_indexes, border = common_region([individ_1, individ_2])
+    
+    for i in range(len(common_indexes[0])):
+        if common_indexes[0][i] in border[0]:
+            # print(common_indexes[0][i], 'граничная')
+            if np.random.random() < 0.5:
+                
+                id_ = common_indexes[0][i]
+                left, right = individ_1.subtree(index = id_)
+                new_nodes.extend(individ_1.nodes[left:right])
+                # print('0', individ_1.subtree(index = id_, return_class = True))
+            else:
+                id_ = common_indexes[1][i]
+                left, right = individ_2.subtree(index = id_)
+                new_nodes.extend(individ_2.nodes[left:right])
+                # print('1', individ_2.subtree(index = id_, return_class = True))
+        else:
+            # print(common_indexes[0][i], 'обычная')
+            if np.random.random() < 0.5:
+                id_ = common_indexes[0][i]
+                new_nodes.append(individ_1.nodes[id_])
+                # print('0', new_nodes[-1].name)
+            else:
+                id_ = common_indexes[1][i]
+                new_nodes.append(individ_2.nodes[id_])
+                # print('1', new_nodes[-1].name)
+    to_return = Tree(new_nodes.copy(), None)
+    to_return.levels = to_return.get_levels()
+    return to_return
+        
+

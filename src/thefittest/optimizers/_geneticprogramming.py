@@ -12,6 +12,7 @@ from ._selections import rank_selection
 from ._selections import tournament_selection
 from ._crossovers import one_point_crossoverGP
 from ._crossovers import standart_crossover
+from ._crossovers import uniform_crossoverGP
 from ._crossovers import empty_crossover
 from ._mutations import point_mutation
 from ._mutations import growing_mutation
@@ -84,8 +85,10 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'tournament': (tournament_selection, self.tour_size)}
 
         self.c_pool = {'empty': (empty_crossover, 1),
+                       'uniform': (uniform_crossoverGP, 2),
                        'standart': (standart_crossover, 2),
-                       'one_point': (one_point_crossoverGP, 2)}
+                       'one_point': (one_point_crossoverGP, 2)
+                       }
 
         self.m_pool = {'weak_point': (point_mutation, 0.25),
                        'average_point': (point_mutation, 1),
