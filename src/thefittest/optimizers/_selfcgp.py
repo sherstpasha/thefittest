@@ -82,26 +82,24 @@ class SelfCGP(GeneticProgramming):
                          keep_history)
 
         self.K = 2
-        self.threshold = 0.01
+        self.threshold = 0.1
         self.set_strategy(select_opers=['proportional',
                                         'rank',
                                         'tournament'],
-                          crossover_opers=[
-            'empty',
-            'standart',
-            'one_point'
-            ],
+                          crossover_opers=['empty',
+                                           'standart',
+                                           'one_point'],
             mutation_opers=['weak_point',
                             'average_point',
-                            #   'strong_point',
+                              'strong_point',
                             'weak_grow',
                             'average_grow',
-                            #   'strong_grow',
-                              'weak_simplify',
-                              'average_simplify',
+                              'strong_grow',
+                            #   'weak_simplify',
+                            #   'average_simplify',
                             #   'strong_simplify',
-                            'weak_gauss',
-                            'average_gauss',
+                            # 'weak_gauss',
+                            # 'average_gauss',
                             #   'strong_gauss'
                             ])
         self.stats: StatisticsSelfCGP
@@ -162,7 +160,8 @@ class SelfCGP(GeneticProgramming):
         offspring_no_mutated = crossover_func(parents,
                                               fitness_scale_p,
                                               fitness_rank_p)
-        mutant = mutation_func(offspring_no_mutated, self.uniset, proba, self.max_level)
+        mutant = mutation_func(offspring_no_mutated,
+                               self.uniset, proba, self.max_level)
         return mutant
 
     def choice_operators(self, proba_dict):

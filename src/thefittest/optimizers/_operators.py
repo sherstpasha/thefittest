@@ -22,7 +22,7 @@ class Sub(Operator):
         self.sign = '-'
 
     def __call__(self, x, y):
-        return x + y
+        return x - y
 
 class Add3(Operator):
     def __init__(self):
@@ -100,9 +100,11 @@ class Div(Operator):
         self.sign = '/'
 
     def __call__(self, x, y):
+        
         if type(y) == np.ndarray:
             mask = y == 0
-            y[mask] = 1e-6
+            y[mask] = 1
         else:
-            y = 1e-6
+            y = 1
+        r = x/y
         return x/y

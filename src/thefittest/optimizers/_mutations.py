@@ -107,27 +107,22 @@ def constant_gauss_mutation(some_tree, uniset,
 def growing_mutation(some_tree, uniset,
                      proba_down, max_level):
     proba = proba_down/len(some_tree.nodes)
-    for i in range(1, len(some_tree.nodes)):
-        if np.random.random() < proba:
-            left, right = some_tree.subtree(i)
-            # max_level_i = some_tree.levels[left:right][-1] - \
-            #     some_tree.levels[left:right][0]
-            max_level_i = max_level - some_tree.levels[left:right][0]
+    if np.random.random() < proba:
+        i = np.random.randint(0, len(some_tree.nodes))
+        left, right = some_tree.subtree(i)
+        max_level_i = max_level - some_tree.levels[left:right][0]
 
-            new_tree = growing_method(uniset, max_level_i)
-            mutated = some_tree.concat(i, new_tree)
-            return mutated
-    return some_tree
+        new_tree = growing_method(uniset, max_level_i)
+        mutated = some_tree.concat(i, new_tree)
+        return mutated
+    else:
+        return some_tree
+
 
 def simplify_mutations(some_tree, uniset,
-                     proba_down, max_level):
+                       proba_down, max_level):
     proba = proba_down/len(some_tree.nodes)
     if np.random.random() < proba:
-        for i in range(len(some_tree.nodes)-1, -1, -1):
-            if type(some_tree.nodes[i]) is FunctionalNode:
-                some_tree, cond = some_tree.simplify_by_index(index=i)
-                if cond:
-                    return some_tree
+        i = np.random.randint(0, len(some_tree.nodes))
+
     return some_tree
-    
-    

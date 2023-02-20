@@ -85,17 +85,18 @@ uniset = UniversalSet(functional_set=(Add(),
                                       Mul(),
                                     #   Neg()
                                       ),
-                      terminal_set={'x0': np.array([1, 2, 3])},
+                      terminal_set={'x0': np.array([1, 2, 3]),
+                                    'x1': np.array([3, 2, 1])},
                       constant_set=(1, 3, 5, 7))
 
 
-F1 = FunctionalNode(Add())
-F2 = FunctionalNode(Add())
-F3 = FunctionalNode(Cos())
-T1 = TerminalConstantNode(11)
-T2 = TerminalConstantNode(22)
-F4 = FunctionalNode(Sin())
-X = TerminalNode(np.array([1, 2, 3]), 'X')
+# F1 = FunctionalNode(Add())
+# F2 = FunctionalNode(Add())
+# F3 = FunctionalNode(Cos())
+# T1 = TerminalConstantNode(11)
+# T2 = TerminalConstantNode(22)
+# F4 = FunctionalNode(Sin())
+# X = TerminalNode(np.array([1, 2, 3]), 'X')
 
 
 tree_1 = full_growing_method(uniset, 5)
@@ -103,15 +104,20 @@ tree_1 = full_growing_method(uniset, 5)
 #               [0, 1, 2, 3, 2, 1, 2])
 
 # tree_2 = tree_1.simplify()
-print(tree_1)
+
+
 # print(tree_2)
 
 print_tree(tree_1, 'tree_1.png')
 
-tree_2 = tree_1.simplify()
-print(tree_2)
+tree_2 = tree_1.change_terminals({'x1': np.array([0, 0, 0])})
+
 
 print_tree(tree_2, 'tree_2.png')
+print(tree_1)
+print(tree_2)
+print(tree_1.compile())
+print(tree_2.compile())
 
 
-print(tree_1.compile(), tree_2.compile())
+# print(tree_1.compile(), tree_2.compile())

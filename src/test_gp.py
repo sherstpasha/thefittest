@@ -92,8 +92,8 @@ def root_mean_square_error(y_true, y_predict):
 
 
 def problem(x):
-    # return np.sqrt(x[:,0])
-    return 20*np.cos(2*x[:, 0]) + 0.3*x[:, 0]*x[:, 0]
+    return np.cos(x[:,0])
+    # return 20*np.cos(2*x[:, 0]) + 0.3*x[:, 0]*x[:, 0]
 
 
 left = -12
@@ -108,9 +108,9 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.33, random_state=42)
 
 uniset = UniversalSet(functional_set=(Add(),
-                                      Cos(),
+                                    #   Cos(),
                                     #   Sin(),
-                                    #   Div(),
+                                      Div(),
                                       Mul(),
                                       Sub(),
                                       ),
@@ -124,9 +124,9 @@ def fitness_function(trees):
     for tree in trees:
         y_pred = tree.compile()*np.ones(len(y_train))
         level = tree.get_max_level()
-        if level > 5:
-            # fine = len(tree.nodes)
-            fine = 0
+        if level > 49:
+            fine = len(tree.nodes)
+            # fine = 0
         else:
             fine = 0
         fitness.append(root_mean_square_error(y_train, y_pred) + fine)
@@ -136,7 +136,7 @@ def fitness_function(trees):
 model = SelfCGP(fitness_function=fitness_function,
                 genotype_to_phenotype=donothing,
                 uniset=uniset,
-                pop_size=250, iters=1500,
+                pop_size=500, iters=1000,
                 show_progress_each=10,
                 minimization=False,
                 no_increase_num=300,
@@ -146,37 +146,30 @@ model.max_level = 15
 model.fit()
 
 fittest = model.thefittest.phenotype
+
 stats = model.stats
 print(fittest)
 
 x_plot = np.linspace(left, right, size).reshape(-1, 1)
 y_plot = problem(x_plot)
 
-y_pred = fittest.compile()*np.ones_like(y_train)
-tree_c = fittest.simplify()
-y_predc = tree_c.compile()*np.ones_like(y_train)
-print_tree(tree_c, 'fittest_c.png')
+fittest_pred = fittest.change_terminals({'x0': x_plot})
+y_pred = fittest_pred.compile()
+if type(y_pred) is not np.ndarray:
+    y_pred = np.full(len(x_plot), y_pred)
 
-print(np.all(y_pred == y_predc), 'true')
+y_pred_train = fittest.compile()
 
-plt.plot(x_plot, y_plot, label='true', color='green')
-plt.scatter(X_train, y_train, label='train', color='black', alpha=0.3)
-plt.scatter(X_train, y_pred, label='pred', color='red', alpha=0.3)
-plt.scatter(X_train, y_predc, label='pred', color='blue', alpha=0.3)
+plt.plot(x_plot[:,0], y_plot, label='true', color='green')
+plt.scatter(X_train[:,0], y_train, label='train', color='black', alpha=0.3)
+plt.scatter(X_train[:,0], y_pred_train, label='train', color='red', alpha=0.3)
+plt.plot(x_plot[:,0], y_pred, color='red')
 plt.legend()
 plt.savefig('line1.png')
 plt.close()
 
 print_tree(fittest, 'fittest.png')
 
-# print(stats.fitness)
-# print(stats.fittest)
-# for f, t in zip(stats.fitness, stats.fittest):
-#     print(f, t)
-
-# print(stats.m_proba)
-# print(stats.c_proba)
-# print(stats.s_proba)
 plt.plot(range(len(stats.fitness)), stats.fitness)
 plt.savefig('fitness.png')
 plt.close()

@@ -206,13 +206,22 @@ class Tree:
 
         value = pack[0]
         return self.concat(index, Tree([TerminalConstantNode(value)], [0])), True
-    
+
     def simplify(self):
         for i in range(len(self.nodes)-1, -1, -1):
             if type(self.nodes[i]) is FunctionalNode:
-                self, cond = self.simplify_by_index(index=i)   
+                self, cond = self.simplify_by_index(index=i)
         return self
 
+    def change_terminals(self, change_list):
+        tree_copy = self.copy()
+        for i, node in enumerate(tree_copy.nodes):
+            if type(node) is TerminalNode:
+                for key, value in change_list.items():
+                    if node.name == key:
+                        tree_copy.nodes[i] = TerminalNode(value=value,
+                                                          name=node.name + '_')
+        return tree_copy
 
 
 class FunctionalNode:
