@@ -90,22 +90,6 @@ def point_mutation(some_tree, uniset,
     return new_tree
 
 
-def constant_gauss_mutation(some_tree, uniset,
-                            proba_down, max_level):
-    some_tree = some_tree.copy()
-    nodes = some_tree.nodes.copy()
-    levels = some_tree.levels.copy()
-
-    proba = proba_down/len(nodes)
-    for i, node in enumerate(nodes):
-        if type(node) == TerminalConstantNode:
-            if np.random.random() < proba:
-                nodes[i] = uniset.mutate_constant(node)
-
-    new_tree = Tree(nodes, levels)
-    return new_tree
-
-
 def growing_mutation(some_tree, uniset,
                      proba_down, max_level):
     some_tree = some_tree.copy()

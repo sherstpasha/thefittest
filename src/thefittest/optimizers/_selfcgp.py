@@ -101,9 +101,6 @@ class SelfCGP(GeneticProgramming):
                             #   'weak_simplify',
                             #   'average_simplify',
                             #   'strong_simplify',
-                            # 'weak_gauss',
-                            # 'average_gauss',
-                            #   'strong_gauss'
                             ])
         self.stats: StatisticsSelfCGP
         self.s_sets: dict
@@ -162,7 +159,8 @@ class SelfCGP(GeneticProgramming):
 
         offspring_no_mutated = crossover_func(parents,
                                               fitness_scale_p,
-                                              fitness_rank_p)
+                                              fitness_rank_p,
+                                              self.max_level)
         mutant = mutation_func(offspring_no_mutated,
                                self.uniset, proba, self.max_level)
         return mutant
@@ -253,7 +251,7 @@ class SelfCGP(GeneticProgramming):
                     m_operators, fitness[:-1])
                 m_proba = self.update_proba(m_proba, m_fittest_oper)
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                # population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
 
