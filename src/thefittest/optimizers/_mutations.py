@@ -1,7 +1,6 @@
 import numpy as np
 from ._base import Tree
 from ._base import FunctionalNode
-from ._base import TerminalConstantNode
 from ._initializations import growing_method
 
 
@@ -78,16 +77,15 @@ def point_mutation(some_tree, uniset,
 
     proba = proba_down/len(nodes)
     for i, node in enumerate(nodes):
-
         if np.random.random() < proba:
             if type(node) != FunctionalNode:
-                new_node = uniset.mutate_terminal(node)
+                new_node = uniset.mutate_terminal()
             else:
-                new_node = uniset.mutate_functional(node)
+                new_node = uniset.mutate_functional(node.n_args)
             nodes[i] = new_node
 
-    new_tree = Tree(nodes, levels)
-    return new_tree
+    to_return = Tree(nodes, levels)
+    return to_return
 
 
 def growing_mutation(some_tree, uniset,
@@ -100,10 +98,10 @@ def growing_mutation(some_tree, uniset,
         max_level_i = max_level - some_tree.levels[left:right][0]
 
         new_tree = growing_method(uniset, max_level_i)
-        mutated = some_tree.concat(i, new_tree)
-        return mutated
+        to_return = some_tree.concat(i, new_tree)
     else:
-        return some_tree
+        to_return = some_tree
+    return to_return
 
 
 def simplify_mutations(some_tree, uniset,
@@ -112,5 +110,7 @@ def simplify_mutations(some_tree, uniset,
     proba = proba_down/len(some_tree.nodes)
     if np.random.random() < proba:
         i = np.random.randint(0, len(some_tree.nodes))
-
-    return some_tree
+        to_return = some_tree.simplify_by_index(i)[0]
+    else:
+        to_return = some_tree
+    return to_return

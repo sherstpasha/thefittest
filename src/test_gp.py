@@ -94,7 +94,7 @@ def root_mean_square_error(y_true, y_predict):
 
 
 def problem(x):
-    return np.cos(2*x[:,0])
+    return np.cos(x[:,0])
     # return 20*np.cos(2*x[:, 0]) + 0.3*x[:, 0]*x[:, 0]
 
 def problem_1(x):
@@ -104,9 +104,9 @@ def problem_2(x):
     return 1 - 0.5*np.cos(1.5*(10*x[:,0]-0.3))*np.cos(31.4*x[:,0]) + 0.5*np.cos(np.sqrt(5)*10*x[:,0])*np.cos(35*x[:,0])
 
 
-left = 0
-right = 2*np.pi
-size = 500
+left = -4.5
+right = 4.5
+size = 100
 n_vars = 1
 X = np.random.uniform(left, right, size=(size, n_vars)).astype(np.float64)
 y = problem(X)
@@ -115,17 +115,20 @@ y = problem(X)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.33, random_state=42)
 
+def generator():
+    return np.random.uniform(-5, 5)
+
 uniset = UniversalSet(functional_set=(
                                       Add(),
                                       Sub(),
                                     #   Sqrt(),
-                                      Sin(),
+                                    #   Sin(),
                                     #   Cos(),
                                       Mul(),
                                       Div()
                                       ),
                       terminal_set={'x0': X_train[:, 0]},
-                      constant_set=(1,)
+                      constant_set={'e1': generator}
                       )
 
 
@@ -134,12 +137,7 @@ def fitness_function(trees):
     for tree in trees:
         y_pred = tree.compile()*np.ones(len(y_train))
         level = tree.get_max_level()
-        if level > 19:
-        #     fine = tree.
-            fine = len(tree.nodes)
-        else:
-            fine = 0
-        fitness.append(root_mean_square_error(y_train, y_pred) + fine)
+        fitness.append(root_mean_square_error(y_train, y_pred))
     return 1/(1 + np.array(fitness))
     # return np.array(fitness)
 
@@ -148,13 +146,13 @@ def fitness_function(trees):
 model = SelfCGP(fitness_function=fitness_function,
                 genotype_to_phenotype=donothing,
                 uniset=uniset,
-                pop_size=500, iters=51,
+                pop_size=500, iters=101,
                 show_progress_each=10,
                 minimization=False,
                 no_increase_num=300,
                 keep_history='full')
-model.tour_size = 3
-model.max_level = 19
+model.tour_size = 2
+model.max_level = 17
 model.fit()
 
 fittest = model.thefittest.phenotype

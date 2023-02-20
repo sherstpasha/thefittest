@@ -180,12 +180,14 @@ class Tree:
     def is_terminal(self, node):
         return type(node) is TerminalNode
 
-    def is_contains_terminals(self, i=0):
-        pool = list(map(self.is_terminal, self.nodes))
-        print(pool)
-        return np.any(pool)
+    # def is_contains_terminals(self, i=0):
+    #     pool = list(map(self.is_terminal, self.nodes))
+    #     print(pool)
+    #     return np.any(pool)
 
     def simplify_by_index(self, index=0):
+        if type(self.nodes[index]) is TerminalNode:
+            return self, False
         n_index = index + 1
         possible_steps = self.nodes[index].n_args
         while possible_steps:
@@ -200,12 +202,19 @@ class Tree:
             for _ in range(node.n_args):
                 args.append(pack.pop())
             if type(node) != FunctionalNode:
+                print(node.value)
                 pack.append(node.value)
             else:
                 pack.append(node.value(*args))
 
+        
         value = pack[0]
-        return self.concat(index, Tree([TerminalConstantNode(value)], [0])), True
+        print(value)
+        node_ = EphemeralConstant()
+        node_.value = value
+        node_.name = str(value)
+        node_.sign = str(value)
+        return self.concat(index, Tree([node_], [0])), True
 
     def simplify(self):
         for i in range(len(self.nodes)-1, -1, -1):
@@ -234,14 +243,11 @@ class Tree:
                 args_id.append(k)
                 n_args = n_args - 1
             k = k + 1
-
-        for id_ in args_id:
-            print(self.subtree(id_, return_class=True))
         return args_id
 
 
 class FunctionalNode:
-    def __init__(self, value):
+    def __init__(self, value: Callable):
         self.value = value
         self.args = None
         self.name = value.__name__
@@ -257,20 +263,21 @@ class TerminalNode:
         self.n_args = 0
 
 
-class TerminalConstantNode:
-    def __init__(self, value):
-        self.value = value
-        self.name = str(value)
-        self.sign = str(value)
+class EphemeralConstant:
+    def __init__(self, generator: Callable = np.random.random):
+        self.value = generator()
+        self.name = str(self.value)
+        self.sign = str(self.value)
         self.n_args = 0
 
 
 class UniversalSet:
-    def __init__(self, functional_set, terminal_set, constant_set=[]):
+    def __init__(self, functional_set, terminal_set, constant_set=dict([])):
         functional_set = list(map(FunctionalNode, functional_set))
         terminal_set = list(TerminalNode(value, key)
                             for key, value in terminal_set.items())
-        constant_set = list(map(TerminalConstantNode, constant_set))
+        constant_set = list((key, value)
+                            for key, value in constant_set.items())
         self.functional_set = {}
         for unit in functional_set:
             n_args = unit.n_args
@@ -284,30 +291,30 @@ class UniversalSet:
         self.union_terminal = terminal_set + constant_set
 
     def choice_terminal(self):
-        return random.choice(self.union_terminal)
+        choosen = random.choice(self.union_terminal)
+        if type(choosen) is not TerminalNode:
+            to_return = EphemeralConstant(choosen[1])
+        else:
+            to_return = choosen
+        return to_return
 
     def choice_functional(self, n_args='any'):
         return random.choice(self.functional_set[n_args])
 
-    def mutate_terminal(self, terminal):
+    def mutate_terminal(self):
         if len(self.union_terminal) > 1:
-            remains = list(filter(lambda x: x != terminal,
-                                  self.union_terminal))
-            to_return = random.choice(remains)
+            choosen = random.choice(self.union_terminal)
+            if type(choosen) is not TerminalNode:
+                to_return = EphemeralConstant(choosen[1])
+            else:
+                to_return = choosen
         else:
             to_return = self.union_terminal[0]
         return to_return
 
-    def mutate_constant(self, constant):
-        new_value = constant.value*np.random.normal(1, 0.05)
-        return TerminalConstantNode(new_value)
-
-    def mutate_functional(self, functional):
-        n_args = functional.n_args
+    def mutate_functional(self, n_args):
         if len(self.functional_set[n_args]) > 1:
-            remains = list(filter(lambda x: x != functional,
-                                  self.functional_set[n_args]))
-            to_return = random.choice(remains)
+            to_return = random.choice(self.functional_set[n_args])
         else:
             to_return = self.functional_set[n_args][0]
         return to_return
