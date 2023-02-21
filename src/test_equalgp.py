@@ -95,9 +95,7 @@ uniset = UniversalSet(functional_set=(Add(),
                                       #   Neg()
                                       ),
                       terminal_set={'x0': np.array([1, 2, 3]),
-                                    'x1': np.array([3, 2, 1])},
-                      constant_set={'e1': generator,
-                                    'e2': generator2})
+                                    'x1': np.array([3, 2, 1])})
 
 
 # F1 = FunctionalNode(Add3())
@@ -114,7 +112,7 @@ uniset = UniversalSet(functional_set=(Add(),
 
 tree_1 = full_growing_method(uniset, 4)
 
-
+print(tree_1 == tree_1)
 
 tree_2 = full_growing_method(uniset, 4)
 

@@ -6,10 +6,10 @@ from ._base import TheFittest
 from ._base import LastBest
 from functools import partial
 from ._differentialevolution import DifferentialEvolution
-from ._crossovers import binomial
-from ._mutations import rand_1
-from ._mutations import current_to_best_1
-from ..tools import numpy_group_by
+from ..tools.operators import binomial
+from ..tools.operators import rand_1
+from ..tools.operators import current_to_best_1
+from ..tools.transformations import numpy_group_by
 
 
 class StaticticSaDE:

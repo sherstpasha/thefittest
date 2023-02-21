@@ -1,5 +1,9 @@
-from ._base import Tree
 import numpy as np
+from ..optimizers._base import Tree
+
+def cauchy_distribution(loc=0, scale=1, size=1):
+    x_ = np.random.standard_cauchy(size=size)
+    return loc + scale*x_
 
 
 def binary_string_population(pop_size: int, str_len: int) -> np.ndarray[np.byte]:
@@ -7,13 +11,11 @@ def binary_string_population(pop_size: int, str_len: int) -> np.ndarray[np.byte]
                              size=(pop_size, str_len),
                              dtype=np.byte)
 
-
 def float_population(pop_size: int,
                      left: np.ndarray[float],
                      right: np.ndarray[float]) -> np.ndarray[float]:
     return np.array([np.random.uniform(left_i, right_i, pop_size)
                      for left_i, right_i in zip(left, right)]).T
-
 
 def full_growing_method(uniset, level_max):
     nodes = []
@@ -114,3 +116,4 @@ def half_and_half(pop_size, uniset, level_max):
         population.append(new_tree)
         
     return np.array(population, dtype=object)
+

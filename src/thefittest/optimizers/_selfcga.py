@@ -1,14 +1,14 @@
 import numpy as np
+from functools import partial
 from typing import Optional
 from typing import Callable
 from typing import Any
-from ._geneticalgorithm import GeneticAlgorithm
-from ..tools import scale_data
-from ..tools import rank_data
-from functools import partial
 from ._base import TheFittest
 from ._base import LastBest
-from ..tools import numpy_group_by
+from ._geneticalgorithm import GeneticAlgorithm
+from ..tools.transformations import scale_data
+from ..tools.transformations import rank_data
+from ..tools.transformations import numpy_group_by
 
 
 class StaticticSelfCGA:

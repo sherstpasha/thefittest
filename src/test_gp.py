@@ -16,9 +16,9 @@ from thefittest.optimizers._operators import Neg
 from thefittest.optimizers._operators import Div
 from thefittest.optimizers._operators import Exp
 from thefittest.optimizers._operators import Sqrt
-from thefittest.tools import donothing
+from thefittest.tools.transformations import donothing
 from sklearn.model_selection import train_test_split
-from thefittest.optimizers import GeneticProgramming, SelfCGP
+from thefittest.optimizers import GeneticProgramming
 
 
 def graph(some_tree):
@@ -94,14 +94,16 @@ def root_mean_square_error(y_true, y_predict):
 
 
 def problem(x):
-    return np.cos(x[:,0])
+    return np.cos(x[:, 0])
     # return 20*np.cos(2*x[:, 0]) + 0.3*x[:, 0]*x[:, 0]
 
+
 def problem_1(x):
-    return 0.05*((x[:,0]-1)**2) + (3 - 2.9*np.exp(-2.77257*(x[:,0]**2)))*(1 - np.cos(x[:,0]*(4-50*np.exp(-2.77257*(x[:,0]**2)))))
+    return 0.05*((x[:, 0]-1)**2) + (3 - 2.9*np.exp(-2.77257*(x[:, 0]**2)))*(1 - np.cos(x[:, 0]*(4-50*np.exp(-2.77257*(x[:, 0]**2)))))
+
 
 def problem_2(x):
-    return 1 - 0.5*np.cos(1.5*(10*x[:,0]-0.3))*np.cos(31.4*x[:,0]) + 0.5*np.cos(np.sqrt(5)*10*x[:,0])*np.cos(35*x[:,0])
+    return 1 - 0.5*np.cos(1.5*(10*x[:, 0]-0.3))*np.cos(31.4*x[:, 0]) + 0.5*np.cos(np.sqrt(5)*10*x[:, 0])*np.cos(35*x[:, 0])
 
 
 left = -4.5
@@ -115,42 +117,41 @@ y = problem(X)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.33, random_state=42)
 
+
 def generator():
     return np.random.uniform(-5, 5)
 
+
 uniset = UniversalSet(functional_set=(
-                                      Add(),
-                                      Sub(),
-                                    #   Sqrt(),
-                                    #   Sin(),
-                                    #   Cos(),
-                                      Mul(),
-                                      Div()
-                                      ),
-                      terminal_set={'x0': X_train[:, 0]},
-                      constant_set={'e1': generator}
-                      )
+    Add(),
+    Sub(),
+    #   Sqrt(),
+    #   Sin(),
+    #   Cos(),
+    Mul(),
+    Div()
+),
+    terminal_set={'x0': X_train[:, 0]},
+    constant_set={'e1': generator}
+)
 
 
 def fitness_function(trees):
     fitness = []
     for tree in trees:
         y_pred = tree.compile()*np.ones(len(y_train))
-        level = tree.get_max_level()
         fitness.append(root_mean_square_error(y_train, y_pred))
     return 1/(1 + np.array(fitness))
-    # return np.array(fitness)
 
 
-
-model = SelfCGP(fitness_function=fitness_function,
-                genotype_to_phenotype=donothing,
-                uniset=uniset,
-                pop_size=500, iters=101,
-                show_progress_each=10,
-                minimization=False,
-                no_increase_num=300,
-                keep_history='full')
+model = GeneticProgramming(fitness_function=fitness_function,
+                           genotype_to_phenotype=donothing,
+                           uniset=uniset,
+                           pop_size=500, iters=101,
+                           show_progress_each=10,
+                           minimization=False,
+                           no_increase_num=300,
+                           keep_history='full')
 model.tour_size = 2
 model.max_level = 17
 model.fit()
@@ -170,10 +171,10 @@ if type(y_pred) is not np.ndarray:
 
 y_pred_train = fittest.compile()
 
-plt.plot(x_plot[:,0], y_plot, label='true', color='green')
-plt.scatter(X_train[:,0], y_train, label='train', color='black', alpha=0.3)
+plt.plot(x_plot[:, 0], y_plot, label='true', color='green')
+plt.scatter(X_train[:, 0], y_train, label='train', color='black', alpha=0.3)
 # plt.scatter(X_train[:,0], y_pred_train, label='train', color='red', alpha=0.3)
-plt.plot(x_plot[:,0], y_pred, color='red')
+plt.plot(x_plot[:, 0], y_pred, color='red')
 plt.legend()
 plt.savefig('line1.png')
 plt.close()
@@ -186,19 +187,19 @@ plt.close()
 
 
 for key, value in stats.m_proba.items():
-    plt.plot(range(len(value)), value, label = key)
+    plt.plot(range(len(value)), value, label=key)
 plt.legend()
 plt.savefig('m_proba.png')
 plt.close()
 
 for key, value in stats.c_proba.items():
-    plt.plot(range(len(value)), value, label = key)
+    plt.plot(range(len(value)), value, label=key)
 plt.legend()
 plt.savefig('c_proba.png')
 plt.close()
 
 for key, value in stats.s_proba.items():
-    plt.plot(range(len(value)), value, label = key)
+    plt.plot(range(len(value)), value, label=key)
 plt.legend()
 plt.savefig('s_proba.png')
 plt.close()

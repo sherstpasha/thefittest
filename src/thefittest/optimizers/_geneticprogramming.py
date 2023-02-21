@@ -7,19 +7,19 @@ from ._base import TheFittest
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
 from ._base import UniversalSet
-from ._selections import proportional_selection
-from ._selections import rank_selection
-from ._selections import tournament_selection
-from ._crossovers import one_point_crossoverGP
-from ._crossovers import standart_crossover
-from ._crossovers import uniform_crossoverGP
-from ._crossovers import empty_crossover
-from ._mutations import point_mutation
-from ._mutations import growing_mutation
-from ._mutations import simplify_mutations
-from ._initializations import half_and_half
-from ..tools import scale_data
-from ..tools import rank_data
+from ..tools.operators import proportional_selection
+from ..tools.operators import rank_selection
+from ..tools.operators import tournament_selection
+from ..tools.operators import one_point_crossoverGP
+from ..tools.operators import standart_crossover
+from ..tools.operators import uniform_crossoverGP
+from ..tools.operators import empty_crossover
+from ..tools.operators import point_mutation
+from ..tools.operators import growing_mutation
+from ..tools.operators import simplify_mutation
+from ..tools.generators import half_and_half
+from ..tools.transformations import scale_data
+from ..tools.transformations import rank_data
 from functools import partial
 
 
@@ -74,7 +74,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
         self.uniset = uniset
         self.tour_size = 2
-        self.max_level = 10
+        self.max_level = 17
         self.initial_population = None
         self.thefittest: TheFittest
         self.stats: StatisticsGP
@@ -86,30 +86,26 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         self.c_pool = {'empty': (empty_crossover, 1),
                        'uniform': (uniform_crossoverGP, 2),
                        'standart': (standart_crossover, 2),
-                       'one_point': (one_point_crossoverGP, 2)
-                       }
+                       'one_point': (one_point_crossoverGP, 2)}
 
         self.m_pool = {'weak_point': (point_mutation, 0.25),
                        'average_point': (point_mutation, 1),
                        'strong_point': (point_mutation, 4),
                        'weak_grow': (growing_mutation, 0),
                        'average_grow': (growing_mutation, 1),
-                       'strong_grow': (growing_mutation, 4),
-                       'weak_simplify': (simplify_mutations, 0.25),
-                       'average_simplify': (simplify_mutations, 1),
-                       'strong_simplify': (simplify_mutations, 4)}
+                       'strong_grow': (growing_mutation, 4)}
 
         self.s_set = self.s_pool['tournament']
         self.c_set = self.c_pool['standart']
         self.m_set = self.m_pool['weak_grow']
 
-# добавить сюда max_level
     def set_strategy(self,
                      selection_oper: Optional[str] = None,
                      crossover_oper: Optional[str] = None,
                      mutation_oper: Optional[str] = None,
                      tour_size_param: Optional[int] = None,
-                     initial_population: Optional[np.ndarray] = None):
+                     initial_population: Optional[np.ndarray] = None,
+                     max_level: Optional[int] = None):
         if selection_oper is not None:
             self.s_set = self.s_pool[selection_oper]
         if crossover_oper is not None:
@@ -119,6 +115,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         if tour_size_param is not None:
             self.tour_size = tour_size_param
         self.initial_population = initial_population
+        if max_level is not None:
+            self.max_level = max_level
         return self
 
     def create_offspring(self, population_g, fitness_scale, fitness_rank, _):

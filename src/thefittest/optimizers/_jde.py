@@ -6,7 +6,7 @@ from ._base import TheFittest
 from ._base import LastBest
 from functools import partial
 from ._differentialevolution import DifferentialEvolution
-from ._crossovers import binomial
+from ..tools.operators import binomial
 
 
 class StatisticsjDE:

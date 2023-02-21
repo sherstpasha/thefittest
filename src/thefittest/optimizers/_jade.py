@@ -6,9 +6,9 @@ from ._base import TheFittest
 from ._base import LastBest
 from functools import partial
 from ._differentialevolution import DifferentialEvolution
-from ._crossovers import binomial
-from ..tools import cauchy_distribution
-from ..tools import lehmer_mean
+from ..tools.operators import binomial
+from ..tools.generators import cauchy_distribution
+from ..tools.transformations import lehmer_mean
 
 
 class StatisticsJADE:

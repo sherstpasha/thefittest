@@ -5,11 +5,11 @@ from typing import Any
 from ._base import TheFittest
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
-from ..tools import cauchy_distribution
-from ._initializations import binary_string_population
-from ._selections import tournament_selection
-from ._crossovers import binomial
-from ._mutations import flip_mutation
+from ..tools.generators import cauchy_distribution
+from ..tools.generators import binary_string_population
+from ..tools.operators import tournament_selection
+from ..tools.operators import binomial
+from ..tools.operators import flip_mutation
 from functools import partial
 
 

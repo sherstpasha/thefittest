@@ -1,6 +1,45 @@
 import numpy as np
 
 
+def common_region(trees):
+    terminate = False
+    indexes = []
+    common_indexes = []
+    border_indexes = []
+    for tree in trees:
+        indexes.append(list(range(len(tree.nodes))))
+        common_indexes.append([])
+        border_indexes.append([])
+
+    while not terminate:
+        inner_break = False
+        iters = np.min(list(map(len, indexes)))
+
+        for i in range(iters):
+            first_n_args = trees[0].nodes[indexes[0][i]].n_args
+            common_indexes[0].append(indexes[0][i])
+            for j in range(1, len(indexes)):
+                common_indexes[j].append(indexes[j][i])
+                if first_n_args != trees[j].nodes[indexes[j][i]].n_args:
+                    inner_break = True
+
+            if inner_break:
+                for j in range(0, len(indexes)):
+                    border_indexes[j].append(indexes[j][i])
+                break
+
+        for j in range(len(indexes)):
+            _, right = trees[j].subtree(common_indexes[j][-1])
+            delete_to = indexes[j].index(right-1) + 1
+            indexes[j] = indexes[j][delete_to:]
+
+            if len(indexes[j]) < 1:
+                terminate = True
+                break
+
+    return common_indexes, border_indexes
+
+
 def donothing(x):
     return x
 

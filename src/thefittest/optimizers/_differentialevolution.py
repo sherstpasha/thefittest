@@ -6,15 +6,15 @@ from ._base import TheFittest
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
 from functools import partial
-from ._crossovers import binomial
-from ._mutations import best_1
-from ._mutations import best_2
-from ._mutations import rand_to_best1
-from ._mutations import current_to_best_1
-from ._mutations import rand_1
-from ._mutations import current_to_pbest_1
-from ._mutations import rand_2
-from ._initializations import float_population
+from ..tools.operators import binomial
+from ..tools.operators import best_1
+from ..tools.operators import best_2
+from ..tools.operators import rand_to_best1
+from ..tools.operators import current_to_best_1
+from ..tools.operators import rand_1
+from ..tools.operators import current_to_pbest_1
+from ..tools.operators import rand_2
+from ..tools.generators import float_population
 
 
 class Statistics:
