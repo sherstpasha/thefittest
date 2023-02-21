@@ -1,24 +1,24 @@
 import numpy as np
-
 import networkx as nx
 import matplotlib.pyplot as plt
 from thefittest.optimizers._base import Tree
 from thefittest.optimizers._base import UniversalSet
 from thefittest.optimizers._base import FunctionalNode
 from thefittest.optimizers._base import TerminalNode
-from thefittest.optimizers._operators import Mul
-from thefittest.optimizers._operators import Sub
-from thefittest.optimizers._operators import Add
-from thefittest.optimizers._operators import Pow
-from thefittest.optimizers._operators import Cos
-from thefittest.optimizers._operators import Sin
-from thefittest.optimizers._operators import Neg
-from thefittest.optimizers._operators import Div
-from thefittest.optimizers._operators import Exp
-from thefittest.optimizers._operators import Sqrt
+from thefittest.tools.operators import Mul
+from thefittest.tools.operators import Sub
+from thefittest.tools.operators import Add
+from thefittest.tools.operators import Pow
+from thefittest.tools.operators import Cos
+from thefittest.tools.operators import Sin
+from thefittest.tools.operators import Neg
+from thefittest.tools.operators import Div
+from thefittest.tools.operators import Exp
+from thefittest.tools.operators import Sqrt
 from thefittest.tools.transformations import donothing
 from sklearn.model_selection import train_test_split
 from thefittest.optimizers import GeneticProgramming
+from thefittest.optimizers import SelfCGP
 
 
 def graph(some_tree):
@@ -94,8 +94,8 @@ def root_mean_square_error(y_true, y_predict):
 
 
 def problem(x):
-    return np.cos(x[:, 0])
-    # return 20*np.cos(2*x[:, 0]) + 0.3*x[:, 0]*x[:, 0]
+    # return np.sin(x[:, 0])
+    return 20*np.cos(2*x[:, 0]) + 0.3*x[:, 0]*x[:, 0]
 
 
 def problem_1(x):
@@ -106,9 +106,9 @@ def problem_2(x):
     return 1 - 0.5*np.cos(1.5*(10*x[:, 0]-0.3))*np.cos(31.4*x[:, 0]) + 0.5*np.cos(np.sqrt(5)*10*x[:, 0])*np.cos(35*x[:, 0])
 
 
-left = -4.5
-right = 4.5
-size = 100
+left = -1
+right = 1
+size = 250
 n_vars = 1
 X = np.random.uniform(left, right, size=(size, n_vars)).astype(np.float64)
 y = problem(X)
@@ -119,22 +119,21 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 
 def generator():
-    return np.random.uniform(-5, 5)
+    return np.round(np.random.uniform(-5, 5), 4)
 
 
 uniset = UniversalSet(functional_set=(
     Add(),
     Sub(),
-    #   Sqrt(),
-    #   Sin(),
-    #   Cos(),
+    Sin(),
+    Pow(),
+    Cos(),
     Mul(),
     Div()
 ),
     terminal_set={'x0': X_train[:, 0]},
     constant_set={'e1': generator}
 )
-
 
 def fitness_function(trees):
     fitness = []
@@ -144,16 +143,17 @@ def fitness_function(trees):
     return 1/(1 + np.array(fitness))
 
 
-model = GeneticProgramming(fitness_function=fitness_function,
-                           genotype_to_phenotype=donothing,
-                           uniset=uniset,
-                           pop_size=500, iters=101,
-                           show_progress_each=10,
-                           minimization=False,
-                           no_increase_num=300,
-                           keep_history='full')
+model = SelfCGP(fitness_function=fitness_function,
+                genotype_to_phenotype=donothing,
+                uniset=uniset,
+                pop_size=300, iters=501,
+                show_progress_each=10,
+                minimization=False,
+                no_increase_num=300,
+                keep_history='quick')
 model.tour_size = 2
-model.max_level = 17
+model.init_level = 5
+model.max_level = 16
 model.fit()
 
 fittest = model.thefittest.phenotype

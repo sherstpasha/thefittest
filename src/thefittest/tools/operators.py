@@ -4,6 +4,7 @@ from ..optimizers._base import FunctionalNode
 from .generators import growing_method
 from .transformations import protect_norm
 from .transformations import common_region
+import random
 
 
 ################################## MUTATUIONS ##################################
@@ -122,8 +123,35 @@ def simplify_mutation(some_tree, uniset,
     return to_return
 
 
-################################## CROSSOVERS ##################################
-# genetic algorithm
+def swap_mutation(some_tree, uniset,
+                  proba_down, max_level):
+    to_return = some_tree.copy()
+    proba = proba_down/len(to_return.nodes)
+    if np.random.random() < proba:
+        indexes = [i for i, nodes in enumerate(
+            to_return.nodes) if nodes.n_args > 1]
+        if len(indexes) > 0:
+            i = random.choice(indexes)
+            args_id = to_return.get_args_id(i)
+            new_arg_id = args_id.copy()
+            np.random.shuffle(new_arg_id)
+
+            for old_j, new_j in zip(args_id, new_arg_id):
+                subtree = some_tree.subtree(old_j, return_class=True)
+                to_return = to_return.concat(new_j, subtree)
+
+            to_return.levels = to_return.get_levels()
+
+    return to_return
+
+
+# def shrink_mutation(some_tree, uniset,
+#                     proba_down, max_level):
+
+    ################################## CROSSOVERS ##################################
+    # genetic algorithm
+
+
 def empty_crossover(individs, *args):
     return individs[0]
 
@@ -278,7 +306,6 @@ def uniform_crossoverGP(individs, fitness, rank, max_level):
 # def uniform_crossoverGP2(individs, fitness, rank, max_level):
 
 
-
 ################################## SELECTIONS ##################################
 # genetic algorithm
 def proportional_selection(fitness, ranks,
@@ -357,6 +384,19 @@ class Mul(Operator):
         x = np.clip(x, -1e3, 1e3)
         y = np.clip(y, -1e3, 1e3)
         return x * y
+
+
+class Mul3(Operator):
+    def __init__(self):
+        self.formula = '({} * {} * {})'
+        self.__name__ = 'mul3'
+        self.sign = '*'
+
+    def __call__(self, x, y, z):
+        x = np.clip(x, -1e3, 1e3)
+        y = np.clip(y, -1e3, 1e3)
+        z = np.clip(z, -1e3, 1e3)
+        return x * y * z
 
 
 class Cos(Operator):

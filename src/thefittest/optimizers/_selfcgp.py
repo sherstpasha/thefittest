@@ -81,7 +81,7 @@ class SelfCGP(GeneticProgramming):
                          show_progress_each,
                          keep_history)
 
-        self.K = 5
+        self.K = 2
         self.threshold = 0.1
         self.set_strategy(select_opers=['proportional',
                                         'rank',
@@ -90,12 +90,17 @@ class SelfCGP(GeneticProgramming):
                                            'uniform',
                                            'standart',
                                            'one_point'],
-                          mutation_opers=['weak_point',
-                                          'average_point',
-                                          'strong_point',
-                                          'weak_grow',
-                                          'average_grow',
-                                          'strong_grow'])
+                          mutation_opers=[
+            'weak_point',
+            'average_point',
+            # 'strong_point',
+            'weak_grow',
+            'average_grow',
+            # 'strong_grow',
+            'weak_swap',
+            'average_swap',
+            # 'strong_swap'
+        ])
         self.stats: StatisticsSelfCGP
         self.s_sets: dict
         self.c_sets: dict
@@ -137,7 +142,7 @@ class SelfCGP(GeneticProgramming):
         if max_level is not None:
             self.max_level = max_level
         if init_level is not None:
-            self.init_level = init_level 
+            self.init_level = init_level
         return self
 
     def create_offspring(self, population_g, fitness_scale, fitness_rank,

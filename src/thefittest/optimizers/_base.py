@@ -207,9 +207,7 @@ class Tree:
             else:
                 pack.append(node.value(*args))
 
-        
         value = pack[0]
-        print(value)
         node_ = EphemeralConstant()
         node_.value = value
         node_.name = str(value)
@@ -232,7 +230,7 @@ class Tree:
                                                           name=node.name + '_')
         return tree_copy
 
-    def get_args_id(self, index):
+    def get_args_id(self, index=0):
         n_args = self.nodes[index].n_args
         args_id = []
         root_level = self.levels[index]

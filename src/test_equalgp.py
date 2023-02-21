@@ -3,16 +3,15 @@ from thefittest.optimizers._base import UniversalSet
 from thefittest.optimizers._base import FunctionalNode
 from thefittest.optimizers._base import TerminalNode
 from thefittest.optimizers._base import EphemeralConstant
-from thefittest.optimizers._operators import Mul
-from thefittest.optimizers._operators import Add3
-from thefittest.optimizers._operators import Add
-from thefittest.optimizers._operators import Pow
-from thefittest.optimizers._operators import Cos
-from thefittest.optimizers._operators import Sin
-from thefittest.optimizers._operators import Neg
-from thefittest.optimizers._crossovers import common_region, uniform_crossoverGP, standart_crossover
-from thefittest.optimizers._initializations import growing_method, full_growing_method
-from thefittest.optimizers._mutations import point_mutation, growing_mutation, simplify_mutations
+from thefittest.tools.operators import Mul
+from thefittest.tools.operators import Add
+from thefittest.tools.operators import Pow
+from thefittest.tools.operators import Cos
+from thefittest.tools.operators import Sin
+from thefittest.tools.operators import Div
+from thefittest.tools.operators import Mul3
+from thefittest.tools.operators import swap_mutation
+from thefittest.tools.generators import growing_method, full_growing_method
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -83,42 +82,31 @@ def print_tree(some_tree, fig_name, underline_nodes=[]):
     plt.close()
 
 def generator():
-    return np.random.random()
+    return np.round(np.random.uniform(0, 2), 4)
 
 def generator2():
     return np.random.uniform(-10, 10)
 
 uniset = UniversalSet(functional_set=(Add(),
-                                      Cos(),
+                                      Mul3(),
                                       Sin(),
                                       Mul(),
+                                      Div(),
                                       #   Neg()
                                       ),
                       terminal_set={'x0': np.array([1, 2, 3]),
-                                    'x1': np.array([3, 2, 1])})
+                                    'x1': np.array([3, 2, 1])},
+                                    constant_set={'e1': generator})
 
 
-# F1 = FunctionalNode(Add3())
-# F2 = FunctionalNode(Add())
-# F3 = FunctionalNode(Cos())
-# T1 = TerminalConstantNode(11)
-# T2 = TerminalConstantNode(22)
-# F4 = FunctionalNode(Sin())
-# F5 = FunctionalNode(Add())
-# T3 = TerminalConstantNode(42)
-# T4 = TerminalConstantNode(123)
-# X = TerminalNode(np.array([1, 2, 3]), 'X')
 
+tree_1 = full_growing_method(uniset, 3)
 
-tree_1 = full_growing_method(uniset, 4)
+# tree_2 = tree_1
+tree_2 = swap_mutation(tree_1, uniset, 1000, 1000)
+print(tree_1)
+print(tree_2)
 
-print(tree_1 == tree_1)
-
-tree_2 = full_growing_method(uniset, 4)
-
-
-tree_3 = uniform_crossoverGP([tree_1, tree_2], 1, 1, 15)
 
 print_tree(tree_1, 'tree_1.png')
 print_tree(tree_2, 'tree_2.png')
-print_tree(tree_3, 'tree_3.png')
