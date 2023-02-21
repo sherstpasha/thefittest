@@ -82,36 +82,31 @@ def current_to_rand_1(current, population, F_value):
 # genetic propramming
 def point_mutation(some_tree, uniset,
                    proba_down, max_level):
-    some_tree = some_tree.copy()
-    nodes = some_tree.nodes.copy()
-    levels = some_tree.levels.copy()
+    to_return = some_tree.copy()
 
-    proba = proba_down/len(nodes)
-    for i, node in enumerate(nodes):
+    proba = proba_down/len(to_return.nodes)
+    for i, node in enumerate(to_return.nodes):
         if np.random.random() < proba:
             if type(node) != FunctionalNode:
                 new_node = uniset.mutate_terminal()
             else:
                 new_node = uniset.mutate_functional(node.n_args)
-            nodes[i] = new_node
+            to_return.nodes[i] = new_node
 
-    to_return = Tree(nodes, levels)
     return to_return
 
 
 def growing_mutation(some_tree, uniset,
                      proba_down, max_level):
-    some_tree = some_tree.copy()
-    proba = proba_down/len(some_tree.nodes)
+    to_return = some_tree.copy()
+    proba = proba_down/len(to_return.nodes)
     if np.random.random() < proba:
-        i = np.random.randint(0, len(some_tree.nodes))
-        left, right = some_tree.subtree(i)
-        max_level_i = max_level - some_tree.levels[left:right][0]
-
+        i = np.random.randint(0, len(to_return.nodes))
+        left, right = to_return.subtree(i)
+        max_level_i = max_level - to_return.levels[left:right][0]
         new_tree = growing_method(uniset, max_level_i)
-        to_return = some_tree.concat(i, new_tree)
-    else:
-        to_return = some_tree
+        to_return = to_return.concat(i, new_tree)
+
     return to_return
 
 
@@ -230,8 +225,8 @@ def standart_crossover(individs, fitness, rank, max_level):
 
 # genetic propramming
 def one_point_crossoverGP(individs, fitness, rank, max_level):
-    individ_1 = individs[0].copy()
-    individ_2 = individs[1].copy()
+    individ_1 = individs[0]
+    individ_2 = individs[1]
     common_indexes, _ = common_region([individ_1, individ_2])
 
     point = np.random.randint(0,  len(common_indexes[0]))
@@ -254,14 +249,13 @@ def uniform_crossoverGP(individs, fitness, rank, max_level):
     '''Poli, Riccardo & Langdon, W.. (2001). On the Search
     Properties of Different Crossover Operators in Genetic Programming. '''
     new_nodes = []
-    individ_1 = individs[0].copy()
-    individ_2 = individs[1].copy()
+    individ_1 = individs[0]
+    individ_2 = individs[1]
     common_indexes, border = common_region([individ_1, individ_2])
 
     for i in range(len(common_indexes[0])):
         if common_indexes[0][i] in border[0]:
             if np.random.random() < 0.5:
-
                 id_ = common_indexes[0][i]
                 left, right = individ_1.subtree(index=id_)
                 new_nodes.extend(individ_1.nodes[left:right])
@@ -279,6 +273,10 @@ def uniform_crossoverGP(individs, fitness, rank, max_level):
     to_return = Tree(new_nodes.copy(), None)
     to_return.levels = to_return.get_levels()
     return to_return
+
+
+# def uniform_crossoverGP2(individs, fitness, rank, max_level):
+
 
 
 ################################## SELECTIONS ##################################
@@ -322,6 +320,8 @@ class Add(Operator):
         self.sign = '+'
 
     def __call__(self, x, y):
+        x = np.clip(x, -1e3, 1e3)
+        y = np.clip(y, -1e3, 1e3)
         return x + y
 
 
@@ -332,27 +332,9 @@ class Sub(Operator):
         self.sign = '-'
 
     def __call__(self, x, y):
+        x = np.clip(x, -1e3, 1e3)
+        y = np.clip(y, -1e3, 1e3)
         return x - y
-
-
-class Add3(Operator):
-    def __init__(self):
-        self.formula = '({} + {} + {})'
-        self.__name__ = 'add3'
-        self.sign = '+'
-
-    def __call__(self, x, y, z):
-        return x + y + z
-
-
-class Dif4(Operator):
-    def __init__(self):
-        self.formula = '({} - {} - {} - {})'
-        self.__name__ = 'dif4'
-        self.sign = '-'
-
-    def __call__(self, x, y, z, t):
-        return x - y - z - t
 
 
 class Neg(Operator):
@@ -372,6 +354,8 @@ class Mul(Operator):
         self.sign = '*'
 
     def __call__(self, x, y):
+        x = np.clip(x, -1e3, 1e3)
+        y = np.clip(y, -1e3, 1e3)
         return x * y
 
 
@@ -403,8 +387,8 @@ class Pow(Operator):
 
     def __call__(self, x, y):
         # проверка если степень от 0 до 1, то под степенью должно быть положительное иначе
-        x = np.clip(x, -10, 10)
-        y = np.clip(y, -10, 10)
+        x = np.clip(x, -1e3, 1e3)
+        y = np.clip(y, -1e1, 1e1)
 
         return np.abs(x)**np.abs(y)
 
@@ -437,10 +421,14 @@ class Div(Operator):
         self.sign = '/'
 
     def __call__(self, x, y):
-
+        x = np.clip(x, -1e3, 1e3)
+        y = np.clip(y, -1e3, 1e3)
         if type(y) == np.ndarray:
-            mask = y == 0
-            y[mask] = 1
+            res = np.divide(x, y, out=np.zeros_like(
+                y, dtype=np.float64), where=y != 0)
         else:
-            y = 1
-        return x/y
+            if y == 0:
+                res = 1
+            else:
+                res = x/y
+        return res

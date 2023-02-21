@@ -1,7 +1,7 @@
 from ._geneticalgorithm import GeneticAlgorithm
 from ._selfcga import SelfCGA
 from ._geneticprogramming import GeneticProgramming
-# from ._selfcgp import SelfCGP
+from ._selfcgp import SelfCGP
 from ._differentialevolution import DifferentialEvolution
 from ._sade2005 import SaDE2005
 from ._jde import jDE

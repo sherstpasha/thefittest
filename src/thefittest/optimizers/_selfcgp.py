@@ -4,13 +4,13 @@ from typing import Callable
 from typing import Any
 from ._geneticprogramming import GeneticProgramming
 from ._geneticprogramming import UniversalSet
-from ..tools import scale_data
-from ..tools import rank_data
+from ..tools.transformations import scale_data
+from ..tools.transformations import rank_data
 from functools import partial
 from ._base import TheFittest
 from ._base import LastBest
-from ..tools import numpy_group_by
-from ._initializations import half_and_half
+from ..tools.transformations import numpy_group_by
+from ..tools.generators import half_and_half
 
 
 class StatisticsSelfCGP:
@@ -81,38 +81,33 @@ class SelfCGP(GeneticProgramming):
                          show_progress_each,
                          keep_history)
 
-        self.K = 2
-        self.threshold = 0.05
+        self.K = 5
+        self.threshold = 0.1
         self.set_strategy(select_opers=['proportional',
                                         'rank',
                                         'tournament'],
-                          crossover_opers=[
-            'empty',
-            'uniform',
-            'standart',
-            'one_point'
-        ],
-            mutation_opers=['weak_point',
-                            'average_point',
-                            'strong_point',
-                            'weak_grow',
-                            'average_grow',
-                            'strong_grow',
-                            #   'weak_simplify',
-                            #   'average_simplify',
-                            #   'strong_simplify',
-                            ])
+                          crossover_opers=['empty',
+                                           'uniform',
+                                           'standart',
+                                           'one_point'],
+                          mutation_opers=['weak_point',
+                                          'average_point',
+                                          'strong_point',
+                                          'weak_grow',
+                                          'average_grow',
+                                          'strong_grow'])
         self.stats: StatisticsSelfCGP
         self.s_sets: dict
         self.c_sets: dict
         self.m_sets: dict
 
-# добавить сюда max_level
     def set_strategy(self, select_opers: Optional[list[str]] = None,
                      crossover_opers: Optional[list[str]] = None,
                      mutation_opers: Optional[list[str]] = None,
                      tour_size_param: Optional[int] = None,
-                     initial_population: Optional[np.ndarray] = None):
+                     initial_population: Optional[np.ndarray] = None,
+                     max_level: Optional[int] = None,
+                     init_level: Optional[int] = None):
 
         if select_opers is not None:
             s_sets = {}
@@ -139,7 +134,10 @@ class SelfCGP(GeneticProgramming):
             self.tour_size = tour_size_param
 
         self.initial_population = initial_population
-
+        if max_level is not None:
+            self.max_level = max_level
+        if init_level is not None:
+            self.init_level = init_level 
         return self
 
     def create_offspring(self, population_g, fitness_scale, fitness_rank,
@@ -195,7 +193,7 @@ class SelfCGP(GeneticProgramming):
             c_proba = dict(zip(list(self.c_sets.keys()), np.full(z_c, 1/z_c)))
 
         population_g = half_and_half(
-            self.pop_size, self.uniset, self.max_level)
+            self.pop_size, self.uniset, self.init_level)
         population_ph = self.genotype_to_phenotype(population_g)
         fitness = self.evaluate(population_ph)
         fitness_scale = scale_data(fitness)
@@ -251,7 +249,7 @@ class SelfCGP(GeneticProgramming):
                     m_operators, fitness[:-1])
                 m_proba = self.update_proba(m_proba, m_fittest_oper)
 
-                # population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
 

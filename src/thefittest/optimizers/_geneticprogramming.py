@@ -16,7 +16,6 @@ from ..tools.operators import uniform_crossoverGP
 from ..tools.operators import empty_crossover
 from ..tools.operators import point_mutation
 from ..tools.operators import growing_mutation
-from ..tools.operators import simplify_mutation
 from ..tools.generators import half_and_half
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
@@ -74,7 +73,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
         self.uniset = uniset
         self.tour_size = 2
-        self.max_level = 17
+        self.max_level = 16
+        self.init_level = 5
         self.initial_population = None
         self.thefittest: TheFittest
         self.stats: StatisticsGP
@@ -91,13 +91,13 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         self.m_pool = {'weak_point': (point_mutation, 0.25),
                        'average_point': (point_mutation, 1),
                        'strong_point': (point_mutation, 4),
-                       'weak_grow': (growing_mutation, 0),
+                       'weak_grow': (growing_mutation, 0.25),
                        'average_grow': (growing_mutation, 1),
                        'strong_grow': (growing_mutation, 4)}
 
-        self.s_set = self.s_pool['tournament']
-        self.c_set = self.c_pool['standart']
-        self.m_set = self.m_pool['weak_grow']
+        self.s_set = self.s_pool['rank']
+        self.c_set = self.c_pool['uniform']
+        self.m_set = self.m_pool['strong_grow']
 
     def set_strategy(self,
                      selection_oper: Optional[str] = None,
@@ -105,7 +105,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                      mutation_oper: Optional[str] = None,
                      tour_size_param: Optional[int] = None,
                      initial_population: Optional[np.ndarray] = None,
-                     max_level: Optional[int] = None):
+                     max_level: Optional[int] = None,
+                     init_level: Optional[int] = None):
         if selection_oper is not None:
             self.s_set = self.s_pool[selection_oper]
         if crossover_oper is not None:
@@ -117,6 +118,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         self.initial_population = initial_population
         if max_level is not None:
             self.max_level = max_level
+        if init_level is not None:
+            self.init_level = init_level
         return self
 
     def create_offspring(self, population_g, fitness_scale, fitness_rank, _):
@@ -143,7 +146,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
     def fit(self):
         population_g = half_and_half(
-            self.pop_size, self.uniset, self.max_level)
+            self.pop_size, self.uniset, self.init_level)
         population_ph = self.genotype_to_phenotype(population_g)
         fitness = self.evaluate(population_ph)
         fitness_scale = scale_data(fitness)

@@ -148,15 +148,15 @@ class Tree:
         left, right = self.subtree(index)
         levels = some_tree.get_levels(origin=self.levels[left])
 
-        new_nodes = self.nodes[:left].copy()
-        new_levels = self.levels[:left].copy()
+        new_nodes = self.nodes[:left]
+        new_levels = self.levels[:left]
 
-        new_nodes += some_tree.nodes.copy()
+        new_nodes += some_tree.nodes
         new_levels += levels
 
-        new_nodes += self.nodes[right:].copy()
-        new_levels += self.levels[right:].copy()
-        to_return = Tree(new_nodes, new_levels)
+        new_nodes += self.nodes[right:]
+        new_levels += self.levels[right:]
+        to_return = Tree(new_nodes.copy(), new_levels.copy())
         return to_return
 
     def copy(self):
