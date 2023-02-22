@@ -8,6 +8,10 @@ from .transformations import common_region
 import random
 
 
+min_value = np.finfo(np.float64).min
+max_value = np.finfo(np.float64).max
+
+
 ################################## MUTATUIONS ##################################
 # genetic algorithm
 def flip_mutation(individ, proba):
@@ -146,13 +150,21 @@ def swap_mutation(some_tree, uniset,
     return to_return
 
 
-# def shrink_mutation(some_tree, uniset,
-#                     proba_down, max_level):
+# меняет node на один из его аргументов
+def shrink_mutation(some_tree, uniset,
+                    proba_down, max_level):
+    to_return = some_tree.copy()
+    proba = proba_down/len(to_return.nodes)
+    if np.random.random() < proba:
+        indexes = [i for i, nodes in enumerate(
+            to_return.nodes) if nodes.n_args > 0]
+        if len(indexes) > 0:
+            i = random.choice(indexes)
+            args_id = to_return.get_args_id(i)
 
-    ################################## CROSSOVERS ##################################
-    # genetic algorithm
 
-
+################################## CROSSOVERS ##################################
+# genetic algorithm
 def empty_crossover(individs, *args):
     return individs[0]
 
@@ -341,65 +353,6 @@ class Operator:
         return self.formula.format(*args)
 
 
-class Add(Operator):
-    def __init__(self):
-        self.formula = '({} + {})'
-        self.__name__ = 'add'
-        self.sign = '+'
-
-    def __call__(self, x, y):
-        x = np.clip(x, -1e3, 1e3)
-        y = np.clip(y, -1e3, 1e3)
-        return x + y
-
-
-class Sub(Operator):
-    def __init__(self):
-        self.formula = '({} - {})'
-        self.__name__ = 'sub'
-        self.sign = '-'
-
-    def __call__(self, x, y):
-        x = np.clip(x, -1e3, 1e3)
-        y = np.clip(y, -1e3, 1e3)
-        return x - y
-
-
-class Neg(Operator):
-    def __init__(self):
-        self.formula = '-{}'
-        self.__name__ = 'neg'
-        self.sign = '-'
-
-    def __call__(self, x):
-        return -x
-
-
-class Mul(Operator):
-    def __init__(self):
-        self.formula = '({} * {})'
-        self.__name__ = 'mul'
-        self.sign = '*'
-
-    def __call__(self, x, y):
-        x = np.clip(x, -1e3, 1e3)
-        y = np.clip(y, -1e3, 1e3)
-        return x * y
-
-
-class Mul3(Operator):
-    def __init__(self):
-        self.formula = '({} * {} * {})'
-        self.__name__ = 'mul3'
-        self.sign = '*'
-
-    def __call__(self, x, y, z):
-        x = np.clip(x, -1e3, 1e3)
-        y = np.clip(y, -1e3, 1e3)
-        z = np.clip(z, -1e3, 1e3)
-        return x * y * z
-
-
 class Cos(Operator):
     def __init__(self):
         self.formula = 'cos({})'
@@ -420,6 +373,46 @@ class Sin(Operator):
         return np.sin(x)
 
 
+class Add(Operator):
+    def __init__(self):
+        self.formula = '({} + {})'
+        self.__name__ = 'add'
+        self.sign = '+'
+
+    def __call__(self, x, y):
+        return np.clip(x + y, min_value, max_value)
+
+
+class Sub(Operator):
+    def __init__(self):
+        self.formula = '({} - {})'
+        self.__name__ = 'sub'
+        self.sign = '-'
+
+    def __call__(self, x, y):
+        return np.clip(x - y, min_value, max_value)
+
+
+class Neg(Operator):
+    def __init__(self):
+        self.formula = '-{}'
+        self.__name__ = 'neg'
+        self.sign = '-'
+
+    def __call__(self, x):
+        return np.clip(-x, min_value, max_value)
+
+
+class Mul(Operator):
+    def __init__(self):
+        self.formula = '({} * {})'
+        self.__name__ = 'mul'
+        self.sign = '*'
+
+    def __call__(self, x, y):
+        return np.clip(x * y, min_value, max_value)
+
+
 class Pow(Operator):
     def __init__(self):
         self.formula = '({}**{})'
@@ -427,32 +420,7 @@ class Pow(Operator):
         self.sign = '**'
 
     def __call__(self, x, y):
-        # проверка если степень от 0 до 1, то под степенью должно быть положительное иначе
-        x = np.clip(x, -1e3, 1e3)
-        y = np.clip(y, -1e1, 1e1)
-
-        return np.abs(x)**np.abs(y)
-
-
-class Sqrt(Operator):
-    def __init__(self):
-        self.formula = 'sqrt({})'
-        self.__name__ = 'sqrt'
-        self.sign = 'sqrt'
-
-    def __call__(self, x):
-        return np.sqrt(np.abs(x))
-
-
-class Exp(Operator):
-    def __init__(self):
-        self.formula = 'np.exp({})'
-        self.__name__ = 'exp'
-        self.sign = 'exp'
-
-    def __call__(self, x):
-        x = np.clip(x, -np.inf, 1.7976931348623157e+308)
-        return np.exp(x)
+        return np.clip(np.abs(x)**y, min_value, max_value)
 
 
 class Div(Operator):
@@ -462,8 +430,6 @@ class Div(Operator):
         self.sign = '/'
 
     def __call__(self, x, y):
-        x = np.clip(x, -1e3, 1e3)
-        y = np.clip(y, -1e3, 1e3)
         if type(y) == np.ndarray:
             res = np.divide(x, y, out=np.zeros_like(
                 y, dtype=np.float64), where=y != 0)
@@ -472,4 +438,36 @@ class Div(Operator):
                 res = 1
             else:
                 res = x/y
-        return res
+        return np.clip(res, min_value, max_value)
+
+
+class Exp(Operator):
+    def __init__(self):
+        self.formula = 'np.exp({})'
+        self.__name__ = 'exp'
+        self.sign = 'exp'
+
+    def __call__(self, x):
+        return np.clip(np.exp(x), min_value, max_value)
+
+class Mul3(Operator):
+    def __init__(self):
+        self.formula = '({} * {} * {})'
+        self.__name__ = 'mul3'
+        self.sign = '*'
+
+    def __call__(self, x, y, z):
+        return np.clip(x * y * z, min_value, max_value)
+
+
+class Sqrt(Operator):
+    def __init__(self):
+        self.formula = 'sqrt({})'
+        self.__name__ = 'sqrt'
+        self.sign = 'sqrt'
+
+    def __call__(self, x):
+        return np.clip(np.sqrt(np.abs(x)), min_value, max_value)
+
+
+
