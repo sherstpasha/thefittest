@@ -82,7 +82,7 @@ class SelfCGP(GeneticProgramming):
                          keep_history)
 
         self.K = 2
-        self.threshold = 0.1
+        self.threshold = 0.01
         self.set_strategy(select_opers=['proportional',
                                         'rank',
                                         'tournament'],
@@ -91,15 +91,18 @@ class SelfCGP(GeneticProgramming):
                                            'standart',
                                            'one_point'],
                           mutation_opers=[
-            'weak_point',
-            'average_point',
+            # 'weak_point',
+            # 'average_point',
             # 'strong_point',
             'weak_grow',
             'average_grow',
-            # 'strong_grow',
+            'strong_grow',
             'weak_swap',
             'average_swap',
-            # 'strong_swap'
+            'strong_swap',
+            'weak_shrink',
+            'average_shrink',
+            'strong_shrink'
         ])
         self.stats: StatisticsSelfCGP
         self.s_sets: dict

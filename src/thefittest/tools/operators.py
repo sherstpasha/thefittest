@@ -160,11 +160,21 @@ def shrink_mutation(some_tree, uniset,
             to_return.nodes) if nodes.n_args > 0]
         if len(indexes) > 0:
             i = random.choice(indexes)
+            # print(i)
             args_id = to_return.get_args_id(i)
+            # print(args_id)
+            choosen = random.choice(args_id)
+            # print(choosen)
+            to_return = to_return.concat(i, some_tree.subtree(
+                choosen, return_class=True))
 
+            # print(choosen)
+    return to_return
 
 ################################## CROSSOVERS ##################################
 # genetic algorithm
+
+
 def empty_crossover(individs, *args):
     return individs[0]
 
@@ -450,6 +460,7 @@ class Exp(Operator):
     def __call__(self, x):
         return np.clip(np.exp(x), min_value, max_value)
 
+
 class Mul3(Operator):
     def __init__(self):
         self.formula = '({} * {} * {})'
@@ -468,6 +479,3 @@ class Sqrt(Operator):
 
     def __call__(self, x):
         return np.clip(np.sqrt(np.abs(x)), min_value, max_value)
-
-
-
