@@ -13,6 +13,9 @@ from ..tools.operators import tournament_selection
 from ..tools.operators import one_point_crossoverGP
 from ..tools.operators import standart_crossover
 from ..tools.operators import uniform_crossoverGP
+from ..tools.operators import uniform_crossoverGP_prop
+from ..tools.operators import uniform_crossoverGP_rank
+from ..tools.operators import uniform_crossoverGP_tour
 from ..tools.operators import empty_crossover
 from ..tools.operators import point_mutation
 from ..tools.operators import growing_mutation
@@ -83,12 +86,23 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
         self.s_pool = {'proportional': (proportional_selection, None),
                        'rank': (rank_selection, None),
-                       'tournament': (tournament_selection, self.tour_size)}
+                       'tournament_k': (tournament_selection, self.tour_size),
+                       'tournament_3': (tournament_selection, 3),
+                       'tournament_5': (tournament_selection, 5),
+                       'tournament_7': (tournament_selection, 7)}
 
         self.c_pool = {'empty': (empty_crossover, 1),
-                       'uniform': (uniform_crossoverGP, 2),
                        'standart': (standart_crossover, 2),
-                       'one_point': (one_point_crossoverGP, 2)}
+                       'one_point': (one_point_crossoverGP, 2),
+                       'uniform2': (uniform_crossoverGP, 2),
+                       'uniform7': (uniform_crossoverGP, 3),
+                       'uniform_prop2': (uniform_crossoverGP_prop, 2),
+                       'uniform_prop7': (uniform_crossoverGP_prop, 3),
+                       'uniform_rank2': (uniform_crossoverGP_rank, 2),
+                       'uniform_rank7': (uniform_crossoverGP_rank, 3),
+                       'uniform_tour2': (uniform_crossoverGP_tour, 2),
+                       'uniform_tour7': (uniform_crossoverGP_tour, 3),
+                       }
 
         self.m_pool = {'weak_point': (point_mutation, 0.25),
                        'average_point': (point_mutation, 1),
@@ -103,7 +117,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'average_shrink': (shrink_mutation, 1),
                        'strong_shrink': (shrink_mutation, 4)}
         self.s_set = self.s_pool['rank']
-        self.c_set = self.c_pool['uniform']
+        self.c_set = self.c_pool['standart']
         self.m_set = self.m_pool['strong_grow']
 
     def set_strategy(self,

@@ -19,6 +19,7 @@ from thefittest.tools.transformations import donothing
 from sklearn.model_selection import train_test_split
 from thefittest.optimizers import GeneticProgramming
 from thefittest.optimizers import SelfCGP
+from thefittest.tools.transformations import scale_data
 
 
 def graph(some_tree):
@@ -94,8 +95,8 @@ def root_mean_square_error(y_true, y_predict):
 
 
 def problem(x):
-    # return np.sin(x[:, 0])
-    return 20*np.cos(2*x[:, 0]) + 0.3*x[:, 0]*x[:, 0]
+    return np.sin(x[:,0])
+    # return 20*np.cos(x[:, 0]) + x[:, 0]*x[:, 0]
 
 
 def problem_1(x):
@@ -106,12 +107,13 @@ def problem_2(x):
     return 1 - 0.5*np.cos(1.5*(10*x[:, 0]-0.3))*np.cos(31.4*x[:, 0]) + 0.5*np.cos(np.sqrt(5)*10*x[:, 0])*np.cos(35*x[:, 0])
 
 
-left = -1
-right = 1
-size = 250
+left = -4.5
+right = 4.5
+size = 100
 n_vars = 1
-X = np.random.uniform(left, right, size=(size, n_vars)).astype(np.float64)
+X = np.linspace(left, right, size).reshape(-1, 1)
 y = problem(X)
+# y = scale_data(y)
 # y = problem + np.random.uniform(0, 10, len(X))
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -125,11 +127,13 @@ def generator():
 uniset = UniversalSet(functional_set=(
     Add(),
     Sub(),
-    Sin(),
-    Pow(),
-    Cos(),
     Mul(),
-    Div()
+    Div(),
+    # Sin(),
+    # Cos(),
+    # Pow(),
+    # Exp(),
+    # Sqrt(),
 ),
     terminal_set={'x0': X_train[:, 0]},
     constant_set={'e1': generator}
@@ -146,13 +150,11 @@ def fitness_function(trees):
 model = SelfCGP(fitness_function=fitness_function,
                 genotype_to_phenotype=donothing,
                 uniset=uniset,
-                pop_size=300, iters=501,
+                pop_size=10000, iters=101,
                 show_progress_each=10,
                 minimization=False,
                 no_increase_num=300,
                 keep_history='quick')
-model.tour_size = 2
-model.init_level = 5
 model.max_level = 16
 model.fit()
 
@@ -163,6 +165,7 @@ print(fittest)
 
 x_plot = np.linspace(left, right, size).reshape(-1, 1)
 y_plot = problem(x_plot)
+# y_plot = scale_data(y_plot)
 
 fittest_pred = fittest.change_terminals({'x0': x_plot})
 y_pred = fittest_pred.compile()
@@ -170,6 +173,7 @@ if type(y_pred) is not np.ndarray:
     y_pred = np.full(len(x_plot), y_pred)
 
 y_pred_train = fittest.compile()
+y_pred_train = y_pred_train
 
 plt.plot(x_plot[:, 0], y_plot, label='true', color='green')
 plt.scatter(X_train[:, 0], y_train, label='train', color='black', alpha=0.3)

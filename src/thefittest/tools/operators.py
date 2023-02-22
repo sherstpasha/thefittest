@@ -160,11 +160,8 @@ def shrink_mutation(some_tree, uniset,
             to_return.nodes) if nodes.n_args > 0]
         if len(indexes) > 0:
             i = random.choice(indexes)
-            # print(i)
             args_id = to_return.get_args_id(i)
-            # print(args_id)
             choosen = random.choice(args_id)
-            # print(choosen)
             to_return = to_return.concat(i, some_tree.subtree(
                 choosen, return_class=True))
 
@@ -296,37 +293,204 @@ def one_point_crossoverGP(individs, fitness, rank, max_level):
     return offspring
 
 
-def uniform_crossoverGP(individs, fitness, rank, max_level):
-    '''Poli, Riccardo & Langdon, W.. (2001). On the Search
-    Properties of Different Crossover Operators in Genetic Programming. '''
-    new_nodes = []
-    individ_1 = individs[0]
-    individ_2 = individs[1]
-    common_indexes, border = common_region([individ_1, individ_2])
+# def uniform_crossoverGP(individs, fitness, rank, max_level):
+#     '''Poli, Riccardo & Langdon, W.. (2001). On the Search
+#     Properties of Different Crossover Operators in Genetic Programming. '''
+#     new_nodes = []
+#     individ_1 = individs[0]
+#     individ_2 = individs[1]
+#     common_indexes, border = common_region([individ_1, individ_2])
 
+#     for i in range(len(common_indexes[0])):
+#         if common_indexes[0][i] in border[0]:
+#             if np.random.random() < 0.5:
+#                 id_ = common_indexes[0][i]
+#                 left, right = individ_1.subtree(index=id_)
+#                 new_nodes.extend(individ_1.nodes[left:right])
+#             else:
+#                 id_ = common_indexes[1][i]
+#                 left, right = individ_2.subtree(index=id_)
+#                 new_nodes.extend(individ_2.nodes[left:right])
+#         else:
+#             if np.random.random() < 0.5:
+#                 id_ = common_indexes[0][i]
+#                 new_nodes.append(individ_1.nodes[id_])
+#             else:
+#                 id_ = common_indexes[1][i]
+#                 new_nodes.append(individ_2.nodes[id_])
+#     to_return = Tree(new_nodes.copy(), None)
+#     to_return.levels = to_return.get_levels()
+#     return to_return
+
+
+def uniform_crossoverGP(individs, fitness, rank, max_level):
+    to_return = Tree([], [])
+    common_indexes, border = common_region(individs)
+    # print(common_indexes, border)
     for i in range(len(common_indexes[0])):
+
         if common_indexes[0][i] in border[0]:
-            if np.random.random() < 0.5:
-                id_ = common_indexes[0][i]
-                left, right = individ_1.subtree(index=id_)
-                new_nodes.extend(individ_1.nodes[left:right])
-            else:
-                id_ = common_indexes[1][i]
-                left, right = individ_2.subtree(index=id_)
-                new_nodes.extend(individ_2.nodes[left:right])
+            # print('border')
+            j = np.random.randint(len(individs))
+            id_ = common_indexes[j][i]
+            # print('i', i, individs[j].nodes[id_].name)
+            # print('id_', id_)
+            # print('j', j)
+            subtrees = []
+            for k, tree in enumerate(individs):
+                inner_id = common_indexes[k][i]
+                args_id = tree.get_args_id(inner_id)
+                for args in args_id:
+                    subtrees.append(tree.subtree(args, return_class=True))
+                    # print('pool', tree.subtree(args, return_class=True))
+
+            to_return.nodes.append(individs[j].nodes[id_])
+            for n in range(individs[j].nodes[id_].n_args):
+                n_i = np.random.randint(len(subtrees))
+                # print('in', subtrees[n_i])
+                to_return.nodes.extend(subtrees.pop(n_i).nodes)
+
         else:
-            if np.random.random() < 0.5:
-                id_ = common_indexes[0][i]
-                new_nodes.append(individ_1.nodes[id_])
-            else:
-                id_ = common_indexes[1][i]
-                new_nodes.append(individ_2.nodes[id_])
-    to_return = Tree(new_nodes.copy(), None)
+            # print('common')
+
+            j = np.random.randint(len(individs))
+
+            id_ = common_indexes[j][i]
+            # print('i', i, individs[j].nodes[id_].name)
+            # print('id_', id_)
+            # print('j', j)
+            to_return.nodes.append(individs[j].nodes[id_])
+    to_return = to_return.copy()
     to_return.levels = to_return.get_levels()
     return to_return
 
 
-# def uniform_crossoverGP2(individs, fitness, rank, max_level):
+def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
+    probability = protect_norm(fitness)
+    # print(probability, fitness, 'probability')
+    to_return = Tree([], [])
+    common_indexes, border = common_region(individs)
+    # print(common_indexes, border)
+    for i in range(len(common_indexes[0])):
+
+        if common_indexes[0][i] in border[0]:
+            # print('border')
+
+            j = np.random.choice(range(len(individs)), 1, p=probability)[0]
+            id_ = common_indexes[j][i]
+            # print('i', i, individs[j].nodes[id_].name)
+            # print('id_', id_)
+            # print('j', j)
+            subtrees = []
+            for k, tree in enumerate(individs):
+                inner_id = common_indexes[k][i]
+                args_id = tree.get_args_id(inner_id)
+                for args in args_id:
+                    subtrees.append(tree.subtree(args, return_class=True))
+                    # print('pool', tree.subtree(args, return_class=True))
+
+            to_return.nodes.append(individs[j].nodes[id_])
+            for n in range(individs[j].nodes[id_].n_args):
+                n_i = np.random.randint(len(subtrees))
+                # print('in', subtrees[n_i])
+                to_return.nodes.extend(subtrees.pop(n_i).nodes)
+
+        else:
+            # print('common')
+            j = np.random.choice(range(len(individs)), 1, p=probability)[0]
+            id_ = common_indexes[j][i]
+            # print('i', i, individs[j].nodes[id_].name)
+            # print('id_', id_)
+            # print('j', j)
+            to_return.nodes.append(individs[j].nodes[id_])
+    to_return = to_return.copy()
+    to_return.levels = to_return.get_levels()
+    return to_return
+
+
+def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
+    probability = protect_norm(rank)
+    # print(probability, fitness, 'probabilityrank')
+    to_return = Tree([], [])
+    common_indexes, border = common_region(individs)
+    # print(common_indexes, border)
+    for i in range(len(common_indexes[0])):
+
+        if common_indexes[0][i] in border[0]:
+            # print('border')
+
+            j = np.random.choice(range(len(individs)), 1, p=probability)[0]
+            id_ = common_indexes[j][i]
+            # print('i', i, individs[j].nodes[id_].name)
+            # print('id_', id_)
+            # print('j', j)
+            subtrees = []
+            for k, tree in enumerate(individs):
+                inner_id = common_indexes[k][i]
+                args_id = tree.get_args_id(inner_id)
+                for args in args_id:
+                    subtrees.append(tree.subtree(args, return_class=True))
+                    # print('pool', tree.subtree(args, return_class=True))
+
+            to_return.nodes.append(individs[j].nodes[id_])
+            for n in range(individs[j].nodes[id_].n_args):
+                n_i = np.random.randint(len(subtrees))
+                # print('in', subtrees[n_i])
+                to_return.nodes.extend(subtrees.pop(n_i).nodes)
+
+        else:
+            # print('common')
+            j = np.random.choice(range(len(individs)), 1, p=probability)[0]
+            id_ = common_indexes[j][i]
+            # print('i', i, individs[j].nodes[id_].name)
+            # print('id_', id_)
+            # print('j', j)
+            to_return.nodes.append(individs[j].nodes[id_])
+    to_return = to_return.copy()
+    to_return.levels = to_return.get_levels()
+    return to_return
+
+
+def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
+    # probability = protect_norm(rank)
+    to_return = Tree([], [])
+    common_indexes, border = common_region(individs)
+    # print(common_indexes, border)
+    for i in range(len(common_indexes[0])):
+
+        if common_indexes[0][i] in border[0]:
+            # print('border')
+
+            j = tournament_selection(fitness, rank, 2, 1)[0]
+            id_ = common_indexes[j][i]
+            # print('i', i, individs[j].nodes[id_].name)
+            # print('id_', id_)
+            # print('j', j)
+            subtrees = []
+            for k, tree in enumerate(individs):
+                inner_id = common_indexes[k][i]
+                args_id = tree.get_args_id(inner_id)
+                for args in args_id:
+                    subtrees.append(tree.subtree(args, return_class=True))
+                    # print('pool', tree.subtree(args, return_class=True))
+
+            to_return.nodes.append(individs[j].nodes[id_])
+            for n in range(individs[j].nodes[id_].n_args):
+                n_i = np.random.randint(len(subtrees))
+                # print('in', subtrees[n_i])
+                to_return.nodes.extend(subtrees.pop(n_i).nodes)
+
+        else:
+            # print('common')
+            j = tournament_selection(fitness, rank, 2, 1)[0]
+            id_ = common_indexes[j][i]
+            # print('i', i, individs[j].nodes[id_].name)
+            # print('id_', id_)
+            # print('j', j)
+            to_return.nodes.append(individs[j].nodes[id_])
+    to_return = to_return.copy()
+    to_return.levels = to_return.get_levels()
+    return to_return
 
 
 ################################## SELECTIONS ##################################
@@ -430,7 +594,16 @@ class Pow(Operator):
         self.sign = '**'
 
     def __call__(self, x, y):
-        return np.clip(np.abs(x)**y, min_value, max_value)
+        if type(x) == np.ndarray:
+            res = np.power(x, y, out=np.ones_like(
+                x, dtype=np.float64), where=x > 0)
+        else:
+            if x < 0:
+                res = 1
+            else:
+                res = x**y
+
+        return np.clip(res, min_value, max_value)
 
 
 class Div(Operator):
@@ -441,7 +614,7 @@ class Div(Operator):
 
     def __call__(self, x, y):
         if type(y) == np.ndarray:
-            res = np.divide(x, y, out=np.zeros_like(
+            res = np.divide(x, y, out=np.ones_like(
                 y, dtype=np.float64), where=y != 0)
         else:
             if y == 0:

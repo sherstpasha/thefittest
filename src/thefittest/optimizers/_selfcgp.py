@@ -85,24 +85,35 @@ class SelfCGP(GeneticProgramming):
         self.threshold = 0.01
         self.set_strategy(select_opers=['proportional',
                                         'rank',
-                                        'tournament'],
-                          crossover_opers=['empty',
-                                           'uniform',
-                                           'standart',
-                                           'one_point'],
-                          mutation_opers=[
-            # 'weak_point',
-            # 'average_point',
+                                        'tournament_3',
+                                        'tournament_5',
+                                        'tournament_7'],
+                          crossover_opers=[
+            'empty',
+            'standart',
+            'one_point',
+            'uniform2',
+            'uniform7',
+            'uniform_prop2',
+            'uniform_prop7',
+            'uniform_rank2',
+            'uniform_rank7',
+            'uniform_tour2',
+            'uniform_tour7'
+        ],
+            mutation_opers=[
+            'weak_point',
+            'average_point',
             # 'strong_point',
             'weak_grow',
             'average_grow',
-            'strong_grow',
+            # 'strong_grow',
             'weak_swap',
             'average_swap',
-            'strong_swap',
+            # 'strong_swap',
             'weak_shrink',
             'average_shrink',
-            'strong_shrink'
+            # 'strong_shrink'
         ])
         self.stats: StatisticsSelfCGP
         self.s_sets: dict
@@ -160,8 +171,8 @@ class SelfCGP(GeneticProgramming):
                                  quantity)
 
         parents = population_g[indexes]
-        fitness_scale_p = fitness_scale[indexes]
-        fitness_rank_p = fitness_rank[indexes]
+        fitness_scale_p = fitness_scale[indexes].copy()
+        fitness_rank_p = fitness_rank[indexes].copy()
 
         offspring_no_mutated = crossover_func(parents,
                                               fitness_scale_p,
@@ -204,8 +215,12 @@ class SelfCGP(GeneticProgramming):
             self.pop_size, self.uniset, self.init_level)
         population_ph = self.genotype_to_phenotype(population_g)
         fitness = self.evaluate(population_ph)
+       
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
+        # print(fitness, 'fitness')
+        # print(fitness_scale, 'fitness_scale')
+        # print(fitness_rank, 'fitness_rank')
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -256,10 +271,6 @@ class SelfCGP(GeneticProgramming):
                 m_fittest_oper = self.find_fittest_operator(
                     m_operators, fitness[:-1])
                 m_proba = self.update_proba(m_proba, m_fittest_oper)
-
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
-                fitness_scale = scale_data(fitness)
-                fitness_rank = rank_data(fitness)
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)

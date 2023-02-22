@@ -10,8 +10,9 @@ from thefittest.tools.operators import Cos
 from thefittest.tools.operators import Sin
 from thefittest.tools.operators import Div
 from thefittest.tools.operators import Mul3
-from thefittest.tools.operators import swap_mutation
+from thefittest.tools.operators import swap_mutation, shrink_mutation, uniform_crossoverGP2
 from thefittest.tools.generators import growing_method, full_growing_method
+from thefittest.tools.transformations import common_region
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -100,13 +101,22 @@ uniset = UniversalSet(functional_set=(Add(),
 
 
 
-tree_1 = full_growing_method(uniset, 3)
+tree_1 = full_growing_method(uniset, 4)
+tree_2 = growing_method(uniset, 5)
+tree_3 = full_growing_method(uniset, 5)
+tree_4 = full_growing_method(uniset, 3)
 
-# tree_2 = tree_1
-tree_2 = swap_mutation(tree_1, uniset, 1000, 1000)
+# # tree_2 = tree_1
+
 print(tree_1)
 print(tree_2)
-
-
-print_tree(tree_1, 'tree_1.png')
-print_tree(tree_2, 'tree_2.png')
+print(tree_3)
+print(tree_4)
+test, _ = common_region([tree_1, tree_2, tree_3, tree_4])
+tree_5 = uniform_crossoverGP2([tree_1, tree_2, tree_3, tree_4], uniset, 1000, 1000)
+print(tree_5)
+print_tree(tree_1, 'tree_1.png', test[0])
+print_tree(tree_2, 'tree_2.png', test[1])
+print_tree(tree_3, 'tree_3.png', test[2])
+print_tree(tree_4, 'tree_4.png', test[3])
+print_tree(tree_5, 'tree_5.png')
