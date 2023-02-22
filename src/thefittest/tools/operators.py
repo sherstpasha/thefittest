@@ -2,6 +2,7 @@ import numpy as np
 from ..optimizers._base import Tree
 from ..optimizers._base import FunctionalNode
 from .generators import growing_method
+from .generators import sattolo_shuffle
 from .transformations import protect_norm
 from .transformations import common_region
 import random
@@ -134,7 +135,7 @@ def swap_mutation(some_tree, uniset,
             i = random.choice(indexes)
             args_id = to_return.get_args_id(i)
             new_arg_id = args_id.copy()
-            np.random.shuffle(new_arg_id)
+            sattolo_shuffle(new_arg_id)
 
             for old_j, new_j in zip(args_id, new_arg_id):
                 subtree = some_tree.subtree(old_j, return_class=True)
