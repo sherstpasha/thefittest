@@ -93,44 +93,6 @@ def growing_method(uniset, level_max):
     return to_return
 
 
-# def half_and_half(pop_size, uniset, level_max):
-#     population = []
-#     first_part = int(pop_size/2)
-#     second_part = pop_size - first_part
-
-#     first_part_by_level = np.linspace(1, level_max, first_part, dtype=int)
-#     second_part_by_level = np.linspace(1, level_max, second_part, dtype=int)
-#     k = 0
-#     for level in first_part_by_level:
-#         new_tree = full_growing_method(uniset, level)
-#         equals = [new_tree != individ for individ in population]
-
-#         if len(equals) > 0:
-#             while np.any(equals):
-#                 new_tree = full_growing_method(uniset, level)
-#                 equals = [new_tree == individ for individ in population]
-#                 k += 1
-#                 if k > pop_size:
-#                     break
-
-#         population.append(new_tree)
-#     k = 0
-#     for level in second_part_by_level:
-#         new_tree = growing_method(uniset, level)
-#         equals = [new_tree != individ for individ in population]
-
-#         if len(equals) > 0:
-#             while np.any(equals):
-#                 new_tree = growing_method(uniset, level)
-#                 equals = [new_tree == individ for individ in population]
-#                 k += 1
-#                 if k > pop_size:
-#                     break
-#         population.append(new_tree)
-
-#     return np.array(population, dtype=object)
-
-
 def half_and_half(pop_size, uniset, level_max):
     population = []
     first_part = int(pop_size/2)
