@@ -91,13 +91,14 @@ def point_mutation(some_tree, uniset,
     to_return = some_tree.copy()
 
     proba = proba_down/len(to_return.nodes)
-    for i, node in enumerate(to_return.nodes):
-        if np.random.random() < proba:
-            if type(node) != FunctionalNode:
-                new_node = uniset.mutate_terminal()
-            else:
-                new_node = uniset.mutate_functional(node.n_args)
-            to_return.nodes[i] = new_node
+    if np.random.random() < proba:
+        i = np.random.randint(0, len(to_return.nodes))
+        if type(to_return.nodes[i]) != FunctionalNode:
+            new_node = uniset.mutate_terminal()
+        else:
+            new_node = uniset.mutate_functional(
+                to_return.nodes[i].n_args)
+        to_return.nodes[i] = new_node
 
     return to_return
 
@@ -410,7 +411,7 @@ def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
 
 def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
     probability = protect_norm(rank)
-    # print(probability, fitness, 'probabilityrank')
+
     to_return = Tree([], [])
     common_indexes, border = common_region(individs)
     # print(common_indexes, border)
