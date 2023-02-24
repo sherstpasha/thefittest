@@ -1,0 +1,56 @@
+import numpy as np
+
+
+def F1(x):
+    firts = 0.05*(x[:, 0]-1)*(x[:, 0]-1)
+
+    exp_x_power_2 = np.exp(-2.77257*x[:, 0]*x[:, 0])
+    left = (3 - 2.9*exp_x_power_2)
+    right = (1 - np.cos(x[:, 0]*(4-50*exp_x_power_2)))
+    return firts + left*right
+
+
+def F2(x):
+    left = 0.5*np.cos(1.5*(10*x[:, 0]-0.3))*np.cos(31.4*x[:, 0])
+    right = 0.5*np.cos(np.sqrt(5)*10*x[:, 0])*np.cos(35*x[:, 0])
+    return 1 - left + right
+
+
+def F3(x):
+    left = 0.1*x[:, 0]**2 + 0.1*x[:, 1]**2
+    right = - 4*np.cos(0.8*x[:, 0]) - 4*np.cos(0.8*x[:, 1]) + 8
+    return left + right
+
+
+def F4(x):
+    left = (0.1*1.5*x[:, 1])**2 + (0.1*0.8*x[:, 0])**2
+    right = -4*np.cos(0.8*1.5*x[:, 1]) - 4*np.cos(0.8*0.8*x[:, 0]) + 8
+    return left + right
+
+
+def F5(x):
+    100*((x[:, 1]-x[:, 0]**2))**2 + (1 - x[:, 0])**2
+
+
+def F6(x):
+    left = 0.005*(x[:, 0]**2 + x[:, 1]**2)
+    right = -np.cos(x[:, 0])*np.cos(x[:, 1]/np.sqrt(2)) + 2
+    return 10/(left + right) + 10
+
+
+def F7(x):
+    down = 100*(x[:, 0]**2 - x[:, 1]) + (1 - x[:, 0])**2 + 1
+    return -100/down + 100
+
+
+def F8(x):
+    power_x_y = x[:, 0]**2 + x[:, 1]**2
+
+    up = 1-np.sin(np.sqrt(power_x_y))**2
+    down = 1 + 0.001*(power_x_y)
+    return up/down
+
+
+def F9(x):
+    first = 0.5*(x[:, 0]**2 + x[:, 1]**2)
+    left = 2*0.8 + 0.8*np.cos(1.5*x[:, 0])*np.cos(3.14*x[:, 1])
