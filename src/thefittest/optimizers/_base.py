@@ -174,52 +174,6 @@ class Tree:
                     return False
         return True
 
-    def is_functional(self, node):
-        return type(node) is FunctionalNode
-
-    def is_terminal(self, node):
-        return type(node) is TerminalNode
-
-    # def is_contains_terminals(self, i=0):
-    #     pool = list(map(self.is_terminal, self.nodes))
-    #     print(pool)
-    #     return np.any(pool)
-
-    def simplify_by_index(self, index=0):
-        if type(self.nodes[index]) is TerminalNode:
-            return self, False
-        n_index = index + 1
-        possible_steps = self.nodes[index].n_args
-        while possible_steps:
-            if type(self.nodes[n_index]) is TerminalNode:
-                return self, False
-            possible_steps += self.nodes[n_index].n_args - 1
-            n_index += 1
-
-        pack = []
-        for node in reversed(self.nodes[index:n_index]):
-            args = []
-            for _ in range(node.n_args):
-                args.append(pack.pop())
-            if type(node) != FunctionalNode:
-                print(node.value)
-                pack.append(node.value)
-            else:
-                pack.append(node.value(*args))
-
-        value = pack[0]
-        node_ = EphemeralConstant()
-        node_.value = value
-        node_.name = str(value)
-        node_.sign = str(value)
-        return self.concat(index, Tree([node_], [0])), True
-
-    def simplify(self):
-        for i in range(len(self.nodes)-1, -1, -1):
-            if type(self.nodes[i]) is FunctionalNode:
-                self, cond = self.simplify_by_index(index=i)
-        return self
-
     def change_terminals(self, change_list):
         tree_copy = self.copy()
         for i, node in enumerate(tree_copy.nodes):
@@ -299,9 +253,16 @@ class UniversalSet:
     def choice_functional(self, n_args='any'):
         return random.choice(self.functional_set[n_args])
 
-    def mutate_terminal(self):
+    def mutate_terminal(self, terminal):
         if len(self.union_terminal) > 1:
-            choosen = random.choice(self.union_terminal)
+            remains = []
+            for terminal_i in self.union_terminal:
+                if type(terminal_i) is not TerminalNode:
+                    remains.append(terminal_i)
+                else:
+                    if terminal_i.name != terminal.name:
+                        remains.append(terminal_i)
+            choosen = random.choice(remains)
             if type(choosen) is not TerminalNode:
                 to_return = EphemeralConstant(choosen[1])
             else:
@@ -310,9 +271,14 @@ class UniversalSet:
             to_return = self.union_terminal[0]
         return to_return
 
-    def mutate_functional(self, n_args):
+    def mutate_functional(self, functional):
+        n_args = functional.n_args
         if len(self.functional_set[n_args]) > 1:
-            to_return = random.choice(self.functional_set[n_args])
+            remains = []
+            for functional_i in self.functional_set[n_args]:
+                if functional_i.name != functional.name:
+                    remains.append(functional_i)
+            to_return = random.choice(remains)
         else:
             to_return = self.functional_set[n_args][0]
         return to_return

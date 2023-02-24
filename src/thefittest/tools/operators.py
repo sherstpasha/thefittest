@@ -94,10 +94,9 @@ def point_mutation(some_tree, uniset,
     if np.random.random() < proba:
         i = np.random.randint(0, len(to_return.nodes))
         if type(to_return.nodes[i]) != FunctionalNode:
-            new_node = uniset.mutate_terminal()
+            new_node = uniset.mutate_terminal(to_return.nodes[i])
         else:
-            new_node = uniset.mutate_functional(
-                to_return.nodes[i].n_args)
+            new_node = uniset.mutate_functional(to_return.nodes[i])
         to_return.nodes[i] = new_node
 
     return to_return
@@ -114,18 +113,6 @@ def growing_mutation(some_tree, uniset,
         new_tree = growing_method(uniset, max_level_i)
         to_return = to_return.concat(i, new_tree)
 
-    return to_return
-
-
-def simplify_mutation(some_tree, uniset,
-                      proba_down, max_level):
-    some_tree = some_tree.copy()
-    proba = proba_down/len(some_tree.nodes)
-    if np.random.random() < proba:
-        i = np.random.randint(0, len(some_tree.nodes))
-        to_return = some_tree.simplify_by_index(i)[0]
-    else:
-        to_return = some_tree
     return to_return
 
 
@@ -165,7 +152,7 @@ def shrink_mutation(some_tree, uniset,
                 choosen = random.choice(args_id)
                 to_return = to_return.concat(i, some_tree.subtree(
                     choosen, return_class=True))
-                
+
     return to_return
 
 
@@ -292,34 +279,34 @@ def one_point_crossoverGP(individs, fitness, rank, max_level):
     return offspring
 
 
-# def uniform_crossoverGP(individs, fitness, rank, max_level):
-#     '''Poli, Riccardo & Langdon, W.. (2001). On the Search
-#     Properties of Different Crossover Operators in Genetic Programming. '''
-#     new_nodes = []
-#     individ_1 = individs[0]
-#     individ_2 = individs[1]
-#     common_indexes, border = common_region([individ_1, individ_2])
+def uniform_crossoverGPc(individs, fitness, rank, max_level):
+    '''Poli, Riccardo & Langdon, W.. (2001). On the Search
+    Properties of Different Crossover Operators in Genetic Programming. '''
+    new_nodes = []
+    individ_1 = individs[0]
+    individ_2 = individs[1]
+    common_indexes, border = common_region([individ_1, individ_2])
 
-#     for i in range(len(common_indexes[0])):
-#         if common_indexes[0][i] in border[0]:
-#             if np.random.random() < 0.5:
-#                 id_ = common_indexes[0][i]
-#                 left, right = individ_1.subtree(index=id_)
-#                 new_nodes.extend(individ_1.nodes[left:right])
-#             else:
-#                 id_ = common_indexes[1][i]
-#                 left, right = individ_2.subtree(index=id_)
-#                 new_nodes.extend(individ_2.nodes[left:right])
-#         else:
-#             if np.random.random() < 0.5:
-#                 id_ = common_indexes[0][i]
-#                 new_nodes.append(individ_1.nodes[id_])
-#             else:
-#                 id_ = common_indexes[1][i]
-#                 new_nodes.append(individ_2.nodes[id_])
-#     to_return = Tree(new_nodes.copy(), None)
-#     to_return.levels = to_return.get_levels()
-#     return to_return
+    for i in range(len(common_indexes[0])):
+        if common_indexes[0][i] in border[0]:
+            if np.random.random() < 0.5:
+                id_ = common_indexes[0][i]
+                left, right = individ_1.subtree(index=id_)
+                new_nodes.extend(individ_1.nodes[left:right])
+            else:
+                id_ = common_indexes[1][i]
+                left, right = individ_2.subtree(index=id_)
+                new_nodes.extend(individ_2.nodes[left:right])
+        else:
+            if np.random.random() < 0.5:
+                id_ = common_indexes[0][i]
+                new_nodes.append(individ_1.nodes[id_])
+            else:
+                id_ = common_indexes[1][i]
+                new_nodes.append(individ_2.nodes[id_])
+    to_return = Tree(new_nodes.copy(), None)
+    to_return.levels = to_return.get_levels()
+    return to_return
 
 
 def uniform_crossoverGP(individs, fitness, rank, max_level):
