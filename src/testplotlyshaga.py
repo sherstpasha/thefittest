@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from thefittest.optimizers import SHAGA
-from thefittest.benchmarks._problems import *
+from thefittest.benchmarks._optproblems import *
 from thefittest.benchmarks import CEC2005
 from thefittest.tools.transformations import GrayCode
 from thefittest.tools.transformations import donothing

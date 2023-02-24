@@ -95,13 +95,13 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'standart': (standart_crossover, 2),
                        'one_point': (one_point_crossoverGP, 2),
                        'uniform2': (uniform_crossoverGP, 2),
-                       'uniform7': (uniform_crossoverGP, 3),
+                       'uniform7': (uniform_crossoverGP, 7),
                        'uniform_prop2': (uniform_crossoverGP_prop, 2),
-                       'uniform_prop7': (uniform_crossoverGP_prop, 3),
+                       'uniform_prop7': (uniform_crossoverGP_prop, 7),
                        'uniform_rank2': (uniform_crossoverGP_rank, 2),
-                       'uniform_rank7': (uniform_crossoverGP_rank, 3),
-                       'uniform_tour2': (uniform_crossoverGP_tour, 2),
-                       'uniform_tour7': (uniform_crossoverGP_tour, 3),
+                       'uniform_rank7': (uniform_crossoverGP_rank, 7),
+                       'uniform_tour3': (uniform_crossoverGP_tour, 3),
+                       'uniform_tour7': (uniform_crossoverGP_tour, 7),
                        }
 
         self.m_pool = {'weak_point': (point_mutation, 0.25),
