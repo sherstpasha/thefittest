@@ -151,28 +151,26 @@ def swap_mutation(some_tree, uniset,
     return to_return
 
 
-# меняет node на один из его аргументов
 def shrink_mutation(some_tree, uniset,
                     proba_down, max_level):
     to_return = some_tree.copy()
-    proba = proba_down/len(to_return.nodes)
-    if np.random.random() < proba:
-        indexes = [i for i, nodes in enumerate(
-            to_return.nodes) if nodes.n_args > 0]
-        if len(indexes) > 0:
-            i = random.choice(indexes)
-            args_id = to_return.get_args_id(i)
-            choosen = random.choice(args_id)
-            to_return = to_return.concat(i, some_tree.subtree(
-                choosen, return_class=True))
-
-            # print(choosen)
+    if len(to_return.nodes) > 2:
+        proba = proba_down/len(to_return.nodes)
+        if np.random.random() < proba:
+            indexes = [i for i, nodes in enumerate(
+                to_return.nodes) if nodes.n_args > 0]
+            if len(indexes) > 0:
+                i = random.choice(indexes)
+                args_id = to_return.get_args_id(i)
+                choosen = random.choice(args_id)
+                to_return = to_return.concat(i, some_tree.subtree(
+                    choosen, return_class=True))
+                
     return to_return
+
 
 ################################## CROSSOVERS ##################################
 # genetic algorithm
-
-
 def empty_crossover(individs, *args):
     return individs[0]
 
@@ -327,7 +325,6 @@ def one_point_crossoverGP(individs, fitness, rank, max_level):
 def uniform_crossoverGP(individs, fitness, rank, max_level):
     to_return = Tree([], [])
     common_indexes, border = common_region(individs)
-    # print(common_indexes, border)
     for i in range(len(common_indexes[0])):
 
         if common_indexes[0][i] in border[0]:
