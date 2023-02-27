@@ -89,17 +89,17 @@ class SelfCGP(GeneticProgramming):
                                         'tournament_5',
                                         'tournament_7'],
                           crossover_opers=[
-            # 'empty',
+            'empty',
             'standart',
             'one_point',
             'uniform2',
-            'uniform7',
-            'uniform_prop2',
-            'uniform_prop7',
-            'uniform_rank2',
-            'uniform_rank7',
-            'uniform_tour3',
-            'uniform_tour7'
+            # 'uniform7',
+            # 'uniform_prop2',
+            # 'uniform_prop7',
+            # 'uniform_rank2',
+            # 'uniform_rank7',
+            # 'uniform_tour3',
+            # 'uniform_tour7'
         ],
             mutation_opers=[
             'weak_point',

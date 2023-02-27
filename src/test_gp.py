@@ -95,21 +95,31 @@ def root_mean_square_error(y_true, y_predict):
 
 
 def problem(x):
-    return np.sin(x[:,0])
-    # return 20*np.cos(x[:, 0]) + x[:, 0]*x[:, 0]
+    return np.sin(x[:, 0])
+    # return 5*np.cos(x[:, 0]) + x[:, 0]*x[:, 0]
 
 
 def problem_1(x):
+    # [-1 1]
     return 0.05*((x[:, 0]-1)**2) + (3 - 2.9*np.exp(-2.77257*(x[:, 0]**2)))*(1 - np.cos(x[:, 0]*(4-50*np.exp(-2.77257*(x[:, 0]**2)))))
 
 
 def problem_2(x):
+    # [-1 1]
     return 1 - 0.5*np.cos(1.5*(10*x[:, 0]-0.3))*np.cos(31.4*x[:, 0]) + 0.5*np.cos(np.sqrt(5)*10*x[:, 0])*np.cos(35*x[:, 0])
 
 
-left = -4.5
-right = 4.5
-size = 100
+def problem_16(x):
+    #[-5 5]
+    return np.sin(x[:, 0])*x[:, 0]*x[:, 0]
+
+def problem_17(x):
+    #[-5 5]
+    return np.sin(x[:, 0]) + x[:, 0]
+
+left = -4.75
+right = 4.75
+size = 300
 n_vars = 1
 X = np.linspace(left, right, size).reshape(-1, 1)
 y = problem(X)
@@ -121,7 +131,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 
 def generator():
-    return np.round(np.random.uniform(-5, 5), 4)
+    return np.round(np.random.uniform(0, 10), 4)
 
 
 uniset = UniversalSet(functional_set=(
@@ -129,6 +139,7 @@ uniset = UniversalSet(functional_set=(
     Sub(),
     Mul(),
     Div(),
+    # Neg(),
     # Sin(),
     # Cos(),
     # Pow(),
@@ -138,6 +149,7 @@ uniset = UniversalSet(functional_set=(
     terminal_set={'x0': X_train[:, 0]},
     constant_set={'e1': generator}
 )
+
 
 def fitness_function(trees):
     fitness = []
@@ -150,7 +162,7 @@ def fitness_function(trees):
 model = SelfCGP(fitness_function=fitness_function,
                 genotype_to_phenotype=donothing,
                 uniset=uniset,
-                pop_size=10000, iters=101,
+                pop_size=500, iters=51,
                 show_progress_each=10,
                 minimization=False,
                 no_increase_num=300,
