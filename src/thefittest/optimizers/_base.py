@@ -89,6 +89,22 @@ class Tree:
         self.nodes = nodes
         self.levels = levels
 
+    def __len__(self):
+        return len(self.nodes)
+    
+    def __str__(self):
+        reverse_nodes = self.nodes[::-1].copy()
+        pack = []
+        for node in reverse_nodes:
+            args = []
+            for _ in range(node.n_args):
+                args.append(pack.pop())
+            if type(node) != FunctionalNode:
+                pack.append(node.name)
+            else:
+                pack.append(node.value.write(*args))
+        return pack[0]
+
     def subtree(self, index: int, return_class=False):
         n_index = index + 1
         possible_steps = self.nodes[index].n_args
@@ -111,19 +127,6 @@ class Tree:
                 pack.append(node.value)
             else:
                 pack.append(node.value(*args))
-        return pack[0]
-
-    def __str__(self):
-        reverse_nodes = self.nodes[::-1].copy()
-        pack = []
-        for node in reverse_nodes:
-            args = []
-            for _ in range(node.n_args):
-                args.append(pack.pop())
-            if type(node) != FunctionalNode:
-                pack.append(node.name)
-            else:
-                pack.append(node.value.write(*args))
         return pack[0]
 
     def get_levels(self, origin=0):
@@ -166,7 +169,7 @@ class Tree:
         return np.max(self.levels)
 
     def __eq__(self, other):
-        if len(self.nodes) != len(other.nodes):
+        if len(self) != len(other):
             return False
         else:
             for node_1, node_2 in zip(self.nodes, other.nodes):

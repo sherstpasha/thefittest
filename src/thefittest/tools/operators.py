@@ -90,9 +90,9 @@ def point_mutation(some_tree, uniset,
                    proba_down, max_level):
     to_return = some_tree.copy()
 
-    proba = proba_down/len(to_return.nodes)
+    proba = proba_down/len(to_return)
     if np.random.random() < proba:
-        i = np.random.randint(0, len(to_return.nodes))
+        i = np.random.randint(0, len(to_return))
         if type(to_return.nodes[i]) != FunctionalNode:
             new_node = uniset.mutate_terminal(to_return.nodes[i])
         else:
@@ -105,9 +105,9 @@ def point_mutation(some_tree, uniset,
 def growing_mutation(some_tree, uniset,
                      proba_down, max_level):
     to_return = some_tree.copy()
-    proba = proba_down/len(to_return.nodes)
+    proba = proba_down/len(to_return)
     if np.random.random() < proba:
-        i = np.random.randint(0, len(to_return.nodes))
+        i = np.random.randint(0, len(to_return))
         left, right = to_return.subtree(i)
         max_level_i = max_level - to_return.levels[left:right][0]
         new_tree = growing_method(uniset, max_level_i)
@@ -119,7 +119,7 @@ def growing_mutation(some_tree, uniset,
 def swap_mutation(some_tree, uniset,
                   proba_down, max_level):
     to_return = some_tree.copy()
-    proba = proba_down/len(to_return.nodes)
+    proba = proba_down/len(to_return)
     if np.random.random() < proba:
         indexes = [i for i, nodes in enumerate(
             to_return.nodes) if nodes.n_args > 1]
@@ -141,8 +141,8 @@ def swap_mutation(some_tree, uniset,
 def shrink_mutation(some_tree, uniset,
                     proba_down, max_level):
     to_return = some_tree.copy()
-    if len(to_return.nodes) > 2:
-        proba = proba_down/len(to_return.nodes)
+    if len(to_return) > 2:
+        proba = proba_down/len(to_return)
         if np.random.random() < proba:
             indexes = [i for i, nodes in enumerate(
                 to_return.nodes) if nodes.n_args > 0]
@@ -237,8 +237,8 @@ def binomial(individ, mutant, CR):
 def standart_crossover(individs, fitness, rank, max_level):
     individ_1 = individs[0].copy()
     individ_2 = individs[1].copy()
-    first_point = np.random.randint(0,  len(individ_1.nodes))
-    second_point = np.random.randint(0,  len(individ_2.nodes))
+    first_point = np.random.randint(0,  len(individ_1))
+    second_point = np.random.randint(0,  len(individ_2))
 
     if np.random.random() < 0.5:
         left, right = individ_1.subtree(first_point)
