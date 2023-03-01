@@ -2,15 +2,16 @@ from thefittest.optimizers._base import Tree
 from thefittest.optimizers._base import UniversalSet
 from thefittest.optimizers._base import FunctionalNode
 from thefittest.optimizers._base import TerminalNode
-from thefittest.optimizers._base import EphemeralConstant
-from thefittest.tools.operators import Mul
+from thefittest.optimizers._base import EphemeralNode
+
 from thefittest.tools.operators import Add
-from thefittest.tools.operators import Pow
+from thefittest.tools.operators import Sub
+from thefittest.tools.operators import Mul
+from thefittest.tools.operators import Div
 from thefittest.tools.operators import Cos
 from thefittest.tools.operators import Sin
-from thefittest.tools.operators import Div
 from thefittest.tools.operators import Mul3
-from thefittest.tools.operators import swap_mutation, shrink_mutation, uniform_crossoverGP2
+from thefittest.tools.operators import swap_mutation, shrink_mutation
 from thefittest.tools.generators import growing_method, full_growing_method
 from thefittest.tools.transformations import common_region
 import numpy as np
@@ -82,41 +83,44 @@ def print_tree(some_tree, fig_name, underline_nodes=[]):
     plt.savefig(fig_name)
     plt.close()
 
+
 def generator():
-    return np.round(np.random.uniform(0, 2), 4)
-
-def generator2():
-    return np.random.uniform(-10, 10)
-
-uniset = UniversalSet(functional_set=(Add(),
-                                      Mul3(),
-                                      Sin(),
-                                      Mul(),
-                                      Div(),
-                                      #   Neg()
-                                      ),
-                      terminal_set={'x0': np.array([1, 2, 3]),
-                                    'x1': np.array([3, 2, 1])},
-                                    constant_set={'e1': generator})
+    return np.round(np.random.uniform(0, 3), 4)
 
 
+functional_set = [FunctionalNode(Add()),
+                  FunctionalNode(Sub()),
+                  FunctionalNode(Mul()),
+                  FunctionalNode(Div()),
+                  FunctionalNode(Cos()),
+                  FunctionalNode(Sin()),
+                  FunctionalNode(Mul3())]
 
-tree_1 = full_growing_method(uniset, 4)
-tree_2 = growing_method(uniset, 5)
-tree_3 = full_growing_method(uniset, 5)
-tree_4 = full_growing_method(uniset, 3)
+terminal_set = [TerminalNode(np.array([1, 2, 3]), 'x0'),
+                TerminalNode(np.array([3, 2, 1]), 'x1')]
 
-# # tree_2 = tree_1
+constant_set = [EphemeralNode(generator)]
 
-print(tree_1)
-print(tree_2)
-print(tree_3)
-print(tree_4)
-test, _ = common_region([tree_1, tree_2, tree_3, tree_4])
-tree_5 = uniform_crossoverGP2([tree_1, tree_2, tree_3, tree_4], uniset, 1000, 1000)
-print(tree_5)
-print_tree(tree_1, 'tree_1.png', test[0])
-print_tree(tree_2, 'tree_2.png', test[1])
-print_tree(tree_3, 'tree_3.png', test[2])
-print_tree(tree_4, 'tree_4.png', test[3])
-print_tree(tree_5, 'tree_5.png')
+uniset = UniversalSet(functional_set, terminal_set)
+
+print(uniset.random_terminal())
+
+# tree_1 = full_growing_method(uniset, 4)
+# tree_2 = growing_method(uniset, 5)
+# tree_3 = full_growing_method(uniset, 5)
+# tree_4 = full_growing_method(uniset, 3)
+
+# # # tree_2 = tree_1
+
+# print(tree_1)
+# print(tree_2)
+# print(tree_3)
+# print(tree_4)
+# test, _ = common_region([tree_1, tree_2, tree_3, tree_4])
+# tree_5 = uniform_crossoverGP2([tree_1, tree_2, tree_3, tree_4], uniset, 1000, 1000)
+# print(tree_5)
+# print_tree(tree_1, 'tree_1.png')
+# print_tree(tree_2, 'tree_2.png', test[1])
+# print_tree(tree_3, 'tree_3.png', test[2])
+# print_tree(tree_4, 'tree_4.png', test[3])
+# print_tree(tree_5, 'tree_5.png')

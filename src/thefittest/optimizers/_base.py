@@ -258,10 +258,8 @@ class EphemeralConstantNode(Node):
 '''functional_set = (FunctionalNode, ..., FunctionalNode)
 terminal_set = (TerminalNode, ..., TerminalNode)
 constant_set = (EphemeralNode, ..., EphemeralNode)'''
-
-
 class UniversalSet:
-    def __init__(self, functional_set: list, terminal_set: list, constant_set=Optional[list]):
+    def __init__(self, functional_set: list, terminal_set: list, constant_set:list=[]):
         self.functional_set = {'any': functional_set}
         for unit in functional_set:
             n_args = unit.n_args
