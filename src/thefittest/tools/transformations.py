@@ -1,6 +1,10 @@
 import numpy as np
 
 
+def root_mean_square_error(y_true, y_predict):
+    return np.sqrt(np.mean((y_true - y_predict)**2))
+
+
 def common_region(trees):
     terminate = False
     indexes = []
