@@ -278,64 +278,7 @@ class UniversalSet:
         else:
             to_return = choosen
         return to_return
-
-
-# class UniversalSet:
-#     def __init__(self, functional_set, terminal_set, constant_set=dict([])):
-#         functional_set = list(map(FunctionalNode, functional_set))
-#         terminal_set = list(TerminalNode(value, key)
-#                             for key, value in terminal_set.items())
-#         constant_set = list((key, value)
-#                             for key, value in constant_set.items())
-#         self.functional_set = {}
-#         for unit in functional_set:
-#             n_args = unit.n_args
-#             if n_args not in self.functional_set:
-#                 self.functional_set[n_args] = [unit]
-#             else:
-#                 self.functional_set[n_args].append(unit)
-#         self.functional_set['any'] = functional_set
-#         self.terminal_set = terminal_set
-#         self.constant_set = constant_set
-#         self.union_terminal = terminal_set + constant_set
-
-#     def choice_terminal(self):
-#         choosen = random.choice(self.union_terminal)
-#         if type(choosen) is not TerminalNode:
-#             to_return = EphemeralConstant(choosen[1])
-#         else:
-#             to_return = choosen
-#         return to_return
-
-#     def choice_functional(self, n_args='any'):
-#         return random.choice(self.functional_set[n_args])
-
-#     def mutate_terminal(self, terminal):
-#         if len(self.union_terminal) > 1:
-#             remains = []
-#             for terminal_i in self.union_terminal:
-#                 if type(terminal_i) is not TerminalNode:
-#                     remains.append(terminal_i)
-#                 else:
-#                     if terminal_i.name != terminal.name:
-#                         remains.append(terminal_i)
-#             choosen = random.choice(remains)
-#             if type(choosen) is not TerminalNode:
-#                 to_return = EphemeralConstant(choosen[1])
-#             else:
-#                 to_return = choosen
-#         else:
-#             to_return = self.union_terminal[0]
-#         return to_return
-
-    # def mutate_functional(self, functional):
-    #     n_args = functional.n_args
-    #     if len(self.functional_set[n_args]) > 1:
-    #         remains = []
-    #         for functional_i in self.functional_set[n_args]:
-    #             if functional_i.name != functional.name:
-    #                 remains.append(functional_i)
-    #         to_return = random.choice(remains)
-    #     else:
-    #         to_return = self.functional_set[n_args][0]
-    #     return to_return
+    
+    def random_functional(self):
+        choosen = random.choice(self.functional_set['any'])
+        return choosen
