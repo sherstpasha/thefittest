@@ -85,9 +85,9 @@ class EvolutionaryAlgorithm:
 
 
 class Tree:
-    def __init__(self, nodes, levels):
+    def __init__(self, nodes):
         self.nodes = nodes
-        self.levels = levels
+        self.levels = []
 
     def __len__(self):
         return len(self.nodes)
@@ -121,7 +121,7 @@ class Tree:
             possible_steps += self.nodes[n_index].n_args - 1
             n_index += 1
         if return_class:
-            new_tree = Tree(self.nodes[index:n_index].copy(), None)
+            new_tree = Tree(self.nodes[index:n_index].copy())
             new_tree.levels = new_tree.get_levels()
             return new_tree
         return index, n_index
@@ -137,6 +137,40 @@ class Tree:
             else:
                 pack.append(node.value(*args))
         return pack[0]
+
+    def concat(self, index, some_tree):
+        left, right = self.subtree(index)
+        levels = some_tree.get_levels(origin=self.levels[left])
+
+        new_nodes = self.nodes[:left]
+        new_levels = self.levels[:left]
+
+        new_nodes += some_tree.nodes
+        new_levels += levels
+
+        new_nodes += self.nodes[right:]
+        new_levels += self.levels[right:]
+        to_return = Tree(new_nodes.copy())
+        to_return.levels = new_levels.copy()
+        return to_return
+
+    def copy(self):
+        tree = Tree(self.nodes.copy())
+        tree.levels = self.levels.copy()
+        return tree
+
+    def change_terminals(self, change_list):
+        tree_copy = self.copy()
+        for i, node in enumerate(tree_copy.nodes):
+            if type(node) is TerminalNode:
+                for key, value in change_list.items():
+                    if node.name == key:
+                        tree_copy.nodes[i] = TerminalNode(value=value,
+                                                          name=node.name + '_')
+        return tree_copy
+
+    def get_max_level(self):
+        return np.max(self.levels)
 
     def get_levels(self, origin=0):
         d_i = origin-1
@@ -156,37 +190,6 @@ class Tree:
                 d.append(d_i)
         return result_list
 
-    def concat(self, index, some_tree):
-        left, right = self.subtree(index)
-        levels = some_tree.get_levels(origin=self.levels[left])
-
-        new_nodes = self.nodes[:left]
-        new_levels = self.levels[:left]
-
-        new_nodes += some_tree.nodes
-        new_levels += levels
-
-        new_nodes += self.nodes[right:]
-        new_levels += self.levels[right:]
-        to_return = Tree(new_nodes.copy(), new_levels.copy())
-        return to_return
-
-    def copy(self):
-        return Tree(self.nodes.copy(), self.levels.copy())
-
-    def get_max_level(self):
-        return np.max(self.levels)
-
-    def change_terminals(self, change_list):
-        tree_copy = self.copy()
-        for i, node in enumerate(tree_copy.nodes):
-            if type(node) is TerminalNode:
-                for key, value in change_list.items():
-                    if node.name == key:
-                        tree_copy.nodes[i] = TerminalNode(value=value,
-                                                          name=node.name + '_')
-        return tree_copy
-
     def get_args_id(self, index=0):
         n_args = self.nodes[index].n_args
         args_id = []
@@ -199,6 +202,54 @@ class Tree:
                 n_args = n_args - 1
             k = k + 1
         return args_id
+
+    def get_graph(self, keep_id=False):
+        pack = []
+        edges = []
+        nodes = []
+        labels = {}
+        for i, node in enumerate(reversed(self.nodes)):
+            index = len(self) - i - 1
+            if keep_id:
+                labels[index] = str(index) + '. ' + node.sign[:6]
+            else:
+                labels[index] = str(index) + '. ' + node.sign[:6]
+
+            nodes.append(index)
+
+            for _ in range(node.n_args):
+                edges.append((index, len(self) - pack.pop() - 1))
+            pack.append(i)
+
+        edges.reverse()
+        nodes.reverse()
+
+        levels = self.levels
+        colors = np.zeros(shape=(len(nodes), 4))
+        pos = np.zeros(shape=(len(self), 2))
+        for i, lvl_i in enumerate(levels):
+            total = 0
+            cond = lvl_i == np.array(levels)
+            h = 1/(1 + np.sum(cond))
+            arange = np.arange(len(pos))[cond]
+
+            for j, a_j in enumerate(arange):
+                total += h
+                pos[a_j][0] = total
+
+            pos[i][1] = -lvl_i
+
+            if type(self.nodes[i]) is FunctionalNode:
+                colors[i] = (1, 0.72, 0.43, 1)
+            else:
+                colors[i] = (0.21, 0.76, 0.56, 1)
+
+        to_return = {'edges': edges,
+                     'labels': labels,
+                     'nodes': nodes,
+                     'pos': pos,
+                     'colors': colors}
+        return to_return
 
 
 class Node:
@@ -258,8 +309,10 @@ class EphemeralConstantNode(Node):
 '''functional_set = (FunctionalNode, ..., FunctionalNode)
 terminal_set = (TerminalNode, ..., TerminalNode)
 constant_set = (EphemeralNode, ..., EphemeralNode)'''
+
+
 class UniversalSet:
-    def __init__(self, functional_set: list, terminal_set: list, constant_set:list=[]):
+    def __init__(self, functional_set: list, terminal_set: list, constant_set: list = []):
         self.functional_set = {'any': functional_set}
         for unit in functional_set:
             n_args = unit.n_args
@@ -276,7 +329,7 @@ class UniversalSet:
         else:
             to_return = choosen
         return to_return
-    
-    def random_functional(self):
-        choosen = random.choice(self.functional_set['any'])
+
+    def random_functional(self, n_args='any'):
+        choosen = random.choice(self.functional_set[n_args])
         return choosen

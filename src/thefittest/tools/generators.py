@@ -45,14 +45,15 @@ def full_growing_method(uniset, level_max):
             level_i = previous_levels[-1] + 1
         levels.append(level_i)
         if level_i == level_max:
-            nodes.append(uniset.choice_terminal())
+            nodes.append(uniset.random_terminal())
         else:
-            nodes.append(uniset.choice_functional())
+            nodes.append(uniset.random_functional())
             n_i = nodes[-1].n_args
 
             possible_steps.append(n_i)
             previous_levels.append(level_i)
-    to_return = Tree(nodes, levels)
+    to_return = Tree(nodes)
+    to_return.levels = levels
     return to_return
 
 
@@ -73,23 +74,24 @@ def growing_method(uniset, level_max):
         levels.append(level_i)
 
         if level_i == level_max:
-            nodes.append(uniset.choice_terminal())
+            nodes.append(uniset.random_terminal())
         elif level_i == 0:
-            nodes.append(uniset.choice_functional())
+            nodes.append(uniset.random_functional())
             n_i = nodes[-1].n_args
             possible_steps.append(n_i)
             previous_levels.append(level_i)
         else:
             if np.random.random() < 0.5:
-                nodes.append(uniset.choice_terminal())
+                nodes.append(uniset.random_terminal())
             else:
-                nodes.append(uniset.choice_functional())
+                nodes.append(uniset.random_functional())
             n_i = nodes[-1].n_args
 
             if n_i > 0:
                 possible_steps.append(n_i)
                 previous_levels.append(level_i)
-    to_return = Tree(nodes, levels)
+    to_return = Tree(nodes)
+    to_return.levels = levels
     return to_return
 
 

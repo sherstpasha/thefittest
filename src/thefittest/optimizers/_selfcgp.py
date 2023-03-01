@@ -108,12 +108,12 @@ class SelfCGP(GeneticProgramming):
             'weak_grow',
             'average_grow',
             'strong_grow',
-            # 'weak_swap',
-            # 'average_swap',
-            # 'strong_swap',
-            # 'weak_shrink',
-            # 'average_shrink',
-            # 'strong_shrink'
+            'weak_swap',
+            'average_swap',
+            'strong_swap',
+            'weak_shrink',
+            'average_shrink',
+            'strong_shrink'
         ])
         self.stats: StatisticsSelfCGP
         self.s_sets: dict

@@ -94,9 +94,10 @@ def point_mutation(some_tree, uniset,
     if np.random.random() < proba:
         i = np.random.randint(0, len(to_return))
         if type(to_return.nodes[i]) != FunctionalNode:
-            new_node = uniset.mutate_terminal(to_return.nodes[i])
+            new_node = uniset.random_terminal()
         else:
-            new_node = uniset.mutate_functional(to_return.nodes[i])
+            n_args = to_return.nodes[i].n_args
+            new_node = uniset.random_functional(n_args)
         to_return.nodes[i] = new_node
 
     return to_return
@@ -144,8 +145,8 @@ def shrink_mutation(some_tree, uniset,
     if len(to_return) > 2:
         proba = proba_down/len(to_return)
         if np.random.random() < proba:
-            indexes = [i for i, nodes in enumerate(
-                to_return.nodes) if nodes.n_args > 0]
+            indexes = [i for i, nodes in enumerate(to_return.nodes)
+                       if nodes.n_args > 0]
             if len(indexes) > 0:
                 i = random.choice(indexes)
                 args_id = to_return.get_args_id(i)
@@ -241,16 +242,12 @@ def standart_crossover(individs, fitness, rank, max_level):
     second_point = np.random.randint(0,  len(individ_2))
 
     if np.random.random() < 0.5:
-        left, right = individ_1.subtree(first_point)
-        first_subtree = Tree(individ_1.nodes[left:right],
-                             individ_1.levels[left:right])
+        first_subtree = individ_1.subtree(first_point, return_class=True)
         offspring = individ_2.concat(second_point, first_subtree)
         if offspring.get_max_level() > max_level:
             offspring = individ_2
     else:
-        left, right = individ_2.subtree(second_point)
-        second_subtree = Tree(individ_2.nodes[left:right],
-                              individ_2.levels[left:right])
+        second_subtree = individ_2.subtree(second_point, return_class=True)
         offspring = individ_1.concat(first_point, second_subtree)
         if offspring.get_max_level() > max_level:
             offspring = individ_1
@@ -267,14 +264,10 @@ def one_point_crossoverGP(individs, fitness, rank, max_level):
     first_point = common_indexes[0][point]
     second_point = common_indexes[1][point]
     if np.random.random() < 0.5:
-        left, right = individ_1.subtree(first_point)
-        first_subtree = Tree(individ_1.nodes[left:right],
-                             individ_1.levels[left:right])
+        first_subtree = individ_1.subtree(first_point, return_class=True)
         offspring = individ_2.concat(second_point, first_subtree)
     else:
-        left, right = individ_2.subtree(second_point)
-        second_subtree = Tree(individ_2.nodes[left:right],
-                              individ_2.levels[left:right])
+        second_subtree = individ_2.subtree(second_point, return_class=True)
         offspring = individ_1.concat(first_point, second_subtree)
     return offspring
 
@@ -304,13 +297,13 @@ def uniform_crossoverGPc(individs, fitness, rank, max_level):
             else:
                 id_ = common_indexes[1][i]
                 new_nodes.append(individ_2.nodes[id_])
-    to_return = Tree(new_nodes.copy(), None)
+    to_return = Tree(new_nodes.copy())
     to_return.levels = to_return.get_levels()
     return to_return
 
 
 def uniform_crossoverGP(individs, fitness, rank, max_level):
-    to_return = Tree([], [])
+    to_return = Tree([])
     common_indexes, border = common_region(individs)
     for i in range(len(common_indexes[0])):
 
@@ -353,7 +346,7 @@ def uniform_crossoverGP(individs, fitness, rank, max_level):
 def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
     probability = protect_norm(fitness)
     # print(probability, fitness, 'probability')
-    to_return = Tree([], [])
+    to_return = Tree([])
     common_indexes, border = common_region(individs)
     # print(common_indexes, border)
     for i in range(len(common_indexes[0])):
@@ -396,7 +389,7 @@ def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
 def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
     probability = protect_norm(rank)
 
-    to_return = Tree([], [])
+    to_return = Tree([])
     common_indexes, border = common_region(individs)
     # print(common_indexes, border)
     for i in range(len(common_indexes[0])):
@@ -438,7 +431,7 @@ def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
 
 def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
     # probability = protect_norm(rank)
-    to_return = Tree([], [])
+    to_return = Tree([])
     common_indexes, border = common_region(individs)
     # print(common_indexes, border)
     for i in range(len(common_indexes[0])):
