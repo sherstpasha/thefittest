@@ -91,7 +91,7 @@ class Tree:
 
     def __len__(self):
         return len(self.nodes)
-    
+
     def __str__(self):
         reverse_nodes = self.nodes[::-1].copy()
         pack = []
@@ -104,6 +104,15 @@ class Tree:
             else:
                 pack.append(node.value.write(*args))
         return pack[0]
+
+    def __eq__(self, other):
+        if len(self) != len(other):
+            return False
+        else:
+            for node_1, node_2 in zip(self.nodes, other.nodes):
+                if np.all(node_1.value != node_2.value):
+                    return False
+        return True
 
     def subtree(self, index: int, return_class=False):
         n_index = index + 1
@@ -168,15 +177,6 @@ class Tree:
     def get_max_level(self):
         return np.max(self.levels)
 
-    def __eq__(self, other):
-        if len(self) != len(other):
-            return False
-        else:
-            for node_1, node_2 in zip(self.nodes, other.nodes):
-                if np.all(node_1.value != node_2.value):
-                    return False
-        return True
-
     def change_terminals(self, change_list):
         tree_copy = self.copy()
         for i, node in enumerate(tree_copy.nodes):
@@ -201,87 +201,141 @@ class Tree:
         return args_id
 
 
-class FunctionalNode:
-    def __init__(self, value: Callable):
-        self.value = value
-        self.args = None
-        self.name = value.__name__
-        self.sign = value.sign
-        self.n_args = len(signature(value).parameters)
-
-
-class TerminalNode:
-    def __init__(self, value, name):
+class Node:
+    def __init__(self,
+                 value,
+                 name,
+                 sign,
+                 n_args):
         self.value = value
         self.name = name
-        self.sign = name
-        self.n_args = 0
+        self.sign = sign
+        self.n_args = n_args
+
+    def __str__(self):
+        return str(self.sign)
+
+    def __eq__(self, other):
+        return self.name == other.name
 
 
-class EphemeralConstant:
-    def __init__(self, generator: Callable = np.random.random):
-        self.value = generator()
-        self.name = str(self.value)
-        self.sign = str(self.value)
-        self.n_args = 0
+class FunctionalNode(Node):
+    def __init__(self, value: Callable, sign: Optional[str] = None):
+        Node.__init__(self,
+                      value=value,
+                      name=value.__name__,
+                      sign=sign or value.sign,
+                      n_args=len(signature(value).parameters))
+
+
+class TerminalNode(Node):
+    def __init__(self, value, name: str):
+        Node.__init__(self,
+                      value=value,
+                      name=name,
+                      sign=name,
+                      n_args=0)
+
+
+class EphemeralNode():
+    def __init__(self, value: Callable):
+        self.value = value
+
+    def __call__(self):
+        return self.value()
+
+
+class EphemeralConstantNode(Node):
+    def __init__(self, generator: Callable):
+        value = generator()
+        Node.__init__(self,
+                      value=value,
+                      name=str(value),
+                      sign=str(value),
+                      n_args=0)
+
+
+'''functional_set = (FunctionalNode, ..., FunctionalNode)
+terminal_set = (TerminalNode, ..., TerminalNode)
+constant_set = (EphemeralNode, ..., EphemeralNode)'''
 
 
 class UniversalSet:
-    def __init__(self, functional_set, terminal_set, constant_set=dict([])):
-        functional_set = list(map(FunctionalNode, functional_set))
-        terminal_set = list(TerminalNode(value, key)
-                            for key, value in terminal_set.items())
-        constant_set = list((key, value)
-                            for key, value in constant_set.items())
-        self.functional_set = {}
+    def __init__(self, functional_set: list, terminal_set: list, constant_set=Optional[list]):
+        self.functional_set = {'any': functional_set}
         for unit in functional_set:
             n_args = unit.n_args
             if n_args not in self.functional_set:
                 self.functional_set[n_args] = [unit]
             else:
                 self.functional_set[n_args].append(unit)
-        self.functional_set['any'] = functional_set
-        self.terminal_set = terminal_set
-        self.constant_set = constant_set
-        self.union_terminal = terminal_set + constant_set
+        self.union_terminal = list(terminal_set) + list(constant_set)
 
-    def choice_terminal(self):
+    def random_terminal(self):
         choosen = random.choice(self.union_terminal)
-        if type(choosen) is not TerminalNode:
-            to_return = EphemeralConstant(choosen[1])
+        if type(choosen) is EphemeralNode:
+            to_return = EphemeralConstantNode(choosen)
         else:
             to_return = choosen
         return to_return
 
-    def choice_functional(self, n_args='any'):
-        return random.choice(self.functional_set[n_args])
 
-    def mutate_terminal(self, terminal):
-        if len(self.union_terminal) > 1:
-            remains = []
-            for terminal_i in self.union_terminal:
-                if type(terminal_i) is not TerminalNode:
-                    remains.append(terminal_i)
-                else:
-                    if terminal_i.name != terminal.name:
-                        remains.append(terminal_i)
-            choosen = random.choice(remains)
-            if type(choosen) is not TerminalNode:
-                to_return = EphemeralConstant(choosen[1])
-            else:
-                to_return = choosen
-        else:
-            to_return = self.union_terminal[0]
-        return to_return
+# class UniversalSet:
+#     def __init__(self, functional_set, terminal_set, constant_set=dict([])):
+#         functional_set = list(map(FunctionalNode, functional_set))
+#         terminal_set = list(TerminalNode(value, key)
+#                             for key, value in terminal_set.items())
+#         constant_set = list((key, value)
+#                             for key, value in constant_set.items())
+#         self.functional_set = {}
+#         for unit in functional_set:
+#             n_args = unit.n_args
+#             if n_args not in self.functional_set:
+#                 self.functional_set[n_args] = [unit]
+#             else:
+#                 self.functional_set[n_args].append(unit)
+#         self.functional_set['any'] = functional_set
+#         self.terminal_set = terminal_set
+#         self.constant_set = constant_set
+#         self.union_terminal = terminal_set + constant_set
 
-    def mutate_functional(self, functional):
-        n_args = functional.n_args
-        if len(self.functional_set[n_args]) > 1:
-            remains = []
-            for functional_i in self.functional_set[n_args]:
-                if functional_i.name != functional.name:
-                    remains.append(functional_i)
-            to_return = random.choice(remains)
-        else:
-            to_return = self.functional_set[n_args][0]
-        return to_return
+#     def choice_terminal(self):
+#         choosen = random.choice(self.union_terminal)
+#         if type(choosen) is not TerminalNode:
+#             to_return = EphemeralConstant(choosen[1])
+#         else:
+#             to_return = choosen
+#         return to_return
+
+#     def choice_functional(self, n_args='any'):
+#         return random.choice(self.functional_set[n_args])
+
+#     def mutate_terminal(self, terminal):
+#         if len(self.union_terminal) > 1:
+#             remains = []
+#             for terminal_i in self.union_terminal:
+#                 if type(terminal_i) is not TerminalNode:
+#                     remains.append(terminal_i)
+#                 else:
+#                     if terminal_i.name != terminal.name:
+#                         remains.append(terminal_i)
+#             choosen = random.choice(remains)
+#             if type(choosen) is not TerminalNode:
+#                 to_return = EphemeralConstant(choosen[1])
+#             else:
+#                 to_return = choosen
+#         else:
+#             to_return = self.union_terminal[0]
+#         return to_return
+
+    # def mutate_functional(self, functional):
+    #     n_args = functional.n_args
+    #     if len(self.functional_set[n_args]) > 1:
+    #         remains = []
+    #         for functional_i in self.functional_set[n_args]:
+    #             if functional_i.name != functional.name:
+    #                 remains.append(functional_i)
+    #         to_return = random.choice(remains)
+    #     else:
+    #         to_return = self.functional_set[n_args][0]
+    #     return to_return
