@@ -1,6 +1,8 @@
 import numpy as np
 from ..optimizers._base import Tree
 from ..optimizers._base import FunctionalNode
+from ..optimizers._base import TerminalNode
+from ..optimizers._base import EphemeralConstantNode
 from .generators import growing_method
 from .generators import sattolo_shuffle
 from .transformations import protect_norm
@@ -94,11 +96,43 @@ def point_mutation(some_tree, uniset,
     if np.random.random() < proba:
         i = np.random.randint(0, len(to_return))
         if type(to_return.nodes[i]) != FunctionalNode:
-            new_node = uniset.random_terminal()
+            new_node = uniset.random_terminal_or_ephemeral()
         else:
             n_args = to_return.nodes[i].n_args
             new_node = uniset.random_functional(n_args)
         to_return.nodes[i] = new_node
+
+    return to_return
+
+
+def ephemeral_mutation(some_tree, uniset,
+                       proba_down, max_level):
+    to_return = some_tree.copy()
+
+    proba = proba_down/len(to_return)
+    if np.random.random() < proba:
+        indexes = [i for i, nodes in enumerate(to_return.nodes)
+                   if type(nodes) == EphemeralConstantNode]
+        if len(indexes) > 0:
+            i = random.choice(indexes)
+            new_node = uniset.random_ephemeral()
+            to_return.nodes[i] = new_node
+
+    return to_return
+
+
+def terminal_mutation(some_tree, uniset,
+                       proba_down, max_level):
+    to_return = some_tree.copy()
+
+    proba = proba_down/len(to_return)
+    if np.random.random() < proba:
+        indexes = [i for i, nodes in enumerate(to_return.nodes)
+                   if type(nodes) == TerminalNode]
+        if len(indexes) > 0:
+            i = random.choice(indexes)
+            new_node = uniset.random_terminal()
+            to_return.nodes[i] = new_node
 
     return to_return
 

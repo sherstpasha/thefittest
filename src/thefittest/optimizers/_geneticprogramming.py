@@ -18,6 +18,8 @@ from ..tools.operators import uniform_crossoverGP_rank
 from ..tools.operators import uniform_crossoverGP_tour
 from ..tools.operators import empty_crossover
 from ..tools.operators import point_mutation
+from ..tools.operators import ephemeral_mutation
+from ..tools.operators import terminal_mutation
 from ..tools.operators import growing_mutation
 from ..tools.operators import swap_mutation
 from ..tools.operators import shrink_mutation
@@ -107,6 +109,12 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         self.m_pool = {'weak_point': (point_mutation, 0.25),
                        'average_point': (point_mutation, 1),
                        'strong_point': (point_mutation, 4),
+                       'weak_ephemeral': (ephemeral_mutation, 0.25),
+                       'average_ephemeral': (ephemeral_mutation, 1),
+                       'strong_ephemeral': (ephemeral_mutation, 4),
+                       'weak_terminal': (terminal_mutation, 0.25),
+                       'average_terminal': (terminal_mutation, 1),
+                       'strong_terminal': (terminal_mutation, 4),
                        'weak_grow': (growing_mutation, 0.25),
                        'average_grow': (growing_mutation, 1),
                        'strong_grow': (growing_mutation, 4),

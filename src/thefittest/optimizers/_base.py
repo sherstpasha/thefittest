@@ -213,7 +213,7 @@ class Tree:
             if keep_id:
                 labels[index] = str(index) + '. ' + node.sign[:6]
             else:
-                labels[index] = str(index) + '. ' + node.sign[:6]
+                labels[index] = node.sign[:6]
 
             nodes.append(index)
 
@@ -308,11 +308,11 @@ class EphemeralConstantNode(Node):
 
 '''functional_set = (FunctionalNode, ..., FunctionalNode)
 terminal_set = (TerminalNode, ..., TerminalNode)
-constant_set = (EphemeralNode, ..., EphemeralNode)'''
+ephemeral_set = (EphemeralNode, ..., EphemeralNode)'''
 
 
 class UniversalSet:
-    def __init__(self, functional_set: list, terminal_set: list, constant_set: list = []):
+    def __init__(self, functional_set: list, terminal_set: list, ephemeral_set: list = []):
         self.functional_set = {'any': functional_set}
         for unit in functional_set:
             n_args = unit.n_args
@@ -320,9 +320,19 @@ class UniversalSet:
                 self.functional_set[n_args] = [unit]
             else:
                 self.functional_set[n_args].append(unit)
-        self.union_terminal = list(terminal_set) + list(constant_set)
+        self.union_terminal = list(terminal_set) + list(ephemeral_set)
+        self.terminal_set = terminal_set
+        self.ephemeral_set = ephemeral_set
 
     def random_terminal(self):
+        choosen = random.choice(self.terminal_set)
+        return choosen
+    
+    def random_ephemeral(self):
+        choosen = random.choice(self.ephemeral_set)
+        return EphemeralConstantNode(choosen)
+
+    def random_terminal_or_ephemeral(self):
         choosen = random.choice(self.union_terminal)
         if type(choosen) is EphemeralNode:
             to_return = EphemeralConstantNode(choosen)

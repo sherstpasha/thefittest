@@ -45,7 +45,7 @@ def full_growing_method(uniset, level_max):
             level_i = previous_levels[-1] + 1
         levels.append(level_i)
         if level_i == level_max:
-            nodes.append(uniset.random_terminal())
+            nodes.append(uniset.random_terminal_or_ephemeral())
         else:
             nodes.append(uniset.random_functional())
             n_i = nodes[-1].n_args
@@ -74,7 +74,7 @@ def growing_method(uniset, level_max):
         levels.append(level_i)
 
         if level_i == level_max:
-            nodes.append(uniset.random_terminal())
+            nodes.append(uniset.random_terminal_or_ephemeral())
         elif level_i == 0:
             nodes.append(uniset.random_functional())
             n_i = nodes[-1].n_args
@@ -82,7 +82,7 @@ def growing_method(uniset, level_max):
             previous_levels.append(level_i)
         else:
             if np.random.random() < 0.5:
-                nodes.append(uniset.random_terminal())
+                nodes.append(uniset.random_terminal_or_ephemeral())
             else:
                 nodes.append(uniset.random_functional())
             n_i = nodes[-1].n_args

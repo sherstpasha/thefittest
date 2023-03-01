@@ -48,7 +48,7 @@ def generator2():
     return np.random.randint(0, 10)
 
 
-F = 'F1'
+F = 'F3'
 function = problems_dict[F]['function']
 left = problems_dict[F]['bounds'][0]
 right = problems_dict[F]['bounds'][1]
@@ -70,9 +70,9 @@ functional_set = [FunctionalNode(Add()),
 
 terminal_set = [TerminalNode(X[:, i], f'x{i}') for i in range(n_vars)]
 
-constant_set = [EphemeralNode(generator1)]
+ephemeral_set = [EphemeralNode(generator1)]
 
-uniset = UniversalSet(functional_set, terminal_set, constant_set)
+uniset = UniversalSet(functional_set, terminal_set, ephemeral_set)
 
 
 def fitness_function(trees):
@@ -105,24 +105,24 @@ fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=3)
 
 ax[0][0].plot(range(len(X)), y, label='y_true', color='green')
 ax[0][0].plot(range(len(X)), y_pred, label='y_pred', color='red')
-ax[0][0].legend()
+ax[0][0].legend(loc="upper left")
 
 ax[0][1].plot(range(len(stats.fitness)), stats.fitness)
 
 for key, value in stats.m_proba.items():
     ax[1][0].plot(range(len(value)), value, label=key)
-ax[1][0].legend()
+ax[1][0].legend(loc="upper left")
 
 for key, value in stats.c_proba.items():
     ax[1][1].plot(range(len(value)), value, label=key)
-ax[1][1].legend()
+ax[1][1].legend(loc="upper left")
 
 for key, value in stats.s_proba.items():
     ax[2][0].plot(range(len(value)), value, label=key)
-ax[2][0].legend()
+ax[2][0].legend(loc="upper left")
 
 print_tree(fittest, ax[2][1])
 
-plt.tight_layout()
+plt.tight_layout(loc="upper left")
 plt.savefig('line1.png')
 plt.close()

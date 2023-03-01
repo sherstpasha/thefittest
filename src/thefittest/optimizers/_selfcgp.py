@@ -102,18 +102,24 @@ class SelfCGP(GeneticProgramming):
             # 'uniform_tour7'
         ],
             mutation_opers=[
-            'weak_point',
-            'average_point',
-            'strong_point',
+            # 'weak_point',
+            # 'average_point',
+            # 'strong_point',
             'weak_grow',
             'average_grow',
             'strong_grow',
-            'weak_swap',
-            'average_swap',
-            'strong_swap',
-            'weak_shrink',
-            'average_shrink',
-            'strong_shrink'
+            'weak_ephemeral',
+            'average_ephemeral',
+            'strong_ephemeral',
+            'weak_terminal',
+            'average_terminal',
+            'strong_terminal',
+            # 'weak_swap',
+            # 'average_swap',
+            # 'strong_swap',
+            # 'weak_shrink',
+            # 'average_shrink',
+            # 'strong_shrink'
         ])
         self.stats: StatisticsSelfCGP
         self.s_sets: dict
