@@ -35,13 +35,13 @@ def F4(x):
 
 
 def F5(x):
-    100*((x[:, 1]-x[:, 0]**2))**2 + (1 - x[:, 0])**2
+    return 100*((x[:, 1]-x[:, 0]**2))**2 + (1 - x[:, 0])**2
 
 
 def F6(x):
     left = 0.005*(x[:, 0]**2 + x[:, 1]**2)
     right = -np.cos(x[:, 0])*np.cos(x[:, 1]/np.sqrt(2)) + 2
-    return 10/(left + right) + 10
+    return -10/(left + right) + 10
 
 
 def F7(x):
@@ -111,7 +111,19 @@ def F17(x):
 
 
 problems_dict = {'F1': {'function': F1, 'bounds': (-1, 1)},
-                 'F1': {'function': F1, 'bounds': (-1, 1)},
-                 'F1': {'function': F1, 'bounds': (-1, 1)},
-                 'F1': {'function': F1, 'bounds': (-1, 1)},
-                 'F1': {'function': F1, 'bounds': (-1, 1)}}
+                 'F2': {'function': F2, 'bounds': (-1, 1)},
+                 'F3': {'function': F3, 'bounds': (-16, 16)},
+                 'F4': {'function': F4, 'bounds': (-16, 16)},
+                 'F5': {'function': F5, 'bounds': (-2, 2)},
+                 'F6': {'function': F6, 'bounds': (-16, 16)},
+                 'F7': {'function': F7, 'bounds': (-5, 5)},
+                 'F8': {'function': F8, 'bounds': (-10, 10)},
+                 'F9': {'function': F9, 'bounds': (-2.5, 2.5)},
+                 'F10': {'function': F10, 'bounds': (-5, 5)},
+                 'F11': {'function': F11, 'bounds': (-4, 4)},
+                 'F12': {'function': F12, 'bounds': (0, 4)},
+                 'F13': {'function': F13, 'bounds': (0, 4)},
+                 'F14': {'function': F14, 'bounds': (0, 4)},
+                 'F15': {'function': F15, 'bounds': (-5, 5)},
+                 'F16': {'function': F16, 'bounds': (-5, 5)},
+                 'F17': {'function': F17, 'bounds': (-5, 5)}}
