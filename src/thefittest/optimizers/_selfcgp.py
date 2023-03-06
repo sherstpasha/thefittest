@@ -86,8 +86,15 @@ class SelfCGP(GeneticProgramming):
         self.set_strategy(select_opers=['proportional',
                                         'rank',
                                         'tournament_3',
+                                        'tour_rank_3',
+                                        'tour_rank_5',
+                                        'tour_rank_7',
+                                        'tour_tour_3',
+                                        'tour_tour_5',
+                                        'tour_tour_7',
                                         'tournament_5',
-                                        'tournament_7'],
+                                        'tournament_7'
+                                        ],
                           crossover_opers=[
             'empty',
             'standart',
@@ -102,24 +109,18 @@ class SelfCGP(GeneticProgramming):
             # 'uniform_tour7'
         ],
             mutation_opers=[
-            # 'weak_point',
-            # 'average_point',
-            # 'strong_point',
+            'weak_point',
+            'average_point',
+            'strong_point',
             'weak_grow',
             'average_grow',
             'strong_grow',
-            'weak_ephemeral',
-            'average_ephemeral',
-            'strong_ephemeral',
-            'weak_terminal',
-            'average_terminal',
-            'strong_terminal',
-            # 'weak_swap',
-            # 'average_swap',
-            # 'strong_swap',
-            # 'weak_shrink',
-            # 'average_shrink',
-            # 'strong_shrink'
+            # 'weak_ephemeral',
+            # 'average_ephemeral',
+            # 'strong_ephemeral',
+            # 'weak_terminal',
+            # 'average_terminal',
+            # 'strong_terminal',
         ])
         self.stats: StatisticsSelfCGP
         self.s_sets: dict

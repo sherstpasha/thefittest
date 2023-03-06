@@ -9,6 +9,7 @@ from ._base import EvolutionaryAlgorithm
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
+from ..tools.operators import truncation_selection
 from ..tools.operators import empty_crossover
 from ..tools.operators import one_point_crossover
 from ..tools.operators import two_point_crossover
@@ -83,7 +84,11 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
         self.s_pool = {'proportional': (proportional_selection, None),
                        'rank': (rank_selection, None),
-                       'tournament': (tournament_selection, self.tour_size)}
+                       'trunc': (truncation_selection, None),
+                       'tournament_k': (tournament_selection, self.tour_size),
+                       'tournament_3': (tournament_selection, 3),
+                       'tournament_5': (tournament_selection, 5),
+                       'tournament_7': (tournament_selection, 7)}
 
         self.c_pool = {'empty': (empty_crossover, 1),
                        'one_point': (one_point_crossover, 2),
@@ -102,7 +107,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                        'average':  (flip_mutation, 1/(self.str_len)),
                        'strong': (flip_mutation, min(1, 3/self.str_len))}
 
-        self.s_set = self.s_pool['tournament']
+        self.s_set = self.s_pool['tournament_k']
         self.m_set = self.m_pool['weak']
         self.c_set = self.c_pool['uniform2']
 

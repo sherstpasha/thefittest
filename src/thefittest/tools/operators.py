@@ -121,8 +121,32 @@ def ephemeral_mutation(some_tree, uniset,
     return to_return
 
 
+def ephemeral_gauss_mutation(some_tree, uniset,
+                             proba_down, max_level):
+    to_return = some_tree.copy()
+
+    proba = proba_down/len(to_return)
+    if np.random.random() < proba:
+        indexes = [i for i, nodes in enumerate(to_return.nodes)
+                   if type(nodes) == EphemeralConstantNode]
+        if len(indexes) > 0:
+            i = random.choice(indexes)
+            value = to_return.nodes[i].value
+            gauss = np.random.normal(1, 0.015)
+            new_node = uniset.random_ephemeral()
+            new_value = value*gauss
+
+            new_node.value = new_value
+            new_node.name = str(new_value)
+            new_node.sign = str(new_value)
+
+            to_return.nodes[i] = new_node
+
+    return to_return
+
+
 def terminal_mutation(some_tree, uniset,
-                       proba_down, max_level):
+                      proba_down, max_level):
     to_return = some_tree.copy()
 
     proba = proba_down/len(to_return)
@@ -394,18 +418,23 @@ def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
             # print('id_', id_)
             # print('j', j)
             subtrees = []
+            subfitness = []
             for k, tree in enumerate(individs):
                 inner_id = common_indexes[k][i]
                 args_id = tree.get_args_id(inner_id)
                 for args in args_id:
                     subtrees.append(tree.subtree(args, return_class=True))
-                    # print('pool', tree.subtree(args, return_class=True))
+                    subfitness.append(fitness[k])
+                    # print('pool', tree.subtree(args, return_class=True), subfitness[-1])
 
             to_return.nodes.append(individs[j].nodes[id_])
             for n in range(individs[j].nodes[id_].n_args):
-                n_i = np.random.randint(len(subtrees))
+                probability_sub =  protect_norm(np.array(subfitness))
+                # print('probability_sub', probability_sub)
+                n_i = np.random.choice(range(len(probability_sub)), p = probability_sub)
                 # print('in', subtrees[n_i])
                 to_return.nodes.extend(subtrees.pop(n_i).nodes)
+                subfitness.pop(n_i)
 
         else:
             # print('common')
@@ -437,18 +466,22 @@ def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
             # print('id_', id_)
             # print('j', j)
             subtrees = []
+            subfitness = []
             for k, tree in enumerate(individs):
                 inner_id = common_indexes[k][i]
                 args_id = tree.get_args_id(inner_id)
                 for args in args_id:
                     subtrees.append(tree.subtree(args, return_class=True))
+                    subfitness.append(rank[k])
                     # print('pool', tree.subtree(args, return_class=True))
 
             to_return.nodes.append(individs[j].nodes[id_])
             for n in range(individs[j].nodes[id_].n_args):
-                n_i = np.random.randint(len(subtrees))
+                probability_sub =  protect_norm(np.array(subfitness))
+                n_i = np.random.choice(range(len(probability_sub)), p = probability_sub)
                 # print('in', subtrees[n_i])
                 to_return.nodes.extend(subtrees.pop(n_i).nodes)
+                subfitness.pop(n_i)
 
         else:
             # print('common')
@@ -479,18 +512,22 @@ def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
             # print('id_', id_)
             # print('j', j)
             subtrees = []
+            subfitness = []
             for k, tree in enumerate(individs):
                 inner_id = common_indexes[k][i]
                 args_id = tree.get_args_id(inner_id)
                 for args in args_id:
                     subtrees.append(tree.subtree(args, return_class=True))
+                    subfitness.append(fitness[k])
                     # print('pool', tree.subtree(args, return_class=True))
 
             to_return.nodes.append(individs[j].nodes[id_])
             for n in range(individs[j].nodes[id_].n_args):
-                n_i = np.random.randint(len(subtrees))
+                probability_sub =  protect_norm(np.array(subfitness))
+                n_i = tournament_selection(probability_sub, None, 2, 1)[0]
                 # print('in', subtrees[n_i])
                 to_return.nodes.extend(subtrees.pop(n_i).nodes)
+                subfitness.pop(n_i)
 
         else:
             # print('common')
@@ -531,6 +568,49 @@ def tournament_selection(fitness, ranks,
     max_fit_id = np.argmax(fitness[tournament], axis=1)
     choosen = np.diag(tournament[:, max_fit_id])
     return choosen
+
+def rank_tournament_selection(fitness, ranks,
+                         tour_size, quantity):
+    probability = ranks/ranks.sum()
+    tournament = np.random.choice(
+        range(len(fitness)), tour_size*quantity, p=probability)
+    tournament = tournament.reshape(-1, tour_size)
+    max_fit_id = np.argmax(fitness[tournament], axis=1)
+    choosen = np.diag(tournament[:, max_fit_id])
+    return choosen
+
+def tour_tournament_selection(fitness, ranks,
+                         tour_size, quantity):
+    tournament = tournament_selection(fitness, ranks, tour_size, tour_size*quantity)
+    tournament = tournament.reshape(-1, tour_size)
+    max_fit_id = np.argmax(fitness[tournament], axis=1)
+    choosen = np.diag(tournament[:, max_fit_id])
+    return choosen
+
+def truncation_selection(fitness, ranks,
+                         tour_size, quantity):
+    rank_mean = ranks < ranks.mean()
+    cond = rank_mean
+
+    truncation = np.ones_like(fitness)
+    truncation[cond] = 0
+    probability = truncation/np.sum(truncation)
+    choosen = np.random.choice(range(len(fitness)),
+                               size=quantity, p=probability)
+    return choosen
+
+def best_selection(fitness, ranks,
+                  tour_size, quantity):
+    best_id = np.argmax(fitness)
+    probability = np.zeros_like(fitness)
+    probability[best_id] = 1
+    choosen = np.random.choice(range(len(fitness)),
+                                size=quantity, p=probability)
+    return choosen
+
+
+    
+    
 
 
 ##################################### MATH #####################################
@@ -611,12 +691,33 @@ class Pow(Operator):
                 x, dtype=np.float64), where=x > 0)
         else:
             if x < 0:
-                res = 1
+                res = 0
             else:
                 res = x**y
 
         return np.clip(res, min_value, max_value)
 
+
+class Pow2(Operator):
+    def __init__(self):
+        self.formula = '({}**2)'
+        self.__name__ = 'pow2'
+        self.sign = '**2'
+
+    def __call__(self, x):
+        res = x**2
+        return np.clip(res, min_value, max_value)
+
+
+# class Pow3(Operator):
+#     def __init__(self):
+#         self.formula = '({}**3)'
+#         self.__name__ = 'pow3'
+#         self.sign = '**3'
+
+#     def __call__(self, x):
+#         res = x**3
+#         return np.clip(res, min_value, max_value)
 
 class Div(Operator):
     def __init__(self):
@@ -630,37 +731,98 @@ class Div(Operator):
                 y, dtype=np.float64), where=y != 0)
         else:
             if y == 0:
-                res = 1
+                res = 0
             else:
                 res = x/y
         return np.clip(res, min_value, max_value)
 
+# class FloorDiv(Operator):
+#     def __init__(self):
+#         self.formula = '({}//{})'
+#         self.__name__ = 'floor_div'
+#         self.sign = '//'
 
-class Exp(Operator):
+#     def __call__(self, x, y):
+#         if type(y) == np.ndarray:
+#             res = np.floor_divide(x, y, out=np.ones_like(
+#                 y, dtype=np.float64), where=y != 0)
+#         else:
+#             if y == 0:
+#                 res = 0
+#             else:
+#                 res = x//y
+#         return np.clip(res, min_value, max_value)`
+
+class Inv(Operator):
     def __init__(self):
-        self.formula = 'np.exp({})'
-        self.__name__ = 'exp'
-        self.sign = 'exp'
+        self.formula = '(1/{})'
+        self.__name__ = 'Ind'
+        self.sign = '1/'
 
-    def __call__(self, x):
-        return np.clip(np.exp(x), min_value, max_value)
+    def __call__(self, y):
+        if type(y) == np.ndarray:
+            res = np.divide(1, y, out=np.ones_like(
+                y, dtype=np.float64), where=y != 0)
+        else:
+            if y == 0:
+                res = 1
+            else:
+                res = 1/y
+        return np.clip(res, min_value, max_value)
+
+# class LogAbs(Operator):
+#     def __init__(self):
+#         self.formula = 'log(abs({}))'
+#         self.__name__ = 'log(abs)'
+#         self.sign = 'log(abs)'
+
+#     def __call__(self, y):
+#         y_ = np.abs(y)
+#         if type(y_) == np.ndarray:
+#             res = np.log(y_, out=np.ones_like(
+#                 y_, dtype=np.float64), where=y_ != 0)
+#         else:
+#             if y_ == 0:
+#                 res = 1
+#             else:
+#                 res = np.log(y_)
+#         return np.clip(res, min_value, max_value)
+
+# class Exp(Operator):
+#     def __init__(self):
+#         self.formula = 'exp({})'
+#         self.__name__ = 'exp'
+#         self.sign = 'exp'
+
+#     def __call__(self, x):
+#         return np.clip(np.exp(x), min_value, max_value)
 
 
-class Mul3(Operator):
+# class Mul3(Operator):
+#     def __init__(self):
+#         self.formula = '({} * {} * {})'
+#         self.__name__ = 'mul3'
+#         self.sign = '*'
+
+#     def __call__(self, x, y, z):
+#         return np.clip(x * y * z, min_value, max_value)
+
+
+class SqrtAbs(Operator):
     def __init__(self):
-        self.formula = '({} * {} * {})'
-        self.__name__ = 'mul3'
-        self.sign = '*'
-
-    def __call__(self, x, y, z):
-        return np.clip(x * y * z, min_value, max_value)
-
-
-class Sqrt(Operator):
-    def __init__(self):
-        self.formula = 'sqrt({})'
-        self.__name__ = 'sqrt'
-        self.sign = 'sqrt'
+        self.formula = 'sqrt(abs({}))'
+        self.__name__ = 'sqrt(abs)'
+        self.sign = 'sqrt(abs)'
 
     def __call__(self, x):
         return np.clip(np.sqrt(np.abs(x)), min_value, max_value)
+    
+
+# class Abs(Operator):
+#     def __init__(self):
+#             self.formula = 'abs({})'
+#             self.__name__ = 'abs()'
+#             self.sign = 'abs()'
+
+#     def __call__(self, x):
+#         return np.clip(np.abs(x), min_value, max_value)

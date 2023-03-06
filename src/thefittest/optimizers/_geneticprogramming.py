@@ -10,6 +10,10 @@ from ._base import UniversalSet
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
+from ..tools.operators import truncation_selection
+from ..tools.operators import rank_tournament_selection
+from ..tools.operators import tour_tournament_selection
+from ..tools.operators import best_selection
 from ..tools.operators import one_point_crossoverGP
 from ..tools.operators import standart_crossover
 from ..tools.operators import uniform_crossoverGP
@@ -19,6 +23,7 @@ from ..tools.operators import uniform_crossoverGP_tour
 from ..tools.operators import empty_crossover
 from ..tools.operators import point_mutation
 from ..tools.operators import ephemeral_mutation
+from ..tools.operators import ephemeral_gauss_mutation
 from ..tools.operators import terminal_mutation
 from ..tools.operators import growing_mutation
 from ..tools.operators import swap_mutation
@@ -88,8 +93,16 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
         self.s_pool = {'proportional': (proportional_selection, None),
                        'rank': (rank_selection, None),
+                       'trunc': (truncation_selection, None),
                        'tournament_k': (tournament_selection, self.tour_size),
+                       'best': (best_selection, None),
                        'tournament_3': (tournament_selection, 3),
+                       'tour_rank_3': (rank_tournament_selection, 3),
+                       'tour_rank_5': (rank_tournament_selection, 5),
+                       'tour_rank_7': (rank_tournament_selection, 7),
+                       'tour_tour_3': (tour_tournament_selection, 3),
+                       'tour_tour_5': (tour_tournament_selection, 5),
+                       'tour_tour_7': (tour_tournament_selection, 7),
                        'tournament_5': (tournament_selection, 5),
                        'tournament_7': (tournament_selection, 7)}
 
@@ -112,6 +125,9 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'weak_ephemeral': (ephemeral_mutation, 0.25),
                        'average_ephemeral': (ephemeral_mutation, 1),
                        'strong_ephemeral': (ephemeral_mutation, 4),
+                       'weak_gauss': (ephemeral_gauss_mutation, 0.25),
+                       'average_gauss': (ephemeral_gauss_mutation, 1),
+                       'strong_gauss': (ephemeral_gauss_mutation, 4),
                        'weak_terminal': (terminal_mutation, 0.25),
                        'average_terminal': (terminal_mutation, 1),
                        'strong_terminal': (terminal_mutation, 4),

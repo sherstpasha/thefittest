@@ -11,7 +11,14 @@ from thefittest.tools.operators import Div
 from thefittest.tools.operators import Cos
 from thefittest.tools.operators import Sin
 from thefittest.tools.operators import Mul3
-from thefittest.tools.operators import swap_mutation, shrink_mutation
+from thefittest.tools.operators import point_mutation
+from thefittest.tools.operators import ephemeral_mutation
+from thefittest.tools.operators import ephemeral_gauss_mutation
+from thefittest.tools.operators import terminal_mutation
+from thefittest.tools.operators import growing_mutation
+from thefittest.tools.operators import swap_mutation
+from thefittest.tools.operators import shrink_mutation
+from thefittest.tools.operators import uniform_crossoverGP_prop
 from thefittest.tools.generators import growing_method, full_growing_method
 from thefittest.tools.transformations import common_region
 import numpy as np
@@ -50,8 +57,24 @@ terminal_set = [TerminalNode(np.array([1, 2, 3]), 'x0'),
 
 constant_set = [EphemeralNode(generator)]
 
-uniset = UniversalSet(functional_set, terminal_set)
+uniset = UniversalSet(functional_set, terminal_set, constant_set)
 
-tree_1 = growing_method(uniset, 4)
+tree_1 = full_growing_method(uniset, 4)
+tree_2 = full_growing_method(uniset, 4)
+tree_3 = full_growing_method(uniset, 4)
 
+tree_4 = uniform_crossoverGP_prop([tree_1, tree_2, tree_3],
+                                   np.array([1, 2, 3]),
+                                     np.array([1, 2, 3]), 16)
+
+
+
+# tree_2 = growing_mutation(tree_1, uniset, 100, 16)
+
+print(tree_1)
+print(tree_2)
+print(tree_3)
 print_tree(tree_1, 'tree_1.png')
+print_tree(tree_2, 'tree_2.png')
+print_tree(tree_3, 'tree_3.png')
+print_tree(tree_4, 'tree_4.png')
