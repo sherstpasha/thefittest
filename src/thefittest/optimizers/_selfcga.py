@@ -238,23 +238,22 @@ class SelfCGA(GeneticAlgorithm):
                 population_ph = self.genotype_to_phenotype(
                     population_g)
                 fitness = self.evaluate(population_ph)
-
-                s_fittest_oper = self.find_fittest_operator(
-                    s_operators, fitness)
-                s_proba = self.update_proba(s_proba, s_fittest_oper)
-
-                c_fittest_oper = self.find_fittest_operator(
-                    c_operators, fitness)
-                c_proba = self.update_proba(c_proba, c_fittest_oper)
-
-                m_fittest_oper = self.find_fittest_operator(
-                    m_operators, fitness)
-                m_proba = self.update_proba(m_proba, m_fittest_oper)
-
                 if self.elitism:
                     population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
+
+                s_fittest_oper = self.find_fittest_operator(
+                    s_operators, fitness_scale)
+                s_proba = self.update_proba(s_proba, s_fittest_oper)
+
+                c_fittest_oper = self.find_fittest_operator(
+                    c_operators, fitness_scale)
+                c_proba = self.update_proba(c_proba, c_fittest_oper)
+
+                m_fittest_oper = self.find_fittest_operator(
+                    m_operators, fitness_scale)
+                m_proba = self.update_proba(m_proba, m_fittest_oper)
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)

@@ -318,6 +318,35 @@ def one_point_crossoverGP(individs, fitness, rank, max_level):
         offspring = individ_1.concat(first_point, second_subtree)
     return offspring
 
+def uniform_crossoverGPc(individs, fitness, rank, max_level):
+    '''Poli, Riccardo & Langdon, W.. (2001). On the Search
+    Properties of Different Crossover Operators in Genetic Programming. '''
+    new_nodes = []
+    individ_1 = individs[0]
+    individ_2 = individs[1]
+    common_indexes, border = common_region([individ_1, individ_2])
+
+    for i in range(len(common_indexes[0])):
+        if common_indexes[0][i] in border[0]:
+            if np.random.random() < 0.5:
+                id_ = common_indexes[0][i]
+                left, right = individ_1.subtree(index=id_)
+                new_nodes.extend(individ_1.nodes[left:right])
+            else:
+                id_ = common_indexes[1][i]
+                left, right = individ_2.subtree(index=id_)
+                new_nodes.extend(individ_2.nodes[left:right])
+        else:
+            if np.random.random() < 0.5:
+                id_ = common_indexes[0][i]
+                new_nodes.append(individ_1.nodes[id_])
+            else:
+                id_ = common_indexes[1][i]
+                new_nodes.append(individ_2.nodes[id_])
+    to_return = Tree(new_nodes.copy())
+    to_return.levels = to_return.get_levels()
+    return to_return
+
 
 def uniform_crossoverGP(individs, fitness, rank, max_level):
     range_ = range(len(individs))

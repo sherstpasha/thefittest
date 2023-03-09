@@ -12,6 +12,7 @@ from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
 from ..tools.operators import one_point_crossoverGP
 from ..tools.operators import standart_crossover
+from ..tools.operators import uniform_crossoverGPc
 from ..tools.operators import uniform_crossoverGP
 from ..tools.operators import uniform_crossoverGP_prop
 from ..tools.operators import uniform_crossoverGP_rank
@@ -106,6 +107,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         self.c_pool = {'empty': (empty_crossover, 1),
                        'standart': (standart_crossover, 2),
                        'one_point': (one_point_crossoverGP, 2),
+                       'uniform2c': (uniform_crossoverGPc, 2),
                        'uniform2': (uniform_crossoverGP, 2),
                        'uniform7': (uniform_crossoverGP, 7),
                        'uniformk': (uniform_crossoverGP, self.parents_num),
