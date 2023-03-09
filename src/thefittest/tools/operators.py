@@ -330,213 +330,222 @@ def one_point_crossoverGP(individs, fitness, rank, max_level):
     return offspring
 
 
-def uniform_crossoverGPc(individs, fitness, rank, max_level):
-    '''Poli, Riccardo & Langdon, W.. (2001). On the Search
-    Properties of Different Crossover Operators in Genetic Programming. '''
-    new_nodes = []
-    individ_1 = individs[0]
-    individ_2 = individs[1]
-    common_indexes, border = common_region([individ_1, individ_2])
-
-    for i in range(len(common_indexes[0])):
-        if common_indexes[0][i] in border[0]:
-            if np.random.random() < 0.5:
-                id_ = common_indexes[0][i]
-                left, right = individ_1.subtree(index=id_)
-                new_nodes.extend(individ_1.nodes[left:right])
-            else:
-                id_ = common_indexes[1][i]
-                left, right = individ_2.subtree(index=id_)
-                new_nodes.extend(individ_2.nodes[left:right])
-        else:
-            if np.random.random() < 0.5:
-                id_ = common_indexes[0][i]
-                new_nodes.append(individ_1.nodes[id_])
-            else:
-                id_ = common_indexes[1][i]
-                new_nodes.append(individ_2.nodes[id_])
-    to_return = Tree(new_nodes.copy())
-    to_return.levels = to_return.get_levels()
-    return to_return
-
-
 def uniform_crossoverGP(individs, fitness, rank, max_level):
+    range_ = range(len(individs))
     to_return = Tree([])
-    common_indexes, border = common_region(individs)
-    for i in range(len(common_indexes[0])):
+    common, border = common_region(individs)
+    for i, common_0_i in enumerate(common[0]):
+        j = np.random.choice(range_, 1)[0]
+        id_ = common[j][i]
+        to_return.nodes.append(individs[j].nodes[id_])
+        if common_0_i in border[0]:
+            left_subtrees = []
+            right_subtrees = []
 
-        if common_indexes[0][i] in border[0]:
-            # print('border')
-            j = np.random.randint(len(individs))
-            id_ = common_indexes[j][i]
-            # print('i', i, individs[j].nodes[id_].name)
-            # print('id_', id_)
-            # print('j', j)
-            subtrees = []
-            for k, tree in enumerate(individs):
-                inner_id = common_indexes[k][i]
-                args_id = tree.get_args_id(inner_id)
-                for args in args_id:
-                    subtrees.append(tree.subtree(args, return_class=True))
-                    # print('pool', tree.subtree(args, return_class=True))
+            for k, tree_k in enumerate(individs):
+                inner_id = common[k][i]
+                args_id = tree_k.get_args_id(inner_id)
 
-            to_return.nodes.append(individs[j].nodes[id_])
-            for n in range(individs[j].nodes[id_].n_args):
-                n_i = np.random.randint(len(subtrees))
-                # print('in', subtrees[n_i])
-                to_return.nodes.extend(subtrees.pop(n_i).nodes)
+                n_args = tree_k.nodes[inner_id].n_args
+                if n_args == 1:
+                    subtree = tree_k.subtree(args_id[0], return_class=True)
+                    left_subtrees.append(subtree)
+                    right_subtrees.append(subtree)
+                elif n_args == 2:
+                    subtree_l = tree_k.subtree(args_id[0], return_class=True)
+                    subtree_r = tree_k.subtree(args_id[1], return_class=True)
+                    left_subtrees.append(subtree_l)
+                    right_subtrees.append(subtree_r)
 
-        else:
-            # print('common')
+            n_args = individs[j].nodes[id_].n_args
+            if n_args == 1:
+                choosen = random.choices(
+                    left_subtrees + right_subtrees, k=1)[0]
+                to_return.nodes.extend(choosen.nodes)
+            elif n_args == 2:
+                choosen_l = random.choices(left_subtrees, k=1)[0]
+                to_return.nodes.extend(choosen_l.nodes)
 
-            j = np.random.randint(len(individs))
+                choosen_r = random.choices(right_subtrees, k=1)[0]
+                to_return.nodes.extend(choosen_r.nodes)
 
-            id_ = common_indexes[j][i]
-            # print('i', i, individs[j].nodes[id_].name)
-            # print('id_', id_)
-            # print('j', j)
-            to_return.nodes.append(individs[j].nodes[id_])
     to_return = to_return.copy()
     to_return.levels = to_return.get_levels()
     return to_return
 
 
 def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
+    range_ = range(len(individs))
     probability = protect_norm(fitness)
-    # print(probability, fitness, 'probability')
     to_return = Tree([])
-    common_indexes, border = common_region(individs)
-    # print(common_indexes, border)
-    for i in range(len(common_indexes[0])):
+    common, border = common_region(individs)
+    for i, common_0_i in enumerate(common[0]):
+        j = np.random.choice(range_, 1, p=probability)[0]
+        id_ = common[j][i]
+        to_return.nodes.append(individs[j].nodes[id_])
+        if common_0_i in border[0]:
+            left_subtrees = []
+            right_subtrees = []
+            left_fitness = []
+            right_fitness = []
 
-        if common_indexes[0][i] in border[0]:
-            # print('border')
+            for k, tree_k in enumerate(individs):
+                inner_id = common[k][i]
+                args_id = tree_k.get_args_id(inner_id)
+                n_args = tree_k.nodes[inner_id].n_args
+                if n_args == 1:
+                    subtree = tree_k.subtree(args_id[0], return_class=True)
+                    left_subtrees.append(subtree)
+                    right_subtrees.append(subtree)
+                    left_fitness.append(fitness[k])
+                    right_fitness.append(fitness[k])
+                elif n_args == 2:
+                    subtree_l = tree_k.subtree(args_id[0], return_class=True)
+                    subtree_r = tree_k.subtree(args_id[1], return_class=True)
+                    left_subtrees.append(subtree_l)
+                    right_subtrees.append(subtree_r)
+                    left_fitness.append(fitness[k])
+                    right_fitness.append(fitness[k])
 
-            j = np.random.choice(range(len(individs)), 1, p=probability)[0]
-            id_ = common_indexes[j][i]
-            # print('i', i, individs[j].nodes[id_].name)
-            # print('id_', id_)
-            # print('j', j)
-            subtrees = []
-            subfitness = []
-            for k, tree in enumerate(individs):
-                inner_id = common_indexes[k][i]
-                args_id = tree.get_args_id(inner_id)
-                for args in args_id:
-                    subtrees.append(tree.subtree(args, return_class=True))
-                    subfitness.append(fitness[k])
-                    # print('pool', tree.subtree(args, return_class=True), subfitness[-1])
+            n_args = individs[j].nodes[id_].n_args
+            if n_args == 1:
+                fitness_i = np.array(left_fitness + right_fitness)
+                proba = protect_norm(fitness_i)
+                choosen = random.choices(
+                    left_subtrees + right_subtrees, weights=proba, k=1)[0]
+                to_return.nodes.extend(choosen.nodes)
+            elif n_args == 2:
+                fitness_l = np.array(left_fitness)
+                fitness_r = np.array(right_fitness)
+                proba_l = protect_norm(fitness_l)
+                proba_r = protect_norm(fitness_r)
 
-            to_return.nodes.append(individs[j].nodes[id_])
-            for n in range(individs[j].nodes[id_].n_args):
-                probability_sub =  protect_norm(np.array(subfitness))
-                # print('probability_sub', probability_sub)
-                n_i = np.random.choice(range(len(probability_sub)), p = probability_sub)
-                # print('in', subtrees[n_i])
-                to_return.nodes.extend(subtrees.pop(n_i).nodes)
-                subfitness.pop(n_i)
+                choosen_l = random.choices(
+                    left_subtrees, weights=proba_l, k=1)[0]
+                to_return.nodes.extend(choosen_l.nodes)
 
-        else:
-            # print('common')
-            j = np.random.choice(range(len(individs)), 1, p=probability)[0]
-            id_ = common_indexes[j][i]
-            # print('i', i, individs[j].nodes[id_].name)
-            # print('id_', id_)
-            # print('j', j)
-            to_return.nodes.append(individs[j].nodes[id_])
+                choosen_r = random.choices(
+                    right_subtrees, weights=proba_r, k=1)[0]
+                to_return.nodes.extend(choosen_r.nodes)
+
     to_return = to_return.copy()
     to_return.levels = to_return.get_levels()
     return to_return
 
 
 def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
+    range_ = range(len(individs))
     probability = protect_norm(rank)
-
     to_return = Tree([])
-    common_indexes, border = common_region(individs)
-    # print(common_indexes, border)
-    for i in range(len(common_indexes[0])):
+    common, border = common_region(individs)
+    for i, common_0_i in enumerate(common[0]):
+        j = np.random.choice(range_, 1, p=probability)[0]
+        id_ = common[j][i]
+        to_return.nodes.append(individs[j].nodes[id_])
+        if common_0_i in border[0]:
+            left_subtrees = []
+            right_subtrees = []
+            left_fitness = []
+            right_fitness = []
 
-        if common_indexes[0][i] in border[0]:
-            # print('border')
+            for k, tree_k in enumerate(individs):
+                inner_id = common[k][i]
+                args_id = tree_k.get_args_id(inner_id)
+                n_args = tree_k.nodes[inner_id].n_args
+                if n_args == 1:
+                    subtree = tree_k.subtree(args_id[0], return_class=True)
+                    left_subtrees.append(subtree)
+                    right_subtrees.append(subtree)
+                    left_fitness.append(rank[k])
+                    right_fitness.append(rank[k])
+                elif n_args == 2:
+                    subtree_l = tree_k.subtree(args_id[0], return_class=True)
+                    subtree_r = tree_k.subtree(args_id[1], return_class=True)
+                    left_subtrees.append(subtree_l)
+                    right_subtrees.append(subtree_r)
+                    left_fitness.append(rank[k])
+                    right_fitness.append(rank[k])
 
-            j = np.random.choice(range(len(individs)), 1, p=probability)[0]
-            id_ = common_indexes[j][i]
-            # print('i', i, individs[j].nodes[id_].name)
-            # print('id_', id_)
-            # print('j', j)
-            subtrees = []
-            subfitness = []
-            for k, tree in enumerate(individs):
-                inner_id = common_indexes[k][i]
-                args_id = tree.get_args_id(inner_id)
-                for args in args_id:
-                    subtrees.append(tree.subtree(args, return_class=True))
-                    subfitness.append(rank[k])
-                    # print('pool', tree.subtree(args, return_class=True))
+            n_args = individs[j].nodes[id_].n_args
+            if n_args == 1:
+                fitness_i = np.array(left_fitness + right_fitness)
+                proba = protect_norm(fitness_i)
+                choosen = random.choices(
+                    left_subtrees + right_subtrees, weights=proba, k=1)[0]
+                to_return.nodes.extend(choosen.nodes)
+            elif n_args == 2:
+                fitness_l = np.array(left_fitness)
+                fitness_r = np.array(right_fitness)
+                proba_l = protect_norm(fitness_l)
+                proba_r = protect_norm(fitness_r)
 
-            to_return.nodes.append(individs[j].nodes[id_])
-            for n in range(individs[j].nodes[id_].n_args):
-                probability_sub =  protect_norm(np.array(subfitness))
-                n_i = np.random.choice(range(len(probability_sub)), p = probability_sub)
-                # print('in', subtrees[n_i])
-                to_return.nodes.extend(subtrees.pop(n_i).nodes)
-                subfitness.pop(n_i)
+                choosen_l = random.choices(
+                    left_subtrees, weights=proba_l, k=1)[0]
+                to_return.nodes.extend(choosen_l.nodes)
 
-        else:
-            # print('common')
-            j = np.random.choice(range(len(individs)), 1, p=probability)[0]
-            id_ = common_indexes[j][i]
-            # print('i', i, individs[j].nodes[id_].name)
-            # print('id_', id_)
-            # print('j', j)
-            to_return.nodes.append(individs[j].nodes[id_])
+                choosen_r = random.choices(
+                    right_subtrees, weights=proba_r, k=1)[0]
+                to_return.nodes.extend(choosen_r.nodes)
+
     to_return = to_return.copy()
     to_return.levels = to_return.get_levels()
     return to_return
 
 
 def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
-    # probability = protect_norm(rank)
+    range_ = range(len(individs))
     to_return = Tree([])
-    common_indexes, border = common_region(individs)
-    # print(common_indexes, border)
-    for i in range(len(common_indexes[0])):
+    common, border = common_region(individs)
+    for i, common_0_i in enumerate(common[0]):
 
-        if common_indexes[0][i] in border[0]:
-            # print('border')
+        j = tournament_selection(fitness, rank, 2, 1)[0]
+        id_ = common[j][i]
+        to_return.nodes.append(individs[j].nodes[id_])
+        if common_0_i in border[0]:
+            left_subtrees = []
+            right_subtrees = []
+            left_fitness = []
+            right_fitness = []
 
-            j = tournament_selection(fitness, rank, 2, 1)[0]
-            id_ = common_indexes[j][i]
-            # print('i', i, individs[j].nodes[id_].name)
-            # print('id_', id_)
-            # print('j', j)
-            subtrees = []
-            subfitness = []
-            for k, tree in enumerate(individs):
-                inner_id = common_indexes[k][i]
-                args_id = tree.get_args_id(inner_id)
-                for args in args_id:
-                    subtrees.append(tree.subtree(args, return_class=True))
-                    subfitness.append(fitness[k])
-                    # print('pool', tree.subtree(args, return_class=True))
+            for k, tree_k in enumerate(individs):
+                inner_id = common[k][i]
+                args_id = tree_k.get_args_id(inner_id)
+                n_args = tree_k.nodes[inner_id].n_args
+                if n_args == 1:
+                    subtree = tree_k.subtree(args_id[0], return_class=True)
+                    left_subtrees.append(subtree)
+                    right_subtrees.append(subtree)
+                    left_fitness.append(rank[k])
+                    right_fitness.append(rank[k])
+                elif n_args == 2:
+                    subtree_l = tree_k.subtree(args_id[0], return_class=True)
+                    subtree_r = tree_k.subtree(args_id[1], return_class=True)
+                    left_subtrees.append(subtree_l)
+                    right_subtrees.append(subtree_r)
+                    left_fitness.append(rank[k])
+                    right_fitness.append(rank[k])
 
-            to_return.nodes.append(individs[j].nodes[id_])
-            for n in range(individs[j].nodes[id_].n_args):
-                probability_sub =  protect_norm(np.array(subfitness))
-                n_i = tournament_selection(probability_sub, None, 2, 1)[0]
-                # print('in', subtrees[n_i])
-                to_return.nodes.extend(subtrees.pop(n_i).nodes)
-                subfitness.pop(n_i)
+            n_args = individs[j].nodes[id_].n_args
+            if n_args == 1:
+                fitness_i = np.array(left_fitness + right_fitness)
+                proba = protect_norm(fitness_i)
+                choosen = random.choices(
+                    left_subtrees + right_subtrees, weights=proba, k=1)[0]
+                to_return.nodes.extend(choosen.nodes)
+            elif n_args == 2:
+                fitness_l = np.array(left_fitness)
+                fitness_r = np.array(right_fitness)
+                proba_l = protect_norm(fitness_l)
+                proba_r = protect_norm(fitness_r)
 
-        else:
-            # print('common')
-            j = tournament_selection(fitness, rank, 2, 1)[0]
-            id_ = common_indexes[j][i]
-            # print('i', i, individs[j].nodes[id_].name)
-            # print('id_', id_)
-            # print('j', j)
-            to_return.nodes.append(individs[j].nodes[id_])
+                choosen_l = random.choices(
+                    left_subtrees, weights=proba_l, k=1)[0]
+                to_return.nodes.extend(choosen_l.nodes)
+
+                choosen_r = random.choices(
+                    right_subtrees, weights=proba_r, k=1)[0]
+                to_return.nodes.extend(choosen_r.nodes)
+
     to_return = to_return.copy()
     to_return.levels = to_return.get_levels()
     return to_return
@@ -568,49 +577,6 @@ def tournament_selection(fitness, ranks,
     max_fit_id = np.argmax(fitness[tournament], axis=1)
     choosen = np.diag(tournament[:, max_fit_id])
     return choosen
-
-def rank_tournament_selection(fitness, ranks,
-                         tour_size, quantity):
-    probability = ranks/ranks.sum()
-    tournament = np.random.choice(
-        range(len(fitness)), tour_size*quantity, p=probability)
-    tournament = tournament.reshape(-1, tour_size)
-    max_fit_id = np.argmax(fitness[tournament], axis=1)
-    choosen = np.diag(tournament[:, max_fit_id])
-    return choosen
-
-def tour_tournament_selection(fitness, ranks,
-                         tour_size, quantity):
-    tournament = tournament_selection(fitness, ranks, tour_size, tour_size*quantity)
-    tournament = tournament.reshape(-1, tour_size)
-    max_fit_id = np.argmax(fitness[tournament], axis=1)
-    choosen = np.diag(tournament[:, max_fit_id])
-    return choosen
-
-def truncation_selection(fitness, ranks,
-                         tour_size, quantity):
-    rank_mean = ranks < ranks.mean()
-    cond = rank_mean
-
-    truncation = np.ones_like(fitness)
-    truncation[cond] = 0
-    probability = truncation/np.sum(truncation)
-    choosen = np.random.choice(range(len(fitness)),
-                               size=quantity, p=probability)
-    return choosen
-
-def best_selection(fitness, ranks,
-                  tour_size, quantity):
-    best_id = np.argmax(fitness)
-    probability = np.zeros_like(fitness)
-    probability[best_id] = 1
-    choosen = np.random.choice(range(len(fitness)),
-                                size=quantity, p=probability)
-    return choosen
-
-
-    
-    
 
 
 ##################################### MATH #####################################
@@ -753,6 +719,7 @@ class Div(Operator):
 #                 res = x//y
 #         return np.clip(res, min_value, max_value)`
 
+
 class Inv(Operator):
     def __init__(self):
         self.formula = '(1/{})'
@@ -770,42 +737,44 @@ class Inv(Operator):
                 res = 1/y
         return np.clip(res, min_value, max_value)
 
-# class LogAbs(Operator):
-#     def __init__(self):
-#         self.formula = 'log(abs({}))'
-#         self.__name__ = 'log(abs)'
-#         self.sign = 'log(abs)'
 
-#     def __call__(self, y):
-#         y_ = np.abs(y)
-#         if type(y_) == np.ndarray:
-#             res = np.log(y_, out=np.ones_like(
-#                 y_, dtype=np.float64), where=y_ != 0)
-#         else:
-#             if y_ == 0:
-#                 res = 1
-#             else:
-#                 res = np.log(y_)
-#         return np.clip(res, min_value, max_value)
+class LogAbs(Operator):
+    def __init__(self):
+        self.formula = 'log(abs({}))'
+        self.__name__ = 'log(abs)'
+        self.sign = 'log(abs)'
 
-# class Exp(Operator):
-#     def __init__(self):
-#         self.formula = 'exp({})'
-#         self.__name__ = 'exp'
-#         self.sign = 'exp'
-
-#     def __call__(self, x):
-#         return np.clip(np.exp(x), min_value, max_value)
+    def __call__(self, y):
+        y_ = np.abs(y)
+        if type(y_) == np.ndarray:
+            res = np.log(y_, out=np.ones_like(
+                y_, dtype=np.float64), where=y_ != 0)
+        else:
+            if y_ == 0:
+                res = 1
+            else:
+                res = np.log(y_)
+        return np.clip(res, min_value, max_value)
 
 
-# class Mul3(Operator):
-#     def __init__(self):
-#         self.formula = '({} * {} * {})'
-#         self.__name__ = 'mul3'
-#         self.sign = '*'
+class Exp(Operator):
+    def __init__(self):
+        self.formula = 'exp({})'
+        self.__name__ = 'exp'
+        self.sign = 'exp'
 
-#     def __call__(self, x, y, z):
-#         return np.clip(x * y * z, min_value, max_value)
+    def __call__(self, x):
+        return np.clip(np.exp(x), min_value, max_value)
+
+
+class Mul3(Operator):
+    def __init__(self):
+        self.formula = '({} * {} * {})'
+        self.__name__ = 'mul3'
+        self.sign = '*'
+
+    def __call__(self, x, y, z):
+        return np.clip(x * y * z, min_value, max_value)
 
 
 class SqrtAbs(Operator):
@@ -816,7 +785,7 @@ class SqrtAbs(Operator):
 
     def __call__(self, x):
         return np.clip(np.sqrt(np.abs(x)), min_value, max_value)
-    
+
 
 # class Abs(Operator):
 #     def __init__(self):
