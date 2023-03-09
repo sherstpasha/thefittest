@@ -4,6 +4,12 @@ import numpy as np
 def root_mean_square_error(y_true, y_predict):
     return np.sqrt(np.mean((y_true - y_predict)**2))
 
+def coefficient_determination(y_true, y_predict):
+    mean = np.mean(y_true)
+    residual_sum = np.sum((y_true - y_predict)**2)
+    total_sum = np.sum((y_true - mean)**2)
+    return 1 - residual_sum/total_sum
+
 
 def common_region(trees):
     terminate = False
