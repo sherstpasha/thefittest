@@ -113,6 +113,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                        'two_point': (two_point_crossover, 2),
                        'uniform2': (uniform_crossover, 2),
                        'uniform7': (uniform_crossover, 7),
+                       'uniformk': (uniform_crossover, self.parents_num),
                        'uniform_prop2': (uniform_prop_crossover, 2),
                        'uniform_prop7': (uniform_prop_crossover, 7),
                        'uniform_propk': (uniform_prop_crossover, self.parents_num),

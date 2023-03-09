@@ -55,7 +55,7 @@ class StatisticsSelfCGP:
 
 
 class SelfCGP(GeneticProgramming):
-    '''Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm 
+    '''Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm
     with modified uniform crossover. 1-6. 10.1109/CEC.2012.6256587. '''
 
     def __init__(self,
@@ -81,72 +81,80 @@ class SelfCGP(GeneticProgramming):
                          show_progress_each,
                          keep_history)
 
-        self.K = 2
-        self.threshold = 0.01
-        self.set_strategy(select_opers=['proportional',
-                                        'rank',
-                                        'tournament_3',
-                                        'tournament_5',
-                                        'tournament_7'
-                                        ],
-                          crossover_opers=['standart',
-                                           'one_point',
-                                           'uniform_rank7'],
-                          mutation_opers=['weak_point',
-                                          'average_point',
-                                          'strong_point',
-                                          'weak_grow',
-                                          'average_grow',
-                                          'strong_grow',])
+        self.thefittest: TheFittest
         self.stats: StatisticsSelfCGP
         self.s_sets: dict
         self.c_sets: dict
         self.m_sets: dict
+        self.K: int
+        self.threshold: float
+        self.s_set: dict
+        self.c_set: dict
+        self.m_set: dict
 
-    def set_strategy(self, select_opers: Optional[list[str]] = None,
-                     crossover_opers: Optional[list[str]] = None,
-                     mutation_opers: Optional[list[str]] = None,
-                     tour_size_param: Optional[int] = None,
+        self.set_strategy()
+
+    def set_strategy(self, select_opers: list[str] = ['proportional',
+                                                      'rank',
+                                                      'tournament_3',
+                                                      'tournament_5',
+                                                      'tournament_7'],
+                     crossover_opers: list[str] = ['standart',
+                                                   'one_point',
+                                                   'uniform_rank7'],
+                     mutation_opers: list[str] = ['weak_point',
+                                                  'average_point',
+                                                  'strong_point',
+                                                  'weak_grow',
+                                                  'average_grow',
+                                                  'strong_grow'],
+                     tour_size_param: int = 2,
                      initial_population: Optional[np.ndarray] = None,
-                     max_level: Optional[int] = None,
-                     init_level: Optional[int] = None):
-
-        if select_opers is not None:
-            s_sets = {}
-            for operator_name in select_opers:
-                value = self.s_pool[operator_name]
-                s_sets[operator_name] = value
-            self.s_sets = dict(sorted(s_sets.items()))
-
-        if crossover_opers is not None:
-            c_sets = {}
-            for operator_name in crossover_opers:
-                value = self.c_pool[operator_name]
-                c_sets[operator_name] = value
-            self.c_sets = dict(sorted(c_sets.items()))
-
-        if mutation_opers is not None:
-            m_sets = {}
-            for operator_name in mutation_opers:
-                value = self.m_pool[operator_name]
-                m_sets[operator_name] = value
-            self.m_sets = dict(sorted(m_sets.items()))
-
-        if tour_size_param is not None:
-            self.tour_size = tour_size_param
-
+                     elitism_param: bool = True,
+                     parents_num_param: int = 7,
+                     mutation_rate_param: float = 0.05,
+                     K_param: int = 2,
+                     threshold_param: float = 0.05,
+                     max_level: int = 16,
+                     init_level: int = 5):
+        self.tour_size = tour_size_param
         self.initial_population = initial_population
-        if max_level is not None:
-            self.max_level = max_level
-        if init_level is not None:
-            self.init_level = init_level
+        self.elitism = elitism_param
+        self.parents_num = parents_num_param
+        self.mutation_rate = mutation_rate_param
+        self.K = K_param
+        self.threshold = threshold_param
+        self.max_level = max_level
+        self.init_level = init_level
+
+        self.update_pool()
+
+        s_sets = {}
+        for operator_name in select_opers:
+            value = self.s_pool[operator_name]
+            s_sets[operator_name] = value
+        self.s_sets = dict(sorted(s_sets.items()))
+
+
+        c_sets = {}
+        for operator_name in crossover_opers:
+            value = self.c_pool[operator_name]
+            c_sets[operator_name] = value
+        self.c_sets = dict(sorted(c_sets.items()))
+
+        m_sets = {}
+        for operator_name in mutation_opers:
+            value = self.m_pool[operator_name]
+            m_sets[operator_name] = value
+        self.m_sets = dict(sorted(m_sets.items()))
+
         return self
 
     def create_offspring(self, population_g, fitness_scale, fitness_rank,
                          selection, crossover, mutation):
         crossover_func, quantity = self.c_sets[crossover]
         selection_func, tour_size = self.s_sets[selection]
-        mutation_func, proba = self.m_sets[mutation]
+        mutation_func, proba_down, not_scale = self.m_sets[mutation]
 
         indexes = selection_func(fitness_scale,
                                  fitness_rank,
@@ -161,6 +169,11 @@ class SelfCGP(GeneticProgramming):
                                               fitness_scale_p,
                                               fitness_rank_p,
                                               self.max_level)
+        
+        if not_scale:
+            proba = proba_down
+        else:
+            proba = proba_down/len(offspring_no_mutated)
         mutant = mutation_func(offspring_no_mutated,
                                self.uniset, proba, self.max_level)
         return mutant
@@ -168,7 +181,7 @@ class SelfCGP(GeneticProgramming):
     def choice_operators(self, proba_dict):
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
-        return np.random.choice(list(operators), self.pop_size - 1, p=proba)
+        return np.random.choice(list(operators), self.pop_size, p=proba)
 
     def update_proba(self, proba, operator):
         proba[operator] += self.K/self.iters
@@ -215,7 +228,6 @@ class SelfCGP(GeneticProgramming):
                                                m_proba)
         for i in range(self.iters-1):
             self.show_progress(i)
-            levels = [tree.get_max_level() for tree in population_g]
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
@@ -229,25 +241,26 @@ class SelfCGP(GeneticProgramming):
                                                    fitness_rank)
                 map_ = map(partial_create_offspring, s_operators,
                            c_operators, m_operators)
-                population_g[:-1] = np.array(list(map_), dtype=object)
-                population_ph[:-1] = self.genotype_to_phenotype(
-                    population_g[:-1])
-                fitness[:-1] = self.evaluate(population_ph[:-1])
+                population_g = np.array(list(map_), dtype=object)
+                population_ph = self.genotype_to_phenotype(
+                    population_g)
+                fitness = self.evaluate(population_ph)
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                if self.elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
 
                 s_fittest_oper = self.find_fittest_operator(
-                    s_operators, fitness[:-1])
+                    s_operators, fitness)
                 s_proba = self.update_proba(s_proba, s_fittest_oper)
 
                 c_fittest_oper = self.find_fittest_operator(
-                    c_operators, fitness[:-1])
+                    c_operators, fitness)
                 c_proba = self.update_proba(c_proba, c_fittest_oper)
 
                 m_fittest_oper = self.find_fittest_operator(
-                    m_operators, fitness[:-1])
+                    m_operators, fitness)
                 m_proba = self.update_proba(m_proba, m_fittest_oper)
 
                 self.thefittest.update(population_g, population_ph, fitness)

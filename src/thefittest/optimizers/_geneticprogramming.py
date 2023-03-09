@@ -80,13 +80,22 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             keep_history=keep_history)
 
         self.uniset = uniset
-        self.tour_size = 2
-        self.max_level = 16
-        self.init_level = 5
-        self.initial_population = None
         self.thefittest: TheFittest
         self.stats: StatisticsGP
+        self.s_pool: dict
+        self.c_pool: dict
+        self.m_pool: dict
+        self.tour_size: int
+        self.max_level: int
+        self.init_level: int
+        self.initial_population: Optional[np.ndarray]
+        self.s_set: tuple
+        self.c_set: tuple
+        self.m_set: tuple
 
+        self.set_strategy()
+
+    def update_pool(self):
         self.s_pool = {'proportional': (proportional_selection, None),
                        'rank': (rank_selection, None),
                        'tournament_k': (tournament_selection, self.tour_size),
@@ -99,65 +108,78 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'one_point': (one_point_crossoverGP, 2),
                        'uniform2': (uniform_crossoverGP, 2),
                        'uniform7': (uniform_crossoverGP, 7),
+                       'uniformk': (uniform_crossoverGP, self.parents_num),
                        'uniform_prop2': (uniform_crossoverGP_prop, 2),
                        'uniform_prop7': (uniform_crossoverGP_prop, 7),
+                       'uniform_propk': (uniform_crossoverGP_prop, self.parents_num),
                        'uniform_rank2': (uniform_crossoverGP_rank, 2),
                        'uniform_rank7': (uniform_crossoverGP_rank, 7),
+                       'uniform_rankk': (uniform_crossoverGP_rank, self.parents_num),
                        'uniform_tour3': (uniform_crossoverGP_tour, 3),
-                       'uniform_tour7': (uniform_crossoverGP_tour, 7)}
+                       'uniform_tour7': (uniform_crossoverGP_tour, 7),
+                       'uniform_tourk': (uniform_crossoverGP_tour, self.parents_num)}
 
-        self.m_pool = {'weak_point': (point_mutation, 0.25),
-                       'average_point': (point_mutation, 1),
-                       'strong_point': (point_mutation, 4),
-                       'weak_ephemeral': (ephemeral_mutation, 0.25),
-                       'average_ephemeral': (ephemeral_mutation, 1),
-                       'strong_ephemeral': (ephemeral_mutation, 4),
-                       'weak_gauss': (ephemeral_gauss_mutation, 0.25),
-                       'average_gauss': (ephemeral_gauss_mutation, 1),
-                       'strong_gauss': (ephemeral_gauss_mutation, 4),
-                       'weak_terminal': (terminal_mutation, 0.25),
-                       'average_terminal': (terminal_mutation, 1),
-                       'strong_terminal': (terminal_mutation, 4),
-                       'weak_grow': (growing_mutation, 0.25),
-                       'average_grow': (growing_mutation, 1),
-                       'strong_grow': (growing_mutation, 4),
-                       'weak_swap': (swap_mutation, 0.25),
-                       'average_swap': (swap_mutation, 1),
-                       'strong_swap': (swap_mutation, 4),
-                       'weak_shrink': (shrink_mutation, 0.25),
-                       'average_shrink': (shrink_mutation, 1),
-                       'strong_shrink': (shrink_mutation, 4)}
-        self.s_set = self.s_pool['rank']
-        self.c_set = self.c_pool['standart']
-        self.m_set = self.m_pool['strong_grow']
+        self.m_pool = {'weak_point': (point_mutation, 0.25, False),
+                       'average_point': (point_mutation, 1, False),
+                       'strong_point': (point_mutation, 4, False),
+                       'custom_rate_point': (point_mutation, self.mutation_rate, True),
+                       'weak_ephemeral': (ephemeral_mutation, 0.25, False),
+                       'average_ephemeral': (ephemeral_mutation, 1, False),
+                       'strong_ephemeral': (ephemeral_mutation, 4, False),
+                       'custom_rate_ephemeral': (ephemeral_mutation, self.mutation_rate, True),
+                       'weak_gauss': (ephemeral_gauss_mutation, 0.25, False),
+                       'average_gauss': (ephemeral_gauss_mutation, 1, False),
+                       'strong_gauss': (ephemeral_gauss_mutation, 4, False),
+                       'custom_rate_gauss': (ephemeral_gauss_mutation, self.mutation_rate, True),
+                       'weak_terminal': (terminal_mutation, 0.25, False),
+                       'average_terminal': (terminal_mutation, 1, False),
+                       'strong_terminal': (terminal_mutation, 4, False),
+                       'custom_rate_terminal': (terminal_mutation, self.mutation_rate, True),
+                       'weak_grow': (growing_mutation, 0.25, False),
+                       'average_grow': (growing_mutation, 1, False),
+                       'strong_grow': (growing_mutation, 4, False),
+                       'custom_rate_grow': (growing_mutation, self.mutation_rate, True),
+                       'weak_swap': (swap_mutation, 0.25, False),
+                       'average_swap': (swap_mutation, 1, False),
+                       'strong_swap': (swap_mutation, 4, False),
+                       'custom_rate_swap': (swap_mutation, self.mutation_rate, True),
+                       'weak_shrink': (shrink_mutation, 0.25, False),
+                       'average_shrink': (shrink_mutation, 1, False),
+                       'strong_shrink': (shrink_mutation, 4, False),
+                       'custom_rate_shrink': (shrink_mutation, self.mutation_rate, True)}
 
     def set_strategy(self,
-                     selection_oper: Optional[str] = None,
-                     crossover_oper: Optional[str] = None,
-                     mutation_oper: Optional[str] = None,
-                     tour_size_param: Optional[int] = None,
+                     selection_oper: str = 'rank',
+                     crossover_oper: str = 'standart',
+                     mutation_oper: str = 'weak_grow',
+                     tour_size_param: int = 2,
                      initial_population: Optional[np.ndarray] = None,
-                     max_level: Optional[int] = None,
-                     init_level: Optional[int] = None):
-        if selection_oper is not None:
-            self.s_set = self.s_pool[selection_oper]
-        if crossover_oper is not None:
-            self.c_set = self.c_pool[crossover_oper]
-        if mutation_oper is not None:
-            self.m_set = self.m_pool[mutation_oper]
-        if tour_size_param is not None:
-            self.tour_size = tour_size_param
+                     max_level: int = 16,
+                     init_level: int = 5,
+                     elitism_param: bool = True,
+                     parents_num_param: int = 7,
+                     mutation_rate_param: float = 0.05):
+        self.tour_size = tour_size_param
         self.initial_population = initial_population
-        if max_level is not None:
-            self.max_level = max_level
-        if init_level is not None:
-            self.init_level = init_level
+        self.max_level = max_level
+        self.init_level = init_level
+        self.elitism = elitism_param
+        self.parents_num = parents_num_param
+        self.mutation_rate = mutation_rate_param
+
+        self.update_pool()
+
+
+        self.s_set = self.s_pool[selection_oper]
+        self.c_set = self.c_pool[crossover_oper]
+        self.m_set = self.m_pool[mutation_oper]
+
         return self
 
     def create_offspring(self, population_g, fitness_scale, fitness_rank, _):
         crossover_func, quantity = self.c_set
         selection_func, tour_size = self.s_set
-        mutation_func, proba = self.m_set
+        mutation_func, proba_down, not_scale = self.m_set
 
         indexes = selection_func(fitness_scale,
                                  fitness_rank,
@@ -172,6 +194,12 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                                               fitness_scale_p,
                                               fitness_rank_p,
                                               self.max_level)
+
+        if not_scale:
+            proba = proba_down
+        else:
+            proba = proba_down/len(offspring_no_mutated)
+
         mutant = mutation_func(offspring_no_mutated,
                                self.uniset, proba, self.max_level)
         return mutant
@@ -194,9 +222,6 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                                                fitness)
         for i in range(self.iters-1):
             self.show_progress(i)
-            levels = [tree.get_max_level() for tree in population_g]
-            print('levels', np.max(levels), np.mean(levels))
-            print('fitness', np.max(fitness), np.mean(fitness))
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
@@ -204,13 +229,13 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                                                    population_g,
                                                    fitness_scale,
                                                    fitness_rank)
-                map_ = map(partial_create_offspring, range(self.pop_size-1))
-                population_g[:-1] = np.array(list(map_), dtype=object)
-                population_ph[:-1] = self.genotype_to_phenotype(
-                    population_g[:-1])
-                fitness[:-1] = self.evaluate(population_ph[:-1])
+                map_ = map(partial_create_offspring, range(self.pop_size))
+                population_g = np.array(list(map_), dtype=object)
+                population_ph = self.genotype_to_phenotype(population_g)
+                fitness = self.evaluate(population_ph)
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                if self.elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
 
