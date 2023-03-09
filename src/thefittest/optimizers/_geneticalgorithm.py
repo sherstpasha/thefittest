@@ -9,7 +9,6 @@ from ._base import EvolutionaryAlgorithm
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
-from ..tools.operators import truncation_selection
 from ..tools.operators import empty_crossover
 from ..tools.operators import one_point_crossover
 from ..tools.operators import two_point_crossover
@@ -77,14 +76,33 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             keep_history=keep_history)
 
         self.str_len = str_len
-        self.tour_size = 2
-        self.initial_population = None
         self.thefittest: TheFittest
         self.stats: Statistics
+        self.s_pool: dict
+        self.c_pool: dict
+        self.m_pool: dict
+        self.initial_population: Optional[np.ndarray]
+        self.tour_size: int
+        self.elitism: bool
+        self.parents_num: int
+        self.mutation_rate: float
+        self.s_set: tuple
+        self.c_set: tuple
+        self.m_set: tuple
 
+        self.set_strategy()
+
+    def generate_init_pop(self):
+        if self.initial_population is None:
+            population_g = binary_string_population(
+                self.pop_size, self.str_len)
+        else:
+            population_g = self.initial_population
+        return population_g
+
+    def update_pool(self):
         self.s_pool = {'proportional': (proportional_selection, None),
                        'rank': (rank_selection, None),
-                       'trunc': (truncation_selection, None),
                        'tournament_k': (tournament_selection, self.tour_size),
                        'tournament_3': (tournament_selection, 3),
                        'tournament_5': (tournament_selection, 5),
@@ -97,43 +115,41 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                        'uniform7': (uniform_crossover, 7),
                        'uniform_prop2': (uniform_prop_crossover, 2),
                        'uniform_prop7': (uniform_prop_crossover, 7),
+                       'uniform_propk': (uniform_prop_crossover, self.parents_num),
                        'uniform_rank2': (uniform_rank_crossover, 2),
                        'uniform_rank7': (uniform_rank_crossover, 7),
+                       'uniform_rankk': (uniform_rank_crossover, self.parents_num),
                        'uniform_tour3': (uniform_tour_crossover, 3),
-                       'uniform_tour7': (uniform_tour_crossover, 7)}
+                       'uniform_tour7': (uniform_tour_crossover, 7),
+                       'uniform_tourk': (uniform_tour_crossover, self.parents_num)}
 
-        self.m_pool = {'no': (flip_mutation, 0),
-                       'weak':  (flip_mutation, 1/(3*self.str_len)),
+        self.m_pool = {'weak':  (flip_mutation, 1/(3*self.str_len)),
                        'average':  (flip_mutation, 1/(self.str_len)),
-                       'strong': (flip_mutation, min(1, 3/self.str_len))}
-
-        self.s_set = self.s_pool['tournament_k']
-        self.m_set = self.m_pool['weak']
-        self.c_set = self.c_pool['uniform2']
-
-    def generate_init_pop(self):
-        if self.initial_population is None:
-            population_g = binary_string_population(
-                self.pop_size, self.str_len)
-        else:
-            population_g = self.initial_population
-        return population_g
+                       'strong': (flip_mutation, min(1, 3/self.str_len)),
+                       'custom_rate': (flip_mutation, self.mutation_rate)}
 
     def set_strategy(self,
-                     selection_oper: Optional[str] = None,
-                     crossover_oper: Optional[str] = None,
-                     mutation_oper: Optional[str] = None,
-                     tour_size_param: Optional[int] = None,
-                     initial_population: Optional[np.ndarray] = None):
-        if selection_oper is not None:
-            self.s_set = self.s_pool[selection_oper]
-        if crossover_oper is not None:
-            self.c_set = self.c_pool[crossover_oper]
-        if mutation_oper is not None:
-            self.m_set = self.m_pool[mutation_oper]
-        if tour_size_param is not None:
-            self.tour_size = tour_size_param
+                     selection_oper: str = 'tournament_k',
+                     crossover_oper: str = 'uniform2',
+                     mutation_oper: str = 'weak',
+                     tour_size_param: int = 2,
+                     initial_population: Optional[np.ndarray] = None,
+                     elitism_param: bool = True,
+                     parents_num_param: int = 7,
+                     mutation_rate_param: float = 0.05):
+
+        self.tour_size = tour_size_param
         self.initial_population = initial_population
+        self.elitism = elitism_param
+        self.parents_num = parents_num_param
+        self.mutation_rate = mutation_rate_param
+
+        self.update_pool()
+
+        self.s_set = self.s_pool[selection_oper]
+        self.c_set = self.c_pool[crossover_oper]
+        self.m_set = self.m_pool[mutation_oper]
+
         return self
 
     def create_offspring(self, population_g, fitness_scale, fitness_rank, _):
@@ -182,14 +198,14 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                                                    population_g,
                                                    fitness_scale,
                                                    fitness_rank)
-                map_ = map(partial_create_offspring, range(self.pop_size-1))
-                population_g[:-1] = np.array(list(map_), dtype=np.byte)
+                map_ = map(partial_create_offspring, range(self.pop_size))
+                population_g = np.array(list(map_), dtype=np.byte)
 
-                population_ph[:-1] = self.genotype_to_phenotype(
-                    population_g[:-1])
-                fitness[:-1] = self.evaluate(population_ph[:-1])
+                population_ph = self.genotype_to_phenotype(population_g)
+                fitness = self.evaluate(population_ph)
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                if self.elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
 

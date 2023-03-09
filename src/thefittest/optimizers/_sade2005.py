@@ -98,32 +98,36 @@ class SaDE2005(DifferentialEvolution):
 
         self.thefittest: TheFittest
         self.stats: StaticticSaDE
-        self.m_learning_period = 50
-        self.CR_update_timer = 5
-        self.CR_m_learning_period = 25
-        self.threshold = 0.1
+        self.m_learning_period: int
+        self.CR_update_timer: int
+        self.CR_m_learning_period: int
+        self.threshold: int
 
         self.Fm = 0.5
         self.F_sigma = 0.3
         self.CR_sigma = 0.1
 
-    def set_strategy(self, m_learning_period_param: Optional[int] = None,
-                     CR_update_timer_param: Optional[int] = None,
-                     CR_m_learning_period_param: Optional[int] = None,
-                     threshold_params: Optional[float] = None):
+        self.set_strategy()
 
-        if m_learning_period_param is not None:
-            self.m_learning_period = m_learning_period_param
-
-        if CR_update_timer_param is not None:
-            self.CR_update_timer = CR_update_timer_param
-
-        if CR_m_learning_period_param is not None:
-            self.CR_m_learning_period = CR_m_learning_period_param
-
-        if threshold_params is not None:
-            self.threshold = threshold_params
-
+    def set_strategy(self, m_learning_period_param: int = 50,
+                     CR_update_timer_param: int = 5,
+                     CR_m_learning_period_param: int = 25,
+                     threshold_params: float = 0.1,
+                     Fm_param: float = 0.5,
+                     F_sigma_param: float = 0.3,
+                     CR_sigma_param: float = 0.1,
+                     elitism_param: bool = True,
+                     initial_population: Optional[np.ndarray] = None):
+        self.update_pool()
+        self.m_learning_period = m_learning_period_param
+        self.CR_update_timer = CR_update_timer_param
+        self.CR_m_learning_period = CR_m_learning_period_param
+        self.threshold = threshold_params
+        self.Fm = Fm_param
+        self.F_sigma = F_sigma_param
+        self.CR_sigma = CR_sigma_param
+        self.elitism = elitism_param
+        self.initial_population = initial_population
         return self
 
     def mutation_and_crossover(self, popuation_g, individ_g,
@@ -151,7 +155,7 @@ class SaDE2005(DifferentialEvolution):
     def choice_operators(self, proba_dict):
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
-        return np.random.choice(list(operators), self.pop_size - 1, p=proba)
+        return np.random.choice(list(operators), self.pop_size, p=proba)
 
     def succeses_to_ns(self, succeses):
         return np.sum(succeses)
@@ -188,7 +192,7 @@ class SaDE2005(DifferentialEvolution):
         z_m = len(self.m_sets)
         m_proba = dict(zip(self.m_sets_keys, np.full(z_m, 1/z_m)))
         CRm = 0.5
-        CR_i = self.generate_CR(self.pop_size-1, CRm)
+        CR_i = self.generate_CR(self.pop_size, CRm)
 
         population_g = self.generate_init_pop()
         population_ph = self.genotype_to_phenotype(population_g)
@@ -223,19 +227,20 @@ class SaDE2005(DifferentialEvolution):
                 partial_mut_and_cross = partial(self.mutation_and_crossover,
                                                 population_g)
                 mutant_cr_g = np.array(list(map(partial_mut_and_cross,
-                                                population_g[:-1],
+                                                population_g,
                                                 m_operators, CR_i)))
 
                 stack = self.evaluate_and_selection(mutant_cr_g,
-                                                    population_g[:-1],
-                                                    population_ph[:-1],
-                                                    fitness[:-1])
+                                                    population_g,
+                                                    population_ph,
+                                                    fitness)
 
-                population_g[:-1] = stack[0]
-                population_ph[:-1] = stack[1]
-                fitness[:-1] = stack[2]
+                population_g = stack[0]
+                population_ph = stack[1]
+                fitness = stack[2]
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                if self.elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 argsort = np.argsort(fitness)
                 population_g = population_g[argsort]
                 population_ph = population_ph[argsort]
@@ -258,7 +263,7 @@ class SaDE2005(DifferentialEvolution):
                     nf = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
 
                 if self.if_period_ended(i, self.CR_update_timer):
-                    CR_i = self.generate_CR(self.pop_size-1, CRm)
+                    CR_i = self.generate_CR(self.pop_size, CRm)
                     if self.if_period_ended(i, self.CR_m_learning_period):
                         if len(CR_s_pool):
                             CRm = np.mean(CR_s_pool)

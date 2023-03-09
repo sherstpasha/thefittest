@@ -102,7 +102,12 @@ class SHADE(DifferentialEvolution):
                               size=1, replace=False)[0]
         return current + F_value*(best - current) + F_value*(population[r1] - pop_archive[r2])
 
-    def set_strategy(self):
+    def set_strategy(self,
+                     elitism_param: bool = True,
+                     initial_population: Optional[np.ndarray] = None):
+        self.update_pool()
+        self.elitism = elitism_param
+        self.initial_population = initial_population
         return self
 
     def mutation_and_crossover(self, popuation_g, popuation_g_archive, individ_g, F_i, CR_i):
@@ -207,37 +212,38 @@ class SHADE(DifferentialEvolution):
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
-                F_i, CR_i = self.generate_F_CR(H_F, H_CR, self.pop_size - 1)
+                F_i, CR_i = self.generate_F_CR(H_F, H_CR, self.pop_size)
                 pop_archive = np.vstack(
                     [population_g.copy(), external_archive.copy()])
 
                 partial_mut_and_cross = partial(self.mutation_and_crossover,
                                                 population_g.copy(), pop_archive.copy())
                 mutant_cr_g = np.array(list(map(partial_mut_and_cross,
-                                                population_g[:-1].copy(),
+                                                population_g.copy(),
                                                 F_i.copy(), CR_i.copy())))
 
                 stack = self.evaluate_and_selection(mutant_cr_g.copy(),
-                                                    population_g[:-1].copy(),
-                                                    population_ph[:-1].copy(),
-                                                    fitness[:-1].copy())
+                                                    population_g.copy(),
+                                                    population_ph.copy(),
+                                                    fitness.copy())
 
                 succeses = stack[3]
-                will_be_replaced_pop = population_g[:-1][succeses].copy()
-                will_be_replaced_fit = fitness[:-1][succeses].copy()
+                will_be_replaced_pop = population_g[succeses].copy()
+                will_be_replaced_fit = fitness[succeses].copy()
                 s_F = F_i[succeses].copy()
                 s_CR = CR_i[succeses].copy()
 
                 external_archive = self.append_archive(
                     external_archive, will_be_replaced_pop)
 
-                population_g[:-1] = stack[0]
-                population_ph[:-1] = stack[1]
-                fitness[:-1] = stack[2]
+                population_g = stack[0]
+                population_ph = stack[1]
+                fitness = stack[2]
 
-                df = np.abs(will_be_replaced_fit - fitness[:-1][succeses])
+                df = np.abs(will_be_replaced_fit - fitness[succeses])
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                if self.elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 argsort = np.argsort(fitness)
                 population_g = population_g[argsort]
                 population_ph = population_ph[argsort]

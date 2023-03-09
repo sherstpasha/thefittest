@@ -89,10 +89,16 @@ class SHAGA(EvolutionaryAlgorithm):
         self.m_set = flip_mutation
         self.c_set = binomial
         self.tour_size = 2
-        self.initial_population = None
+        self.elitism: bool
+        self.initial_population: Optional[np.ndarray]
+        self.set_strategy()
 
-    def set_strategy():
-        pass
+    def set_strategy(self,
+                     elitism_param: bool = True,
+                     initial_population: Optional[np.ndarray] = None):
+        self.elitism = elitism_param
+        self.initial_population = initial_population
+        return self
 
     def generate_init_pop(self):
         if self.initial_population is None:
@@ -136,10 +142,8 @@ class SHAGA(EvolutionaryAlgorithm):
 
     def randc(self, u, scale):
         value = cauchy_distribution(loc=u, scale=scale)[0]
-        while value <= 0 or value > 3/self.str_len:
+        while value <= 0 or value > 5/self.str_len:
             value = cauchy_distribution(loc=u, scale=scale)[0]
-        # if value > 5/self.str_len:
-        #     value = 5/self.str_len
         return value
 
     def randn(self, u, scale):
@@ -188,39 +192,39 @@ class SHAGA(EvolutionaryAlgorithm):
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
-                MR_i, CR_i = self.generate_MR_CR(H_MR, H_CR, self.pop_size - 1)
-                # print(MR_i, CR_i)
+                MR_i, CR_i = self.generate_MR_CR(H_MR, H_CR, self.pop_size )
+
                 partial_operators = partial(self.selection_crossover_mutation,
                                             population_g.copy(), fitness.copy())
 
                 mutant_cr_g = np.array(list(map(partial_operators,
-                                                population_g[:-1].copy(),
+                                                population_g.copy(),
                                                 MR_i.copy(), CR_i.copy())))
 
                 stack = self.evaluate_replace(mutant_cr_g.copy(),
-                                              population_g[:-1].copy(),
-                                              population_ph[:-1].copy(),
-                                              fitness[:-1].copy())
+                                              population_g.copy(),
+                                              population_ph.copy(),
+                                              fitness.copy())
 
                 succeses = stack[3]
-                will_be_replaced_fit = fitness[:-1][succeses].copy()
+                will_be_replaced_fit = fitness[succeses].copy()
                 s_MR = MR_i[succeses].copy()
                 s_CR = CR_i[succeses].copy()
 
-                population_g[:-1] = stack[0]
-                population_ph[:-1] = stack[1]
-                fitness[:-1] = stack[2]
+                population_g = stack[0]
+                population_ph = stack[1]
+                fitness = stack[2]
 
-                df = np.abs(will_be_replaced_fit - fitness[:-1][succeses])
+                df = np.abs(will_be_replaced_fit - fitness[succeses])
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                if self.elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
 
                 if next_k == self.H_size:
                     next_k = 0
 
                 H_MR[next_k] = self.update_u(H_MR[k], s_MR, df)
                 H_CR[next_k] = self.update_u(H_CR[k], s_CR, df)
-                # print(H_CR)
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)

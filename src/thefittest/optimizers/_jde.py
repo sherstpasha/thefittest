@@ -81,25 +81,27 @@ class jDE(DifferentialEvolution):
 
         self.thefittest: TheFittest
         self.stats: StatisticsjDE
-        self.m_function = self.m_pool['rand_1']
-        self.F_left = 0.1
-        self.F_right = 0.9
-        self.t_f = 0.1
-        self.t_cr = 0.1
+        self.F_left: float
+        self.F_right: float
+        self.t_f: float
+        self.t_cr: float
 
     def set_strategy(self,
-                     F_left_param: Optional[float] = None,
-                     F_right_param: Optional[float] = None,
-                     t_f_param: Optional[float] = None,
-                     t_cr_param: Optional[float] = None):
-        if F_left_param is not None:
-            self.F_left = F_left_param
-        if F_right_param is not None:
-            self.F_right = F_right_param
-        if t_f_param is not None:
-            self.t_f = t_cr_param
-        if t_cr_param is not None:
-            self.t_cr = t_f_param
+                     mutation_oper: str = 'rand_1',
+                     F_left_param: float = 0.1,
+                     F_right_param: float = 0.9,
+                     t_f_param: float = 0.1,
+                     t_cr_param: float = 0.1,
+                     elitism_param: bool = True,
+                     initial_population: Optional[np.ndarray] = None):
+        self.update_pool()
+        self.m_function = self.m_pool[mutation_oper]
+        self.F_left = F_left_param
+        self.F_right = F_right_param
+        self.t_f = t_cr_param
+        self.t_cr = t_f_param
+        self.elitism = elitism_param
+        self.initial_population = initial_population
         return self
 
     def mutation_and_crossover(self, popuation_g, individ_g, F_i, CR_i):
@@ -151,8 +153,8 @@ class jDE(DifferentialEvolution):
         population_ph = population_ph[argsort]
         fitness = fitness[argsort]
 
-        F_i = np.full(self.pop_size-1, 0.5)
-        CR_i = np.full(self.pop_size-1, 0.9)
+        F_i = np.full(self.pop_size, 0.5)
+        CR_i = np.full(self.pop_size, 0.9)
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -177,22 +179,23 @@ class jDE(DifferentialEvolution):
                 partial_mut_and_cross = partial(self.mutation_and_crossover,
                                                 population_g)
                 mutant_cr_g = np.array(list(map(partial_mut_and_cross,
-                                                population_g[:-1],
+                                                population_g,
                                                 F_i_new, CR_i_new)))
 
                 stack = self.evaluate_and_selection(mutant_cr_g,
-                                                    population_g[:-1],
-                                                    population_ph[:-1],
-                                                    fitness[:-1])
-                population_g[:-1] = stack[0]
-                population_ph[:-1] = stack[1]
-                fitness[:-1] = stack[2]
+                                                    population_g,
+                                                    population_ph,
+                                                    fitness)
+                population_g = stack[0]
+                population_ph = stack[1]
+                fitness = stack[2]
 
                 succeses = stack[3]
                 F_i[succeses] = F_i_new[succeses]
                 CR_i[succeses] = CR_i_new[succeses]
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                if self.elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 argsort = np.argsort(fitness)
                 population_g = population_g[argsort]
                 population_ph = population_ph[argsort]

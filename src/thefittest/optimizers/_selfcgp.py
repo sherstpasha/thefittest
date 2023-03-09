@@ -86,42 +86,18 @@ class SelfCGP(GeneticProgramming):
         self.set_strategy(select_opers=['proportional',
                                         'rank',
                                         'tournament_3',
-                                        'tour_rank_3',
-                                        'tour_rank_5',
-                                        'tour_rank_7',
-                                        'tour_tour_3',
-                                        'tour_tour_5',
-                                        'tour_tour_7',
                                         'tournament_5',
                                         'tournament_7'
                                         ],
-                          crossover_opers=[
-            'empty',
-            'standart',
-            'one_point',
-            'uniform2',
-            # 'uniform7',
-            # 'uniform_prop2',
-            # 'uniform_prop7',
-            # 'uniform_rank2',
-            # 'uniform_rank7',
-            # 'uniform_tour3',
-            # 'uniform_tour7'
-        ],
-            mutation_opers=[
-            'weak_point',
-            'average_point',
-            'strong_point',
-            'weak_grow',
-            'average_grow',
-            'strong_grow',
-            # 'weak_ephemeral',
-            # 'average_ephemeral',
-            # 'strong_ephemeral',
-            # 'weak_terminal',
-            # 'average_terminal',
-            # 'strong_terminal',
-        ])
+                          crossover_opers=['standart',
+                                           'one_point',
+                                           'uniform_rank7'],
+                          mutation_opers=['weak_point',
+                                          'average_point',
+                                          'strong_point',
+                                          'weak_grow',
+                                          'average_grow',
+                                          'strong_grow',])
         self.stats: StatisticsSelfCGP
         self.s_sets: dict
         self.c_sets: dict
@@ -222,12 +198,9 @@ class SelfCGP(GeneticProgramming):
             self.pop_size, self.uniset, self.init_level)
         population_ph = self.genotype_to_phenotype(population_g)
         fitness = self.evaluate(population_ph)
-       
+
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
-        # print(fitness, 'fitness')
-        # print(fitness_scale, 'fitness_scale')
-        # print(fitness_rank, 'fitness_rank')
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -243,8 +216,6 @@ class SelfCGP(GeneticProgramming):
         for i in range(self.iters-1):
             self.show_progress(i)
             levels = [tree.get_max_level() for tree in population_g]
-            print('levels', np.max(levels), np.mean(levels))
-            print('fitness', np.max(fitness), np.mean(fitness))
             if self.termitation_check(lastbest.no_increase):
                 break
             else:

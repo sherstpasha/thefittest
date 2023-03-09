@@ -86,63 +86,74 @@ class SelfCGA(GeneticAlgorithm):
                                   show_progress_each=show_progress_each,
                                   keep_history=keep_history)
 
-        self.K = 0.5
-        self.threshold = 0.05
-        self.set_strategy(select_opers=['proportional',
-                                        'rank',
-                                        'tournament_3',
-                                        'tournament_5',
-                                        'tournament_7'],
-                          crossover_opers=['empty',
-                                           'one_point',
-                                           'two_point',
-                                           'uniform2',
-                                           'uniform7',
-                                           'uniform_prop2',
-                                           'uniform_prop7',
-                                           'uniform_rank2',
-                                           'uniform_rank7',
-                                           'uniform_tour3',
-                                           'uniform_tour7'],
-                          mutation_opers=['weak',
-                                          'average',
-                                          'strong'])
+        self.thefittest: TheFittest
         self.stats: StaticticSelfCGA
         self.s_sets: dict
         self.c_sets: dict
         self.m_sets: dict
+        self.K: int
+        self.threshold: float
+        self.s_set: dict
+        self.c_set: dict
+        self.m_set: dict
 
-    def set_strategy(self, select_opers: Optional[list[str]] = None,
-                     crossover_opers: Optional[list[str]] = None,
-                     mutation_opers: Optional[list[str]] = None,
-                     tour_size_param: Optional[int] = None,
-                     initial_population: Optional[np.ndarray] = None):
+        self.set_strategy()
 
-        if select_opers is not None:
-            s_sets = {}
-            for operator_name in select_opers:
-                value = self.s_pool[operator_name]
-                s_sets[operator_name] = value
-            self.s_sets = dict(sorted(s_sets.items()))
+    def set_strategy(self,
+                     selection_oper: list[str] = ['proportional',
+                                                  'rank',
+                                                  'tournament_3',
+                                                  'tournament_5',
+                                                  'tournament_7'],
+                     crossover_opers: list[str] = ['empty',
+                                                   'one_point',
+                                                   'two_point',
+                                                   'uniform2',
+                                                   'uniform7',
+                                                   'uniform_prop2',
+                                                   'uniform_prop7',
+                                                   'uniform_rank2',
+                                                   'uniform_rank7',
+                                                   'uniform_tour3',
+                                                   'uniform_tour7'],
+                     mutation_opers: list[str] = ['weak',
+                                                  'average',
+                                                  'strong'],
+                     tour_size_param: int = 2,
+                     initial_population: Optional[np.ndarray] = None,
+                     elitism_param: bool = True,
+                     parents_num_param: int = 7,
+                     mutation_rate_param: float = 0.05,
+                     K_param: int = 2,
+                     threshold_param: float = 0.05):
 
-        if crossover_opers is not None:
-            c_sets = {}
-            for operator_name in crossover_opers:
-                value = self.c_pool[operator_name]
-                c_sets[operator_name] = value
-            self.c_sets = dict(sorted(c_sets.items()))
-
-        if mutation_opers is not None:
-            m_sets = {}
-            for operator_name in mutation_opers:
-                value = self.m_pool[operator_name]
-                m_sets[operator_name] = value
-            self.m_sets = dict(sorted(m_sets.items()))
-
-        if tour_size_param is not None:
-            self.tour_size = tour_size_param
-
+        self.tour_size = tour_size_param
         self.initial_population = initial_population
+        self.elitism = elitism_param
+        self.parents_num = parents_num_param
+        self.mutation_rate = mutation_rate_param
+        self.K = K_param
+        self.threshold = threshold_param
+
+        self.update_pool()
+
+        s_sets = {}
+        for operator_name in selection_oper:
+            value = self.s_pool[operator_name]
+            s_sets[operator_name] = value
+        self.s_sets = dict(sorted(s_sets.items()))
+
+        c_sets = {}
+        for operator_name in crossover_opers:
+            value = self.c_pool[operator_name]
+            c_sets[operator_name] = value
+        self.c_sets = dict(sorted(c_sets.items()))
+
+        m_sets = {}
+        for operator_name in mutation_opers:
+            value = self.m_pool[operator_name]
+            m_sets[operator_name] = value
+        self.m_sets = dict(sorted(m_sets.items()))
 
         return self
 
@@ -164,7 +175,7 @@ class SelfCGA(GeneticAlgorithm):
     def choice_operators(self, proba_dict):
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
-        return np.random.choice(list(operators), self.pop_size - 1, p=proba)
+        return np.random.choice(list(operators), self.pop_size, p=proba)
 
     def update_proba(self, proba, operator):
         proba[operator] += self.K/self.iters
@@ -222,25 +233,26 @@ class SelfCGA(GeneticAlgorithm):
                     self.create_offs, population_g.copy(),
                     fitness_scale.copy(), fitness_rank.copy())
 
-                population_g[:-1] = np.array(list(map(create_offs, s_operators,
-                                                  c_operators, m_operators)))
-                population_ph[:-1] = self.genotype_to_phenotype(
-                    population_g[:-1])
-                fitness[:-1] = self.evaluate(population_ph[:-1])
+                population_g = np.array(list(map(create_offs, s_operators,
+                                                 c_operators, m_operators)))
+                population_ph = self.genotype_to_phenotype(
+                    population_g)
+                fitness = self.evaluate(population_ph)
 
                 s_fittest_oper = self.find_fittest_operator(
-                    s_operators, fitness[:-1])
+                    s_operators, fitness)
                 s_proba = self.update_proba(s_proba, s_fittest_oper)
 
                 c_fittest_oper = self.find_fittest_operator(
-                    c_operators, fitness[:-1])
+                    c_operators, fitness)
                 c_proba = self.update_proba(c_proba, c_fittest_oper)
 
                 m_fittest_oper = self.find_fittest_operator(
-                    m_operators, fitness[:-1])
+                    m_operators, fitness)
                 m_proba = self.update_proba(m_proba, m_fittest_oper)
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                if self.elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
 

@@ -82,12 +82,15 @@ class JADE(DifferentialEvolution):
         self.c = 0.1
         self.p = 0.05
 
-    def set_strategy(self, c_param: Optional[float] = None,
-                     p_param: Optional[float] = None):
-        if c_param is not None:
-            self.c = c_param
-        if p_param is not None:
-            self.p = p_param
+    def set_strategy(self, c_param: float = 0.1,
+                     p_param: float = 0.05,
+                     elitism_param: bool = True,
+                     initial_population: Optional[np.ndarray] = None):
+        self.update_pool()
+        self.c = c_param
+        self.p = p_param
+        self.elitism = elitism_param
+        self.initial_population = initial_population
         return self
 
     def current_to_pbest_1_archive(self, current, population, F_value, pop_archive):
@@ -132,7 +135,7 @@ class JADE(DifferentialEvolution):
         return individ_g
 
     def generate_F(self, u_F):
-        F_i = cauchy_distribution(loc=u_F, scale=0.1, size=self.pop_size-1)
+        F_i = cauchy_distribution(loc=u_F, scale=0.1, size=self.pop_size)
         mask = F_i <= 0
         while np.any(mask):
             F_i[mask] = cauchy_distribution(
@@ -142,7 +145,7 @@ class JADE(DifferentialEvolution):
         return F_i
 
     def generate_CR(self, u_CR):
-        CR_i = np.random.normal(u_CR, 0.1, self.pop_size-1)
+        CR_i = np.random.normal(u_CR, 0.1, self.pop_size)
         CR_i[CR_i >= 1] = 1
         CR_i[CR_i <= 0] = 0
         return CR_i
@@ -201,27 +204,28 @@ class JADE(DifferentialEvolution):
                 partial_mut_and_cross = partial(self.mutation_and_crossover,
                                                 population_g.copy(), pop_archive.copy())
                 mutant_cr_g = np.array(list(map(partial_mut_and_cross,
-                                                population_g[:-1].copy(),
+                                                population_g.copy(),
                                                 F_i.copy(), CR_i.copy())))
 
                 stack = self.evaluate_and_selection(mutant_cr_g.copy(),
-                                                    population_g[:-1].copy(),
-                                                    population_ph[:-1].copy(),
-                                                    fitness[:-1].copy())
+                                                    population_g.copy(),
+                                                    population_ph.copy(),
+                                                    fitness.copy())
 
                 succeses = stack[3]
-                will_be_replaced = population_g[:-1][succeses].copy()
+                will_be_replaced = population_g[succeses].copy()
                 s_F = F_i[succeses].copy()
                 s_CR = CR_i[succeses].copy()
 
                 external_archive = self.append_archive(
                     external_archive, will_be_replaced)
 
-                population_g[:-1] = stack[0]
-                population_ph[:-1] = stack[1]
-                fitness[:-1] = stack[2]
+                population_g = stack[0]
+                population_ph = stack[1]
+                fitness = stack[2]
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                if self.elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 argsort = np.argsort(fitness)
                 population_g = population_g[argsort]
                 population_ph = population_ph[argsort]

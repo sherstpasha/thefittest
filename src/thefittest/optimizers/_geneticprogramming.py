@@ -10,10 +10,6 @@ from ._base import UniversalSet
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
-from ..tools.operators import truncation_selection
-from ..tools.operators import rank_tournament_selection
-from ..tools.operators import tour_tournament_selection
-from ..tools.operators import best_selection
 from ..tools.operators import one_point_crossoverGP
 from ..tools.operators import standart_crossover
 from ..tools.operators import uniform_crossoverGP
@@ -93,16 +89,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
         self.s_pool = {'proportional': (proportional_selection, None),
                        'rank': (rank_selection, None),
-                       'trunc': (truncation_selection, None),
                        'tournament_k': (tournament_selection, self.tour_size),
-                       'best': (best_selection, None),
                        'tournament_3': (tournament_selection, 3),
-                       'tour_rank_3': (rank_tournament_selection, 3),
-                       'tour_rank_5': (rank_tournament_selection, 5),
-                       'tour_rank_7': (rank_tournament_selection, 7),
-                       'tour_tour_3': (tour_tournament_selection, 3),
-                       'tour_tour_5': (tour_tournament_selection, 5),
-                       'tour_tour_7': (tour_tournament_selection, 7),
                        'tournament_5': (tournament_selection, 5),
                        'tournament_7': (tournament_selection, 7)}
 
@@ -116,8 +104,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'uniform_rank2': (uniform_crossoverGP_rank, 2),
                        'uniform_rank7': (uniform_crossoverGP_rank, 7),
                        'uniform_tour3': (uniform_crossoverGP_tour, 3),
-                       'uniform_tour7': (uniform_crossoverGP_tour, 7),
-                       }
+                       'uniform_tour7': (uniform_crossoverGP_tour, 7)}
 
         self.m_pool = {'weak_point': (point_mutation, 0.25),
                        'average_point': (point_mutation, 1),

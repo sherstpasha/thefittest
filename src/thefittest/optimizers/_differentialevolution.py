@@ -76,21 +76,15 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
         self.left = left
         self.right = right
-        self.initial_population = None
-
-        self.m_pool = {'best_1': best_1,
-                       'rand_1': rand_1,
-                       'current_to_best_1': current_to_best_1,
-                       'current_to_pbest_1': current_to_pbest_1,
-                       'rand_to_best1': rand_to_best1,
-                       'best_2': best_2,
-                       'rand_2': rand_2}
-
         self.thefittest: TheFittest
         self.stats: Statistics
-        self.m_function = self.m_pool['current_to_best_1']
-        self.F = 0.5
-        self.CR = 0.5
+        self.initial_population: Optional[np.ndarray]
+        self.m_function: Callable
+        self.F: float
+        self.CR: float
+        self.elitism: bool
+
+        self.set_strategy()
 
     def generate_init_pop(self):
         if self.initial_population is None:
@@ -100,16 +94,28 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             population_g = self.initial_population
         return population_g
 
+    def update_pool(self):
+        self.m_pool = {'best_1': best_1,
+                       'rand_1': rand_1,
+                       'current_to_best_1': current_to_best_1,
+                       'current_to_pbest_1': current_to_pbest_1,
+                       'rand_to_best1': rand_to_best1,
+                       'best_2': best_2,
+                       'rand_2': rand_2}
+
     def set_strategy(self,
-                     mutation_oper: Optional[str] = None,
-                     F_param: Optional[float] = None,
-                     CR_param: Optional[float] = None):
-        if mutation_oper is not None:
-            self.m_function = self.m_pool[mutation_oper]
-        if F_param is not None:
-            self.F = F_param
-        if CR_param is not None:
-            self.CR = CR_param
+                     mutation_oper: str = 'rand_1',
+                     F_param: float = 0.5,
+                     CR_param: float = 0.5,
+                     elitism_param: bool = True,
+                     initial_population: Optional[np.ndarray] = None):
+        
+        self.update_pool()
+        self.m_function = self.m_pool[mutation_oper]
+        self.F = F_param
+        self.CR = CR_param
+        self.elitism = elitism_param
+        self.initial_population = initial_population
         return self
 
     def mutation_and_crossover(self, popuation_g, individ_g, F_i, CR_i):
@@ -165,22 +171,23 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
-                F_i = np.full(self.pop_size-1, self.F)
-                CR_i = np.full(self.pop_size-1, self.CR)
+                F_i = np.full(self.pop_size, self.F)
+                CR_i = np.full(self.pop_size, self.CR)
 
                 partial_mut_and_cross = partial(self.mutation_and_crossover,
                                                 population_g)
                 mutant_cr_g = np.array(list(map(partial_mut_and_cross,
-                                                population_g[:-1],
+                                                population_g,
                                                 F_i, CR_i)))
 
                 stack = self.evaluate_and_selection(mutant_cr_g,
-                                                    population_g[:-1],
-                                                    population_ph[:-1],
-                                                    fitness[:-1])
-                population_g[:-1], population_ph[:-1], fitness[:-1] = stack
+                                                    population_g,
+                                                    population_ph,
+                                                    fitness)
+                population_g, population_ph, fitness = stack
 
-                population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
+                if self.elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 argsort = np.argsort(fitness)
                 population_g = population_g[argsort]
                 population_ph = population_ph[argsort]
