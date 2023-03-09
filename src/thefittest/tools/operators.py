@@ -89,10 +89,8 @@ def current_to_rand_1(current, population, F_value):
 
 # genetic propramming
 def point_mutation(some_tree, uniset,
-                   proba_down, max_level):
+                   proba, max_level):
     to_return = some_tree.copy()
-
-    proba = proba_down/len(to_return)
     if np.random.random() < proba:
         i = np.random.randint(0, len(to_return))
         if type(to_return.nodes[i]) != FunctionalNode:
@@ -106,10 +104,8 @@ def point_mutation(some_tree, uniset,
 
 
 def ephemeral_mutation(some_tree, uniset,
-                       proba_down, max_level):
+                       proba, max_level):
     to_return = some_tree.copy()
-
-    proba = proba_down/len(to_return)
     if np.random.random() < proba:
         indexes = [i for i, nodes in enumerate(to_return.nodes)
                    if type(nodes) == EphemeralConstantNode]
@@ -122,10 +118,8 @@ def ephemeral_mutation(some_tree, uniset,
 
 
 def ephemeral_gauss_mutation(some_tree, uniset,
-                             proba_down, max_level):
+                             proba, max_level):
     to_return = some_tree.copy()
-
-    proba = proba_down/len(to_return)
     if np.random.random() < proba:
         indexes = [i for i, nodes in enumerate(to_return.nodes)
                    if type(nodes) == EphemeralConstantNode]
@@ -146,10 +140,8 @@ def ephemeral_gauss_mutation(some_tree, uniset,
 
 
 def terminal_mutation(some_tree, uniset,
-                      proba_down, max_level):
+                      proba, max_level):
     to_return = some_tree.copy()
-
-    proba = proba_down/len(to_return)
     if np.random.random() < proba:
         indexes = [i for i, nodes in enumerate(to_return.nodes)
                    if type(nodes) == TerminalNode]
@@ -162,9 +154,8 @@ def terminal_mutation(some_tree, uniset,
 
 
 def growing_mutation(some_tree, uniset,
-                     proba_down, max_level):
+                     proba, max_level):
     to_return = some_tree.copy()
-    proba = proba_down/len(to_return)
     if np.random.random() < proba:
         i = np.random.randint(0, len(to_return))
         left, right = to_return.subtree(i)
@@ -176,9 +167,8 @@ def growing_mutation(some_tree, uniset,
 
 
 def swap_mutation(some_tree, uniset,
-                  proba_down, max_level):
+                  proba, max_level):
     to_return = some_tree.copy()
-    proba = proba_down/len(to_return)
     if np.random.random() < proba:
         indexes = [i for i, nodes in enumerate(
             to_return.nodes) if nodes.n_args > 1]
@@ -198,10 +188,9 @@ def swap_mutation(some_tree, uniset,
 
 
 def shrink_mutation(some_tree, uniset,
-                    proba_down, max_level):
+                    proba, max_level):
     to_return = some_tree.copy()
     if len(to_return) > 2:
-        proba = proba_down/len(to_return)
         if np.random.random() < proba:
             indexes = [i for i, nodes in enumerate(to_return.nodes)
                        if nodes.n_args > 0]
