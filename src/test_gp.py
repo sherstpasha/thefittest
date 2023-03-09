@@ -13,7 +13,7 @@ from thefittest.tools.operators import Cos
 from thefittest.tools.operators import Sin
 from thefittest.tools.operators import Neg
 from thefittest.tools.operators import Div
-# from thefittest.tools.operators import Exp
+from thefittest.tools.operators import Exp
 from thefittest.tools.operators import SqrtAbs
 from thefittest.tools.operators import Inv
 from thefittest.tools.operators import Pow2
@@ -21,10 +21,15 @@ from thefittest.tools.operators import Pow2
 # from thefittest.tools.operators import Pow3
 # from thefittest.tools.operators import FloorDiv
 from thefittest.tools.transformations import donothing
-from thefittest.optimizers import SelfCGP
+from thefittest.optimizers import SelfCGP, GeneticProgramming
 from thefittest.tools.transformations import scale_data
 from thefittest.tools.transformations import root_mean_square_error
+from thefittest.tools.transformations import coefficient_determination
 from thefittest.benchmarks.symbolicregression17 import problems_dict
+
+
+min_value = np.finfo(np.float64).min
+max_value = np.finfo(np.float64).max
 
 
 def print_tree(some_tree, ax):
@@ -53,15 +58,15 @@ def generator2():
 
 
 F = 'F1'
-function = problems_dict[F]['function']
-left = problems_dict[F]['bounds'][0]
-right = problems_dict[F]['bounds'][1]
-# function = problem
-# left = -4.75
-# right = 4.75
+# function = problems_dict[F]['function']
+# left = problems_dict[F]['bounds'][0]
+# right = problems_dict[F]['bounds'][1]
+function = problem
+left = -4.75
+right = 4.75
 size = 300
-n_vars = problems_dict[F]['n_vars']
-# n_vars = 1
+# n_vars = problems_dict[F]['n_vars']
+n_vars = 1
 X = np.array([np.linspace(left, right, size) for _ in range(n_vars)]).T
 
 
@@ -69,18 +74,15 @@ y = function(X)
 
 functional_set = [FunctionalNode(Add()),
                   FunctionalNode(Mul()),
-                  FunctionalNode(Div()),
-                  FunctionalNode(Sub()),
+                #   FunctionalNode(Div()),
+                #   FunctionalNode(Sub()),
                   FunctionalNode(Pow2()),
-                #   FunctionalNode(Pow()),
-                #   FunctionalNode(Inv()),
-                #   FunctionalNode(Neg()),
-                #   FunctionalNode(SqrtAbs()),
+                  FunctionalNode(Inv()),  
+                  FunctionalNode(Neg()),
                 #   FunctionalNode(Exp()),
-                #   FunctionalNode(LogAbs()),
-                  FunctionalNode(Cos()),
-                  FunctionalNode(Sin()),
-                #   FunctionalNode(Abs())
+                #   FunctionalNode(SqrtAbs()),
+                #   FunctionalNode(Cos()),
+                #   FunctionalNode(Sin()),
                   ]
 
 
@@ -95,19 +97,26 @@ def fitness_function(trees):
     fitness = []
     for tree in trees:
         y_pred = tree.compile()*np.ones(len(y))
-        fitness.append(root_mean_square_error(y, y_pred))
-    return 1/(1 + np.array(fitness))
+        # fitness.append(root_mean_square_error(y, y_pred))
+        fitness.append(coefficient_determination(y, y_pred))
+
+    # return 1/(1 + np.array(fitness))
+    fitness = np.array(fitness)
+    return np.clip(fitness, -1e10, 1)
 
 
 model = SelfCGP(fitness_function=fitness_function,
                 genotype_to_phenotype=donothing,
                 uniset=uniset,
-                pop_size=1000, iters=100,
-                show_progress_each=10,
+                pop_size=1000, iters=300,
+                show_progress_each=1,
                 minimization=False,
                 no_increase_num=300,
                 keep_history='quick')
-model.max_level = 16
+
+model.set_strategy(elitism_param=True)
+
+
 model.fit()
 
 fittest = model.thefittest.phenotype
@@ -115,6 +124,7 @@ fittest = model.thefittest.phenotype
 stats = model.stats
 print(fittest)
 y_pred = fittest.compile()
+y_pred = np.ones_like(y)*y_pred
 
 fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=3)
 
