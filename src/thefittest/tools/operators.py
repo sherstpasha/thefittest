@@ -91,8 +91,10 @@ def current_to_rand_1(current, population, F_value):
 def point_mutation(some_tree, uniset,
                    proba, max_level):
     to_return = some_tree.copy()
-    if np.random.random() < proba:
-        i = np.random.randint(0, len(to_return))
+    if random.random() < proba:
+    # if np.random.random() < proba:
+        i = random.randrange(len(to_return))
+        # i = np.random.randint(0, len(to_return))
         if type(to_return.nodes[i]) != FunctionalNode:
             new_node = uniset.random_terminal_or_ephemeral()
         else:
@@ -156,8 +158,10 @@ def terminal_mutation(some_tree, uniset,
 def growing_mutation(some_tree, uniset,
                      proba, max_level):
     to_return = some_tree.copy()
-    if np.random.random() < proba:
-        i = np.random.randint(0, len(to_return))
+    if random.random() < proba:
+    # if np.random.random() < proba:
+        # i = np.random.randint(0, len(to_return))
+        i = random.randrange(len(to_return))
         left, right = to_return.subtree(i)
         max_level_i = max_level - to_return.levels[left:right][0]
         new_tree = growing_method(uniset, max_level_i)
@@ -282,13 +286,17 @@ def binomial(individ, mutant, CR):
     return individ
 
 
+# genetic propramming
 def standart_crossover(individs, fitness, rank, max_level):
     individ_1 = individs[0].copy()
     individ_2 = individs[1].copy()
-    first_point = np.random.randint(0,  len(individ_1))
-    second_point = np.random.randint(0,  len(individ_2))
+    first_point = random.randrange(len(individ_1))
+    second_point = random.randrange(len(individ_2))
+    # first_point = np.random.randint(0,  len(individ_1))
+    # second_point = np.random.randint(0,  len(individ_2))
 
-    if np.random.random() < 0.5:
+    if random.random() < 0.5:
+        # if np.random.random() < 0.5:
         first_subtree = individ_1.subtree(first_point, return_class=True)
         offspring = individ_2.concat(second_point, first_subtree)
         if offspring.get_max_level() > max_level:
@@ -301,22 +309,24 @@ def standart_crossover(individs, fitness, rank, max_level):
     return offspring
 
 
-# genetic propramming
 def one_point_crossoverGP(individs, fitness, rank, max_level):
     individ_1 = individs[0]
     individ_2 = individs[1]
     common_indexes, _ = common_region([individ_1, individ_2])
 
-    point = np.random.randint(0,  len(common_indexes[0]))
+    # point = np.random.randint(0,  len(common_indexes[0]))
+    point = random.randrange(len(common_indexes[0]))
     first_point = common_indexes[0][point]
     second_point = common_indexes[1][point]
-    if np.random.random() < 0.5:
+    if random.random() < 0.5:
+    # if np.random.random() < 0.5:
         first_subtree = individ_1.subtree(first_point, return_class=True)
         offspring = individ_2.concat(second_point, first_subtree)
     else:
         second_subtree = individ_2.subtree(second_point, return_class=True)
         offspring = individ_1.concat(first_point, second_subtree)
     return offspring
+
 
 def uniform_crossoverGPc(individs, fitness, rank, max_level):
     '''Poli, Riccardo & Langdon, W.. (2001). On the Search
@@ -457,7 +467,8 @@ def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
     to_return = Tree([])
     common, border = common_region(individs)
     for i, common_0_i in enumerate(common[0]):
-        j = np.random.choice(range_, 1, p=probability)[0]
+        j = random.choices(range_, weights=probability)[0]
+        # j = np.random.choice(range_, 1, p=probability)[0]
         id_ = common[j][i]
         to_return.nodes.append(individs[j].nodes[id_])
         if common_0_i in border[0]:
@@ -574,24 +585,31 @@ def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
 def proportional_selection(fitness, ranks,
                            tour_size, quantity):
     probability = fitness/fitness.sum()
-    choosen = np.random.choice(range(len(fitness)),
-                               size=quantity, p=probability)
+    # choosen = np.random.choice(range(len(fitness)),
+    #                            size=quantity, p=probability)
+    choosen = random.choices(range(len(fitness)),
+                                k=quantity, weights=probability)
     return choosen
 
 
 def rank_selection(fitness, ranks,
                    tour_size, quantity):
     probability = ranks/np.sum(ranks)
-    choosen = np.random.choice(range(len(fitness)),
-                               size=quantity, p=probability)
+    # choosen = np.random.choice(range(len(fitness)),
+    #                            size=quantity, p=probability)
+    choosen = random.choices(range(len(fitness)),
+                                k=quantity, weights=probability)
     return choosen
 
 
 def tournament_selection(fitness, ranks,
                          tour_size, quantity):
-    tournament = np.random.choice(
-        range(len(fitness)), tour_size*quantity)
-    tournament = tournament.reshape(-1, tour_size)
+    # tournament = np.random.choice(
+    #     range(len(fitness)), tour_size*quantity)
+    tournament = random.choices(range(len(fitness)),
+                                k=tour_size*quantity)
+    tournament = np.array(tournament).reshape(-1, tour_size)
+    # tournament = tournament.reshape(-1, tour_size)
     max_fit_id = np.argmax(fitness[tournament], axis=1)
     choosen = np.diag(tournament[:, max_fit_id])
     return choosen
@@ -630,8 +648,7 @@ class Add(Operator):
         self.sign = '+'
 
     def __call__(self, x, y):
-        return np.clip(x + y, min_value, max_value)
-
+        return x + y
 
 class Sub(Operator):
     def __init__(self):
@@ -640,7 +657,7 @@ class Sub(Operator):
         self.sign = '-'
 
     def __call__(self, x, y):
-        return np.clip(x - y, min_value, max_value)
+        return x - y
 
 
 class Neg(Operator):
@@ -650,7 +667,8 @@ class Neg(Operator):
         self.sign = '-'
 
     def __call__(self, x):
-        return np.clip(-x, min_value, max_value)
+        return -x
+
 
 
 class Mul(Operator):
@@ -660,26 +678,7 @@ class Mul(Operator):
         self.sign = '*'
 
     def __call__(self, x, y):
-        return np.clip(x * y, min_value, max_value)
-
-
-class Pow(Operator):
-    def __init__(self):
-        self.formula = '({}**{})'
-        self.__name__ = 'pow'
-        self.sign = '**'
-
-    def __call__(self, x, y):
-        if type(x) == np.ndarray:
-            res = np.power(x, y, out=np.ones_like(
-                x, dtype=np.float64), where=x > 0)
-        else:
-            if x < 0:
-                res = 0
-            else:
-                res = x**y
-
-        return np.clip(res, min_value, max_value)
+        return x * y
 
 
 class Pow2(Operator):
@@ -754,6 +753,8 @@ class Inv(Operator):
             else:
                 res = 1/y
         return np.clip(res, min_value, max_value)
+        # return res
+
 
 
 class LogAbs(Operator):
