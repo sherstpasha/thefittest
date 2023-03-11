@@ -1,9 +1,5 @@
 import numpy as np
-from typing import Optional
-from typing import Callable
-from typing import Any
 from ._geneticprogramming import GeneticProgramming
-from ._geneticprogramming import UniversalSet
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 from functools import partial
@@ -23,8 +19,8 @@ class StatisticsSelfCGP:
         self.m_proba = dict()
 
     def update(self,
-               fittest_i: np.ndarray,
-               fitness_i: np.ndarray,
+               fittest_i,
+               fitness_i,
                s_proba_i, c_proba_i, m_proba_i):
         if self.mode == 'quick':
             self.fitness = np.append(self.fitness, np.max(fitness_i))
@@ -59,17 +55,17 @@ class SelfCGP(GeneticProgramming):
     with modified uniform crossover. 1-6. 10.1109/CEC.2012.6256587. '''
 
     def __init__(self,
-                 fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
-                 genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
-                 uniset: UniversalSet,
-                 iters: int,
-                 pop_size: int,
-                 optimal_value: Optional[float] = None,
-                 termination_error_value: float = 0,
-                 no_increase_num: Optional[int] = None,
-                 minimization: bool = False,
-                 show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+                 fitness_function,
+                 genotype_to_phenotype,
+                 uniset,
+                 iters,
+                 pop_size,
+                 optimal_value = None,
+                 termination_error_value = 0,
+                 no_increase_num = None,
+                 minimization = False,
+                 show_progress_each = None,
+                 keep_history = False):
         super().__init__(fitness_function,
                          genotype_to_phenotype,
                          uniset, iters,
@@ -94,28 +90,28 @@ class SelfCGP(GeneticProgramming):
 
         self.set_strategy()
 
-    def set_strategy(self, select_opers: list[str] = ['proportional',
+    def set_strategy(self, select_opers = ['proportional',
                                                       'rank',
                                                       'tournament_3',
                                                       'tournament_5'],
-                     crossover_opers: list[str] = ['standart',
+                     crossover_opers = ['standart',
                                                    'one_point',
                                                    'uniform_rank7'],
-                     mutation_opers: list[str] = ['weak_point',
+                     mutation_opers = ['weak_point',
                                                   'average_point',
                                                   'strong_point',
                                                   'weak_grow',
                                                   'average_grow',
                                                   'strong_grow'],
-                     tour_size_param: int = 2,
-                     initial_population: Optional[np.ndarray] = None,
-                     elitism_param: bool = True,
-                     parents_num_param: int = 7,
-                     mutation_rate_param: float = 0.05,
-                     K_param: int = 2,
-                     threshold_param: float = 0.05,
-                     max_level: int = 16,
-                     init_level: int = 5):
+                     tour_size_param = 2,
+                     initial_population = None,
+                     elitism_param = True,
+                     parents_num_param = 7,
+                     mutation_rate_param = 0.05,
+                     K_param = 2,
+                     threshold_param = 0.05,
+                     max_level = 16,
+                     init_level = 5):
         self.tour_size = tour_size_param
         self.initial_population = initial_population
         self.elitism = elitism_param

@@ -1,7 +1,5 @@
 import numpy as np
-from typing import Optional
 from typing import Callable
-from typing import Any
 from ._base import TheFittest
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
@@ -31,8 +29,8 @@ class Statistics:
         return result
 
     def update(self,
-               population_g_i: np.ndarray,
-               fitness_i: np.ndarray):
+               population_g_i,
+               fitness_i):
         if self.mode == 'quick':
             self.fitness = np.append(self.fitness, np.max(fitness_i))
         elif self.mode == 'full':
@@ -49,18 +47,18 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
     Adaptive Scheme for Global Optimization Over Continuous Spaces. Journal of Global Optimization. 23'''
 
     def __init__(self,
-                 fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
-                 genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
-                 iters: int,
-                 pop_size: int,
-                 left: np.ndarray[float],
-                 right: np.ndarray[float],
-                 optimal_value: Optional[float] = None,
-                 termination_error_value: float = 0.,
-                 no_increase_num: Optional[int] = None,
-                 minimization: bool = False,
-                 show_progress_each: Optional[int] = None,
-                 keep_history: Optional[str] = None):
+                 fitness_function,
+                 genotype_to_phenotype,
+                 iters,
+                 pop_size,
+                 left,
+                 right,
+                 optimal_value = None,
+                 termination_error_value = 0.,
+                 no_increase_num = None,
+                 minimization = False,
+                 show_progress_each = None,
+                 keep_history = None):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -78,7 +76,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         self.right = right
         self.thefittest: TheFittest
         self.stats: Statistics
-        self.initial_population: Optional[np.ndarray]
+        self.initial_population: np.ndarray
         self.m_function: Callable
         self.F: float
         self.CR: float
@@ -104,11 +102,11 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                        'rand_2': rand_2}
 
     def set_strategy(self,
-                     mutation_oper: str = 'rand_1',
-                     F_param: float = 0.5,
-                     CR_param: float = 0.5,
-                     elitism_param: bool = True,
-                     initial_population: Optional[np.ndarray] = None):
+                     mutation_oper = 'rand_1',
+                     F_param = 0.5,
+                     CR_param = 0.5,
+                     elitism_param = True,
+                     initial_population = None):
         
         self.update_pool()
         self.m_function = self.m_pool[mutation_oper]

@@ -17,15 +17,15 @@ def cauchy_distribution(loc=0, scale=1, size=1):
     return loc + scale*x_
 
 
-def binary_string_population(pop_size: int, str_len: int) -> np.ndarray[np.byte]:
+def binary_string_population(pop_size, str_len):
     return np.random.randint(low=2,
                              size=(pop_size, str_len),
                              dtype=np.byte)
 
 
-def float_population(pop_size: int,
-                     left: np.ndarray[float],
-                     right: np.ndarray[float]) -> np.ndarray[float]:
+def float_population(pop_size,
+                     left,
+                     right):
     return np.array([np.random.uniform(left_i, right_i, pop_size)
                      for left_i, right_i in zip(left, right)]).T
 

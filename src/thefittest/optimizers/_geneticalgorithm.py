@@ -1,8 +1,5 @@
 import numpy as np
 from functools import partial
-from typing import Optional
-from typing import Callable
-from typing import Any
 from ._base import TheFittest
 from ._base import LastBest
 from ._base import EvolutionaryAlgorithm
@@ -36,8 +33,8 @@ class Statistics:
         return result
 
     def update(self,
-               population_g_i: np.ndarray,
-               fitness_i: np.ndarray):
+               population_g_i,
+               fitness_i):
         if self.mode == 'quick':
             self.fitness = np.append(self.fitness, np.max(fitness_i))
         elif self.mode == 'full':
@@ -51,17 +48,17 @@ class Statistics:
 
 class GeneticAlgorithm(EvolutionaryAlgorithm):
     def __init__(self,
-                 fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
-                 genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
-                 iters: int,
-                 pop_size: int,
-                 str_len: int,
-                 optimal_value: Optional[float] = None,
-                 termination_error_value: float = 0.,
-                 no_increase_num: Optional[int] = None,
-                 minimization: bool = False,
-                 show_progress_each: Optional[int] = None,
-                 keep_history: Optional[str] = None):
+                 fitness_function,
+                 genotype_to_phenotype,
+                 iters,
+                 pop_size,
+                 str_len,
+                 optimal_value = None,
+                 termination_error_value = 0.,
+                 no_increase_num = None,
+                 minimization = False,
+                 show_progress_each = None,
+                 keep_history = None):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -81,7 +78,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         self.s_pool: dict
         self.c_pool: dict
         self.m_pool: dict
-        self.initial_population: Optional[np.ndarray]
+        self.initial_population: np.ndarray
         self.tour_size: int
         self.elitism: bool
         self.parents_num: int
@@ -130,14 +127,14 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                        'custom_rate': (flip_mutation, self.mutation_rate)}
 
     def set_strategy(self,
-                     selection_oper: str = 'tournament_k',
-                     crossover_oper: str = 'uniform2',
-                     mutation_oper: str = 'weak',
-                     tour_size_param: int = 2,
-                     initial_population: Optional[np.ndarray] = None,
-                     elitism_param: bool = True,
-                     parents_num_param: int = 7,
-                     mutation_rate_param: float = 0.05):
+                     selection_oper = 'tournament_k',
+                     crossover_oper = 'uniform2',
+                     mutation_oper = 'weak',
+                     tour_size_param = 2,
+                     initial_population = None,
+                     elitism_param = True,
+                     parents_num_param = 7,
+                     mutation_rate_param = 0.05):
 
         self.tour_size = tour_size_param
         self.initial_population = initial_population

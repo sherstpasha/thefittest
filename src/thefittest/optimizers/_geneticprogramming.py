@@ -1,12 +1,9 @@
 import numpy as np
 import numpy as np
-from typing import Optional
-from typing import Callable
 from typing import Any
 from ._base import TheFittest
 from ._base import EvolutionaryAlgorithm
 from ._base import LastBest
-from ._base import UniversalSet
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
@@ -38,8 +35,8 @@ class StatisticsGP:
         self.fitness = np.array([])
 
     def update(self,
-               fittest_i: np.ndarray,
-               fitness_i: np.ndarray):
+               fittest_i,
+               fitness_i):
         if self.mode == 'quick':
             self.fitness = np.append(self.fitness, np.max(fitness_i))
         elif self.mode == 'full':
@@ -55,17 +52,17 @@ class GeneticProgramming(EvolutionaryAlgorithm):
     of natural selection.” Complex Adaptive Systems (1993)'''
 
     def __init__(self,
-                 fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
-                 genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
-                 uniset: UniversalSet,
-                 iters: int,
-                 pop_size: int,
-                 optimal_value: Optional[float] = None,
-                 termination_error_value: float = 0.,
-                 no_increase_num: Optional[int] = None,
-                 minimization: bool = False,
-                 show_progress_each: Optional[int] = None,
-                 keep_history: Optional[str] = None):
+                 fitness_function,
+                 genotype_to_phenotype,
+                 uniset,
+                 iters,
+                 pop_size,
+                 optimal_value = None,
+                 termination_error_value = 0.,
+                 no_increase_num = None,
+                 minimization = False,
+                 show_progress_each = None,
+                 keep_history = None):
 
         EvolutionaryAlgorithm.__init__(
             self,
@@ -89,7 +86,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         self.tour_size: int
         self.max_level: int
         self.init_level: int
-        self.initial_population: Optional[np.ndarray]
+        self.initial_population: np.ndarray
         self.s_set: tuple
         self.c_set: tuple
         self.m_set: tuple
@@ -151,16 +148,16 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'custom_rate_shrink': (shrink_mutation, self.mutation_rate, True)}
 
     def set_strategy(self,
-                     selection_oper: str = 'rank',
-                     crossover_oper: str = 'standart',
-                     mutation_oper: str = 'weak_grow',
-                     tour_size_param: int = 2,
-                     initial_population: Optional[np.ndarray] = None,
-                     max_level: int = 16,
-                     init_level: int = 5,
-                     elitism_param: bool = True,
-                     parents_num_param: int = 7,
-                     mutation_rate_param: float = 0.05):
+                     selection_oper = 'rank',
+                     crossover_oper = 'standart',
+                     mutation_oper = 'weak_grow',
+                     tour_size_param = 2,
+                     initial_population = None,
+                     max_level = 16,
+                     init_level = 5,
+                     elitism_param = True,
+                     parents_num_param = 7,
+                     mutation_rate_param = 0.05):
         self.tour_size = tour_size_param
         self.initial_population = initial_population
         self.max_level = max_level

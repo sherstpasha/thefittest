@@ -1,8 +1,5 @@
 import numpy as np
 from functools import partial
-from typing import Optional
-from typing import Callable
-from typing import Any
 from ._base import TheFittest
 from ._base import LastBest
 from ._geneticalgorithm import GeneticAlgorithm
@@ -27,8 +24,8 @@ class StaticticSelfCGA:
                             arr_from.copy().reshape(shape_from)])
         return result
 
-    def update(self, population_g_i: np.ndarray,
-               fitness_i: np.ndarray,
+    def update(self, population_g_i,
+               fitness_i,
                s_proba_i, c_proba_i, m_proba_i):
 
         if self.mode == 'quick':
@@ -62,17 +59,17 @@ class StaticticSelfCGA:
 
 class SelfCGA(GeneticAlgorithm):
     def __init__(self,
-                 fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
-                 genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
-                 iters: int,
-                 pop_size: int,
-                 str_len: int,
-                 optimal_value: Optional[float] = None,
-                 termination_error_value: float = 0.,
-                 no_increase_num: Optional[int] = None,
-                 minimization: bool = False,
-                 show_progress_each: Optional[int] = None,
-                 keep_history: Optional[str] = None):
+                 fitness_function,
+                 genotype_to_phenotype,
+                 iters,
+                 pop_size,
+                 str_len,
+                 optimal_value = None,
+                 termination_error_value = 0.,
+                 no_increase_num = None,
+                 minimization = False,
+                 show_progress_each = None,
+                 keep_history = None):
         GeneticAlgorithm.__init__(self,
                                   fitness_function=fitness_function,
                                   genotype_to_phenotype=genotype_to_phenotype,
@@ -100,12 +97,12 @@ class SelfCGA(GeneticAlgorithm):
         self.set_strategy()
 
     def set_strategy(self,
-                     selection_oper: list[str] = ['proportional',
+                     selection_oper = ['proportional',
                                                   'rank',
                                                   'tournament_3',
                                                   'tournament_5',
                                                   'tournament_7'],
-                     crossover_opers: list[str] = ['empty',
+                     crossover_opers = ['empty',
                                                    'one_point',
                                                    'two_point',
                                                    'uniform2',
@@ -116,16 +113,16 @@ class SelfCGA(GeneticAlgorithm):
                                                    'uniform_rank7',
                                                    'uniform_tour3',
                                                    'uniform_tour7'],
-                     mutation_opers: list[str] = ['weak',
+                     mutation_opers = ['weak',
                                                   'average',
                                                   'strong'],
-                     tour_size_param: int = 2,
-                     initial_population: Optional[np.ndarray] = None,
-                     elitism_param: bool = True,
-                     parents_num_param: int = 7,
-                     mutation_rate_param: float = 0.05,
-                     K_param: int = 2,
-                     threshold_param: float = 0.05):
+                     tour_size_param = 2,
+                     initial_population = None,
+                     elitism_param = True,
+                     parents_num_param = 7,
+                     mutation_rate_param = 0.05,
+                     K_param = 2,
+                     threshold_param = 0.05):
 
         self.tour_size = tour_size_param
         self.initial_population = initial_population

@@ -54,7 +54,7 @@ def donothing(x):
     return x
 
 
-def numpy_group_by(group: np.ndarray, by: np.ndarray):
+def numpy_group_by(group, by):
 
     argsort = np.argsort(by)
     group = group[argsort]
@@ -65,13 +65,13 @@ def numpy_group_by(group: np.ndarray, by: np.ndarray):
     return keys, groups
 
 
-def lehmer_mean(x: np.ndarray, power=2) -> np.ndarray:
+def lehmer_mean(x, power=2):
     x_up = np.power(x, power)
     x_down = np.power(x, power-1)
     return np.sum(x_up)/np.sum(x_down)
 
 
-def rank_data(arr: np.ndarray) -> np.ndarray:
+def rank_data(arr):
     arr = arr.copy()
     raw_ranks = np.zeros(shape=(arr.shape[0]))
     argsort = np.argsort(arr)
@@ -82,7 +82,7 @@ def rank_data(arr: np.ndarray) -> np.ndarray:
     return ranks
 
 
-def protect_norm(x: np.ndarray) -> np.ndarray:
+def protect_norm(x):
     sum_ = x.sum()
     if sum_ > 0:
         return x/sum_
@@ -91,7 +91,7 @@ def protect_norm(x: np.ndarray) -> np.ndarray:
         return np.full(len_, 1/len_)
 
 
-def scale_data(arr: np.ndarray) -> np.ndarray:
+def scale_data(arr):
     arr = arr.copy()
     max_ = arr.max()
     min_ = arr.min()
@@ -139,7 +139,7 @@ def numpy_bit_to_gray(bit_array):
 
 class SamplingGrid:
 
-    def __init__(self, fit_by: str = 'h') -> None:
+    def __init__(self, fit_by = 'h') -> None:
         self.fit_by = fit_by
         self.left: np.ndarray
         self.right: np.ndarray
@@ -147,20 +147,18 @@ class SamplingGrid:
         self.h: np.ndarray
         self.power_arange: np.ndarray
 
-    def culc_h_from_parts(self, left: np.ndarray, right: np.ndarray,
-                          parts: np.ndarray) -> np.ndarray:
+    def culc_h_from_parts(self, left, right, parts):
         return (right - left)/(2.0**parts - 1)
 
-    def culc_parts_from_h(self, left: np.ndarray, right: np.ndarray,
-                          h: np.ndarray) -> np.ndarray:
+    def culc_parts_from_h(self, left, right, h):
         return np.ceil(np.log2((right - left)/h + 1)).astype(int)
 
     def decode(self, bit_array_i):
         int_convert = numpy_bit_to_int(bit_array_i, self.power_arange)
         return int_convert
 
-    def fit(self, left: np.ndarray, right: np.ndarray,
-            arg: np.ndarray):
+    def fit(self, left, right,
+            arg):
         self.left = left
         self.right = right
 
@@ -177,7 +175,7 @@ class SamplingGrid:
         self.power_arange = 2**np.arange(self.parts.max(), dtype=np.int64)
         return self
 
-    def transform(self, population: np.ndarray) -> np.ndarray:
+    def transform(self, population):
         splits = np.add.accumulate(self.parts)
         p_parts = np.split(population, splits[:-1], axis=1)
 
@@ -192,7 +190,7 @@ class SamplingGrid:
         int_array = np.rint(grid_number)
         return numpy_int_to_bit(int_array)
 
-    def inverse_transform(self, population: np.ndarray) -> np.ndarray:
+    def inverse_transform(self, population):
         map_ = map(self.float_to_bit, population.T, self.left, self.h)
         return np.hstack(list(map_))
 

@@ -1,6 +1,4 @@
 import numpy as np
-from typing import Optional
-from typing import Callable
 from typing import Any
 import random
 from inspect import signature
@@ -26,7 +24,7 @@ class TheFittest:
         self.phenotype: Any
         self.fitness = -np.inf
 
-    def update(self, population_g: np.ndarray, population_ph: np.ndarray, fitness: np.ndarray[float]):
+    def update(self, population_g, population_ph, fitness):
         temp_best_id = np.argmax(fitness)
         temp_best_fitness = fitness[temp_best_id].copy()
         if temp_best_fitness > self.fitness:
@@ -42,16 +40,16 @@ class TheFittest:
 
 class EvolutionaryAlgorithm:
     def __init__(self,
-                 fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
-                 genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
-                 iters: int,
-                 pop_size: int,
-                 optimal_value: Optional[float] = None,
-                 termination_error_value: float = 0.,
-                 no_increase_num: Optional[int] = None,
-                 minimization: bool = False,
-                 show_progress_each: Optional[int] = None,
-                 keep_history: Optional[str] = None):
+                 fitness_function,
+                 genotype_to_phenotype,
+                 iters,
+                 pop_size,
+                 optimal_value = None,
+                 termination_error_value = 0.,
+                 no_increase_num = None,
+                 minimization = False,
+                 show_progress_each = None,
+                 keep_history = None):
         self.fitness_function = fitness_function
         self.genotype_to_phenotype = genotype_to_phenotype
         self.iters = iters
@@ -69,15 +67,15 @@ class EvolutionaryAlgorithm:
 
         self.calls = 0
 
-    def evaluate(self, population_ph: np.ndarray[Any]):
+    def evaluate(self, population_ph):
         self.calls += len(population_ph)
         return self.sign*self.fitness_function(population_ph)
 
-    def show_progress(self, i: int):
+    def show_progress(self, i):
         if (self.show_progress_each is not None) and (i % self.show_progress_each == 0):
             print(f'{i} iteration with fitness = {self.thefittest.fitness}')
 
-    def termitation_check(self, no_increase: int):
+    def termitation_check(self, no_increase):
         return (self.thefittest.fitness >= self.aim) or (no_increase == self.no_increase_num)
 
     def get_remains_calls(self):
@@ -114,7 +112,7 @@ class Tree:
                     return False
         return True
 
-    def subtree(self, index: int, return_class=False):
+    def subtree(self, index, return_class=False):
         n_index = index + 1
         possible_steps = self.nodes[index].n_args
         while possible_steps:
@@ -270,7 +268,7 @@ class Node:
 
 
 class FunctionalNode(Node):
-    def __init__(self, value: Callable, sign: Optional[str] = None):
+    def __init__(self, value, sign = None):
         Node.__init__(self,
                       value=value,
                       name=value.__name__,
@@ -279,7 +277,7 @@ class FunctionalNode(Node):
 
 
 class TerminalNode(Node):
-    def __init__(self, value, name: str):
+    def __init__(self, value, name):
         Node.__init__(self,
                       value=value,
                       name=name,
@@ -288,7 +286,7 @@ class TerminalNode(Node):
 
 
 class EphemeralNode():
-    def __init__(self, value: Callable):
+    def __init__(self, value):
         self.value = value
 
     def __call__(self):
@@ -296,7 +294,7 @@ class EphemeralNode():
 
 
 class EphemeralConstantNode(Node):
-    def __init__(self, generator: Callable):
+    def __init__(self, generator):
         value = generator()
         Node.__init__(self,
                       value=value,
@@ -311,7 +309,7 @@ ephemeral_set = (EphemeralNode, ..., EphemeralNode)'''
 
 
 class UniversalSet:
-    def __init__(self, functional_set: list, terminal_set: list, ephemeral_set: list = []):
+    def __init__(self, functional_set, terminal_set, ephemeral_set = []):
         self.functional_set = {'any': functional_set}
         for unit in functional_set:
             n_args = unit.n_args

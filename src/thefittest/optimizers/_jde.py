@@ -1,7 +1,4 @@
 import numpy as np
-from typing import Optional
-from typing import Callable
-from typing import Any
 from ._base import TheFittest
 from ._base import LastBest
 from functools import partial
@@ -52,18 +49,18 @@ class jDE(DifferentialEvolution):
     Benchmark Problems. Evolutionary Computation, IEEE Transactions on. 10. 646 - 657. 10.1109/TEVC.2006.872133. '''
 
     def __init__(self,
-                 fitness_function: Callable[[np.ndarray[Any]], np.ndarray[float]],
-                 genotype_to_phenotype: Callable[[np.ndarray[Any]], np.ndarray[Any]],
-                 iters: int,
-                 pop_size: int,
-                 left: np.ndarray[float],
-                 right: np.ndarray[float],
-                 optimal_value: Optional[float] = None,
-                 termination_error_value: float = 0.,
-                 no_increase_num: Optional[int] = None,
-                 minimization: bool = False,
-                 show_progress_each: Optional[int] = None,
-                 keep_history: Optional[str] = None):
+                 fitness_function,
+                 genotype_to_phenotype,
+                 iters,
+                 pop_size,
+                 left,
+                 right,
+                 optimal_value = None,
+                 termination_error_value = 0.,
+                 no_increase_num = None,
+                 minimization = False,
+                 show_progress_each = None,
+                 keep_history = None):
         DifferentialEvolution.__init__(
             self,
             fitness_function=fitness_function,
@@ -87,13 +84,13 @@ class jDE(DifferentialEvolution):
         self.t_cr: float
 
     def set_strategy(self,
-                     mutation_oper: str = 'rand_1',
-                     F_left_param: float = 0.1,
-                     F_right_param: float = 0.9,
-                     t_f_param: float = 0.1,
-                     t_cr_param: float = 0.1,
-                     elitism_param: bool = True,
-                     initial_population: Optional[np.ndarray] = None):
+                     mutation_oper = 'rand_1',
+                     F_left_param = 0.1,
+                     F_right_param = 0.9,
+                     t_f_param = 0.1,
+                     t_cr_param = 0.1,
+                     elitism_param = True,
+                     initial_population = None):
         self.update_pool()
         self.m_function = self.m_pool[mutation_oper]
         self.F_left = F_left_param
