@@ -122,7 +122,6 @@ class Tree:
             n_index += 1
         if return_class:
             new_tree = Tree(self.nodes[index:n_index].copy())
-            new_tree.levels = new_tree.get_levels() #лишние циклы и так везде пересчитвается вообще функцию переписать удобнее
             return new_tree
         return index, n_index
 
