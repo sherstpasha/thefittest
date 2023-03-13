@@ -72,14 +72,19 @@ def lehmer_mean(x, power=2):
 
 
 def rank_data(arr):
-    arr = arr.copy()
-    raw_ranks = np.zeros(shape=(arr.shape[0]))
-    argsort = np.argsort(arr)
+    arange =  np.arange(len(arr), dtype=int)
 
-    s = (arr[:, np.newaxis] == arr).astype(int)
-    raw_ranks[argsort] = np.arange(arr.shape[0]) + 1
-    ranks = np.sum(raw_ranks*s, axis=1)/s.sum(axis=0)
-    return ranks
+    argsort = np.argsort(arr)
+    arr_sorted = arr.copy()[argsort]
+
+    cond = np.r_[True, arr_sorted[1:] != arr_sorted[:-1]]
+    raw_ranks = np.r_[arange[cond == True], len(arange)]
+    ranks  = (raw_ranks[1:] + raw_ranks[:-1] + 1)/2
+    count = raw_ranks[1:] - raw_ranks[:-1]
+
+    retults = np.empty_like(arr, dtype = float)
+    retults[argsort] = ranks.repeat(count)
+    return retults
 
 
 def protect_norm(x):

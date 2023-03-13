@@ -25,27 +25,29 @@ def flip_mutation(individ, proba):
 # differential evolution
 def best_1(current, population, F_value):
     best = population[-1]
-    r1, r2 = np.random.choice(range(len(population)), size=2, replace=False)
+    r1, r2 = np.random.choice(
+        np.arange(len(population)), size=2, replace=False)
     return best + F_value*(population[r1] - population[r2])
 
 
 def rand_1(current, population, F_value):
     r1, r2, r3 = np.random.choice(
-        range(len(population)), size=3, replace=False)
+        np.arange(len(population)), size=3, replace=False)
     return population[r3] + F_value*(population[r1] - population[r2])
 
 
 def rand_to_best1(current, population, F_value):
     best = population[-1]
     r1, r2, r3 = np.random.choice(
-        range(len(population)), size=3, replace=False)
+        np.arange(len(population)), size=3, replace=False)
     return population[r1] + F_value*(
         best - population[r1]) + F_value*(population[r2] - population[r3])
 
 
 def current_to_best_1(current, population, F_value):
     best = population[-1]
-    r1, r2 = np.random.choice(range(len(population)), size=2, replace=False)
+    r1, r2 = np.random.choice(
+        np.arange(len(population)), size=2, replace=False)
     return current + F_value*(best - current) +\
         F_value*(population[r1] - population[r2])
 
@@ -60,7 +62,7 @@ def best_2(current, population, F_value):
 
 def rand_2(current, population, F_value):
     r1, r2, r3, r4, r5 = np.random.choice(
-        range(len(population)), size=5, replace=False)
+        np.arange(len(population)), size=5, replace=False)
     return population[r5] + F_value*(population[r1] - population[r2]) +\
         F_value*(population[r3] - population[r4])
 
@@ -75,14 +77,15 @@ def current_to_pbest_1(current, population, F_value):
 
     best = pbest[p_best_ind]
 
-    r1, r2 = np.random.choice(range(len(population)), size=2, replace=False)
+    r1, r2 = np.random.choice(
+        np.arange(len(population)), size=2, replace=False)
     return current + F_value*(best - current) +\
         F_value*(population[r1] - population[r2])
 
 
 def current_to_rand_1(current, population, F_value):
     r1, r2, r3 = np.random.choice(
-        range(len(population)), size=3, replace=False)
+        np.arange(len(population)), size=3, replace=False)
     return population[r1] + F_value*(population[r3] - current) +\
         F_value*(population[r1] - population[r2])
 
@@ -211,70 +214,64 @@ def empty_crossover(individs, *args):
 
 
 def one_point_crossover(individs, fitness, rank):
-    cross_point = np.random.randint(0, len(individs[0]))
+    cross_point = random.randrange(len(individs[0]))
+    slice_ = slice(0, cross_point)
+
     if random.random() > 0.5:
         offspring = individs[0].copy()
-        offspring[:cross_point] = individs[1][:cross_point].copy()
+        offspring[slice_] = individs[1][slice_].copy()
     else:
         offspring = individs[1].copy()
-        offspring[:cross_point] = individs[0][:cross_point].copy()
+        offspring[slice_] = individs[0][slice_].copy()
     return offspring
 
 
 def two_point_crossover(individs, fitness, rank):
-    c_point_1, c_point_2 = np.sort(np.random.choice(range(len(individs[0])),
-                                                    size=2,
-                                                    replace=False))
+    c_points = sorted(random.sample(range(len(individs[0])), k=2))
+    slice_ = slice(c_points[0], c_points[1])
+
     if random.random() > 0.5:
         offspring = individs[0].copy()
-        offspring[c_point_1:c_point_2] = \
-            individs[1][c_point_1:c_point_2].copy()
+        offspring[slice_] = individs[1][slice_].copy()
     else:
         offspring = individs[1].copy()
-        offspring[c_point_1:c_point_2] = \
-            individs[0][c_point_1:c_point_2].copy()
-
+        offspring[slice_] = individs[0][slice_].copy()
     return offspring
 
 
 def uniform_crossover(individs, fitness, rank):
-    choosen = np.random.choice(range(len(individs)),
-                               size=len(individs[0]))
-    diag = range(len(individs[0]))
-    return individs[choosen, diag]
+    choosen = np.random.choice(np.arange(len(individs)), size=len(individs[0]))
+    return individs[choosen, np.arange(len(individs[0]))]
 
 
 def uniform_prop_crossover(individs, fitness, rank):
     probability = protect_norm(fitness)
-    choosen = np.random.choice(range(len(individs)),
-                               size=len(individs[0]), p=probability)
-
-    diag = range(len(individs[0]))
-    return individs[choosen, diag]
+    choosen = np.random.choice(np.arange(len(individs)),
+                               size=len(individs[0]),
+                               p=probability)
+    return individs[choosen, np.arange(len(individs[0]))]
 
 
 def uniform_rank_crossover(individs, fitness, rank):
     probability = protect_norm(rank)
-    choosen = np.random.choice(range(len(individs)),
-                               size=len(individs[0]), p=probability)
-
-    diag = range(len(individs[0]))
-    return individs[choosen, diag]
+    choosen = np.random.choice(np.arange(len(individs)),
+                               size=len(individs[0]),
+                               p=probability)
+    return individs[choosen, np.arange(len(individs[0]))]
 
 
 def uniform_tour_crossover(individs, fitness, rank):
-    tournament = np.random.choice(range(len(individs)), 2*len(individs[0]))
+    tournament = np.random.choice(np.arange(len(individs)), 2*len(individs[0]))
     tournament = tournament.reshape(-1, 2)
 
     choosen = np.argmin(fitness[tournament], axis=1)
-    diag = range(len(individs[0]))
-    return individs[choosen, diag]
+    return individs[choosen, np.arange(len(individs[0]))]
 
 
 # differential evolution
 def binomial(individ, mutant, CR):
     individ = individ.copy()
-    j = np.random.choice(range(len(individ)), size=1)[0]
+    j = np.random.choice(np.arange(len(individ)), size=1)[0]
     mask_random = np.random.random(len(individ)) <= CR
     mask_j = np.arange(len(individ)) == j
     mask_union = mask_random | mask_j
@@ -572,30 +569,25 @@ def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
 
 ################################## SELECTIONS ##################################
 # genetic algorithm
-def proportional_selection(fitness, ranks,
-                           tour_size, quantity):
-    probability = fitness/fitness.sum()
-    choosen = random.choices(range(len(fitness)),
-                                k=quantity, weights=probability)
+def proportional_selection(proba_fitness, proba_rank, tour_size, quantity):
+    choosen = np.random.choice(np.arange(len(proba_fitness)),
+                               size=quantity, p=proba_fitness)
     return choosen
 
 
-def rank_selection(fitness, ranks,
-                   tour_size, quantity):
-    probability = ranks/np.sum(ranks)
-    choosen = random.choices(range(len(fitness)),
-                                k=quantity, weights=probability)
+def rank_selection(proba_fitness, proba_rank, tour_size, quantity):
+    choosen = np.random.choice(np.arange(len(proba_rank)),
+                               size=quantity, p=proba_rank)
     return choosen
 
 
 def tournament_selection(fitness, ranks,
                          tour_size, quantity):
-    tournament = random.choices(range(len(fitness)),
-                                k=tour_size*quantity)
-    tournament = np.array(tournament).reshape(-1, tour_size)
+    tournament = np.random.randint(len(fitness),
+                                   size=tour_size*quantity)
+    tournament = tournament.reshape(-1, tour_size)
     max_fit_id = np.argmax(fitness[tournament], axis=1)
-    choosen = np.diag(tournament[:, max_fit_id])
-    return choosen
+    return tournament[np.arange(quantity), max_fit_id]
 
 
 ##################################### MATH #####################################
@@ -633,6 +625,7 @@ class Add(Operator):
     def __call__(self, x, y):
         return x + y
 
+
 class Sub(Operator):
     def __init__(self):
         self.formula = '({} - {})'
@@ -651,7 +644,6 @@ class Neg(Operator):
 
     def __call__(self, x):
         return -x
-
 
 
 class Mul(Operator):
@@ -737,7 +729,6 @@ class Inv(Operator):
                 res = 1/y
         return np.clip(res, min_value, max_value)
         # return res
-
 
 
 class LogAbs(Operator):

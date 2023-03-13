@@ -6,6 +6,7 @@ from ._geneticalgorithm import GeneticAlgorithm
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 from ..tools.transformations import numpy_group_by
+from ..tools.transformations import protect_norm
 
 
 class StaticticSelfCGA:
@@ -64,12 +65,12 @@ class SelfCGA(GeneticAlgorithm):
                  iters,
                  pop_size,
                  str_len,
-                 optimal_value = None,
-                 termination_error_value = 0.,
-                 no_increase_num = None,
-                 minimization = False,
-                 show_progress_each = None,
-                 keep_history = None):
+                 optimal_value=None,
+                 termination_error_value=0.,
+                 no_increase_num=None,
+                 minimization=False,
+                 show_progress_each=None,
+                 keep_history=None):
         GeneticAlgorithm.__init__(self,
                                   fitness_function=fitness_function,
                                   genotype_to_phenotype=genotype_to_phenotype,
@@ -97,32 +98,33 @@ class SelfCGA(GeneticAlgorithm):
         self.set_strategy()
 
     def set_strategy(self,
-                     selection_oper = ['proportional',
-                                                  'rank',
-                                                  'tournament_3',
-                                                  'tournament_5',
-                                                  'tournament_7'],
-                     crossover_opers = ['empty',
-                                                   'one_point',
-                                                   'two_point',
-                                                   'uniform2',
-                                                   'uniform7',
-                                                   'uniform_prop2',
-                                                   'uniform_prop7',
-                                                   'uniform_rank2',
-                                                   'uniform_rank7',
-                                                   'uniform_tour3',
-                                                   'uniform_tour7'],
-                     mutation_opers = ['weak',
-                                                  'average',
-                                                  'strong'],
-                     tour_size_param = 2,
-                     initial_population = None,
-                     elitism_param = True,
-                     parents_num_param = 7,
-                     mutation_rate_param = 0.05,
-                     K_param = 2,
-                     threshold_param = 0.05):
+                     selection_oper=['proportional',
+                                     'rank',
+                                     'tournament_3',
+                                     'tournament_5',
+                                     'tournament_7'],
+                     crossover_opers=['empty',
+                                      'one_point',
+                                      'two_point',
+                                      'uniform2',
+                                      'uniform7',
+                                      'uniform_prop2',
+                                      'uniform_prop7',
+                                      'uniform_rank2',
+                                      'uniform_rank7',
+                                      'uniform_tour3',
+                                      'uniform_tour7'
+                                      ],
+                     mutation_opers=['weak',
+                                     'average',
+                                     'strong'],
+                     tour_size_param=2,
+                     initial_population=None,
+                     elitism_param=True,
+                     parents_num_param=7,
+                     mutation_rate_param=0.05,
+                     K_param=2,
+                     threshold_param=0.05):
 
         self.tour_size = tour_size_param
         self.initial_population = initial_population
@@ -203,6 +205,8 @@ class SelfCGA(GeneticAlgorithm):
         fitness = self.evaluate(population_ph)
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
+        proba_scale = protect_norm(fitness_scale)
+        proba_rank = protect_norm(fitness_rank)
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -226,9 +230,8 @@ class SelfCGA(GeneticAlgorithm):
                 c_operators = self.choice_operators(c_proba)
                 m_operators = self.choice_operators(m_proba)
 
-                create_offs = partial(
-                    self.create_offs, population_g.copy(),
-                    fitness_scale.copy(), fitness_rank.copy())
+                create_offs = partial(self.create_offs, population_g,
+                                      proba_scale, proba_rank)
 
                 population_g = np.array(list(map(create_offs, s_operators,
                                                  c_operators, m_operators)))
@@ -239,6 +242,8 @@ class SelfCGA(GeneticAlgorithm):
                     population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
+                proba_scale = protect_norm(fitness_scale)
+                proba_rank = protect_norm(fitness_rank)
 
                 s_fittest_oper = self.find_fittest_operator(
                     s_operators, fitness_scale)
