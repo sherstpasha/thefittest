@@ -55,7 +55,7 @@ def current_to_best_1(current, population, F_value):
 def best_2(current, population, F_value):
     best = population[-1]
     r1, r2, r3, r4 = np.random.choice(
-        range(len(population)), size=4, replace=False)
+        np.arange(len(population)), size=4, replace=False)
     return best + F_value*(population[r1] - population[r2]) +\
         F_value*(population[r3] - population[r4])
 
@@ -115,28 +115,6 @@ def ephemeral_mutation(some_tree, uniset,
         if len(indexes) > 0:
             i = random.choice(indexes)
             new_node = uniset.random_ephemeral()
-            to_return.nodes[i] = new_node
-
-    return to_return
-
-
-def ephemeral_gauss_mutation(some_tree, uniset,
-                             proba, max_level):
-    to_return = some_tree.copy()
-    if random.random() < proba:
-        indexes = [i for i, nodes in enumerate(to_return.nodes)
-                   if type(nodes) == EphemeralConstantNode]
-        if len(indexes) > 0:
-            i = random.choice(indexes)
-            value = to_return.nodes[i].value
-            gauss = np.random.normal(1, 0.015)
-            new_node = uniset.random_ephemeral()
-            new_value = value*gauss
-
-            new_node.value = new_value
-            new_node.name = str(new_value)
-            new_node.sign = str(new_value)
-
             to_return.nodes[i] = new_node
 
     return to_return
@@ -271,7 +249,7 @@ def uniform_tour_crossover(individs, fitness, rank):
 # differential evolution
 def binomial(individ, mutant, CR):
     individ = individ.copy()
-    j = np.random.choice(np.arange(len(individ)), size=1)[0]
+    j = random.randrange(len(individ))
     mask_random = np.random.random(len(individ)) <= CR
     mask_j = np.arange(len(individ)) == j
     mask_union = mask_random | mask_j
