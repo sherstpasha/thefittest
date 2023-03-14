@@ -4,6 +4,7 @@ import numpy as np
 def root_mean_square_error(y_true, y_predict):
     return np.sqrt(np.mean((y_true - y_predict)**2))
 
+
 def coefficient_determination(y_true, y_predict):
     mean = np.mean(y_true)
     residual_sum = np.sum((y_true - y_predict)**2)
@@ -23,7 +24,7 @@ def common_region(trees):
 
     while not terminate:
         inner_break = False
-        iters = np.min(list(map(len, indexes)))
+        iters = min(list(map(len, indexes)))
 
         for i in range(iters):
             first_n_args = trees[0].nodes[indexes[0][i]].n_args
@@ -50,6 +51,9 @@ def common_region(trees):
     return common_indexes, border_indexes
 
 
+
+
+
 def donothing(x):
     return x
 
@@ -72,17 +76,17 @@ def lehmer_mean(x, power=2):
 
 
 def rank_data(arr):
-    arange =  np.arange(len(arr), dtype=int)
+    arange = np.arange(len(arr), dtype=int)
 
     argsort = np.argsort(arr)
     arr_sorted = arr.copy()[argsort]
 
     cond = np.r_[True, arr_sorted[1:] != arr_sorted[:-1]]
     raw_ranks = np.r_[arange[cond == True], len(arange)]
-    ranks  = (raw_ranks[1:] + raw_ranks[:-1] + 1)/2
+    ranks = (raw_ranks[1:] + raw_ranks[:-1] + 1)/2
     count = raw_ranks[1:] - raw_ranks[:-1]
 
-    retults = np.empty_like(arr, dtype = float)
+    retults = np.empty_like(arr, dtype=float)
     retults[argsort] = ranks.repeat(count)
     return retults
 
@@ -144,7 +148,7 @@ def numpy_bit_to_gray(bit_array):
 
 class SamplingGrid:
 
-    def __init__(self, fit_by = 'h') -> None:
+    def __init__(self, fit_by='h') -> None:
         self.fit_by = fit_by
         self.left: np.ndarray
         self.right: np.ndarray

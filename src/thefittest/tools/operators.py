@@ -106,34 +106,6 @@ def point_mutation(some_tree, uniset,
     return to_return
 
 
-def ephemeral_mutation(some_tree, uniset,
-                       proba, max_level):
-    to_return = some_tree.copy()
-    if random.random() < proba:
-        indexes = [i for i, nodes in enumerate(to_return.nodes)
-                   if type(nodes) == EphemeralConstantNode]
-        if len(indexes) > 0:
-            i = random.choice(indexes)
-            new_node = uniset.random_ephemeral()
-            to_return.nodes[i] = new_node
-
-    return to_return
-
-
-def terminal_mutation(some_tree, uniset,
-                      proba, max_level):
-    to_return = some_tree.copy()
-    if random.random() < proba:
-        indexes = [i for i, nodes in enumerate(to_return.nodes)
-                   if type(nodes) == TerminalNode]
-        if len(indexes) > 0:
-            i = random.choice(indexes)
-            new_node = uniset.random_terminal()
-            to_return.nodes[i] = new_node
-
-    return to_return
-
-
 def growing_mutation(some_tree, uniset,
                      proba, max_level):
     to_return = some_tree.copy()
@@ -645,16 +617,6 @@ class Pow2(Operator):
         return np.clip(res, min_value, max_value)
 
 
-# class Pow3(Operator):
-#     def __init__(self):
-#         self.formula = '({}**3)'
-#         self.__name__ = 'pow3'
-#         self.sign = '**3'
-
-#     def __call__(self, x):
-#         res = x**3
-#         return np.clip(res, min_value, max_value)
-
 class Div(Operator):
     def __init__(self):
         self.formula = '({}/{})'
@@ -671,23 +633,6 @@ class Div(Operator):
             else:
                 res = x/y
         return np.clip(res, min_value, max_value)
-
-# class FloorDiv(Operator):
-#     def __init__(self):
-#         self.formula = '({}//{})'
-#         self.__name__ = 'floor_div'
-#         self.sign = '//'
-
-#     def __call__(self, x, y):
-#         if type(y) == np.ndarray:
-#             res = np.floor_divide(x, y, out=np.ones_like(
-#                 y, dtype=np.float64), where=y != 0)
-#         else:
-#             if y == 0:
-#                 res = 0
-#             else:
-#                 res = x//y
-#         return np.clip(res, min_value, max_value)`
 
 
 class Inv(Operator):
@@ -758,11 +703,11 @@ class SqrtAbs(Operator):
         return np.clip(np.sqrt(np.abs(x)), min_value, max_value)
 
 
-# class Abs(Operator):
-#     def __init__(self):
-#             self.formula = 'abs({})'
-#             self.__name__ = 'abs()'
-#             self.sign = 'abs()'
+class Abs(Operator):
+    def __init__(self):
+        self.formula = 'abs({})'
+        self.__name__ = 'abs()'
+        self.sign = 'abs()'
 
-#     def __call__(self, x):
-#         return np.clip(np.abs(x), min_value, max_value)
+    def __call__(self, x):
+        return np.abs(x)

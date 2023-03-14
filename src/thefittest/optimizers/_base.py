@@ -44,12 +44,12 @@ class EvolutionaryAlgorithm:
                  genotype_to_phenotype,
                  iters,
                  pop_size,
-                 optimal_value = None,
-                 termination_error_value = 0.,
-                 no_increase_num = None,
-                 minimization = False,
-                 show_progress_each = None,
-                 keep_history = None):
+                 optimal_value=None,
+                 termination_error_value=0.,
+                 no_increase_num=None,
+                 minimization=False,
+                 show_progress_each=None,
+                 keep_history=None):
         self.fitness_function = fitness_function
         self.genotype_to_phenotype = genotype_to_phenotype
         self.iters = iters
@@ -167,7 +167,7 @@ class Tree:
         return tree_copy
 
     def get_max_level(self):
-        return np.max(self.levels)
+        return max(self.levels)
 
     def get_levels(self, origin=0):
         d_i = origin-1
@@ -268,7 +268,7 @@ class Node:
 
 
 class FunctionalNode(Node):
-    def __init__(self, value, sign = None):
+    def __init__(self, value, sign=None):
         Node.__init__(self,
                       value=value,
                       name=value.__name__,
@@ -309,7 +309,7 @@ ephemeral_set = (EphemeralNode, ..., EphemeralNode)'''
 
 
 class UniversalSet:
-    def __init__(self, functional_set, terminal_set, ephemeral_set = []):
+    def __init__(self, functional_set, terminal_set, ephemeral_set=[]):
         self.functional_set = {'any': functional_set}
         for unit in functional_set:
             n_args = unit.n_args
@@ -324,7 +324,7 @@ class UniversalSet:
     def random_terminal(self):
         choosen = random.choice(self.terminal_set)
         return choosen
-    
+
     def random_ephemeral(self):
         choosen = random.choice(self.ephemeral_set)
         return EphemeralConstantNode(choosen)

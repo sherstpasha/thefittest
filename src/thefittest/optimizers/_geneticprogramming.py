@@ -16,9 +16,6 @@ from ..tools.operators import uniform_crossoverGP_rank
 from ..tools.operators import uniform_crossoverGP_tour
 from ..tools.operators import empty_crossover
 from ..tools.operators import point_mutation
-from ..tools.operators import ephemeral_mutation
-from ..tools.operators import ephemeral_gauss_mutation
-from ..tools.operators import terminal_mutation
 from ..tools.operators import growing_mutation
 from ..tools.operators import swap_mutation
 from ..tools.operators import shrink_mutation
@@ -122,18 +119,6 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'average_point': (point_mutation, 1, False),
                        'strong_point': (point_mutation, 4, False),
                        'custom_rate_point': (point_mutation, self.mutation_rate, True),
-                       'weak_ephemeral': (ephemeral_mutation, 0.25, False),
-                       'average_ephemeral': (ephemeral_mutation, 1, False),
-                       'strong_ephemeral': (ephemeral_mutation, 4, False),
-                       'custom_rate_ephemeral': (ephemeral_mutation, self.mutation_rate, True),
-                       'weak_gauss': (ephemeral_gauss_mutation, 0.25, False),
-                       'average_gauss': (ephemeral_gauss_mutation, 1, False),
-                       'strong_gauss': (ephemeral_gauss_mutation, 4, False),
-                       'custom_rate_gauss': (ephemeral_gauss_mutation, self.mutation_rate, True),
-                       'weak_terminal': (terminal_mutation, 0.25, False),
-                       'average_terminal': (terminal_mutation, 1, False),
-                       'strong_terminal': (terminal_mutation, 4, False),
-                       'custom_rate_terminal': (terminal_mutation, self.mutation_rate, True),
                        'weak_grow': (growing_mutation, 0.25, False),
                        'average_grow': (growing_mutation, 1, False),
                        'strong_grow': (growing_mutation, 4, False),
