@@ -650,9 +650,7 @@ class Inv(Operator):
                 res = 1
             else:
                 res = 1/y
-        return np.clip(res, min_value, max_value)
-        # return res
-
+        return res
 
 class LogAbs(Operator):
     def __init__(self):
@@ -670,7 +668,7 @@ class LogAbs(Operator):
                 res = 1
             else:
                 res = np.log(y_)
-        return np.clip(res, min_value, max_value)
+        return res
 
 
 class Exp(Operator):
@@ -680,17 +678,8 @@ class Exp(Operator):
         self.sign = 'exp'
 
     def __call__(self, x):
-        return np.clip(np.exp(x), min_value, max_value)
-
-
-class Mul3(Operator):
-    def __init__(self):
-        self.formula = '({} * {} * {})'
-        self.__name__ = 'mul3'
-        self.sign = '*'
-
-    def __call__(self, x, y, z):
-        return np.clip(x * y * z, min_value, max_value)
+        to_return = np.exp(x)
+        return np.clip(to_return, min_value, max_value)
 
 
 class SqrtAbs(Operator):
@@ -700,7 +689,7 @@ class SqrtAbs(Operator):
         self.sign = 'sqrt(abs)'
 
     def __call__(self, x):
-        return np.clip(np.sqrt(np.abs(x)), min_value, max_value)
+        return np.sqrt(np.abs(x))
 
 
 class Abs(Operator):

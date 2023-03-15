@@ -33,6 +33,7 @@ def float_population(pop_size,
 def full_growing_method(uniset, level_max):
     nodes = []
     levels = []
+    n_args = []
     possible_steps = [1]
     previous_levels = [-1]
     level_i = -1
@@ -46,14 +47,16 @@ def full_growing_method(uniset, level_max):
         levels.append(level_i)
         if level_i == level_max:
             nodes.append(uniset.random_terminal_or_ephemeral())
+            n_args.append(0)
         else:
             nodes.append(uniset.random_functional())
             n_i = nodes[-1].n_args
-
+            n_args.append(n_i)
             possible_steps.append(n_i)
             previous_levels.append(level_i)
     to_return = Tree(nodes)
     to_return.levels = levels
+    to_return.n_args = np.array(n_args, dtype = np.int32)
     return to_return
 
 
@@ -61,6 +64,7 @@ def growing_method(uniset, level_max):
 
     nodes = []
     levels = []
+    n_args = []
     possible_steps = [1]
     previous_levels = [-1]
     level_i = -1
@@ -75,9 +79,11 @@ def growing_method(uniset, level_max):
 
         if level_i == level_max:
             nodes.append(uniset.random_terminal_or_ephemeral())
+            n_args.append(0)
         elif level_i == 0:
             nodes.append(uniset.random_functional())
             n_i = nodes[-1].n_args
+            n_args.append(n_i)
             possible_steps.append(n_i)
             previous_levels.append(level_i)
         else:
@@ -86,12 +92,14 @@ def growing_method(uniset, level_max):
             else:
                 nodes.append(uniset.random_functional())
             n_i = nodes[-1].n_args
+            n_args.append(n_i)
 
             if n_i > 0:
                 possible_steps.append(n_i)
                 previous_levels.append(level_i)
     to_return = Tree(nodes)
     to_return.levels = levels
+    to_return.n_args = np.array(n_args, dtype = np.int32)
     return to_return
 
 

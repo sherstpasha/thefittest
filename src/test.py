@@ -11,9 +11,10 @@ from thefittest.tools.operators import Mul
 from thefittest.tools.operators import Div
 from thefittest.tools.operators import Cos
 from thefittest.tools.operators import Sin
-
+from thefittest.tools.transformations import protect_norm
 from thefittest.tools.generators import growing_method, full_growing_method
 from thefittest.tools.transformations import common_region
+from thefittest.tools.transformations import common_region1
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -21,33 +22,11 @@ import time
 import random
 from line_profiler import LineProfiler
 from functools import partial
-
-def sattolo_shuffle(items):
-    i = len(items)
-    while i > 1:
-        i = i - 1
-        j = random.randrange(i)
-        items[j], items[i] = items[i], items[j]
-    return
-
-def print_tree(some_tree, file_name):
-    graph = some_tree.get_graph(True)
-    g = nx.Graph()
-    g.add_nodes_from(graph['nodes'])
-    g.add_edges_from(graph['edges'])
-
-    nx.draw_networkx_nodes(g, graph['pos'], node_color=graph['colors'],
-                           edgecolors='black', linewidths=0.5)
-    nx.draw_networkx_edges(g, graph['pos'])
-    nx.draw_networkx_labels(g, graph['pos'], graph['labels'], font_size=10)
-    
-    plt.savefig(file_name)
-    plt.close()
+from thefittest.tools.numba_funcs import find_end_subtree_from_i
 
 
 def generator():
     return np.round(np.random.uniform(0, 3), 4)
-
 
 functional_set = [FunctionalNode(Add()),
                   FunctionalNode(Sub()),
@@ -63,60 +42,141 @@ constant_set = [EphemeralNode(generator)]
 
 uniset = UniversalSet(functional_set, terminal_set, constant_set)
 
+def subtree(self, index, return_class=False):
+    n_index = index + 1
+    possible_steps = self.nodes[index].n_args
+    while possible_steps:
+        possible_steps += self.nodes[n_index].n_args - 1
+        n_index += 1
+    if return_class:
+        new_tree = Tree(self.nodes[index:n_index].copy())
+        return new_tree
+    return index, n_index
 
-def one_point_crossoverGP(individs, fitness, rank, max_level):
-    individ_1 = individs[0]
-    individ_2 = individs[1]
-    common_indexes, _ = common_region([individ_1, individ_2])
+def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
+    range_ = range(len(individs))
+    probability = protect_norm(rank)
+    to_return = Tree([])
+    common, border = common_region(individs)
+    for i, common_0_i in enumerate(common[0]):
+        j = random.choices(range_, weights=probability)[0]
+        id_ = common[j][i]
+        to_return.nodes.append(individs[j].nodes[id_])
+        if common_0_i in border[0]:
+            left_subtrees = []
+            right_subtrees = []
+            left_fitness = []
+            right_fitness = []
 
-    point = random.randrange(len(common_indexes[0]))
-    first_point = common_indexes[0][point]
-    second_point = common_indexes[1][point]
-    if random.random() < 0.5:
-        first_subtree = individ_1.subtree(first_point, return_class=True)
-        offspring = individ_2.concat(second_point, first_subtree)
-    else:
-        second_subtree = individ_2.subtree(second_point, return_class=True)
-        offspring = individ_1.concat(first_point, second_subtree)
-    return offspring
+            for k, tree_k in enumerate(individs):
+                inner_id = common[k][i]
+                args_id = tree_k.get_args_id(inner_id)
+                n_args = tree_k.nodes[inner_id].n_args
+                if n_args == 1:
+                    subtree = tree_k.subtree(args_id[0], return_class=True)
+                    left_subtrees.append(subtree)
+                    right_subtrees.append(subtree)
+                    left_fitness.append(rank[k])
+                    right_fitness.append(rank[k])
+                elif n_args == 2:
+                    subtree_l = tree_k.subtree(args_id[0], return_class=True)
+                    subtree_r = tree_k.subtree(args_id[1], return_class=True)
+                    left_subtrees.append(subtree_l)
+                    right_subtrees.append(subtree_r)
+                    left_fitness.append(rank[k])
+                    right_fitness.append(rank[k])
 
-def one_point_crossoverGP2(individs, fitness, rank, max_level):
-    individ_1 = individs[0]
-    individ_2 = individs[1]
-    common_indexes, _ = common_region([individ_1, individ_2])
+            n_args = individs[j].nodes[id_].n_args
+            if n_args == 1:
+                fitness_i = np.array(left_fitness + right_fitness)
+                proba = protect_norm(fitness_i)
+                choosen = random.choices(
+                    left_subtrees + right_subtrees, weights=proba, k=1)[0]
+                to_return.nodes.extend(choosen.nodes)
+            elif n_args == 2:
+                fitness_l = np.array(left_fitness)
+                fitness_r = np.array(right_fitness)
+                proba_l = protect_norm(fitness_l)
+                proba_r = protect_norm(fitness_r)
 
-    point = random.randrange(len(common_indexes[0]))
-    first_point = common_indexes[0][point]
-    second_point = common_indexes[1][point]
-    if random.random() < 0.5:
-        first_subtree = individ_1.subtree(first_point, return_class=True)
-        offspring = individ_2.concat2(second_point, first_subtree)
-    else:
-        second_subtree = individ_2.subtree(second_point, return_class=True)
-        offspring = individ_1.concat2(first_point, second_subtree)
-    return offspring
+                choosen_l = random.choices(
+                    left_subtrees, weights=proba_l, k=1)[0]
+                to_return.nodes.extend(choosen_l.nodes)
+
+                choosen_r = random.choices(
+                    right_subtrees, weights=proba_r, k=1)[0]
+                to_return.nodes.extend(choosen_r.nodes)
+
+    to_return = to_return.copy()
+    to_return.levels = to_return.get_levels()
+    return to_return
+
+def uniform_crossoverGP_rank2(individs, fitness, rank, max_level):
+    range_ = range(len(individs))
+    probability = protect_norm(rank)
+    to_return = Tree([])
+    common, border = common_region(individs)
+    for i, common_0_i in enumerate(common[0]):
+        j = random.choices(range_, weights=probability)[0]
+        id_ = common[j][i]
+        to_return.nodes.append(individs[j].nodes[id_])
+        if common_0_i in border[0]:
+            left_subtrees = []
+            right_subtrees = []
+            left_fitness = []
+            right_fitness = []
+
+            for k, tree_k in enumerate(individs):
+                inner_id = common[k][i]
+                args_id = np.array(tree_k.get_args_id(inner_id), np.int32)
+                n_args = tree_k.nodes[inner_id].n_args
+                if n_args == 1:
+                    n_index = find_end_subtree_from_i(args_id[0], tree_k.n_args)
+                    subtree = Tree(tree_k.nodes[args_id[0]:n_index].copy())
+    
+                    left_subtrees.append(subtree)
+                    right_subtrees.append(subtree)
+                    left_fitness.append(rank[k])
+                    right_fitness.append(rank[k])
+                elif n_args == 2:
+                    n_index = find_end_subtree_from_i(args_id[0], tree_k.n_args)
+                    subtree_l = Tree(tree_k.nodes[args_id[0]:n_index].copy())
+
+                    n_index = find_end_subtree_from_i(args_id[1], tree_k.n_args)
+                    subtree_r = Tree(tree_k.nodes[args_id[1]:n_index].copy())
+                    left_subtrees.append(subtree_l)
+                    right_subtrees.append(subtree_r)
+                    left_fitness.append(rank[k])
+                    right_fitness.append(rank[k])
+
+            n_args = individs[j].nodes[id_].n_args
+            if n_args == 1:
+                fitness_i = np.array(left_fitness + right_fitness)
+                proba = protect_norm(fitness_i)
+                choosen = random.choices(
+                    left_subtrees + right_subtrees, weights=proba, k=1)[0]
+                to_return.nodes.extend(choosen.nodes)
+            elif n_args == 2:
+                fitness_l = np.array(left_fitness)
+                fitness_r = np.array(right_fitness)
+                proba_l = protect_norm(fitness_l)
+                proba_r = protect_norm(fitness_r)
+
+                choosen_l = random.choices(
+                    left_subtrees, weights=proba_l, k=1)[0]
+                to_return.nodes.extend(choosen_l.nodes)
+
+                choosen_r = random.choices(
+                    right_subtrees, weights=proba_r, k=1)[0]
+                to_return.nodes.extend(choosen_r.nodes)
+
+    to_return = to_return.copy()
+    to_return.levels = to_return.get_levels()
+    return to_return
+
+tree_1 = full_growing_method(uniset, 5)
 
 
-tree_1 = full_growing_method(uniset, 16)
-tree_2 = full_growing_method(uniset, 16)
+print(tree_1)
 
-# print_tree(tree_1, 'tree_1.png')
-# print_tree(tree_2, 'tree_2.png')
-# slice_ = slice(*tree_1.subtree(4))
-# tree_3 = tree_1.replace(slice_, tree_2)
-
-# print_tree(tree_3, 'tree_3.png')
-
-n = 1000
-begin = time.time()
-for i in range(n):
-    # res = one_point_crossoverGP([tree_1, tree_2], 1, 1, 16)
-    res = one_point_crossoverGP([tree_1, tree_2], 1, 1, 16)
-print(time.time() - begin)
-
-begin = time.time()
-for i in range(n):
-    res = one_point_crossoverGP2([tree_1, tree_2], 1, 1, 16)
-    # res = one_point_crossoverGP2([tree_1, tree_2], 1, 1, 16)
-print(time.time() - begin)
 

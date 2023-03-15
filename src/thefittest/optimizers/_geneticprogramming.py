@@ -23,6 +23,7 @@ from ..tools.generators import half_and_half
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 from functools import partial
+from ..tools.transformations import protect_norm
 
 
 class StatisticsGP:
@@ -195,6 +196,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         fitness = self.evaluate(population_ph)
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
+        proba_scale = protect_norm(fitness_scale)
+        proba_rank = protect_norm(fitness_rank)
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -211,8 +214,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             else:
                 partial_create_offspring = partial(self.create_offspring,
                                                    population_g,
-                                                   fitness_scale,
-                                                   fitness_rank)
+                                                   proba_scale, proba_rank)
                 map_ = map(partial_create_offspring, range(self.pop_size))
                 population_g = np.array(list(map_), dtype=object)
                 population_ph = self.genotype_to_phenotype(population_g)
@@ -222,6 +224,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                     population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
+                proba_scale = protect_norm(fitness_scale)
+                proba_rank = protect_norm(fitness_rank)
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)

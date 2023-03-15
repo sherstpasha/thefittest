@@ -86,6 +86,7 @@ class Tree:
     def __init__(self, nodes):
         self.nodes = nodes
         self.levels = []
+        self.n_args = []
 
     def __len__(self):
         return len(self.nodes)
@@ -122,6 +123,7 @@ class Tree:
             new_tree = Tree(self.nodes[index:n_index].copy())
             return new_tree
         return index, n_index
+
 
     def compile(self):
         pack = []
@@ -198,6 +200,26 @@ class Tree:
                 args_id.append(k)
                 n_args = n_args - 1
             k = k + 1
+        return args_id
+
+
+    def get_args_id2(self, index=0):
+        args_id = []
+        n_args = self.nodes[index].n_args
+
+        if len(self) != index and n_args > 0:
+            indexes = list(range(len(self)))
+            args_id.append(index + 1)
+            _, right = self.subtree2(index + 1)
+            delete_to = indexes.index(right-1) + 1
+            indexes = indexes[delete_to:]
+
+            for __ in range(n_args-1):
+                args_id.append(indexes[0])
+                _, right = self.subtree2(args_id[-1])
+                delete_to = indexes.index(right-1) + 1
+                indexes = indexes[delete_to:]
+
         return args_id
 
     def get_graph(self, keep_id=False):

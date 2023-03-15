@@ -7,6 +7,7 @@ from ._base import TheFittest
 from ._base import LastBest
 from ..tools.transformations import numpy_group_by
 from ..tools.generators import half_and_half
+from ..tools.transformations import protect_norm
 
 
 class StatisticsSelfCGP:
@@ -208,6 +209,8 @@ class SelfCGP(GeneticProgramming):
 
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
+        proba_scale = protect_norm(fitness_scale)
+        proba_rank = protect_norm(fitness_rank)
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -231,8 +234,7 @@ class SelfCGP(GeneticProgramming):
 
                 partial_create_offspring = partial(self.create_offspring,
                                                    population_g,
-                                                   fitness_scale,
-                                                   fitness_rank)
+                                                   proba_scale, proba_rank)
                 map_ = map(partial_create_offspring, s_operators,
                            c_operators, m_operators)
                 population_g = np.array(list(map_), dtype=object)
@@ -244,6 +246,8 @@ class SelfCGP(GeneticProgramming):
                     population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
+                proba_scale = protect_norm(fitness_scale)
+                proba_rank = protect_norm(fitness_rank)
 
                 s_fittest_oper = self.find_fittest_operator(
                     s_operators, fitness_scale)
