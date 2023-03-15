@@ -54,9 +54,7 @@ def full_growing_method(uniset, level_max):
             n_args.append(n_i)
             possible_steps.append(n_i)
             previous_levels.append(level_i)
-    to_return = Tree(nodes)
-    to_return.levels = levels
-    to_return.n_args = np.array(n_args, dtype = np.int32)
+    to_return = Tree(nodes, np.array(n_args, dtype = np.int32))
     return to_return
 
 
@@ -97,9 +95,7 @@ def growing_method(uniset, level_max):
             if n_i > 0:
                 possible_steps.append(n_i)
                 previous_levels.append(level_i)
-    to_return = Tree(nodes)
-    to_return.levels = levels
-    to_return.n_args = np.array(n_args, dtype = np.int32)
+    to_return = Tree(nodes, np.array(n_args, dtype = np.int32))
     return to_return
 
 

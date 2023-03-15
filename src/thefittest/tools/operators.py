@@ -111,9 +111,7 @@ def growing_mutation(some_tree, uniset,
     to_return = some_tree.copy()
     if random.random() < proba:
         i = random.randrange(len(to_return))
-        left, right = to_return.subtree(i)
-        max_level_i = max_level - to_return.levels[left:right][0]
-        new_tree = growing_method(uniset, max_level_i)
+        new_tree = growing_method(uniset,  max(to_return.get_levels(i)))
         to_return = to_return.concat(i, new_tree)
 
     return to_return
@@ -123,19 +121,15 @@ def swap_mutation(some_tree, uniset,
                   proba, max_level):
     to_return = some_tree.copy()
     if random.random() < proba:
-        indexes = [i for i, nodes in enumerate(
-            to_return.nodes) if nodes.n_args > 1]
+        indexes = np.arange(len(some_tree))[to_return.n_args > 1]
         if len(indexes) > 0:
             i = random.choice(indexes)
             args_id = to_return.get_args_id(i)
             new_arg_id = args_id.copy()
             sattolo_shuffle(new_arg_id)
-
             for old_j, new_j in zip(args_id, new_arg_id):
                 subtree = some_tree.subtree(old_j, return_class=True)
                 to_return = to_return.concat(new_j, subtree)
-
-            to_return.levels = to_return.get_levels()
 
     return to_return
 
@@ -145,8 +139,7 @@ def shrink_mutation(some_tree, uniset,
     to_return = some_tree.copy()
     if len(to_return) > 2:
         if random.random() < proba:
-            indexes = [i for i, nodes in enumerate(to_return.nodes)
-                       if nodes.n_args > 0]
+            indexes = np.arange(len(some_tree))[to_return.n_args > 0]
             if len(indexes) > 0:
                 i = random.choice(indexes)
                 args_id = to_return.get_args_id(i)
@@ -651,6 +644,7 @@ class Inv(Operator):
             else:
                 res = 1/y
         return res
+
 
 class LogAbs(Operator):
     def __init__(self):
