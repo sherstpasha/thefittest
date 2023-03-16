@@ -1,4 +1,6 @@
 import numpy as np
+from .numba_funcs import find_common_id_in_two_trees
+from numba.typed import List
 
 
 def root_mean_square_error(y_true, y_predict):
@@ -12,7 +14,7 @@ def coefficient_determination(y_true, y_predict):
     return 1 - residual_sum/total_sum
 
 
-def common_region(trees):
+def common_region_(trees):
     terminate = False
     indexes = []
     common_indexes = []
@@ -40,7 +42,7 @@ def common_region(trees):
                 break
 
         for j in range(len(indexes)):
-            _, right = trees[j].subtree(common_indexes[j][-1])
+            _, right = trees[j].subtree_(common_indexes[j][-1])
             delete_to = indexes[j].index(right-1) + 1
             indexes[j] = indexes[j][delete_to:]
 
@@ -51,7 +53,9 @@ def common_region(trees):
     return common_indexes, border_indexes
 
 
-
+def common_region(trees):
+    n_args_list = [tree.n_args for tree in trees]
+    return find_common_id_in_two_trees(List(n_args_list))
 
 
 def donothing(x):

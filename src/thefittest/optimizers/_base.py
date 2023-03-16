@@ -161,66 +161,11 @@ class Tree:
         args_id = find_id_args_from_i(np.int32(index), self.n_args)
         return args_id
 
-    # def get_args_id_(self, index=0):
-    #     levels = self.get_levels()
-    #     n_args = self.nodes[index].n_args
-    #     args_id = []
-    #     root_level = levels[self.get_levels()[index]]
-    #     next_level = root_level + 1
-    #     k = index + 1
-    #     while n_args:
-    #         if levels[k] == next_level:
-    #             args_id.append(k)
-    #             n_args = n_args - 1
-    #         k = k + 1
-    #     return args_id
-
-    def subtree_(self, index, return_class=False):
-        n_index = index + 1
-        possible_steps = self.nodes[index].n_args
-        while possible_steps:
-            possible_steps += self.nodes[n_index].n_args - 1
-            n_index += 1
-        if return_class:
-            new_tree = Tree(self.nodes[index:n_index].copy())
-            return new_tree
-        return index, n_index
-
     def get_levels(self, index):
         return get_levels_tree_from_i(np.int32(index), self.n_args)
 
     def get_max_level(self):
         return max(self.get_levels(0))
-    # def concat_(self, index, some_tree):
-    #     left, right = self.subtree_(index)
-
-    #     new_nodes = self.nodes[:left] + some_tree.nodes + self.nodes[right:]
-    #     new_n_args = np.r_[self.n_args[:left],
-    #                        some_tree.n_args,
-    #                        self.n_args[right:]]
-    #     to_return = Tree(new_nodes.copy(), new_n_args.copy())
-    #     return to_return
-
-    # def get_levels_(self, origin=0):
-    #     d_i = origin-1
-    #     s = [1]
-    #     d = [origin-1]
-    #     result_list = []
-    #     for node in self.nodes[origin:]:
-    #         s[-1] = s[-1] - 1
-    #         if s[-1] == 0:
-    #             s.pop()
-    #             d_i = d.pop() + 1
-    #         else:
-    #             d_i = d[-1] + 1
-    #         result_list.append(d_i)
-    #         if node.n_args > 0:
-    #             s.append(node.n_args)
-    #             d.append(d_i)
-    #         if len(s) == 0:
-    #             break
-
-    #     return np.array(result_list)
 
     def get_graph(self, keep_id=False):
         pack = []
@@ -269,6 +214,62 @@ class Tree:
                      'pos': pos,
                      'colors': colors}
         return to_return
+
+    def subtree_(self, index, return_class=False):
+        n_index = index + 1
+        possible_steps = self.nodes[index].n_args
+        while possible_steps:
+            possible_steps += self.nodes[n_index].n_args - 1
+            n_index += 1
+        if return_class:
+            new_tree = Tree(self.nodes[index:n_index].copy())
+            return new_tree
+        return index, n_index
+
+    # def get_args_id_(self, index=0):
+    #     levels = self.get_levels()
+    #     n_args = self.nodes[index].n_args
+    #     args_id = []
+    #     root_level = levels[self.get_levels()[index]]
+    #     next_level = root_level + 1
+    #     k = index + 1
+    #     while n_args:
+    #         if levels[k] == next_level:
+    #             args_id.append(k)
+    #             n_args = n_args - 1
+    #         k = k + 1
+    #     return args_id
+
+    # def concat_(self, index, some_tree):
+    #     left, right = self.subtree_(index)
+
+    #     new_nodes = self.nodes[:left] + some_tree.nodes + self.nodes[right:]
+    #     new_n_args = np.r_[self.n_args[:left],
+    #                        some_tree.n_args,
+    #                        self.n_args[right:]]
+    #     to_return = Tree(new_nodes.copy(), new_n_args.copy())
+    #     return to_return
+
+    # def get_levels_(self, origin=0):
+    #     d_i = origin-1
+    #     s = [1]
+    #     d = [origin-1]
+    #     result_list = []
+    #     for node in self.nodes[origin:]:
+    #         s[-1] = s[-1] - 1
+    #         if s[-1] == 0:
+    #             s.pop()
+    #             d_i = d.pop() + 1
+    #         else:
+    #             d_i = d[-1] + 1
+    #         result_list.append(d_i)
+    #         if node.n_args > 0:
+    #             s.append(node.n_args)
+    #             d.append(d_i)
+    #         if len(s) == 0:
+    #             break
+
+    #     return np.array(result_list)
 
 
 class Node:
