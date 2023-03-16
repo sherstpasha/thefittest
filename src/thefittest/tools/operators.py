@@ -263,6 +263,7 @@ def uniform_crossoverGPc(individs, fitness, rank, max_level):
     '''Poli, Riccardo & Langdon, W.. (2001). On the Search
     Properties of Different Crossover Operators in Genetic Programming. '''
     new_nodes = []
+    new_n_args = []
     individ_1 = individs[0]
     individ_2 = individs[1]
     common_indexes, border = common_region([individ_1, individ_2])
@@ -273,30 +274,35 @@ def uniform_crossoverGPc(individs, fitness, rank, max_level):
                 id_ = common_indexes[0][i]
                 left, right = individ_1.subtree(index=id_)
                 new_nodes.extend(individ_1.nodes[left:right])
+                new_n_args.extend(individ_1.n_args[left:right])
             else:
                 id_ = common_indexes[1][i]
                 left, right = individ_2.subtree(index=id_)
                 new_nodes.extend(individ_2.nodes[left:right])
+                new_n_args.extend(individ_2.n_args[left:right])
         else:
             if random.random() < 0.5:
                 id_ = common_indexes[0][i]
                 new_nodes.append(individ_1.nodes[id_])
+                new_n_args.append(individ_1.n_args[id_])
             else:
                 id_ = common_indexes[1][i]
                 new_nodes.append(individ_2.nodes[id_])
-    to_return = Tree(new_nodes.copy())
-    to_return.levels = to_return.get_levels()
+                new_n_args.append(individ_2.n_args[id_])
+    to_return = Tree(new_nodes.copy(),
+                     np.array(new_n_args.copy(), dtype=np.int32))
     return to_return
 
 
 def uniform_crossoverGP(individs, fitness, rank, max_level):
-    range_ = range(len(individs))
-    to_return = Tree([])
+    to_return = Tree([], [])
+    new_n_args = []
     common, border = common_region(individs)
     for i, common_0_i in enumerate(common[0]):
-        j = random.randrange(range_)
+        j = random.randrange(len(individs))
         id_ = common[j][i]
         to_return.nodes.append(individs[j].nodes[id_])
+        new_n_args.append(individs[j].n_args[id_])
         if common_0_i in border[0]:
             left_subtrees = []
             right_subtrees = []
@@ -321,27 +327,33 @@ def uniform_crossoverGP(individs, fitness, rank, max_level):
                 choosen = random.choices(
                     left_subtrees + right_subtrees, k=1)[0]
                 to_return.nodes.extend(choosen.nodes)
+                new_n_args.extend(choosen.n_args)
             elif n_args == 2:
                 choosen_l = random.choices(left_subtrees, k=1)[0]
                 to_return.nodes.extend(choosen_l.nodes)
+                new_n_args.extend(choosen_l.n_args)
 
                 choosen_r = random.choices(right_subtrees, k=1)[0]
                 to_return.nodes.extend(choosen_r.nodes)
+                new_n_args.extend(choosen_r.n_args)
 
     to_return = to_return.copy()
-    to_return.levels = to_return.get_levels()
+    to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
+
     return to_return
 
 
 def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
     range_ = range(len(individs))
     probability = protect_norm(fitness)
-    to_return = Tree([])
+    to_return = Tree([], [])
+    new_n_args = []
     common, border = common_region(individs)
     for i, common_0_i in enumerate(common[0]):
         j = random.choices(range_, weights=probability)[0]
         id_ = common[j][i]
         to_return.nodes.append(individs[j].nodes[id_])
+        new_n_args.append(individs[j].n_args[id_])
         if common_0_i in border[0]:
             left_subtrees = []
             right_subtrees = []
@@ -351,6 +363,7 @@ def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
             for k, tree_k in enumerate(individs):
                 inner_id = common[k][i]
                 args_id = tree_k.get_args_id(inner_id)
+
                 n_args = tree_k.nodes[inner_id].n_args
                 if n_args == 1:
                     subtree = tree_k.subtree(args_id[0], return_class=True)
@@ -373,34 +386,38 @@ def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
                 choosen = random.choices(
                     left_subtrees + right_subtrees, weights=proba, k=1)[0]
                 to_return.nodes.extend(choosen.nodes)
+                new_n_args.extend(choosen.n_args)
             elif n_args == 2:
                 fitness_l = np.array(left_fitness)
                 fitness_r = np.array(right_fitness)
                 proba_l = protect_norm(fitness_l)
                 proba_r = protect_norm(fitness_r)
-
                 choosen_l = random.choices(
                     left_subtrees, weights=proba_l, k=1)[0]
                 to_return.nodes.extend(choosen_l.nodes)
+                new_n_args.extend(choosen_l.n_args)
 
                 choosen_r = random.choices(
                     right_subtrees, weights=proba_r, k=1)[0]
                 to_return.nodes.extend(choosen_r.nodes)
+                new_n_args.extend(choosen_r.n_args)
 
     to_return = to_return.copy()
-    to_return.levels = to_return.get_levels()
-    return to_return
+    to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
 
+    return to_return
 
 def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
     range_ = range(len(individs))
     probability = protect_norm(rank)
-    to_return = Tree([])
+    to_return = Tree([], [])
+    new_n_args = []
     common, border = common_region(individs)
     for i, common_0_i in enumerate(common[0]):
         j = random.choices(range_, weights=probability)[0]
         id_ = common[j][i]
         to_return.nodes.append(individs[j].nodes[id_])
+        new_n_args.append(individs[j].n_args[id_])
         if common_0_i in border[0]:
             left_subtrees = []
             right_subtrees = []
@@ -410,6 +427,7 @@ def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
             for k, tree_k in enumerate(individs):
                 inner_id = common[k][i]
                 args_id = tree_k.get_args_id(inner_id)
+
                 n_args = tree_k.nodes[inner_id].n_args
                 if n_args == 1:
                     subtree = tree_k.subtree(args_id[0], return_class=True)
@@ -432,34 +450,38 @@ def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
                 choosen = random.choices(
                     left_subtrees + right_subtrees, weights=proba, k=1)[0]
                 to_return.nodes.extend(choosen.nodes)
+                new_n_args.extend(choosen.n_args)
             elif n_args == 2:
                 fitness_l = np.array(left_fitness)
                 fitness_r = np.array(right_fitness)
                 proba_l = protect_norm(fitness_l)
                 proba_r = protect_norm(fitness_r)
-
                 choosen_l = random.choices(
                     left_subtrees, weights=proba_l, k=1)[0]
                 to_return.nodes.extend(choosen_l.nodes)
+                new_n_args.extend(choosen_l.n_args)
 
                 choosen_r = random.choices(
                     right_subtrees, weights=proba_r, k=1)[0]
                 to_return.nodes.extend(choosen_r.nodes)
+                new_n_args.extend(choosen_r.n_args)
 
     to_return = to_return.copy()
-    to_return.levels = to_return.get_levels()
+    to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
+
     return to_return
 
 
 def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
-    range_ = range(len(individs))
-    to_return = Tree([])
+    to_return = Tree([], [])
+    new_n_args = []
     common, border = common_region(individs)
     for i, common_0_i in enumerate(common[0]):
 
         j = tournament_selection(fitness, rank, 2, 1)[0]
         id_ = common[j][i]
         to_return.nodes.append(individs[j].nodes[id_])
+        new_n_args.append(individs[j].n_args[id_])
         if common_0_i in border[0]:
             left_subtrees = []
             right_subtrees = []
@@ -487,26 +509,26 @@ def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
             n_args = individs[j].nodes[id_].n_args
             if n_args == 1:
                 fitness_i = np.array(left_fitness + right_fitness)
-                proba = protect_norm(fitness_i)
-                choosen = random.choices(
-                    left_subtrees + right_subtrees, weights=proba, k=1)[0]
+                j = tournament_selection(fitness_i, fitness_i, 2, 1)[0]
+                choosen = (left_subtrees + right_subtrees)[j]
                 to_return.nodes.extend(choosen.nodes)
+                new_n_args.extend(choosen.n_args)
             elif n_args == 2:
                 fitness_l = np.array(left_fitness)
                 fitness_r = np.array(right_fitness)
-                proba_l = protect_norm(fitness_l)
-                proba_r = protect_norm(fitness_r)
 
-                choosen_l = random.choices(
-                    left_subtrees, weights=proba_l, k=1)[0]
+
+                j = tournament_selection(fitness_l, fitness_l, 2, 1)[0]
+                choosen_l = left_subtrees[j]
                 to_return.nodes.extend(choosen_l.nodes)
-
-                choosen_r = random.choices(
-                    right_subtrees, weights=proba_r, k=1)[0]
+                new_n_args.extend(choosen_l.n_args)
+                j = tournament_selection(fitness_r, fitness_r, 2, 1)[0]
+                choosen_r = right_subtrees[j]
                 to_return.nodes.extend(choosen_r.nodes)
+                new_n_args.extend(choosen_r.n_args)
 
     to_return = to_return.copy()
-    to_return.levels = to_return.get_levels()
+    to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
     return to_return
 
 

@@ -222,15 +222,15 @@ class Tree:
             possible_steps += self.nodes[n_index].n_args - 1
             n_index += 1
         if return_class:
-            new_tree = Tree(self.nodes[index:n_index].copy())
+            new_tree = Tree(self.nodes[index:n_index].copy(), self.n_args[index:n_index].copy())
             return new_tree
         return index, n_index
 
     # def get_args_id_(self, index=0):
-    #     levels = self.get_levels()
+    #     levels = self.get_levels(index)
     #     n_args = self.nodes[index].n_args
     #     args_id = []
-    #     root_level = levels[self.get_levels()[index]]
+    #     root_level = levels[index]
     #     next_level = root_level + 1
     #     k = index + 1
     #     while n_args:
@@ -240,15 +240,15 @@ class Tree:
     #         k = k + 1
     #     return args_id
 
-    # def concat_(self, index, some_tree):
-    #     left, right = self.subtree_(index)
+    def concat_(self, index, some_tree):
+        left, right = self.subtree_(index)
 
-    #     new_nodes = self.nodes[:left] + some_tree.nodes + self.nodes[right:]
-    #     new_n_args = np.r_[self.n_args[:left],
-    #                        some_tree.n_args,
-    #                        self.n_args[right:]]
-    #     to_return = Tree(new_nodes.copy(), new_n_args.copy())
-    #     return to_return
+        new_nodes = self.nodes[:left] + some_tree.nodes + self.nodes[right:]
+        new_n_args = np.r_[self.n_args[:left],
+                           some_tree.n_args,
+                           self.n_args[right:]]
+        to_return = Tree(new_nodes.copy(), new_n_args.copy())
+        return to_return
 
     # def get_levels_(self, origin=0):
     #     d_i = origin-1
