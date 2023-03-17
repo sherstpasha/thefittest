@@ -13,8 +13,8 @@ from ..tools.transformations import protect_norm
 class StatisticsSelfCGP:
     def __init__(self, mode='quick'):
         self.mode = mode
-        self.fittest = np.array([])
-        self.fitness = np.array([])
+        self.fittest = []
+        self.fitness = []
         self.s_proba = dict()
         self.c_proba = dict()
         self.m_proba = dict()
@@ -24,30 +24,30 @@ class StatisticsSelfCGP:
                fitness_i,
                s_proba_i, c_proba_i, m_proba_i):
         if self.mode == 'quick':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            self.fitness.append(max(fitness_i))
             for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
                                           (self.s_proba, self.c_proba, self.m_proba)):
                 if not len(archive_i):
                     for key, value in proba_i.items():
-                        archive_i[key] = np.array(value)
+                        archive_i[key] = [value]
                 else:
                     for key, value in proba_i.items():
-                        archive_i[key] = np.append(
-                            archive_i[key], np.array(value))
+                        archive_i[key].append(value)
+
         elif self.mode == 'full':
-            self.fittest = np.append(self.fittest, fittest_i.copy())
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
+            self.fittest.append(fittest_i.copy())
+            self.fitness.append(max(fitness_i))
             for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
                                           (self.s_proba, self.c_proba, self.m_proba)):
                 if not len(archive_i):
                     for key, value in proba_i.items():
-                        archive_i[key] = np.array(value)
+                        archive_i[key] = [value]
                 else:
                     for key, value in proba_i.items():
-                        archive_i[key] = np.append(
-                            archive_i[key], np.array(value))
+                        archive_i[key].append(value)
         else:
-            raise ValueError('the "mode" must be either "quick" or "full"')
+            raise ValueError(
+                'the "mode" must be either "quick" or "full" or None')
         return self
 
 
@@ -94,10 +94,11 @@ class SelfCGP(GeneticProgramming):
     def set_strategy(self, select_opers=['proportional',
                                          'rank',
                                          'tournament_3',
-                                         'tournament_5'],
+                                         'tournament_5',
+                                         'tournament_7'],
                      crossover_opers=['standart',
                                       'one_point',
-                                      'uniform_rank7'],
+                                      'uniform_rank2'],
                      mutation_opers=['weak_point',
                                      'average_point',
                                      'strong_point',
@@ -107,12 +108,12 @@ class SelfCGP(GeneticProgramming):
                      tour_size_param=2,
                      initial_population=None,
                      elitism_param=True,
-                     parents_num_param=7,
+                     parents_num_param=3,
                      mutation_rate_param=0.05,
                      K_param=2,
-                     threshold_param=0.05,
-                     max_level=16,
-                     init_level=5):
+                     threshold_param=0.1,
+                     max_level_param=16,
+                     init_level_param=5):
         self.tour_size = tour_size_param
         self.initial_population = initial_population
         self.elitism = elitism_param
@@ -120,8 +121,8 @@ class SelfCGP(GeneticProgramming):
         self.mutation_rate = mutation_rate_param
         self.K = K_param
         self.threshold = threshold_param
-        self.max_level = max_level
-        self.init_level = init_level
+        self.max_level = max_level_param
+        self.init_level = init_level_param
 
         self.update_pool()
 

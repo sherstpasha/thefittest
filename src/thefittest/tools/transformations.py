@@ -1,5 +1,5 @@
 import numpy as np
-from .numba_funcs import find_common_id_in_two_trees
+from .numba_funcs import find_common_id_in_trees
 from numba.typed import List
 
 
@@ -55,7 +55,7 @@ def common_region_(trees):
 
 def common_region(trees):
     n_args_list = [tree.n_args for tree in trees]
-    return find_common_id_in_two_trees(List(n_args_list))
+    return find_common_id_in_trees(List(n_args_list))
 
 
 def donothing(x):

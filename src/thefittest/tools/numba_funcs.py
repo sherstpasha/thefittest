@@ -1,9 +1,7 @@
 import numpy as np
 from numba import njit
 from numba import int32
-from numba import void
-from numba.typed import List
-
+from numba import float32
 
 
 @njit(int32(int32, int32[:]))
@@ -47,8 +45,9 @@ def get_levels_tree_from_i(origin, n_args_array):
             break
     return np.array(result_list, dtype=np.int32)
 
+
 @njit
-def find_common_id_in_two_trees(n_args_list):
+def find_common_id_in_trees(n_args_list):
     terminate = False
     indexes = []
     common_indexes = []
@@ -78,7 +77,8 @@ def find_common_id_in_two_trees(n_args_list):
                 break
 
         for j in range(len(indexes)):
-            right = find_end_subtree_from_i(common_indexes[j][-1], n_args_list[j])
+            right = find_end_subtree_from_i(
+                common_indexes[j][-1], n_args_list[j])
             delete_to = indexes[j].index(right-1) + 1
             indexes[j] = indexes[j][delete_to:]
 
@@ -87,3 +87,14 @@ def find_common_id_in_two_trees(n_args_list):
                 break
 
     return common_indexes, border_indexes
+
+
+@njit(int32[:](float32[:], int32, int32))
+def select_quantity_id_by_tournament(fitness, tour_size, quantity):
+    indexes = np.arange(len(fitness))
+    choosen = np.empty(quantity, dtype=np.int32)
+    for i in range(quantity):
+        tournament = np.random.choice(indexes, size=tour_size, replace=False)
+        argmax = np.argmax(fitness[tournament])
+        choosen[i] = tournament[argmax]
+    return choosen
