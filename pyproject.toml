@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=57.4.0", "numpy==1.22"]
+requires = ["setuptools>=57.4.0", "numpy==1.21.6", "numba==0.56.4"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -13,7 +13,7 @@ where = ["src"]
 
 [project]
 name = "thefittest"
-version = "0.1.7"
+version = "0.1.8"
 authors = [
   { name="Pavel Sherstnev", email="sherstpasha99@gmail.com" },
 ]
