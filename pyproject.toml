@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=57.4.0", "numpy==1.21.6", "numba==0.56.4"]
+requires = ["setuptools>=57.4.0", "numpy>=1.21.6,<=1.23", "numba>=0.56.4"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -19,7 +19,7 @@ authors = [
 ]
 description = "Implementation of data mining methods that use evolutionary algorithms"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.7,<=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
