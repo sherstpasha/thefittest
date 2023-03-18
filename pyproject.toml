@@ -19,7 +19,7 @@ authors = [
 ]
 description = "Implementation of data mining methods that use evolutionary algorithms"
 readme = "README.md"
-requires-python = ">=3.7,<=3.10"
+requires-python = ">=3.7,<3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
