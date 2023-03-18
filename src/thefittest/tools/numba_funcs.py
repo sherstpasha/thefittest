@@ -98,3 +98,11 @@ def select_quantity_id_by_tournament(fitness, tour_size, quantity):
         argmax = np.argmax(fitness[tournament])
         choosen[i] = tournament[argmax]
     return choosen
+
+
+@njit(int32(int32[:], int32[:]))
+def find_first_difference_between_two(array_1, array_2):
+    for i in range(min(len(array_1), len(array_2))):
+        if array_1[i] != array_2[i]:
+            break
+    return i

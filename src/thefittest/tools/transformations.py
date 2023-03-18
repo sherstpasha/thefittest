@@ -1,5 +1,7 @@
 import numpy as np
 from .numba_funcs import find_common_id_in_trees
+from .numba_funcs import find_first_difference_between_two
+from .numba_funcs import find_end_subtree_from_i
 from numba.typed import List
 
 
@@ -14,7 +16,7 @@ def coefficient_determination(y_true, y_predict):
     return 1 - residual_sum/total_sum
 
 
-def common_region_(trees):
+def common_region(trees):
     terminate = False
     indexes = []
     common_indexes = []
@@ -42,7 +44,7 @@ def common_region_(trees):
                 break
 
         for j in range(len(indexes)):
-            _, right = trees[j].subtree_(common_indexes[j][-1])
+            _, right = trees[j].subtree(common_indexes[j][-1])
             delete_to = indexes[j].index(right-1) + 1
             indexes[j] = indexes[j][delete_to:]
 
@@ -53,9 +55,46 @@ def common_region_(trees):
     return common_indexes, border_indexes
 
 
-def common_region(trees):
-    n_args_list = [tree.n_args for tree in trees]
-    return find_common_id_in_trees(List(n_args_list))
+def common_region_two_trees(n_args_array_1, n_args_array_2):
+    index_list_1 = range(len(n_args_array_1))
+    index_list_2 = range(len(n_args_array_2))
+    index_1 = 0
+    index_2 = 0
+
+    common_1 = []
+    common_2 = []
+    border_1 = []
+    border_2 = []
+
+    while True:
+        if index_1 < len(n_args_array_1) and index_2 < len(n_args_array_2):
+            id_1 = index_1
+            id_2 = index_2
+            end = find_first_difference_between_two(n_args_array_1[id_1:],
+                                                    n_args_array_2[id_2:])
+            index_1 = index_1 + end
+            index_2 = index_2 + end
+            common_1.extend(index_list_1[id_1:index_1+1])
+            common_2.extend(index_list_2[id_2:index_2+1])
+
+        if len(n_args_array_1)-1 > index_1 or len(n_args_array_2)-1 > index_2:
+            border_1.append(index_1)
+            border_2.append(index_2)
+            index_1 = find_end_subtree_from_i(index_1, n_args_array_1)
+            index_2 = find_end_subtree_from_i(index_2, n_args_array_2)
+        else:
+            break
+
+    return [common_1, common_2], [border_1, border_2]
+
+
+def common_region_(trees):
+    if len(trees) == 2:
+        to_return = common_region_two_trees(trees[0].n_args, trees[1].n_args)
+    else:
+        to_return = common_region_(trees)
+
+    return to_return
 
 
 def donothing(x):
