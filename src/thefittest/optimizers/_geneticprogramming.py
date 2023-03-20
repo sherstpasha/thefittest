@@ -15,9 +15,7 @@ from ..tools.operators import uniform_crossoverGP_rank
 from ..tools.operators import uniform_crossoverGP_tour
 from ..tools.operators import empty_crossover
 from ..tools.operators import point_mutation
-from ..tools.operators import point_mutation_proba
 from ..tools.operators import growing_mutation
-from ..tools.operators import growing_mutation_proba
 from ..tools.operators import swap_mutation
 from ..tools.operators import shrink_mutation
 from ..tools.generators import half_and_half
@@ -123,14 +121,6 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'weak_grow': (growing_mutation, 0.25, False),
                        'average_grow': (growing_mutation, 1, False),
                        'strong_grow': (growing_mutation, 4, False),
-                       'weak_point_p': (point_mutation_proba, 0.25, False),
-                       'average_point_p': (point_mutation_proba, 1, False),
-                       'strong_point_p': (point_mutation_proba, 4, False),
-                       'custom_rate_point_p': (point_mutation_proba, self.mutation_rate, True),
-                       'weak_grow_p': (growing_mutation_proba, 0.25, False),
-                       'average_grow_p': (growing_mutation_proba, 1, False),
-                       'strong_grow_p': (growing_mutation_proba, 4, False),
-                       'custom_rate_grow_p': (growing_mutation_proba, self.mutation_rate, True),
                        'weak_swap': (swap_mutation, 0.25, False),
                        'average_swap': (swap_mutation, 1, False),
                        'strong_swap': (swap_mutation, 4, False),

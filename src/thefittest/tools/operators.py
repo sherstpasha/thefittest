@@ -107,22 +107,6 @@ def point_mutation(some_tree, uniset,
     return to_return
 
 
-def point_mutation_proba(some_tree, uniset,
-                         proba, max_level):
-    to_return = some_tree.copy()
-    new_node = None
-    if random.random() < proba:
-        i = random.randrange(len(to_return))
-        if type(to_return.nodes[i]) != FunctionalNode:
-            new_node = uniset.random_terminal_or_ephemeral()
-        else:
-            n_args = to_return.nodes[i].n_args
-            new_node = uniset.random_functional(n_args)
-        to_return.nodes[i] = new_node
-
-    return to_return, new_node
-
-
 def growing_mutation(some_tree, uniset,
                      proba, max_level):
     to_return = some_tree.copy()
@@ -134,21 +118,6 @@ def growing_mutation(some_tree, uniset,
         to_return = to_return.concat(i, new_tree)
 
     return to_return
-
-
-def growing_mutation_proba(some_tree, uniset,
-                     proba, max_level):
-    to_return = some_tree.copy()
-    new_nodes = None
-    if random.random() < proba:
-
-        i = random.randrange(len(to_return))
-        max_level - max(some_tree.get_levels(i))
-        new_tree = growing_method(uniset,  max(to_return.get_levels(i)))
-        to_return = to_return.concat(i, new_tree)
-        new_nodes = [node for node in new_tree.nodes if type(node) == FunctionalNode]
-
-    return to_return, new_nodes
 
 
 def swap_mutation(some_tree, uniset,
