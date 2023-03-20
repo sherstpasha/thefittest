@@ -1,8 +1,6 @@
 import numpy as np
-from .numba_funcs import find_common_id_in_trees
 from .numba_funcs import find_first_difference_between_two
 from .numba_funcs import find_end_subtree_from_i
-from numba.typed import List
 
 
 def root_mean_square_error(y_true, y_predict):

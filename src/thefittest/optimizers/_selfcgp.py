@@ -3,8 +3,8 @@ from ._geneticprogramming import GeneticProgramming
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 from functools import partial
-from ._base import TheFittest
-from ._base import LastBest
+from ..base import TheFittest
+from ..base import LastBest
 from ..tools.transformations import numpy_group_by
 from ..tools.generators import half_and_half
 from ..tools.transformations import protect_norm

@@ -1,88 +1,9 @@
 import numpy as np
-from typing import Any
-import random
 from inspect import signature
 from ..tools.numba_funcs import find_end_subtree_from_i
 from ..tools.numba_funcs import find_id_args_from_i
 from ..tools.numba_funcs import get_levels_tree_from_i
-
-
-class LastBest:
-    def __init__(self):
-        self.value = np.nan
-        self.no_increase = 0
-
-    def update(self, current_value: float):
-        if self.value == current_value:
-            self.no_increase += 1
-        else:
-            self.no_increase = 0
-            self.value = current_value
-        return self
-
-
-class TheFittest:
-    def __init__(self):
-        self.genotype: Any
-        self.phenotype: Any
-        self.fitness = -np.inf
-
-    def update(self, population_g, population_ph, fitness):
-        temp_best_id = np.argmax(fitness)
-        temp_best_fitness = fitness[temp_best_id].copy()
-        if temp_best_fitness > self.fitness:
-            self.genotype = population_g[temp_best_id].copy()
-            self.phenotype = population_ph[temp_best_id].copy()
-            self.fitness = temp_best_fitness.copy()
-
-        return self
-
-    def get(self):
-        return self.genotype.copy(), self.phenotype.copy(), self.fitness.copy()
-
-
-class EvolutionaryAlgorithm:
-    def __init__(self,
-                 fitness_function,
-                 genotype_to_phenotype,
-                 iters,
-                 pop_size,
-                 optimal_value=None,
-                 termination_error_value=0.,
-                 no_increase_num=None,
-                 minimization=False,
-                 show_progress_each=None,
-                 keep_history=None):
-        self.fitness_function = fitness_function
-        self.genotype_to_phenotype = genotype_to_phenotype
-        self.iters = iters
-        self.pop_size = pop_size
-        self.no_increase_num = no_increase_num
-        self.show_progress_each = show_progress_each
-        self.keep_history = keep_history
-
-        self.sign = -1 if minimization else 1
-
-        if optimal_value is not None:
-            self.aim = self.sign*optimal_value - termination_error_value
-        else:
-            self.aim = np.inf
-
-        self.calls = 0
-
-    def evaluate(self, population_ph):
-        self.calls += len(population_ph)
-        return self.sign*self.fitness_function(population_ph)
-
-    def show_progress(self, i):
-        if (self.show_progress_each is not None) and (i % self.show_progress_each == 0):
-            print(f'{i} iteration with fitness = {self.thefittest.fitness}')
-
-    def termitation_check(self, no_increase):
-        return (self.thefittest.fitness >= self.aim) or (no_increase == self.no_increase_num)
-
-    def get_remains_calls(self):
-        return (self.pop_size + (self.iters-1)*(self.pop_size-1)) - self.calls
+import random
 
 
 class Tree:
@@ -227,20 +148,6 @@ class Tree:
             return new_tree
         return index, n_index
 
-    # def get_args_id_(self, index=0):
-    #     levels = self.get_levels(index)
-    #     n_args = self.nodes[index].n_args
-    #     args_id = []
-    #     root_level = levels[index]
-    #     next_level = root_level + 1
-    #     k = index + 1
-    #     while n_args:
-    #         if levels[k] == next_level:
-    #             args_id.append(k)
-    #             n_args = n_args - 1
-    #         k = k + 1
-    #     return args_id
-
     def concat_(self, index, some_tree):
         left, right = self.subtree_(index)
 
@@ -250,27 +157,6 @@ class Tree:
                            self.n_args[right:]]
         to_return = Tree(new_nodes.copy(), new_n_args.copy())
         return to_return
-
-    # def get_levels_(self, origin=0):
-    #     d_i = origin-1
-    #     s = [1]
-    #     d = [origin-1]
-    #     result_list = []
-    #     for node in self.nodes[origin:]:
-    #         s[-1] = s[-1] - 1
-    #         if s[-1] == 0:
-    #             s.pop()
-    #             d_i = d.pop() + 1
-    #         else:
-    #             d_i = d[-1] + 1
-    #         result_list.append(d_i)
-    #         if node.n_args > 0:
-    #             s.append(node.n_args)
-    #             d.append(d_i)
-    #         if len(s) == 0:
-    #             break
-
-    #     return np.array(result_list)
 
 
 class Node:
@@ -327,11 +213,6 @@ class EphemeralConstantNode(Node):
                       n_args=0)
 
 
-'''functional_set = (FunctionalNode, ..., FunctionalNode)
-terminal_set = (TerminalNode, ..., TerminalNode)
-ephemeral_set = (EphemeralNode, ..., EphemeralNode)'''
-
-
 class UniversalSet:
     def __init__(self, functional_set, terminal_set, ephemeral_set=[]):
         self.functional_set = {'any': functional_set}
@@ -363,5 +244,4 @@ class UniversalSet:
 
     def random_functional(self, n_args='any'):
         choosen = random.choice(self.functional_set[n_args])
-
         return choosen

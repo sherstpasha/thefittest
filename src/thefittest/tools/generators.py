@@ -1,5 +1,5 @@
 import numpy as np
-from ..optimizers._base import Tree
+from ..base import Tree
 import random
 
 
