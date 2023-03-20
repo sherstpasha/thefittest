@@ -205,8 +205,6 @@ class SelfCGA(GeneticAlgorithm):
         fitness = self.evaluate(population_ph)
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
-        proba_scale = protect_norm(fitness_scale)
-        proba_rank = protect_norm(fitness_rank)
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -231,7 +229,7 @@ class SelfCGA(GeneticAlgorithm):
                 m_operators = self.choice_operators(m_proba)
 
                 create_offs = partial(self.create_offs, population_g,
-                                      proba_scale, proba_rank)
+                                      fitness_scale, fitness_rank)
 
                 population_g = np.array(list(map(create_offs, s_operators,
                                                  c_operators, m_operators)))
@@ -242,8 +240,6 @@ class SelfCGA(GeneticAlgorithm):
                     population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
-                proba_scale = protect_norm(fitness_scale)
-                proba_rank = protect_norm(fitness_rank)
 
                 s_fittest_oper = self.find_fittest_operator(
                     s_operators, fitness_scale)

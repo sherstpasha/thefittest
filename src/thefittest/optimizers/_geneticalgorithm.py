@@ -168,6 +168,8 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         offspring_no_mutated = crossover_func(parents,
                                               proba_scale_p,
                                               proba_rank_p)
+        # if callable(proba):
+        #     proba = proba()
 
         mutant = mutation_func(offspring_no_mutated, proba)
         return mutant
@@ -178,8 +180,6 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         fitness = self.evaluate(population_ph)
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
-        proba_scale = protect_norm(fitness_scale)
-        proba_rank = protect_norm(fitness_rank)
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -197,8 +197,8 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             else:
                 partial_create_offspring = partial(self.create_offspring,
                                                    population_g,
-                                                   proba_scale,
-                                                   proba_rank)
+                                                   fitness_scale,
+                                                   fitness_rank)
                 map_ = map(partial_create_offspring, range(self.pop_size))
                 population_g = np.array(list(map_), dtype=np.byte)
 
@@ -209,8 +209,6 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                     population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
-                proba_scale = protect_norm(fitness_scale)
-                proba_rank = protect_norm(fitness_rank)
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)

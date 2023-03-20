@@ -364,13 +364,15 @@ def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
 
 ################################## SELECTIONS ##################################
 # genetic algorithm
-def proportional_selection(proba_fitness, proba_rank, tour_size, quantity):
+def proportional_selection(fitness, rank, tour_size, quantity):
+    proba_fitness = protect_norm(fitness)
     choosen = np.random.choice(np.arange(len(proba_fitness)),
                                size=quantity, p=proba_fitness)
     return choosen
 
 
-def rank_selection(proba_fitness, proba_rank, tour_size, quantity):
+def rank_selection(fitness, rank, tour_size, quantity):
+    proba_rank = protect_norm(rank)
     choosen = np.random.choice(np.arange(len(proba_rank)),
                                size=quantity, p=proba_rank)
     return choosen
