@@ -7,7 +7,6 @@ from ..base import TheFittest
 from ..base import LastBest
 from ..tools.transformations import numpy_group_by
 from ..tools.generators import half_and_half
-from ..tools.transformations import protect_norm
 
 
 class StatisticsSelfCGP:
@@ -147,10 +146,11 @@ class SelfCGP(GeneticProgramming):
         return self
 
     def create_offspring(self, population_g, fitness_scale, fitness_rank,
-                         selection, crossover, mutation):
+                         fitness_scale_mean, fitness_scale_max,
+                         fitness_scale_i,  fitness_rank_i, selection, crossover, mutation):
         crossover_func, quantity = self.c_sets[crossover]
         selection_func, tour_size = self.s_sets[selection]
-        mutation_func, proba_down, not_scale = self.m_sets[mutation]
+        mutation_func, proba_up, not_scale = self.m_sets[mutation]
 
         indexes = selection_func(fitness_scale,
                                  fitness_rank,
@@ -167,9 +167,17 @@ class SelfCGP(GeneticProgramming):
                                               self.max_level)
 
         if not_scale:
-            proba = proba_down
+            if callable(proba_up):
+                proba = proba_up(fitness_i=fitness_scale_i,
+                                 fitness_mean=fitness_scale_mean,
+                                 fitness_max=fitness_scale_max,
+                                 k=0.5)
+                # print(min(1, 4/len(offspring_no_mutated)))
+            else:
+                proba = proba_up
         else:
-            proba = proba_down/len(offspring_no_mutated)
+            proba = proba_up/len(offspring_no_mutated)
+        # print(proba)
         mutant = mutation_func(offspring_no_mutated,
                                self.uniset, proba, self.max_level)
         return mutant
@@ -210,8 +218,6 @@ class SelfCGP(GeneticProgramming):
 
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
-        proba_scale = protect_norm(fitness_scale)
-        proba_rank = protect_norm(fitness_rank)
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -235,9 +241,15 @@ class SelfCGP(GeneticProgramming):
 
                 partial_create_offspring = partial(self.create_offspring,
                                                    population_g,
-                                                   proba_scale, proba_rank)
-                map_ = map(partial_create_offspring, s_operators,
-                           c_operators, m_operators)
+                                                   fitness_scale,
+                                                   fitness_rank,
+                                                   fitness_scale.mean(),
+                                                   fitness_scale.max())
+                map_ = map(partial_create_offspring, fitness_scale,
+                           fitness_rank,
+                           s_operators,
+                           c_operators,
+                           m_operators)
                 population_g = np.array(list(map_), dtype=object)
                 population_ph = self.genotype_to_phenotype(
                     population_g)
@@ -247,8 +259,6 @@ class SelfCGP(GeneticProgramming):
                     population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
-                proba_scale = protect_norm(fitness_scale)
-                proba_rank = protect_norm(fitness_rank)
 
                 s_fittest_oper = self.find_fittest_operator(
                     s_operators, fitness_scale)

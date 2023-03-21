@@ -17,6 +17,7 @@ from ..tools.operators import point_mutation
 from ..tools.operators import growing_mutation
 from ..tools.operators import swap_mutation
 from ..tools.operators import shrink_mutation
+from ..tools.operators import fitness_based_mutate_adaptation
 from ..tools.generators import half_and_half
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
@@ -53,12 +54,12 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                  uniset,
                  iters,
                  pop_size,
-                 optimal_value = None,
-                 termination_error_value = 0.,
-                 no_increase_num = None,
-                 minimization = False,
-                 show_progress_each = None,
-                 keep_history = None):
+                 optimal_value=None,
+                 termination_error_value=0.,
+                 no_increase_num=None,
+                 minimization=False,
+                 show_progress_each=None,
+                 keep_history=None):
 
         EvolutionaryAlgorithm.__init__(
             self,
@@ -117,29 +118,35 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                        'average_point': (point_mutation, 1, False),
                        'strong_point': (point_mutation, 4, False),
                        'custom_rate_point': (point_mutation, self.mutation_rate, True),
+                       'fitness_based_adaptation_point': (point_mutation, fitness_based_mutate_adaptation, True),
                        'weak_grow': (growing_mutation, 0.25, False),
                        'average_grow': (growing_mutation, 1, False),
                        'strong_grow': (growing_mutation, 4, False),
+                       'custom_rate_grow': (growing_mutation, self.mutation_rate, True),
+                       'fitness_based_adaptation_grow': (growing_mutation, fitness_based_mutate_adaptation, True),
                        'weak_swap': (swap_mutation, 0.25, False),
                        'average_swap': (swap_mutation, 1, False),
                        'strong_swap': (swap_mutation, 4, False),
                        'custom_rate_swap': (swap_mutation, self.mutation_rate, True),
+                       'fitness_based_adaptation_swap': (swap_mutation, fitness_based_mutate_adaptation, True),
                        'weak_shrink': (shrink_mutation, 0.25, False),
                        'average_shrink': (shrink_mutation, 1, False),
                        'strong_shrink': (shrink_mutation, 4, False),
-                       'custom_rate_shrink': (shrink_mutation, self.mutation_rate, True)}
+                       'custom_rate_shrink': (shrink_mutation, self.mutation_rate, True),
+                       'fitness_based_adaptation_shrink': (shrink_mutation, fitness_based_mutate_adaptation, True),
+                       }
 
     def set_strategy(self,
-                     selection_oper = 'rank',
-                     crossover_oper = 'standart',
-                     mutation_oper = 'weak_grow',
-                     tour_size_param = 2,
-                     initial_population = None,
-                     max_level_param = 16,
-                     init_level_param = 5,
-                     elitism_param = True,
-                     parents_num_param = 7,
-                     mutation_rate_param = 0.05):
+                     selection_oper='rank',
+                     crossover_oper='standart',
+                     mutation_oper='weak_grow',
+                     tour_size_param=2,
+                     initial_population=None,
+                     max_level_param=16,
+                     init_level_param=5,
+                     elitism_param=True,
+                     parents_num_param=7,
+                     mutation_rate_param=0.05):
         self.tour_size = tour_size_param
         self.initial_population = initial_population
         self.max_level = max_level_param
@@ -156,10 +163,12 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
         return self
 
-    def create_offspring(self, population_g, fitness_scale, fitness_rank, _):
+    def create_offspring(self, population_g, fitness_scale, fitness_rank,
+                         fitness_scale_mean, fitness_scale_max,
+                         fitness_scale_i,  fitness_rank_i):
         crossover_func, quantity = self.c_set
         selection_func, tour_size = self.s_set
-        mutation_func, proba_down, not_scale = self.m_set
+        mutation_func, proba_up, not_scale = self.m_set
 
         indexes = selection_func(fitness_scale,
                                  fitness_rank,
@@ -176,10 +185,17 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                                               self.max_level)
 
         if not_scale:
-            proba = proba_down
+            if callable(proba_up):
+                proba = proba_up(fitness_i=fitness_scale_i,
+                                 fitness_mean=fitness_scale_mean,
+                                 fitness_max=fitness_scale_max,
+                                 k=min(1, 4/len(offspring_no_mutated)))
+                # print(min(1, 4/len(offspring_no_mutated)))
+            else:
+                proba = proba_up
         else:
-            proba = proba_down/len(offspring_no_mutated)
-
+            proba = proba_up/len(offspring_no_mutated)
+        # print(proba)
         mutant = mutation_func(offspring_no_mutated,
                                self.uniset, proba, self.max_level)
         return mutant
@@ -191,8 +207,6 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         fitness = self.evaluate(population_ph)
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
-        proba_scale = protect_norm(fitness_scale)
-        proba_rank = protect_norm(fitness_rank)
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -209,8 +223,11 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             else:
                 partial_create_offspring = partial(self.create_offspring,
                                                    population_g,
-                                                   proba_scale, proba_rank)
-                map_ = map(partial_create_offspring, range(self.pop_size))
+                                                   fitness_scale, fitness_rank,
+                                                   fitness_scale.mean(),
+                                                   fitness_scale.max())
+                map_ = map(partial_create_offspring,
+                           fitness_scale, fitness_rank)
                 population_g = np.array(list(map_), dtype=object)
                 population_ph = self.genotype_to_phenotype(population_g)
                 fitness = self.evaluate(population_ph)
@@ -219,9 +236,6 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                     population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
-                proba_scale = protect_norm(fitness_scale)
-                proba_rank = protect_norm(fitness_rank)
-
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
                 if self.keep_history is not None:

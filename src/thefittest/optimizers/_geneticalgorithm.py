@@ -14,6 +14,7 @@ from ..tools.operators import uniform_prop_crossover
 from ..tools.operators import uniform_rank_crossover
 from ..tools.operators import uniform_tour_crossover
 from ..tools.operators import flip_mutation
+from ..tools.operators import fitness_based_mutate_adaptation
 from ..tools.generators import binary_string_population
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
@@ -122,10 +123,12 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                        'uniform_tour7': (uniform_tour_crossover, 7),
                        'uniform_tourk': (uniform_tour_crossover, self.parents_num)}
 
-        self.m_pool = {'weak':  (flip_mutation, 1/(3*self.str_len)),
-                       'average':  (flip_mutation, 1/(self.str_len)),
-                       'strong': (flip_mutation, min(1, 3/self.str_len)),
-                       'custom_rate': (flip_mutation, self.mutation_rate)}
+        self.m_pool = {
+            'weak':  (flip_mutation, 1/(3*self.str_len)),
+            'average':  (flip_mutation, 1/(self.str_len)),
+            'strong': (flip_mutation, min(1, 3/self.str_len)),
+            'custom_rate': (flip_mutation, self.mutation_rate),
+            'fitness_based_adaptation': (flip_mutation, fitness_based_mutate_adaptation)}
 
     def set_strategy(self,
                      selection_oper='tournament_k',
@@ -151,23 +154,31 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
         return self
 
-    def create_offspring(self, population_g, proba_scale, proba_rank, _):
+    def create_offspring(self,
+                         population_g, fitness_scale, fitness_rank, fitness_scale_mean, fitness_scale_max,
+                         fitness_scale_i,  fitness_rank_i):
         crossover_func, quantity = self.c_set
         selection_func, tour_size = self.s_set
         mutation_func, proba = self.m_set
 
-        indexes = selection_func(proba_scale,
-                                 proba_rank,
+        indexes = selection_func(fitness_scale,
+                                 fitness_rank,
                                  tour_size,
                                  quantity)
 
         parents = population_g[indexes].copy()
-        proba_scale_p = proba_scale[indexes].copy()
-        proba_rank_p = proba_rank[indexes].copy()
+        fitness_scale_p = fitness_scale[indexes].copy()
+        fitness_rank_p = fitness_rank[indexes].copy()
 
         offspring_no_mutated = crossover_func(parents,
-                                              proba_scale_p,
-                                              proba_rank_p)
+                                              fitness_scale_p,
+                                              fitness_rank_p)
+
+        if callable(proba):
+            proba = proba(fitness_i=fitness_scale_i,
+                          fitness_mean=fitness_scale_mean,
+                          fitness_max=fitness_scale_max,
+                          k=min(1, 3/self.str_len))
 
         mutant = mutation_func(offspring_no_mutated, proba)
         return mutant
@@ -178,8 +189,6 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         fitness = self.evaluate(population_ph)
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
-        proba_scale = protect_norm(fitness_scale)
-        proba_rank = protect_norm(fitness_rank)
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -197,9 +206,12 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             else:
                 partial_create_offspring = partial(self.create_offspring,
                                                    population_g,
-                                                   proba_scale,
-                                                   proba_rank)
-                map_ = map(partial_create_offspring, range(self.pop_size))
+                                                   fitness_scale,
+                                                   fitness_rank,
+                                                   fitness_scale.mean(),
+                                                   fitness_scale.max())
+                map_ = map(partial_create_offspring,
+                           fitness_scale, fitness_rank)
                 population_g = np.array(list(map_), dtype=np.byte)
 
                 population_ph = self.genotype_to_phenotype(population_g)
@@ -209,8 +221,6 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                     population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
-                proba_scale = protect_norm(fitness_scale)
-                proba_rank = protect_norm(fitness_rank)
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)

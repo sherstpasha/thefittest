@@ -6,7 +6,6 @@ from ._geneticalgorithm import GeneticAlgorithm
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 from ..tools.transformations import numpy_group_by
-from ..tools.transformations import protect_norm
 
 
 class StaticticSelfCGA:
@@ -156,8 +155,8 @@ class SelfCGA(GeneticAlgorithm):
 
         return self
 
-    def create_offs(self, popuation, fitness, ranks,
-                    selection, crossover, mutation):
+    def create_offs(self, popuation, fitness, ranks, fitness_scale_mean, fitness_scale_max,
+                    fitness_scale_i,  fitness_rank_i, selection, crossover, mutation):
         crossover_func, quantity = self.c_sets[crossover]
         selection_func, tour_size = self.s_sets[selection]
         mutation_func, proba = self.m_sets[mutation]
@@ -167,6 +166,11 @@ class SelfCGA(GeneticAlgorithm):
         parents = popuation[indexes].copy()
         fitness_p = fitness[indexes].copy()
         ranks_p = ranks[indexes].copy()
+        if callable(proba):
+            proba = proba(fitness_i=fitness_scale_i,
+                          fitness_mean=fitness_scale_mean,
+                          fitness_max=fitness_scale_max,
+                          k=min(1, 3/self.str_len))
 
         offspring_no_mutated = crossover_func(parents, fitness_p, ranks_p)
         return mutation_func(offspring_no_mutated, proba)
@@ -205,8 +209,6 @@ class SelfCGA(GeneticAlgorithm):
         fitness = self.evaluate(population_ph)
         fitness_scale = scale_data(fitness)
         fitness_rank = rank_data(fitness)
-        proba_scale = protect_norm(fitness_scale)
-        proba_rank = protect_norm(fitness_rank)
 
         self.thefittest = TheFittest().update(population_g,
                                               population_ph,
@@ -231,10 +233,17 @@ class SelfCGA(GeneticAlgorithm):
                 m_operators = self.choice_operators(m_proba)
 
                 create_offs = partial(self.create_offs, population_g,
-                                      proba_scale, proba_rank)
+                                      fitness_scale,
+                                      fitness_rank,
+                                      fitness_scale.mean(),
+                                      fitness_scale.max())
 
-                population_g = np.array(list(map(create_offs, s_operators,
-                                                 c_operators, m_operators)))
+                population_g = np.array(list(map(create_offs,
+                                                 fitness_scale,
+                                                 fitness_rank,
+                                                 s_operators,
+                                                 c_operators,
+                                                 m_operators)))
                 population_ph = self.genotype_to_phenotype(
                     population_g)
                 fitness = self.evaluate(population_ph)
@@ -242,8 +251,6 @@ class SelfCGA(GeneticAlgorithm):
                     population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
                 fitness_scale = scale_data(fitness)
                 fitness_rank = rank_data(fitness)
-                proba_scale = protect_norm(fitness_scale)
-                proba_rank = protect_norm(fitness_rank)
 
                 s_fittest_oper = self.find_fittest_operator(
                     s_operators, fitness_scale)
