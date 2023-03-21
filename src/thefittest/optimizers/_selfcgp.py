@@ -7,7 +7,6 @@ from ..base import TheFittest
 from ..base import LastBest
 from ..tools.transformations import numpy_group_by
 from ..tools.generators import half_and_half
-from ..tools.transformations import protect_norm
 
 
 class StatisticsSelfCGP:
