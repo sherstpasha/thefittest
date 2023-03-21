@@ -6,7 +6,6 @@ from ._geneticalgorithm import GeneticAlgorithm
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 from ..tools.transformations import numpy_group_by
-from ..tools.transformations import protect_norm
 
 
 class StaticticSelfCGA:
