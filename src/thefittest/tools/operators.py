@@ -151,6 +151,23 @@ def shrink_mutation(some_tree, uniset,
     return to_return
 
 
+def fitness_based_mutate_adaptation(fitness_i, fitness_mean, fitness_max, k):
+    '''Srinivas, Maloth & Patnaik, Lalit. (1994). Patnaik, L.M.: Adaptive probabilities
+      of crossover and mutation in genetic algorithms. IEEE Trans. Syst. Man Cybern. 24,
+        656-667. Systems, Man and Cybernetics, IEEE Transactions on. 24. 656 - 667. 10.1109/21.286385. '''
+    # print(fitness_i, fitness_mean, fitness_max)
+    
+    if fitness_i >= fitness_mean:
+        down = (fitness_max - fitness_mean)
+        if down != 0:
+            p_m_i = k*(fitness_max - fitness_i)/down
+        else:
+            p_m_i = k
+    else:
+        p_m_i = k
+    return p_m_i
+    
+  
 ################################## CROSSOVERS ##################################
 # genetic algorithm
 def empty_crossover(individs, *args):
