@@ -1,5 +1,10 @@
 # thefittest
 
+## Installation
+```bash
+pip install thefittest
+```
+
 # the package contains methods
 * **Genetic algorithm** (Holland, J. H. (1992). Genetic algorithms. Scientific American, 267(1), 66-72):
     * **Self-configuring genetic algorithm** (Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform Crossover Operator. LNCS, 7331, 2012, pp. 414-421);
