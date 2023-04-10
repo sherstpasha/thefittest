@@ -14,11 +14,9 @@ from ..tools.operators import uniform_prop_crossover
 from ..tools.operators import uniform_rank_crossover
 from ..tools.operators import uniform_tour_crossover
 from ..tools.operators import flip_mutation
-from ..tools.operators import fitness_based_mutate_adaptation
 from ..tools.generators import binary_string_population
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
-from ..tools.transformations import protect_norm
 
 
 class Statistics:
@@ -123,12 +121,10 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                        'uniform_tour7': (uniform_tour_crossover, 7),
                        'uniform_tourk': (uniform_tour_crossover, self.parents_num)}
 
-        self.m_pool = {
-            'weak':  (flip_mutation, 1/(3*self.str_len)),
-            'average':  (flip_mutation, 1/(self.str_len)),
-            'strong': (flip_mutation, min(1, 3/self.str_len)),
-            'custom_rate': (flip_mutation, self.mutation_rate),
-            'fitness_based_adaptation': (flip_mutation, fitness_based_mutate_adaptation)}
+        self.m_pool = {'weak':  (flip_mutation, 1/(3*self.str_len)),
+                       'average':  (flip_mutation, 1/(self.str_len)),
+                       'strong': (flip_mutation, min(1, 3/self.str_len)),
+                       'custom_rate': (flip_mutation, self.mutation_rate)}
 
     def set_strategy(self,
                      selection_oper='tournament_k',
@@ -154,9 +150,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
         return self
 
-    def create_offspring(self,
-                         population_g, fitness_scale, fitness_rank, fitness_scale_mean, fitness_scale_max,
-                         fitness_scale_i,  fitness_rank_i):
+    def create_offspring(self, population_g, fitness_scale, fitness_rank):
         crossover_func, quantity = self.c_set
         selection_func, tour_size = self.s_set
         mutation_func, proba = self.m_set
@@ -173,12 +167,6 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         offspring_no_mutated = crossover_func(parents,
                                               fitness_scale_p,
                                               fitness_rank_p)
-
-        if callable(proba):
-            proba = proba(fitness_i=fitness_scale_i,
-                          fitness_mean=fitness_scale_mean,
-                          fitness_max=fitness_scale_max,
-                          k=min(1, 3/self.str_len))
 
         mutant = mutation_func(offspring_no_mutated, proba)
         return mutant
@@ -198,7 +186,6 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             self.stats = Statistics(
                 mode=self.keep_history).update(population_g,
                                                fitness)
-
         for i in range(self.iters-1):
             self.show_progress(i)
             if self.termitation_check(lastbest.no_increase):
@@ -206,10 +193,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             else:
                 partial_create_offspring = partial(self.create_offspring,
                                                    population_g,
-                                                   fitness_scale,
-                                                   fitness_rank,
-                                                   fitness_scale.mean(),
-                                                   fitness_scale.max())
+                                                   fitness_scale)
                 map_ = map(partial_create_offspring,
                            fitness_scale, fitness_rank)
                 population_g = np.array(list(map_), dtype=np.byte)
