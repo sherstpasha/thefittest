@@ -1,58 +1,13 @@
 import numpy as np
 from ..base import TheFittest
 from ..base import LastBest
+from ..base import Statistics
 from functools import partial
 from ._differentialevolution import DifferentialEvolution
 from ..tools.operators import binomial
 from ..tools.operators import rand_1
 from ..tools.operators import current_to_best_1
 from ..tools.transformations import numpy_group_by
-
-
-class StaticticSaDE:
-    def __init__(self, mode='quick'):
-        self.mode = mode
-        self.population_g = np.array([])
-        self.fitness = np.array([])
-        self.m_proba = dict()
-        self.CRm = np.array([], dtype=float)
-
-    def append_arr(self, arr_to, arr_from):
-        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
-        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
-        result = np.vstack([arr_to.reshape(shape_to),
-                            arr_from.copy().reshape(shape_from)])
-        return result
-
-    def update(self,
-               population_g_i,
-               fitness_i,
-               m_proba_i, CRm_i):
-        if self.mode == 'quick':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-            if not len(self.m_proba):
-                for key, value in m_proba_i.items():
-                    self.m_proba[key] = np.array(value)
-            else:
-                for key, value in m_proba_i.items():
-                    self.m_proba[key] = np.append(
-                        self.m_proba[key], np.array(value))
-            self.CRm = np.append(self.CRm, CRm_i)
-        elif self.mode == 'full':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-            self.population_g = self.append_arr(self.population_g,
-                                                population_g_i)
-            if not len(self.m_proba):
-                for key, value in m_proba_i.items():
-                    self.m_proba[key] = np.array(value)
-            else:
-                for key, value in m_proba_i.items():
-                    self.m_proba[key] = np.append(
-                        self.m_proba[key], np.array(value))
-            self.CRm = np.append(self.CRm, CRm_i)
-        else:
-            raise ValueError('the "mode" must be either "quick" or "full"')
-        return self
 
 
 class SaDE2005(DifferentialEvolution):
@@ -67,12 +22,12 @@ class SaDE2005(DifferentialEvolution):
                  pop_size,
                  left,
                  right,
-                 optimal_value = None,
-                 termination_error_value = 0.,
-                 no_increase_num = None,
-                 minimization = False,
-                 show_progress_each = None,
-                 keep_history = None):
+                 optimal_value=None,
+                 termination_error_value=0.,
+                 no_increase_num=None,
+                 minimization=False,
+                 show_progress_each=None,
+                 keep_history=False):
         DifferentialEvolution.__init__(
             self,
             fitness_function=fitness_function,
@@ -94,7 +49,7 @@ class SaDE2005(DifferentialEvolution):
         self.m_sets_keys = list(self.m_sets.keys())
 
         self.thefittest: TheFittest
-        self.stats: StaticticSaDE
+        self.stats: Statistics
         self.m_learning_period: int
         self.CR_update_timer: int
         self.CR_m_learning_period: int
@@ -106,15 +61,15 @@ class SaDE2005(DifferentialEvolution):
 
         self.set_strategy()
 
-    def set_strategy(self, m_learning_period_param = 50,
-                     CR_update_timer_param = 5,
-                     CR_m_learning_period_param = 25,
-                     threshold_params = 0.1,
-                     Fm_param = 0.5,
-                     F_sigma_param = 0.3,
-                     CR_sigma_param = 0.1,
-                     elitism_param = True,
-                     initial_population = None):
+    def set_strategy(self, m_learning_period_param=50,
+                     CR_update_timer_param=5,
+                     CR_m_learning_period_param=25,
+                     threshold_params=0.1,
+                     Fm_param=0.5,
+                     F_sigma_param=0.3,
+                     CR_sigma_param=0.1,
+                     elitism_param=True,
+                     initial_population=None):
         self.update_pool()
         self.m_learning_period = m_learning_period_param
         self.CR_update_timer = CR_update_timer_param
@@ -204,12 +159,12 @@ class SaDE2005(DifferentialEvolution):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history is not None:
-            self.stats = StaticticSaDE(
-                mode=self.keep_history).update(population_g,
-                                               fitness,
-                                               m_proba,
-                                               CRm)
+        if self.keep_history:
+            self.stats = Statistics(
+                mode=self.keep_history).update({'population_g': population_g,
+                                                'fitness_max': self.thefittest.fitness,
+                                                'm_proba': m_proba.copy(),
+                                                'CRm': CRm})
 
         ns = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
         nf = dict(zip(self.m_sets_keys, np.zeros(z_m, dtype=int)))
@@ -245,11 +200,11 @@ class SaDE2005(DifferentialEvolution):
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
-                if self.keep_history is not None:
-                    self.stats.update(population_g,
-                                      fitness,
-                                      m_proba,
-                                      CRm)
+                if self.keep_history:
+                    self.stats.update({'population_g': population_g,
+                                       'fitness_max': self.thefittest.fitness,
+                                       'm_proba': m_proba.copy(),
+                                       'CRm': CRm})
                 successes = stack[-1]
                 ns, nf = self.update_ns_nf(m_operators, successes, ns, nf)
                 CR_s_pool = np.append(CR_s_pool, CR_i[successes])

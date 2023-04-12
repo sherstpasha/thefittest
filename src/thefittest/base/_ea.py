@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Any
+from copy import copy
 
 
 class LastBest:
@@ -36,6 +37,16 @@ class TheFittest:
         return self.genotype.copy(), self.phenotype.copy(), self.fitness.copy()
 
 
+class Statistics(dict):
+    def update(self, dict_args):
+        for key, value in dict_args.items():
+            if key not in self.keys():
+                self[key] = [value]
+            else:
+                self[key].append(value)
+        return self
+
+
 class EvolutionaryAlgorithm:
     def __init__(self,
                  fitness_function,
@@ -47,7 +58,7 @@ class EvolutionaryAlgorithm:
                  no_increase_num=None,
                  minimization=False,
                  show_progress_each=None,
-                 keep_history=None):
+                 keep_history=False):
         self.fitness_function = fitness_function
         self.genotype_to_phenotype = genotype_to_phenotype
         self.iters = iters

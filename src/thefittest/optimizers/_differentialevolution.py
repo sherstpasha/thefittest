@@ -3,6 +3,7 @@ from typing import Callable
 from ..base import TheFittest
 from ..base import EvolutionaryAlgorithm
 from ..base import LastBest
+from ..base import Statistics
 from functools import partial
 from ..tools.operators import binomial
 from ..tools.operators import best_1
@@ -13,33 +14,6 @@ from ..tools.operators import rand_1
 from ..tools.operators import current_to_pbest_1
 from ..tools.operators import rand_2
 from ..tools.generators import float_population
-
-
-class Statistics:
-    def __init__(self, mode='quick'):
-        self.mode = mode
-        self.population_g = np.array([])
-        self.fitness = np.array([])
-
-    def append_arr(self, arr_to, arr_from):
-        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
-        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
-        result = np.vstack([arr_to.reshape(shape_to),
-                            arr_from.copy().reshape(shape_from)])
-        return result
-
-    def update(self,
-               population_g_i,
-               fitness_i):
-        if self.mode == 'quick':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-        elif self.mode == 'full':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-            self.population_g = self.append_arr(self.population_g,
-                                                population_g_i)
-        else:
-            raise ValueError('the "mode" must be either "quick" or "full"')
-        return self
 
 
 class DifferentialEvolution(EvolutionaryAlgorithm):
@@ -53,12 +27,12 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                  pop_size,
                  left,
                  right,
-                 optimal_value = None,
-                 termination_error_value = 0.,
-                 no_increase_num = None,
-                 minimization = False,
-                 show_progress_each = None,
-                 keep_history = None):
+                 optimal_value=None,
+                 termination_error_value=0.,
+                 no_increase_num=None,
+                 minimization=False,
+                 show_progress_each=None,
+                 keep_history=False):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -102,12 +76,12 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                        'rand_2': rand_2}
 
     def set_strategy(self,
-                     mutation_oper = 'rand_1',
-                     F_param = 0.5,
-                     CR_param = 0.5,
-                     elitism_param = True,
-                     initial_population = None):
-        
+                     mutation_oper='rand_1',
+                     F_param=0.5,
+                     CR_param=0.5,
+                     elitism_param=True,
+                     initial_population=None):
+
         self.update_pool()
         self.m_function = self.m_pool[mutation_oper]
         self.F = F_param
@@ -159,10 +133,10 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history is not None:
+        if self.keep_history:
             self.stats = Statistics(
-                mode=self.keep_history).update(population_g,
-                                               fitness)
+                mode=self.keep_history).update({'population_g': population_g.copy(),
+                                                'fitness_max': self.thefittest.fitness})
 
         for i in range(self.iters-1):
             self.show_progress(i)
@@ -193,7 +167,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
-                if self.keep_history is not None:
-                    self.stats.update(population_g,
-                                      fitness)
+                if self.keep_history:
+                    self.stats.update({'population_g': population_g.copy(),
+                                       'fitness_max': self.thefittest.fitness})
         return self

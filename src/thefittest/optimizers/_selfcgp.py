@@ -5,49 +5,9 @@ from ..tools.transformations import rank_data
 from functools import partial
 from ..base import TheFittest
 from ..base import LastBest
+from ..base import Statistics
 from ..tools.transformations import numpy_group_by
 from ..tools.generators import half_and_half
-
-
-class StatisticsSelfCGP:
-    def __init__(self, mode='quick'):
-        self.mode = mode
-        self.fittest = []
-        self.fitness = []
-        self.s_proba = dict()
-        self.c_proba = dict()
-        self.m_proba = dict()
-
-    def update(self,
-               fittest_i,
-               fitness_i,
-               s_proba_i, c_proba_i, m_proba_i):
-        if self.mode == 'quick':
-            self.fitness.append(max(fitness_i))
-            for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
-                                          (self.s_proba, self.c_proba, self.m_proba)):
-                if not len(archive_i):
-                    for key, value in proba_i.items():
-                        archive_i[key] = [value]
-                else:
-                    for key, value in proba_i.items():
-                        archive_i[key].append(value)
-
-        elif self.mode == 'full':
-            self.fittest.append(fittest_i.copy())
-            self.fitness.append(max(fitness_i))
-            for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
-                                          (self.s_proba, self.c_proba, self.m_proba)):
-                if not len(archive_i):
-                    for key, value in proba_i.items():
-                        archive_i[key] = [value]
-                else:
-                    for key, value in proba_i.items():
-                        archive_i[key].append(value)
-        else:
-            raise ValueError(
-                'the "mode" must be either "quick" or "full" or None')
-        return self
 
 
 class SelfCGP(GeneticProgramming):
@@ -78,7 +38,7 @@ class SelfCGP(GeneticProgramming):
                          keep_history)
 
         self.thefittest: TheFittest
-        self.stats: StatisticsSelfCGP
+        self.stats: Statistics
         self.s_sets: dict
         self.c_sets: dict
         self.m_sets: dict
@@ -146,8 +106,7 @@ class SelfCGP(GeneticProgramming):
         return self
 
     def create_offspring(self, population_g, fitness_scale, fitness_rank,
-                         fitness_scale_mean, fitness_scale_max,
-                         fitness_scale_i,  fitness_rank_i, selection, crossover, mutation):
+                         selection, crossover, mutation):
         crossover_func, quantity = self.c_sets[crossover]
         selection_func, tour_size = self.s_sets[selection]
         mutation_func, proba_up, not_scale = self.m_sets[mutation]
@@ -167,17 +126,10 @@ class SelfCGP(GeneticProgramming):
                                               self.max_level)
 
         if not_scale:
-            if callable(proba_up):
-                proba = proba_up(fitness_i=fitness_scale_i,
-                                 fitness_mean=fitness_scale_mean,
-                                 fitness_max=fitness_scale_max,
-                                 k=0.5)
-                # print(min(1, 4/len(offspring_no_mutated)))
-            else:
-                proba = proba_up
+            proba = proba_up
         else:
             proba = proba_up/len(offspring_no_mutated)
-        # print(proba)
+
         mutant = mutation_func(offspring_no_mutated,
                                self.uniset, proba, self.max_level)
         return mutant
@@ -223,13 +175,13 @@ class SelfCGP(GeneticProgramming):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history is not None:
-            self.stats = StatisticsSelfCGP(
-                mode=self.keep_history).update(self.thefittest.genotype,
-                                               fitness,
-                                               s_proba,
-                                               c_proba,
-                                               m_proba)
+        if self.keep_history:
+            self.stats = Statistics(
+                mode=self.keep_history).update({'individ_max': self.thefittest.genotype.copy(),
+                                                'fitness_max': self.thefittest.fitness,
+                                                's_proba': s_proba.copy(),
+                                                'c_proba': c_proba.copy(),
+                                                'm_proba': m_proba.copy()})
         for i in range(self.iters-1):
             self.show_progress(i)
             if self.termitation_check(lastbest.no_increase):
@@ -242,11 +194,8 @@ class SelfCGP(GeneticProgramming):
                 partial_create_offspring = partial(self.create_offspring,
                                                    population_g,
                                                    fitness_scale,
-                                                   fitness_rank,
-                                                   fitness_scale.mean(),
-                                                   fitness_scale.max())
-                map_ = map(partial_create_offspring, fitness_scale,
-                           fitness_rank,
+                                                   fitness_rank)
+                map_ = map(partial_create_offspring,
                            s_operators,
                            c_operators,
                            m_operators)
@@ -275,10 +224,10 @@ class SelfCGP(GeneticProgramming):
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
 
-                if self.keep_history is not None:
-                    self.stats.update(self.thefittest.genotype,
-                                      fitness,
-                                      s_proba,
-                                      c_proba,
-                                      m_proba)
+                if self.keep_history:
+                    self.stats.update({'individ_max': self.thefittest.genotype.copy(),
+                                       'fitness_max': self.thefittest.fitness,
+                                       's_proba': s_proba.copy(),
+                                       'c_proba': c_proba.copy(),
+                                       'm_proba': m_proba.copy()})
         return self

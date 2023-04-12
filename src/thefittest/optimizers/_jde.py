@@ -1,46 +1,10 @@
 import numpy as np
 from ..base import TheFittest
 from ..base import LastBest
+from ..base import Statistics
 from functools import partial
 from ._differentialevolution import DifferentialEvolution
 from ..tools.operators import binomial
-
-
-class StatisticsjDE:
-    def __init__(self, mode='quick'):
-        self.mode = mode
-        self.population_g = np.array([])
-        self.fitness = np.array([])
-        self.F = np.array([], dtype=float)
-        self.CR = np.array([], dtype=float)
-
-    def append_arr(self, arr_to, arr_from):
-        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
-        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
-        result = np.vstack([arr_to.reshape(shape_to),
-                            arr_from.copy().reshape(shape_from)])
-        return result
-
-    def update(self,
-               population_g_i: np.ndarray,
-               fitness_i: np.ndarray,
-               F_i, CR_i):
-        if self.mode == 'quick':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-        elif self.mode == 'full':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-            self.population_g = self.append_arr(self.population_g,
-                                                population_g_i)
-            if not len(self.F):
-                self.F = F_i.copy().reshape(1, -1)
-                self.CR = CR_i.copy().reshape(1, -1)
-            else:
-                self.F = np.append(self.F, F_i.copy().reshape(1, -1), axis=0)
-                self.CR = np.append(
-                    self.CR, CR_i.copy().reshape(1, -1), axis=0)
-        else:
-            raise ValueError('the "mode" must be either "quick" or "full"')
-        return self
 
 
 class jDE(DifferentialEvolution):
@@ -55,12 +19,12 @@ class jDE(DifferentialEvolution):
                  pop_size,
                  left,
                  right,
-                 optimal_value = None,
-                 termination_error_value = 0.,
-                 no_increase_num = None,
-                 minimization = False,
-                 show_progress_each = None,
-                 keep_history = None):
+                 optimal_value=None,
+                 termination_error_value=0.,
+                 no_increase_num=None,
+                 minimization=False,
+                 show_progress_each=None,
+                 keep_history=False):
         DifferentialEvolution.__init__(
             self,
             fitness_function=fitness_function,
@@ -77,20 +41,20 @@ class jDE(DifferentialEvolution):
             keep_history=keep_history)
 
         self.thefittest: TheFittest
-        self.stats: StatisticsjDE
+        self.stats: Statistics
         self.F_left: float
         self.F_right: float
         self.t_f: float
         self.t_cr: float
 
     def set_strategy(self,
-                     mutation_oper = 'rand_1',
-                     F_left_param = 0.1,
-                     F_right_param = 0.9,
-                     t_f_param = 0.1,
-                     t_cr_param = 0.1,
-                     elitism_param = True,
-                     initial_population = None):
+                     mutation_oper='rand_1',
+                     F_left_param=0.1,
+                     F_right_param=0.9,
+                     t_f_param=0.1,
+                     t_cr_param=0.1,
+                     elitism_param=True,
+                     initial_population=None):
         self.update_pool()
         self.m_function = self.m_pool[mutation_oper]
         self.F_left = F_left_param
@@ -157,12 +121,12 @@ class jDE(DifferentialEvolution):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history is not None:
-            self.stats = StatisticsjDE(
-                mode=self.keep_history).update(population_g,
-                                               fitness,
-                                               F_i,
-                                               CR_i)
+        if self.keep_history:
+            self.stats = Statistics(
+                mode=self.keep_history).update({'population_g': population_g,
+                                                'fitness_max': self.thefittest.fitness,
+                                                'F': F_i.copy(),
+                                                'CR': CR_i.copy()})
 
         for i in range(self.iters-1):
             self.show_progress(i)
@@ -200,9 +164,9 @@ class jDE(DifferentialEvolution):
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
-                if self.keep_history is not None:
-                    self.stats.update(population_g,
-                                      fitness,
-                                      F_i,
-                                      CR_i)
+                if self.keep_history:
+                    self.stats.update({'population_g': population_g,
+                                       'fitness_max': self.thefittest.fitness,
+                                       'F': F_i.copy(),
+                                       'CR': CR_i.copy()})
         return self

@@ -2,51 +2,13 @@ import numpy as np
 from ..base import TheFittest
 from ..base import EvolutionaryAlgorithm
 from ..base import LastBest
+from ..base import Statistics
 from ..tools.generators import cauchy_distribution
 from ..tools.generators import binary_string_population
 from ..tools.operators import tournament_selection
 from ..tools.operators import binomial
 from ..tools.operators import flip_mutation
 from functools import partial
-
-
-class StatisticsSHAGA:
-    def __init__(self, mode='quick'):
-        self.mode = mode
-        self.population_g = np.array([])
-        self.fitness = np.array([])
-        self.H_MR = np.array([], dtype=float)
-        self.H_CR = np.array([], dtype=float)
-
-    def append_arr(self, arr_to, arr_from):
-        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
-        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
-        result = np.vstack([arr_to.reshape(shape_to),
-                            arr_from.copy().reshape(shape_from)])
-        return result
-
-    def update(self,
-               population_g_i,
-               fitness_i,
-               H_MR_i,
-               H_CR_i):
-        if self.mode == 'quick':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-        elif self.mode == 'full':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-            self.population_g = self.append_arr(self.population_g,
-                                                population_g_i)
-            if not len(self.H_MR):
-                self.H_MR = H_MR_i.copy().reshape(1, -1)
-                self.H_CR = H_CR_i.copy().reshape(1, -1)
-            else:
-                self.H_MR = np.append(
-                    self.H_MR, H_MR_i.copy().reshape(1, -1), axis=0)
-                self.H_CR = np.append(
-                    self.H_CR, H_CR_i.copy().reshape(1, -1), axis=0)
-        else:
-            raise ValueError('the "mode" must be either "quick" or "full"')
-        return self
 
 
 class SHAGA(EvolutionaryAlgorithm):
@@ -60,12 +22,12 @@ class SHAGA(EvolutionaryAlgorithm):
                  iters,
                  pop_size,
                  str_len,
-                 optimal_value = None,
-                 termination_error_value = 0.,
-                 no_increase_num = None,
-                 minimization = False,
-                 show_progress_each = None,
-                 keep_history = None):
+                 optimal_value=None,
+                 termination_error_value=0.,
+                 no_increase_num=None,
+                 minimization=False,
+                 show_progress_each=None,
+                 keep_history=False):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -91,8 +53,8 @@ class SHAGA(EvolutionaryAlgorithm):
         self.set_strategy()
 
     def set_strategy(self,
-                     elitism_param = True,
-                     initial_population = None):
+                     elitism_param=True,
+                     initial_population=None):
         self.elitism = elitism_param
         self.initial_population = initial_population
         return self
@@ -178,18 +140,19 @@ class SHAGA(EvolutionaryAlgorithm):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history is not None:
-            self.stats = StatisticsSHAGA(
-                mode=self.keep_history).update(population_g,
-                                               fitness,
-                                               H_MR,
-                                               H_CR)
+        if self.keep_history:
+            self.stats = Statistics(
+                mode=self.keep_history).update({'population_g': population_g.copy(),
+                                                'fitness_max': self.thefittest.fitness,
+                                                'H_MR': H_MR.copy(),
+                                                'H_CR': H_CR.copy()})
+
         for i in range(self.iters-1):
             self.show_progress(i)
             if self.termitation_check(lastbest.no_increase):
                 break
             else:
-                MR_i, CR_i = self.generate_MR_CR(H_MR, H_CR, self.pop_size )
+                MR_i, CR_i = self.generate_MR_CR(H_MR, H_CR, self.pop_size)
 
                 partial_operators = partial(self.selection_crossover_mutation,
                                             population_g.copy(), fitness.copy())
@@ -226,11 +189,11 @@ class SHAGA(EvolutionaryAlgorithm):
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
 
-                if self.keep_history is not None:
-                    self.stats.update(population_g,
-                                      fitness,
-                                      H_MR,
-                                      H_CR)
+                if self.keep_history:
+                    self.stats.update({'population_g': population_g.copy(),
+                                       'fitness_max': self.thefittest.fitness,
+                                       'H_MR': H_MR.copy(),
+                                       'H_CR': H_CR.copy()})
 
                 if k == self.H_size - 1:
                     k = 0

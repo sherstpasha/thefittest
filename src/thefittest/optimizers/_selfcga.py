@@ -2,59 +2,11 @@ import numpy as np
 from functools import partial
 from ..base import TheFittest
 from ..base import LastBest
+from ..base import Statistics
 from ._geneticalgorithm import GeneticAlgorithm
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 from ..tools.transformations import numpy_group_by
-
-
-class StaticticSelfCGA:
-    def __init__(self, mode='quick'):
-        self.mode = mode
-        self.population_g = np.array([])
-        self.fitness = np.array([])
-        self.s_proba = dict()
-        self.c_proba = dict()
-        self.m_proba = dict()
-
-    def append_arr(self, arr_to, arr_from):
-        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
-        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
-        result = np.vstack([arr_to.reshape(shape_to),
-                            arr_from.copy().reshape(shape_from)])
-        return result
-
-    def update(self, population_g_i,
-               fitness_i,
-               s_proba_i, c_proba_i, m_proba_i):
-
-        if self.mode == 'quick':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-            for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
-                                          (self.s_proba, self.c_proba, self.m_proba)):
-                if not len(archive_i):
-                    for key, value in proba_i.items():
-                        archive_i[key] = np.array(value)
-                else:
-                    for key, value in proba_i.items():
-                        archive_i[key] = np.append(
-                            archive_i[key], np.array(value))
-        elif self.mode == 'full':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-            for proba_i, archive_i in zip((s_proba_i, c_proba_i, m_proba_i),
-                                          (self.s_proba, self.c_proba, self.m_proba)):
-                if not len(archive_i):
-                    for key, value in proba_i.items():
-                        archive_i[key] = np.array(value)
-                else:
-                    for key, value in proba_i.items():
-                        archive_i[key] = np.append(
-                            archive_i[key], np.array(value))
-            self.population_g = self.append_arr(self.population_g,
-                                                population_g_i)
-        else:
-            raise ValueError('the "mode" must be either "quick" or "full"')
-        return self
 
 
 class SelfCGA(GeneticAlgorithm):
@@ -69,7 +21,7 @@ class SelfCGA(GeneticAlgorithm):
                  no_increase_num=None,
                  minimization=False,
                  show_progress_each=None,
-                 keep_history=None):
+                 keep_history=False):
         GeneticAlgorithm.__init__(self,
                                   fitness_function=fitness_function,
                                   genotype_to_phenotype=genotype_to_phenotype,
@@ -84,7 +36,7 @@ class SelfCGA(GeneticAlgorithm):
                                   keep_history=keep_history)
 
         self.thefittest: TheFittest
-        self.stats: StaticticSelfCGA
+        self.stats: Statistics
         self.s_sets: dict
         self.c_sets: dict
         self.m_sets: dict
@@ -97,11 +49,11 @@ class SelfCGA(GeneticAlgorithm):
         self.set_strategy()
 
     def set_strategy(self,
-                     selection_oper=['proportional',
-                                     'rank',
-                                     'tournament_3',
-                                     'tournament_5',
-                                     'tournament_7'],
+                     selection_opers=['proportional',
+                                      'rank',
+                                      'tournament_3',
+                                      'tournament_5',
+                                      'tournament_7'],
                      crossover_opers=['empty',
                                       'one_point',
                                       'two_point',
@@ -136,7 +88,7 @@ class SelfCGA(GeneticAlgorithm):
         self.update_pool()
 
         s_sets = {}
-        for operator_name in selection_oper:
+        for operator_name in selection_opers:
             value = self.s_pool[operator_name]
             s_sets[operator_name] = value
         self.s_sets = dict(sorted(s_sets.items()))
@@ -155,8 +107,7 @@ class SelfCGA(GeneticAlgorithm):
 
         return self
 
-    def create_offs(self, popuation, fitness, ranks, fitness_scale_mean, fitness_scale_max,
-                    fitness_scale_i,  fitness_rank_i, selection, crossover, mutation):
+    def create_offs(self, popuation, fitness, ranks, selection, crossover, mutation):
         crossover_func, quantity = self.c_sets[crossover]
         selection_func, tour_size = self.s_sets[selection]
         mutation_func, proba = self.m_sets[mutation]
@@ -166,11 +117,6 @@ class SelfCGA(GeneticAlgorithm):
         parents = popuation[indexes].copy()
         fitness_p = fitness[indexes].copy()
         ranks_p = ranks[indexes].copy()
-        if callable(proba):
-            proba = proba(fitness_i=fitness_scale_i,
-                          fitness_mean=fitness_scale_mean,
-                          fitness_max=fitness_scale_max,
-                          k=min(1, 3/self.str_len))
 
         offspring_no_mutated = crossover_func(parents, fitness_p, ranks_p)
         return mutation_func(offspring_no_mutated, proba)
@@ -215,13 +161,13 @@ class SelfCGA(GeneticAlgorithm):
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
 
-        if self.keep_history is not None:
-            self.stats = StaticticSelfCGA(
-                mode=self.keep_history).update(population_g,
-                                               fitness,
-                                               s_proba,
-                                               c_proba,
-                                               m_proba)
+        if self.keep_history:
+            self.stats = Statistics(
+                mode=self.keep_history).update({'population_g': population_g.copy(),
+                                                'fitness_max': self.thefittest.fitness,
+                                                's_proba': s_proba.copy(),
+                                                'c_proba': c_proba.copy(),
+                                                'm_proba': m_proba.copy()})
 
         for i in range(self.iters-1):
             self.show_progress(i)
@@ -232,15 +178,12 @@ class SelfCGA(GeneticAlgorithm):
                 c_operators = self.choice_operators(c_proba)
                 m_operators = self.choice_operators(m_proba)
 
-                create_offs = partial(self.create_offs, population_g,
+                create_offs = partial(self.create_offs,
+                                      population_g,
                                       fitness_scale,
-                                      fitness_rank,
-                                      fitness_scale.mean(),
-                                      fitness_scale.max())
+                                      fitness_rank)
 
                 population_g = np.array(list(map(create_offs,
-                                                 fitness_scale,
-                                                 fitness_rank,
                                                  s_operators,
                                                  c_operators,
                                                  m_operators)))
@@ -267,10 +210,10 @@ class SelfCGA(GeneticAlgorithm):
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
 
-                if self.keep_history is not None:
-                    self.stats.update(population_g,
-                                      fitness,
-                                      s_proba,
-                                      c_proba,
-                                      m_proba)
+                if self.keep_history:
+                    self.stats.update({'population_g': population_g.copy(),
+                                       'fitness_max': self.thefittest.fitness,
+                                       's_proba': s_proba.copy(),
+                                       'c_proba': c_proba.copy(),
+                                       'm_proba': m_proba.copy()})
         return self

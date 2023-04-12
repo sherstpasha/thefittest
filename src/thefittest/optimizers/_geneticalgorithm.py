@@ -3,6 +3,7 @@ from functools import partial
 from ..base import TheFittest
 from ..base import EvolutionaryAlgorithm
 from ..base import LastBest
+from ..base import Statistics
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
@@ -19,33 +20,6 @@ from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 
 
-class Statistics:
-    def __init__(self, mode='quick'):
-        self.mode = mode
-        self.population_g = np.array([])
-        self.fitness = np.array([])
-
-    def append_arr(self, arr_to, arr_from):
-        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
-        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
-        result = np.vstack([arr_to.reshape(shape_to),
-                            arr_from.copy().reshape(shape_from)])
-        return result
-
-    def update(self,
-               population_g_i,
-               fitness_i):
-        if self.mode == 'quick':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-        elif self.mode == 'full':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-            self.population_g = self.append_arr(self.population_g,
-                                                population_g_i)
-        else:
-            raise ValueError('the "mode" must be either "quick" or "full"')
-        return self
-
-
 class GeneticAlgorithm(EvolutionaryAlgorithm):
     def __init__(self,
                  fitness_function,
@@ -58,7 +32,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                  no_increase_num=None,
                  minimization=False,
                  show_progress_each=None,
-                 keep_history=None):
+                 keep_history=False):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -150,7 +124,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
         return self
 
-    def create_offspring(self, population_g, fitness_scale, fitness_rank):
+    def create_offspring(self, population_g, fitness_scale, fitness_rank, _):
         crossover_func, quantity = self.c_set
         selection_func, tour_size = self.s_set
         mutation_func, proba = self.m_set
@@ -182,10 +156,9 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history is not None:
-            self.stats = Statistics(
-                mode=self.keep_history).update(population_g,
-                                               fitness)
+        if self.keep_history:
+            self.stats = Statistics().update({'population_g': population_g.copy(),
+                                              'fitness_max': self.thefittest.fitness})
         for i in range(self.iters-1):
             self.show_progress(i)
             if self.termitation_check(lastbest.no_increase):
@@ -193,9 +166,9 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             else:
                 partial_create_offspring = partial(self.create_offspring,
                                                    population_g,
-                                                   fitness_scale)
-                map_ = map(partial_create_offspring,
-                           fitness_scale, fitness_rank)
+                                                   fitness_scale,
+                                                   fitness_rank)
+                map_ = map(partial_create_offspring, range(self.pop_size))
                 population_g = np.array(list(map_), dtype=np.byte)
 
                 population_ph = self.genotype_to_phenotype(population_g)
@@ -208,7 +181,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
-                if self.keep_history is not None:
-                    self.stats.update(population_g,
-                                      fitness)
+                if self.keep_history:
+                    self.stats.update({'population_g': population_g.copy(),
+                                       'fitness_max': self.thefittest.fitness})
         return self

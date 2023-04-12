@@ -1,45 +1,12 @@
 import numpy as np
 from ..base import TheFittest
 from ..base import LastBest
+from ..base import Statistics
 from functools import partial
 from ._differentialevolution import DifferentialEvolution
 from ..tools.operators import binomial
 from ..tools.generators import cauchy_distribution
 from ..tools.transformations import lehmer_mean
-
-
-class StatisticsSHADE:
-    def __init__(self, mode='quick'):
-        self.mode = mode
-        self.population_g = np.array([])
-        self.fitness = np.array([])
-        self.H_F = np.array([], dtype=float)
-        self.H_CR = np.array([], dtype=float)
-
-    def append_arr(self, arr_to, arr_from):
-        shape_to = (-1, arr_from.shape[0], arr_from.shape[1])
-        shape_from = (1, arr_from.shape[0], arr_from.shape[1])
-        result = np.vstack([arr_to.reshape(shape_to),
-                            arr_from.copy().reshape(shape_from)])
-        return result
-
-    def update(self,
-               population_g_i,
-               fitness_i,
-               H_F_i,
-               H_CR_i):
-        if self.mode == 'quick':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-
-        elif self.mode == 'full':
-            self.fitness = np.append(self.fitness, np.max(fitness_i))
-            self.population_g = self.append_arr(self.population_g,
-                                                population_g_i)
-            self.H_F = H_F_i.copy().reshape(1, -1)
-            self.H_CR = H_CR_i.copy().reshape(1, -1)
-        else:
-            raise ValueError('the "mode" must be either "quick" or "full"')
-        return self
 
 
 class SHADE(DifferentialEvolution):
@@ -54,12 +21,12 @@ class SHADE(DifferentialEvolution):
                  pop_size,
                  left,
                  right,
-                 optimal_value = None,
-                 termination_error_value = 0.,
-                 no_increase_num = None,
-                 minimization = False,
-                 show_progress_each = None,
-                 keep_history = None):
+                 optimal_value=None,
+                 termination_error_value=0.,
+                 no_increase_num=None,
+                 minimization=False,
+                 show_progress_each=None,
+                 keep_history=False):
         DifferentialEvolution.__init__(
             self,
             fitness_function=fitness_function,
@@ -76,7 +43,7 @@ class SHADE(DifferentialEvolution):
             keep_history=keep_history)
 
         self.thefittest: TheFittest
-        self.stats: StatisticsSHADE
+        self.stats: Statistics
         self.H_size = pop_size
 
     def append_archive(self, archive, worse_i):
@@ -100,8 +67,8 @@ class SHADE(DifferentialEvolution):
         return current + F_value*(best - current) + F_value*(population[r1] - pop_archive[r2])
 
     def set_strategy(self,
-                     elitism_param = True,
-                     initial_population = None):
+                     elitism_param=True,
+                     initial_population=None):
         self.update_pool()
         self.elitism = elitism_param
         self.initial_population = initial_population
@@ -198,12 +165,13 @@ class SHADE(DifferentialEvolution):
                                               population_ph,
                                               fitness)
         lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history is not None:
-            self.stats = StatisticsSHADE(
-                mode=self.keep_history).update(population_g,
-                                               fitness,
-                                               H_F,
-                                               H_CR)
+        if self.keep_history:
+            self.stats = Statistics(
+                mode=self.keep_history).update({'population_g': population_g.copy(),
+                                                'fitness_max': self.thefittest.fitness,
+                                                'H_F': H_F.copy(),
+                                                'H_CR': H_CR.copy()})
+
         for i in range(self.iters-1):
             self.show_progress(i)
             if self.termitation_check(lastbest.no_increase):
@@ -255,11 +223,11 @@ class SHADE(DifferentialEvolution):
                 self.thefittest.update(population_g, population_ph, fitness)
                 lastbest.update(self.thefittest.fitness)
 
-                if self.keep_history is not None:
-                    self.stats.update(population_g,
-                                      fitness,
-                                      H_F,
-                                      H_CR)
+                if self.keep_history:
+                    self.stats.update({'population_g': population_g.copy(),
+                                       'fitness_max': self.thefittest.fitness,
+                                       'H_F': H_F.copy(),
+                                       'H_CR': H_CR.copy()})
 
                 if k == self.H_size - 1:
                     k = 0
