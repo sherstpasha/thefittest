@@ -214,7 +214,7 @@ class EphemeralConstantNode(Node):
 
 
 class UniversalSet:
-    def __init__(self, functional_set, terminal_set, ephemeral_set=[]):
+    def __init__(self, functional_set, terminal_set):
         self.functional_set = {'any': functional_set}
         for unit in functional_set:
             n_args = unit.n_args
@@ -222,20 +222,10 @@ class UniversalSet:
                 self.functional_set[n_args] = [unit]
             else:
                 self.functional_set[n_args].append(unit)
-        self.union_terminal = list(terminal_set) + list(ephemeral_set)
-        self.terminal_set = terminal_set
-        self.ephemeral_set = ephemeral_set
-
-    def random_terminal(self):
-        choosen = random.choice(self.terminal_set)
-        return choosen
-
-    def random_ephemeral(self):
-        choosen = random.choice(self.ephemeral_set)
-        return EphemeralConstantNode(choosen)
+        self.terminal_set = list(terminal_set)
 
     def random_terminal_or_ephemeral(self):
-        choosen = random.choice(self.union_terminal)
+        choosen = random.choice(self.terminal_set)
         if type(choosen) is EphemeralNode:
             to_return = EphemeralConstantNode(choosen)
         else:
