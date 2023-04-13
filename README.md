@@ -6,8 +6,9 @@ pip install thefittest
 ```
 ##  Dependencies
 thefittest requires:
-* numpy>=1.21.6,<=1.23;
-* numba>=0.56.4.
+* python (>=3.7,<3.11)
+* numpy (>=1.21.6,<=1.23);
+* numba (>=0.56.4).
 
 
 ## The package contains methods
