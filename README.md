@@ -4,6 +4,11 @@
 ```bash
 pip install thefittest
 ```
+##  Dependencies
+thefittest requires:
+* numpy>=1.21.6,<=1.23;
+* numba>=0.56.4.
+
 
 ## The package contains methods
 * **Genetic algorithm** (Holland, J. H. (1992). Genetic algorithms. Scientific American, 267(1), 66-72):
