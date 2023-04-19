@@ -192,7 +192,8 @@ def shrink_mutation(tree: Tree,
 def empty_crossover(individs: np.ndarray,
                     fitness: np.ndarray,
                     rank: np.ndarray) -> np.ndarray:
-    return individs[0]
+    offspring = individs[0].copy()
+    return offspring
 
 
 def one_point_crossover(individs: np.ndarray,
@@ -232,7 +233,7 @@ def uniform_crossover(individs: np.ndarray,
     diag = np.arange(len(individs[0]))
 
     choosen = np.random.choice(range_, size=len(individs[0]))
-    offspring = individs[choosen, diag]
+    offspring = individs[choosen, diag].copy()
     return offspring
 
 
@@ -244,7 +245,7 @@ def uniform_prop_crossover(individs: np.ndarray,
 
     probability = protect_norm(fitness)
     choosen = np.random.choice(range_, size=len(individs[0]), p=probability)
-    offspring = individs[choosen, diag]
+    offspring = individs[choosen, diag].copy()
     return offspring
 
 
@@ -256,7 +257,7 @@ def uniform_rank_crossover(individs: np.ndarray,
 
     probability = protect_norm(rank)
     choosen = np.random.choice(range_, size=len(individs[0]), p=probability)
-    offspring = individs[choosen, diag]
+    offspring = individs[choosen, diag].copy()
     return offspring
 
 
@@ -269,7 +270,7 @@ def uniform_tour_crossover(individs: np.ndarray,
     tournament = np.random.choice(range_, 2*len(individs[0]))
     tournament = tournament.reshape(-1, 2)
     choosen = np.argmin(fitness[tournament], axis=1)
-    offspring = individs[choosen, diag]
+    offspring = individs[choosen, diag].copy()
     return offspring
 
 
@@ -284,7 +285,8 @@ def binomial(individ: np.ndarray,
     mask_j = np.arange(len(individ)) == j
     mask_union = mask_random | mask_j
     individ[mask_union] = mutant[mask_union].copy()
-    return individ
+    offspring = individ.copy()
+    return offspring
 
 
 # genetic propramming

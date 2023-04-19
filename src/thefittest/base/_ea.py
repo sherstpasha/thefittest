@@ -1,54 +1,54 @@
-import numpy as np
 from typing import Any
 from typing import Tuple
 from typing import Dict
 from typing import Callable
 from typing import Optional
+import numpy as np
 
 
 class LastBest:
     def __init__(self) -> None:
-        self.value = np.nan
-        self.no_increase_counter = 0
+        self._value = np.nan
+        self._no_increase_counter = 0
 
-    def update(self,
-               current_value: float):
-        if self.value == current_value:
-            self.no_increase_counter += 1
+    def _update(self,
+                current_value: float):
+        if self._value == current_value:
+            self._no_increase_counter += 1
         else:
-            self.no_increase_counter = 0
-            self.value = current_value
+            self._no_increase_counter = 0
+            self._value = current_value
         return self
 
 
 class TheFittest:
     def __init__(self):
-        self.genotype: Any
-        self.phenotype: Any
-        self.fitness = -np.inf
+        self._genotype: Any
+        self._phenotype: Any
+        self._fitness = -np.inf
 
-    def update(self,
-               population_g: np.ndarray,
-               population_ph: np.ndarray,
-               fitness: np.ndarray):
+    def _update(self,
+                population_g: np.ndarray,
+                population_ph: np.ndarray,
+                fitness: np.ndarray):
         temp_best_id = np.argmax(fitness)
         temp_best_fitness = fitness[temp_best_id].copy()
-        if temp_best_fitness > self.fitness:
-            self.genotype = population_g[temp_best_id].copy()
-            self.phenotype = population_ph[temp_best_id].copy()
-            self.fitness = temp_best_fitness.copy()
+        if temp_best_fitness > self._fitness:
+            self._genotype = population_g[temp_best_id].copy()
+            self._phenotype = population_ph[temp_best_id].copy()
+            self._fitness = temp_best_fitness.copy()
         return self
 
     def get(self) -> Tuple:
-        to_return = (self.genotype.copy(),
-                     self.phenotype.copy(),
-                     self.fitness.copy())
+        to_return = (self._genotype.copy(),
+                     self._phenotype.copy(),
+                     self._fitness.copy())
         return to_return
 
 
 class Statistics(dict):
-    def update(self,
-               arg: Dict):
+    def _update(self,
+                arg: Dict):
         for key, value in arg.items():
             if key not in self.keys():
                 self[key] = [value]
@@ -69,38 +69,74 @@ class EvolutionaryAlgorithm:
                  minimization: bool = False,
                  show_progress_each: Optional[int] = None,
                  keep_history: bool = False):
-        self.fitness_function = fitness_function
-        self.genotype_to_phenotype = genotype_to_phenotype
-        self.iters = iters
-        self.pop_size = pop_size
-        self.no_increase_num = no_increase_num
-        self.show_progress_each = show_progress_each
-        self.keep_history = keep_history
+        self._fitness_function = fitness_function
+        self._genotype_to_phenotype = genotype_to_phenotype
+        self._iters = iters
+        self._pop_size = pop_size
+        self._no_increase_num = no_increase_num
+        self._show_progress_each = show_progress_each
+        self._keep_history = keep_history
 
-        self.sign = -1 if minimization else 1
+        self._sign = -1 if minimization else 1
 
         if optimal_value is not None:
-            self.aim = self.sign*optimal_value - termination_error_value
+            self._aim = self._sign*optimal_value - termination_error_value
         else:
-            self.aim = np.inf
+            self._aim = np.inf
 
-        self.calls = 0
+        self._calls = 0
 
-    def evaluate(self,
-                 population_ph: np.ndarray) -> np.ndarray:
-        self.calls += len(population_ph)
-        return self.sign*self.fitness_function(population_ph)
+        self._thefittest: Optional[TheFittest] = None
+        self._lastbest: Optional[LastBest] = None
+        self._stats: Optional[Statistics] = None
 
-    def show_progress(self, iteration_number: int) -> None:
-        cond_show_progress_switch = self.show_progress_each is not None
-        cond_show_progress_now = iteration_number % self.show_progress_each == 0
-        if cond_show_progress_switch and cond_show_progress_now:
-            print(f'{iteration_number} iteration with fitness = {self.thefittest.fitness}')
+    def _evaluate(self,
+                  population_ph: np.ndarray) -> np.ndarray:
+        self._calls += len(population_ph)
+        return self._sign*self._fitness_function(population_ph)
 
-    def termitation_check(self, no_increase_counter):
-        cond_aim_achieved = self.thefittest.fitness >= self.aim
-        cond_no_increase_achieved = no_increase_counter == self.no_increase_num
-        return cond_aim_achieved or cond_no_increase_achieved
+    def _show_progress(self, iter_number: int) -> None:
+        cond_show_switch = self._show_progress_each is not None
+        cond_show_now = iter_number % self._show_progress_each == 0
+        if cond_show_switch and cond_show_now:
+            print(
+                f'{iter_number} iteration with fitness = {self._thefittest._fitness}')
+
+    def _termitation_check(self):
+        cond_aim = self._thefittest._fitness >= self._aim
+        cond_no_increase = self._lastbest._no_increase_counter == self._no_increase_num
+        return cond_aim or cond_no_increase
+
+    def _update_fittest(self,
+                       population_g: np.ndarray,
+                       population_ph: np.ndarray,
+                       fitness: np.ndarray) -> None:
+        if self._thefittest is None:
+            self._thefittest = TheFittest()._update(population_g,
+                                                    population_ph,
+                                                    fitness)
+            self._lastbest = LastBest()._update(self._thefittest._fitness)
+
+        else:
+            self._thefittest._update(population_g, population_ph, fitness)
+            self._lastbest._update(self._thefittest._fitness)
+
+    def _update_stats(self,
+                     statistic_args: Dict) -> None:
+        if self._keep_history:
+            if self._stats is None:
+                self._stats = Statistics()._update(statistic_args)
+            else:
+                self._stats._update(statistic_args)
+
+    def get_phenotype(self, popultion_g: np.ndarray) -> np.ndarray:
+        return self._genotype_to_phenotype(popultion_g)
 
     def get_remains_calls(self):
-        return (self.pop_size + (self.iters-1)*(self.pop_size-1)) - self.calls
+        return (self._pop_size + (self._iters-1)*(self._pop_size-1)) - self._calls
+
+    def get_fittest(self) -> TheFittest:
+        return self._thefittest
+
+    def get_stats(self) -> Statistics:
+        return self._stats
