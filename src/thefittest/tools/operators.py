@@ -1,5 +1,6 @@
 import numpy as np
 from ..base import Tree
+from ..base import UniversalSet
 from ..base import FunctionalNode
 from .generators import growing_method
 from .generators import sattolo_shuffle
@@ -15,58 +16,86 @@ max_value = np.finfo(np.float64).max
 
 ################################## MUTATUIONS ##################################
 # genetic algorithm
-def flip_mutation(individ, proba):
+def flip_mutation(individ: np.ndarray,
+                  proba: float) -> np.ndarray:
     mask = np.random.random(size=individ.shape) < proba
     individ[mask] = 1 - individ[mask]
     return individ
 
 
 # differential evolution
-def best_1(current, population, F_value):
+def best_1(current: np.ndarray,
+           population: np.ndarray,
+           F: float) -> np.ndarray:
     best = population[-1]
-    r1, r2 = np.random.choice(
-        np.arange(len(population)), size=2, replace=False)
-    return best + F_value*(population[r1] - population[r2])
+    range_ = np.arange(len(population))
+    r1, r2 = np.random.choice(range_, size=2, replace=False)
+
+    offspring = best + F*(population[r1] - population[r2])
+    return offspring
 
 
-def rand_1(current, population, F_value):
-    r1, r2, r3 = np.random.choice(
-        np.arange(len(population)), size=3, replace=False)
-    return population[r3] + F_value*(population[r1] - population[r2])
+def rand_1(current: np.ndarray,
+           population: np.ndarray,
+           F: float) -> np.ndarray:
+    range_ = np.arange(len(population))
+    r1, r2, r3 = np.random.choice(range_, size=3, replace=False)
+
+    offspring = population[r3] + F*(population[r1] - population[r2])
+    return offspring
 
 
-def rand_to_best1(current, population, F_value):
+def rand_to_best1(current: np.ndarray,
+                  population: np.ndarray,
+                  F: float) -> np.ndarray:
     best = population[-1]
-    r1, r2, r3 = np.random.choice(
-        np.arange(len(population)), size=3, replace=False)
-    return population[r1] + F_value*(
-        best - population[r1]) + F_value*(population[r2] - population[r3])
+    range_ = np.arange(len(population))
+    r1, r2, r3 = np.random.choice(range_, size=3, replace=False)
+
+    offspring = population[r1] +\
+        F*(best - population[r1]) + F*(population[r2] - population[r3])
+    return offspring
 
 
-def current_to_best_1(current, population, F_value):
+def current_to_best_1(current: np.ndarray,
+                      population: np.ndarray,
+                      F: float) -> np.ndarray:
     best = population[-1]
-    r1, r2 = np.random.choice(
-        np.arange(len(population)), size=2, replace=False)
-    return current + F_value*(best - current) +\
-        F_value*(population[r1] - population[r2])
+    range_ = np.arange(len(population))
+    r1, r2 = np.random.choice(range_, size=2, replace=False)
+
+    offspring = current + F*(best - current) +\
+        F*(population[r1] - population[r2])
+    return offspring
 
 
-def best_2(current, population, F_value):
+def best_2(current: np.ndarray,
+           population: np.ndarray,
+           F: float) -> np.ndarray:
     best = population[-1]
-    r1, r2, r3, r4 = np.random.choice(
-        np.arange(len(population)), size=4, replace=False)
-    return best + F_value*(population[r1] - population[r2]) +\
-        F_value*(population[r3] - population[r4])
+    range_ = np.arange(len(population))
+    r1, r2, r3, r4 = np.random.choice(range_, size=4, replace=False)
+
+    offspring = best + F*(population[r1] - population[r2]) +\
+        F*(population[r3] - population[r4])
+    return offspring
 
 
-def rand_2(current, population, F_value):
-    r1, r2, r3, r4, r5 = np.random.choice(
-        np.arange(len(population)), size=5, replace=False)
-    return population[r5] + F_value*(population[r1] - population[r2]) +\
-        F_value*(population[r3] - population[r4])
+def rand_2(current: np.ndarray,
+           population: np.ndarray,
+           F: float) -> np.ndarray:
+    range_ = np.arange(len(population))
+    r1, r2, r3, r4, r5 = np.random.choice(range_, size=5, replace=False)
+
+    offspring = population[r5] + F*(population[r1] - population[r2]) +\
+        F*(population[r3] - population[r4])
+    return offspring
 
 
-def current_to_pbest_1(current, population, F_value):
+def current_to_pbest_1(current: np.ndarray,
+                       population: np.ndarray,
+                       F: float) -> np.ndarray:
+    range_ = np.arange(len(population))
     p_min = 2/len(population)
     p_i = np.random.uniform(p_min, 0.2)
 
@@ -76,23 +105,30 @@ def current_to_pbest_1(current, population, F_value):
 
     best = pbest[p_best_ind]
 
-    r1, r2 = np.random.choice(
-        np.arange(len(population)), size=2, replace=False)
-    return current + F_value*(best - current) +\
-        F_value*(population[r1] - population[r2])
+    r1, r2 = np.random.choice(range_, size=2, replace=False)
+
+    offspring = current + F*(best - current) +\
+        F*(population[r1] - population[r2])
+    return offspring
 
 
-def current_to_rand_1(current, population, F_value):
-    r1, r2, r3 = np.random.choice(
-        np.arange(len(population)), size=3, replace=False)
-    return population[r1] + F_value*(population[r3] - current) +\
-        F_value*(population[r1] - population[r2])
+def current_to_rand_1(current: np.ndarray,
+                      population: np.ndarray,
+                      F: float) -> np.ndarray:
+    range_ = np.arange(len(population))
+    r1, r2, r3 = np.random.choice(range_, size=3, replace=False)
+
+    offspring = population[r1] + F*(population[r3] - current) +\
+        F*(population[r1] - population[r2])
+    return offspring
 
 
 # genetic propramming
-def point_mutation(some_tree, uniset,
-                   proba, max_level):
-    to_return = some_tree.copy()
+def point_mutation(tree: Tree,
+                   uniset: UniversalSet,
+                   proba: float,
+                   max_level) -> Tree:
+    to_return = tree.copy()
     if random.random() < proba:
         i = random.randrange(len(to_return))
         if type(to_return.nodes[i]) != FunctionalNode:
@@ -101,63 +137,67 @@ def point_mutation(some_tree, uniset,
             n_args = to_return.nodes[i].n_args
             new_node = uniset.random_functional(n_args)
         to_return.nodes[i] = new_node
-
     return to_return
 
 
-def growing_mutation(some_tree, uniset,
-                     proba, max_level):
-    to_return = some_tree.copy()
+def growing_mutation(tree: Tree,
+                     uniset: UniversalSet,
+                     proba: float,
+                     max_level) -> Tree:
+    to_return = tree.copy()
     if random.random() < proba:
-
         i = random.randrange(len(to_return))
-        max_level - max(some_tree.get_levels(i))
         new_tree = growing_method(uniset,  max(to_return.get_levels(i)))
         to_return = to_return.concat(i, new_tree)
-
     return to_return
 
 
-def swap_mutation(some_tree, uniset,
-                  proba, max_level):
-    to_return = some_tree.copy()
+def swap_mutation(tree: Tree,
+                  uniset: UniversalSet,
+                  proba: float,
+                  max_level) -> Tree:
+    to_return = tree.copy()
     if random.random() < proba:
-        indexes = np.arange(len(some_tree))[to_return.n_args > 1]
+        indexes = np.arange(len(tree))[to_return.n_args > 1]
         if len(indexes) > 0:
             i = random.choice(indexes)
             args_id = to_return.get_args_id(i)
             new_arg_id = args_id.copy()
             sattolo_shuffle(new_arg_id)
             for old_j, new_j in zip(args_id, new_arg_id):
-                subtree = some_tree.subtree(old_j, return_class=True)
+                subtree = tree.subtree(old_j, return_class=True)
                 to_return = to_return.concat(new_j, subtree)
-
     return to_return
 
 
-def shrink_mutation(some_tree, uniset,
-                    proba, max_level):
-    to_return = some_tree.copy()
+def shrink_mutation(tree: Tree,
+                    uniset: UniversalSet,
+                    proba: float,
+                    max_level) -> Tree:
+    to_return = tree.copy()
     if len(to_return) > 2:
         if random.random() < proba:
-            indexes = np.arange(len(some_tree))[to_return.n_args > 0]
+            indexes = np.arange(len(tree))[to_return.n_args > 0]
             if len(indexes) > 0:
                 i = random.choice(indexes)
                 args_id = to_return.get_args_id(i)
                 choosen = random.choice(args_id)
-                to_return = to_return.concat(i, some_tree.subtree(
+                to_return = to_return.concat(i, tree.subtree(
                     choosen, return_class=True))
-
     return to_return
 
 
 ################################## CROSSOVERS ##################################
 # genetic algorithm
-def empty_crossover(individs, *args):
+def empty_crossover(individs: np.ndarray,
+                    fitness: np.ndarray,
+                    rank: np.ndarray) -> np.ndarray:
     return individs[0]
 
 
-def one_point_crossover(individs, fitness, rank):
+def one_point_crossover(individs: np.ndarray,
+                        fitness: np.ndarray,
+                        rank: np.ndarray) -> np.ndarray:
     cross_point = random.randrange(len(individs[0]))
     slice_ = slice(0, cross_point)
 
@@ -170,7 +210,9 @@ def one_point_crossover(individs, fitness, rank):
     return offspring
 
 
-def two_point_crossover(individs, fitness, rank):
+def two_point_crossover(individs: np.ndarray,
+                        fitness: np.ndarray,
+                        rank: np.ndarray) -> np.ndarray:
     c_points = sorted(random.sample(range(len(individs[0])), k=2))
     slice_ = slice(c_points[0], c_points[1])
 
@@ -183,38 +225,60 @@ def two_point_crossover(individs, fitness, rank):
     return offspring
 
 
-def uniform_crossover(individs, fitness, rank):
-    choosen = np.random.choice(np.arange(len(individs)), size=len(individs[0]))
-    return individs[choosen, np.arange(len(individs[0]))]
+def uniform_crossover(individs: np.ndarray,
+                      fitness: np.ndarray,
+                      rank: np.ndarray) -> np.ndarray:
+    range_ = np.arange(len(individs))
+    diag = np.arange(len(individs[0]))
+
+    choosen = np.random.choice(range_, size=len(individs[0]))
+    offspring = individs[choosen, diag]
+    return offspring
 
 
-def uniform_prop_crossover(individs, fitness, rank):
+def uniform_prop_crossover(individs: np.ndarray,
+                           fitness: np.ndarray,
+                           rank: np.ndarray) -> np.ndarray:
+    range_ = np.arange(len(individs))
+    diag = np.arange(len(individs[0]))
+
     probability = protect_norm(fitness)
-    choosen = np.random.choice(np.arange(len(individs)),
-                               size=len(individs[0]),
-                               p=probability)
-    return individs[choosen, np.arange(len(individs[0]))]
+    choosen = np.random.choice(range_, size=len(individs[0]), p=probability)
+    offspring = individs[choosen, diag]
+    return offspring
 
 
-def uniform_rank_crossover(individs, fitness, rank):
+def uniform_rank_crossover(individs: np.ndarray,
+                           fitness: np.ndarray,
+                           rank: np.ndarray) -> np.ndarray:
+    range_ = np.arange(len(individs))
+    diag = np.arange(len(individs[0]))
+
     probability = protect_norm(rank)
-    choosen = np.random.choice(np.arange(len(individs)),
-                               size=len(individs[0]),
-                               p=probability)
-    return individs[choosen, np.arange(len(individs[0]))]
+    choosen = np.random.choice(range_, size=len(individs[0]), p=probability)
+    offspring = individs[choosen, diag]
+    return offspring
 
 
-def uniform_tour_crossover(individs, fitness, rank):
-    tournament = np.random.choice(np.arange(len(individs)), 2*len(individs[0]))
+def uniform_tour_crossover(individs: np.ndarray,
+                           fitness: np.ndarray,
+                           rank: np.ndarray) -> np.ndarray:
+    range_ = np.arange(len(individs))
+    diag = np.arange(len(individs[0]))
+
+    tournament = np.random.choice(range_, 2*len(individs[0]))
     tournament = tournament.reshape(-1, 2)
-
     choosen = np.argmin(fitness[tournament], axis=1)
-    return individs[choosen, np.arange(len(individs[0]))]
+    offspring = individs[choosen, diag]
+    return offspring
 
 
 # differential evolution
-def binomial(individ, mutant, CR):
+def binomial(individ: np.ndarray,
+             mutant: np.ndarray,
+             CR: float) -> np.ndarray:
     individ = individ.copy()
+
     j = random.randrange(len(individ))
     mask_random = np.random.random(len(individ)) <= CR
     mask_j = np.arange(len(individ)) == j
@@ -224,7 +288,10 @@ def binomial(individ, mutant, CR):
 
 
 # genetic propramming
-def standart_crossover(individs, fitness, rank, max_level):
+def standart_crossover(individs: np.ndarray,
+                       fitness: np.ndarray,
+                       rank: np.ndarray,
+                       max_level: int) -> Tree:
     individ_1 = individs[0].copy()
     individ_2 = individs[1].copy()
     first_point = random.randrange(len(individ_1))
@@ -243,7 +310,10 @@ def standart_crossover(individs, fitness, rank, max_level):
     return offspring
 
 
-def one_point_crossoverGP(individs, fitness, rank, max_level):
+def one_point_crossoverGP(individs: np.ndarray,
+                          fitness: np.ndarray,
+                          rank: np.ndarray,
+                          max_level: int) -> Tree:
     individ_1 = individs[0]
     individ_2 = individs[1]
     common_indexes, _ = common_region([individ_1, individ_2])
@@ -260,7 +330,10 @@ def one_point_crossoverGP(individs, fitness, rank, max_level):
     return offspring
 
 
-def uniform_crossoverGP(individs, fitness, rank, max_level):
+def uniform_crossoverGP(individs: np.ndarray,
+                        fitness: np.ndarray,
+                        rank: np.ndarray,
+                        max_level: int) -> Tree:
     '''Poli, Riccardo & Langdon, W.. (2001). On the Search
     Properties of Different Crossover Operators in Genetic Programming. '''
     new_nodes = []
@@ -295,12 +368,16 @@ def uniform_crossoverGP(individs, fitness, rank, max_level):
     return to_return
 
 
-def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
+def uniform_crossoverGP_prop(individs: np.ndarray,
+                             fitness: np.ndarray,
+                             rank: np.ndarray,
+                             max_level: int) -> Tree:
     to_return = Tree([], [])
     new_n_args = []
     common, border = common_region(individs)
     range_ = range(len(individs))
     probability = protect_norm(fitness)
+
     for i, common_0_i in enumerate(common[0]):
         j = random.choices(range_, weights=probability)[0]
         id_ = common[j][i]
@@ -314,16 +391,19 @@ def uniform_crossoverGP_prop(individs, fitness, rank, max_level):
 
     to_return = to_return.copy()
     to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
-
     return to_return
 
 
-def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
+def uniform_crossoverGP_rank(individs: np.ndarray,
+                             fitness: np.ndarray,
+                             rank: np.ndarray,
+                             max_level: int) -> Tree:
     to_return = Tree([], [])
     new_n_args = []
     common, border = common_region(individs)
     range_ = range(len(individs))
     probability = protect_norm(rank)
+
     for i, common_0_i in enumerate(common[0]):
         j = random.choices(range_, weights=probability)[0]
         id_ = common[j][i]
@@ -337,14 +417,17 @@ def uniform_crossoverGP_rank(individs, fitness, rank, max_level):
 
     to_return = to_return.copy()
     to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
-
     return to_return
 
 
-def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
+def uniform_crossoverGP_tour(individs: np.ndarray,
+                             fitness: np.ndarray,
+                             rank: np.ndarray,
+                             max_level: int) -> Tree:
     to_return = Tree([], [])
     new_n_args = []
     common, border = common_region(individs)
+
     for i, common_0_i in enumerate(common[0]):
         j = tournament_selection(fitness, rank, 2, 1)[0]
         id_ = common[j][i]
@@ -358,36 +441,49 @@ def uniform_crossoverGP_tour(individs, fitness, rank, max_level):
 
     to_return = to_return.copy()
     to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
-
     return to_return
 
 
 ################################## SELECTIONS ##################################
 # genetic algorithm
-def proportional_selection(fitness, rank, tour_size, quantity):
+def proportional_selection(fitness: np.ndarray,
+                           rank: np.ndarray,
+                           tour_size: int,
+                           quantity: int) -> np.ndarray:
     proba_fitness = protect_norm(fitness)
-    choosen = np.random.choice(np.arange(len(proba_fitness)),
-                               size=quantity, p=proba_fitness)
+    range_ = np.arange(len(proba_fitness))
+
+    choosen = np.random.choice(range_, size=quantity, p=proba_fitness)
     return choosen
 
 
-def rank_selection(fitness, rank, tour_size, quantity):
+def rank_selection(fitness: np.ndarray,
+                   rank: np.ndarray,
+                   tour_size: int,
+                   quantity: int) -> np.ndarray:
     proba_rank = protect_norm(rank)
-    choosen = np.random.choice(np.arange(len(proba_rank)),
-                               size=quantity, p=proba_rank)
+    range_ = np.arange(len(proba_rank))
+
+    choosen = np.random.choice(range_, size=quantity, p=proba_rank)
     return choosen
 
 
-def tournament_selection(fitness, ranks,
-                         tour_size, quantity):
+def tournament_selection(fitness: np.ndarray,
+                         rank: np.ndarray,
+                         tour_size: int,
+                         quantity: int) -> np.ndarray:
     tournament = np.random.randint(len(fitness),
                                    size=tour_size*quantity)
     tournament = tournament.reshape(-1, tour_size)
     max_fit_id = np.argmax(fitness[tournament], axis=1)
-    return tournament[np.arange(quantity), max_fit_id]
+    choosen = tournament[np.arange(quantity), max_fit_id]
+    return choosen
 
 
-def tournament_selection_(fitness, ranks, tour_size, quantity):
+def tournament_selection_(fitness: np.ndarray,
+                          rank: np.ndarray,
+                          tour_size: int,
+                          quantity: int) -> np.ndarray:
     return select_quantity_id_by_tournament(fitness.astype(np.float32),
                                             np.int32(tour_size),
                                             np.int32(quantity))
@@ -554,13 +650,3 @@ class Abs(Operator):
 
     def __call__(self, x):
         return np.abs(x)
-
-
-class Sigma(Operator):
-    def __init__(self):
-        self.formula = 'sigma({})'
-        self.__name__ = 'sigma()'
-        self.sign = 'sigma()'
-
-    def __call__(self, x):
-        return 1/(1 + np.exp(-x))
