@@ -1,20 +1,27 @@
 import numpy as np
 from .numba_funcs import find_first_difference_between_two
 from .numba_funcs import find_end_subtree_from_i
+from typing import List
+from typing import Tuple
+from typing import Any
 
 
-def root_mean_square_error(y_true, y_predict):
-    return np.sqrt(np.mean((y_true - y_predict)**2))
+def root_mean_square_error(y_true: np.ndarray,
+                           y_predict: np.ndarray) -> float:
+    error = y_true - y_predict
+    return np.sqrt(np.mean((error)**2))
 
 
-def coefficient_determination(y_true, y_predict):
-    mean = np.mean(y_true)
-    residual_sum = np.sum((y_true - y_predict)**2)
-    total_sum = np.sum((y_true - mean)**2)
+def coefficient_determination(y_true: np.ndarray,
+                              y_predict: np.ndarray) -> float:
+    error = y_true - y_predict
+    mean_y_true = np.mean(y_true)
+    residual_sum = np.sum((error)**2)
+    total_sum = np.sum((y_true - mean_y_true)**2)
     return 1 - residual_sum/total_sum
 
 
-def common_region(trees):
+def common_region(trees: List) -> Tuple:
     terminate = False
     indexes = []
     common_indexes = []
@@ -53,7 +60,8 @@ def common_region(trees):
     return common_indexes, border_indexes
 
 
-def common_region_two_trees(n_args_array_1, n_args_array_2):
+def common_region_two_trees(n_args_array_1: np.ndarray,
+                            n_args_array_2: np.ndarray) -> Tuple:
     index_list_1 = range(len(n_args_array_1))
     index_list_2 = range(len(n_args_array_2))
     index_1 = 0
@@ -86,7 +94,7 @@ def common_region_two_trees(n_args_array_1, n_args_array_2):
     return [common_1, common_2], [border_1, border_2]
 
 
-def common_region_(trees):
+def common_region_(trees: List) -> Tuple:
     if len(trees) == 2:
         to_return = common_region_two_trees(trees[0].n_args, trees[1].n_args)
     else:
@@ -95,11 +103,12 @@ def common_region_(trees):
     return to_return
 
 
-def donothing(x):
+def donothing(x: Any) -> Any:
     return x
 
 
-def numpy_group_by(group, by):
+def numpy_group_by(group: np.ndarray,
+                   by: np.ndarray) -> Tuple:
 
     argsort = np.argsort(by)
     group = group[argsort]
@@ -110,13 +119,14 @@ def numpy_group_by(group, by):
     return keys, groups
 
 
-def lehmer_mean(x, power=2):
+def lehmer_mean(x: np.ndarray,
+                power: int = 2) -> float:
     x_up = np.power(x, power)
     x_down = np.power(x, power-1)
     return np.sum(x_up)/np.sum(x_down)
 
 
-def rank_data(arr):
+def rank_data(arr: np.ndarray) -> np.ndarray:
     arange = np.arange(len(arr), dtype=int)
 
     argsort = np.argsort(arr)
@@ -132,27 +142,29 @@ def rank_data(arr):
     return retults
 
 
-def protect_norm(x):
+def protect_norm(x: np.ndarray) -> np.ndarray:
     sum_ = x.sum()
     if sum_ > 0:
-        return x/sum_
+        to_return = x/sum_
     else:
         len_ = len(x)
-        return np.full(len_, 1/len_)
+        to_return = np.full(len_, 1/len_)
+    return to_return
 
 
-def scale_data(arr):
+def scale_data(arr: np.ndarray) -> np.ndarray:
     arr = arr.copy()
     max_ = arr.max()
     min_ = arr.min()
     if max_ == min_:
-        arr_n = np.ones_like(arr)
+        to_return = np.ones_like(arr)
     else:
-        arr_n = (arr - min_)/(max_ - min_)
-    return arr_n
+        to_return = (arr - min_)/(max_ - min_)
+    return to_return
 
 
-def numpy_bit_to_int(bit_array, powers=None):
+def numpy_bit_to_int(bit_array: np.ndarray,
+                     powers: np.ndarray = None) -> np.ndarray:
     if powers is None:
         powers = 2**np.arange(bit_array.shape[1], dtype=np.int64)
     arange_ = powers[:bit_array.shape[1]][::-1]
@@ -160,7 +172,7 @@ def numpy_bit_to_int(bit_array, powers=None):
     return int_array
 
 
-def numpy_int_to_bit(int_array):
+def numpy_int_to_bit(int_array: np.ndarray) -> np.ndarray:
     result = []
     bit = int_array % 2
     remains = int_array//2
@@ -169,17 +181,17 @@ def numpy_int_to_bit(int_array):
         bit = remains % 2
         remains = remains//2
         result.append(bit)
+    bit_array = np.array(result)[::-1].T
+    return bit_array
 
-    return np.array(result)[::-1].T
 
-
-def numpy_gray_to_bit(gray_array):
+def numpy_gray_to_bit(gray_array: np.ndarray) -> np.ndarray:
     bit_array = np.logical_xor.accumulate(
         gray_array, axis=-1).astype(np.byte)
     return bit_array
 
 
-def numpy_bit_to_gray(bit_array):
+def numpy_bit_to_gray(bit_array: np.ndarray) -> np.ndarray:
     cut_gray = np.logical_xor(bit_array[:, :-1],
                               bit_array[:, 1:])
     gray_array = np.hstack(
@@ -188,8 +200,8 @@ def numpy_bit_to_gray(bit_array):
 
 
 class SamplingGrid:
-
-    def __init__(self, fit_by='h') -> None:
+    def __init__(self,
+                 fit_by: str = 'h') -> None:
         self.fit_by = fit_by
         self.left: np.ndarray
         self.right: np.ndarray
@@ -197,23 +209,35 @@ class SamplingGrid:
         self.h: np.ndarray
         self.power_arange: np.ndarray
 
-    def culc_h_from_parts(self, left, right, parts):
-        return (right - left)/(2.0**parts - 1)
+    def culc_h_from_parts(self,
+                          left: np.ndarray,
+                          right: np.ndarray,
+                          parts: np.ndarray) -> np.ndarray:
+        h = (right - left)/(2.0**parts - 1)
+        return h
 
-    def culc_parts_from_h(self, left, right, h):
-        return np.ceil(np.log2((right - left)/h + 1)).astype(int)
+    def culc_parts_from_h(self,
+                          left: np.ndarray,
+                          right: np.ndarray,
+                          h: np.ndarray) -> np.ndarray:
+        parts = np.ceil(np.log2((right - left)/h + 1)).astype(int)
+        return parts
 
-    def decode(self, bit_array_i):
+    def decode(self,
+               bit_array_i: np.ndarray) -> np.ndarray:
         int_convert = numpy_bit_to_int(bit_array_i, self.power_arange)
         return int_convert
 
-    def fit(self, left, right,
-            arg):
+    def fit(self,
+            left: np.ndarray,
+            right: np.ndarray,
+            arg: np.ndarray):
         self.left = left
         self.right = right
 
         assert self.fit_by in [
-            'h', 'parts'], f"incorrect option {self.fit_by} for fit_by. The available ones are 'h' and 'parts'"
+            'h', 'parts'], f"incorrect option {self.fit_by} for fit_by."
+        "The available ones are 'h' and 'parts'"
         if self.fit_by == 'h':
             min_h = arg
             self.parts = self.culc_parts_from_h(left, right, min_h)
@@ -225,7 +249,8 @@ class SamplingGrid:
         self.power_arange = 2**np.arange(self.parts.max(), dtype=np.int64)
         return self
 
-    def transform(self, population):
+    def transform(self,
+                  population: np.ndarray) -> np.ndarray:
         splits = np.add.accumulate(self.parts)
         p_parts = np.split(population, splits[:-1], axis=1)
 
@@ -235,28 +260,40 @@ class SamplingGrid:
 
         return float_array
 
-    def float_to_bit(self, float_array, left, h):
+    def float_to_bit(self,
+                     float_array: np.ndarray,
+                     left: np.ndarray,
+                     h: np.ndarray) -> np.ndarray:
         grid_number = (float_array - left)/h
         int_array = np.rint(grid_number)
-        return numpy_int_to_bit(int_array)
+        bit_array = numpy_int_to_bit(int_array)
+        return bit_array
 
-    def inverse_transform(self, population):
+    def inverse_transform(self,
+                          population: np.ndarray) -> np.ndarray:
         map_ = map(self.float_to_bit, population.T, self.left, self.h)
-        return np.hstack(list(map_))
+        bit_array = np.hstack(list(map_))
+        return bit_array
 
 
 class GrayCode(SamplingGrid):
 
-    def __init__(self, fit_by: str = 'h') -> None:
+    def __init__(self,
+                 fit_by: str = 'h') -> None:
         SamplingGrid.__init__(self, fit_by)
 
-    def decode(self, gray_array_i):
+    def decode(self,
+               gray_array_i: np.ndarray) -> np.ndarray:
         bit_array_i = numpy_gray_to_bit(gray_array_i)
         int_convert = numpy_bit_to_int(bit_array_i, self.power_arange)
         return int_convert
 
-    def float_to_bit(self, float_array, left, h):
+    def float_to_bit(self,
+                     float_array: np.ndarray,
+                     left: np.ndarray,
+                     h: np.ndarray) -> np.ndarray:
         grid_number = (float_array - left)/h
         int_array = np.rint(grid_number)
         bit_array = numpy_int_to_bit(int_array)
-        return numpy_bit_to_gray(bit_array)
+        gray_array = numpy_bit_to_gray(bit_array)
+        return gray_array
