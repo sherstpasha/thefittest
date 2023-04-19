@@ -202,30 +202,30 @@ def numpy_bit_to_gray(bit_array: np.ndarray) -> np.ndarray:
 class SamplingGrid:
     def __init__(self,
                  fit_by: str = 'h') -> None:
-        self.fit_by = fit_by
+        self._fit_by = fit_by
         self.left: np.ndarray
         self.right: np.ndarray
         self.parts: np.ndarray
         self.h: np.ndarray
-        self.power_arange: np.ndarray
+        self._power_arange: np.ndarray
 
-    def culc_h_from_parts(self,
-                          left: np.ndarray,
-                          right: np.ndarray,
-                          parts: np.ndarray) -> np.ndarray:
+    def _culc_h_from_parts(self,
+                           left: np.ndarray,
+                           right: np.ndarray,
+                           parts: np.ndarray) -> np.ndarray:
         h = (right - left)/(2.0**parts - 1)
         return h
 
-    def culc_parts_from_h(self,
-                          left: np.ndarray,
-                          right: np.ndarray,
-                          h: np.ndarray) -> np.ndarray:
+    def _culc_parts_from_h(self,
+                           left: np.ndarray,
+                           right: np.ndarray,
+                           h: np.ndarray) -> np.ndarray:
         parts = np.ceil(np.log2((right - left)/h + 1)).astype(int)
         return parts
 
-    def decode(self,
-               bit_array_i: np.ndarray) -> np.ndarray:
-        int_convert = numpy_bit_to_int(bit_array_i, self.power_arange)
+    def _decode(self,
+                bit_array_i: np.ndarray) -> np.ndarray:
+        int_convert = numpy_bit_to_int(bit_array_i, self._power_arange)
         return int_convert
 
     def fit(self,
@@ -235,18 +235,18 @@ class SamplingGrid:
         self.left = left
         self.right = right
 
-        assert self.fit_by in [
-            'h', 'parts'], f"incorrect option {self.fit_by} for fit_by."
+        assert self._fit_by in [
+            'h', 'parts'], f"incorrect option {self._fit_by} for fit_by."
         "The available ones are 'h' and 'parts'"
-        if self.fit_by == 'h':
+        if self._fit_by == 'h':
             min_h = arg
-            self.parts = self.culc_parts_from_h(left, right, min_h)
-            self.h = self.culc_h_from_parts(left, right, self.parts)
+            self.parts = self._culc_parts_from_h(left, right, min_h)
+            self.h = self._culc_h_from_parts(left, right, self.parts)
         else:
             self.parts = arg
-            self.h = self.culc_h_from_parts(left, right, self.parts)
+            self.h = self._culc_h_from_parts(left, right, self.parts)
 
-        self.power_arange = 2**np.arange(self.parts.max(), dtype=np.int64)
+        self._power_arange = 2**np.arange(self.parts.max(), dtype=np.int64)
         return self
 
     def transform(self,
@@ -254,16 +254,15 @@ class SamplingGrid:
         splits = np.add.accumulate(self.parts)
         p_parts = np.split(population, splits[:-1], axis=1)
 
-        int_array = np.array(list(map(self.decode, p_parts))).T
+        int_array = np.array(list(map(self._decode, p_parts))).T
         float_array = self.left[np.newaxis, :] +\
             self.h[np.newaxis, :]*int_array
-
         return float_array
 
-    def float_to_bit(self,
-                     float_array: np.ndarray,
-                     left: np.ndarray,
-                     h: np.ndarray) -> np.ndarray:
+    def _float_to_bit(self,
+                      float_array: np.ndarray,
+                      left: np.ndarray,
+                      h: np.ndarray) -> np.ndarray:
         grid_number = (float_array - left)/h
         int_array = np.rint(grid_number)
         bit_array = numpy_int_to_bit(int_array)
@@ -271,7 +270,7 @@ class SamplingGrid:
 
     def inverse_transform(self,
                           population: np.ndarray) -> np.ndarray:
-        map_ = map(self.float_to_bit, population.T, self.left, self.h)
+        map_ = map(self._float_to_bit, population.T, self.left, self.h)
         bit_array = np.hstack(list(map_))
         return bit_array
 
@@ -282,16 +281,16 @@ class GrayCode(SamplingGrid):
                  fit_by: str = 'h') -> None:
         SamplingGrid.__init__(self, fit_by)
 
-    def decode(self,
-               gray_array_i: np.ndarray) -> np.ndarray:
+    def _decode(self,
+                gray_array_i: np.ndarray) -> np.ndarray:
         bit_array_i = numpy_gray_to_bit(gray_array_i)
-        int_convert = numpy_bit_to_int(bit_array_i, self.power_arange)
+        int_convert = numpy_bit_to_int(bit_array_i, self._power_arange)
         return int_convert
 
-    def float_to_bit(self,
-                     float_array: np.ndarray,
-                     left: np.ndarray,
-                     h: np.ndarray) -> np.ndarray:
+    def _float_to_bit(self,
+                      float_array: np.ndarray,
+                      left: np.ndarray,
+                      h: np.ndarray) -> np.ndarray:
         grid_number = (float_array - left)/h
         int_array = np.rint(grid_number)
         bit_array = numpy_int_to_bit(int_array)
