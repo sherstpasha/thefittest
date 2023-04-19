@@ -129,7 +129,7 @@ class EvolutionaryAlgorithm:
             else:
                 self._stats._update(statistic_args)
 
-    def get_phenotype(self, popultion_g: np.ndarray) -> np.ndarray:
+    def _get_phenotype(self, popultion_g: np.ndarray) -> np.ndarray:
         return self._genotype_to_phenotype(popultion_g)
 
     def get_remains_calls(self):

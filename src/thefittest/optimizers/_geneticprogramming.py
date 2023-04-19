@@ -1,6 +1,9 @@
-import numpy as np
+from functools import partial
+from typing import Callable
+from typing import Optional
 import numpy as np
 from ..base import TheFittest
+from ..base import UniversalSet
 from ..base import EvolutionaryAlgorithm
 from ..base import LastBest
 from ..base import Statistics
@@ -21,7 +24,6 @@ from ..tools.operators import shrink_mutation
 from ..tools.generators import half_and_half
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
-from functools import partial
 
 
 class GeneticProgramming(EvolutionaryAlgorithm):
@@ -29,18 +31,17 @@ class GeneticProgramming(EvolutionaryAlgorithm):
     of natural selection.” Complex Adaptive Systems (1993)'''
 
     def __init__(self,
-                 fitness_function,
-                 genotype_to_phenotype,
-                 uniset,
-                 iters,
-                 pop_size,
-                 optimal_value=None,
-                 termination_error_value=0.,
-                 no_increase_num=None,
-                 minimization=False,
-                 show_progress_each=None,
-                 keep_history=None):
-
+                 fitness_function: Callable,
+                 genotype_to_phenotype: Callable,
+                 uniset: UniversalSet,
+                 iters: int,
+                 pop_size: int,
+                 optimal_value: Optional[float] = None,
+                 termination_error_value: float = 0.,
+                 no_increase_num: Optional[int] = None,
+                 minimization: bool = False,
+                 show_progress_each: Optional[int] = None,
+                 keep_history: bool = False):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -55,8 +56,6 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             keep_history=keep_history)
 
         self.uniset = uniset
-        self.thefittest: TheFittest
-        self.stats: Statistics
         self.s_pool: dict
         self.c_pool: dict
         self.m_pool: dict

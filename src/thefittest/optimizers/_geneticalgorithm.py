@@ -46,9 +46,9 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             keep_history=keep_history)
 
         self._str_len = str_len
-        self._s_pool: dict
-        self._c_pool: dict
-        self._m_pool: dict
+        self._selection_pool: dict
+        self._crossover_pool: dict
+        self._mutation_pool: dict
         self._initial_population: np.ndarray
         self._tour_size: int
         self._elitism: bool
@@ -61,14 +61,14 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         self.set_strategy()
 
     def _update_pool(self):
-        self._s_pool = {'proportional': (proportional_selection, None),
+        self._selection_pool = {'proportional': (proportional_selection, None),
                         'rank': (rank_selection, None),
                         'tournament_k': (tournament_selection, self._tour_size),
                         'tournament_3': (tournament_selection, 3),
                         'tournament_5': (tournament_selection, 5),
                         'tournament_7': (tournament_selection, 7)}
 
-        self._c_pool = {'empty': (empty_crossover, 1),
+        self._crossover_pool = {'empty': (empty_crossover, 1),
                         'one_point': (one_point_crossover, 2),
                         'two_point': (two_point_crossover, 2),
                         'uniform2': (uniform_crossover, 2),
@@ -84,7 +84,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                         'uniform_tour7': (uniform_tour_crossover, 7),
                         'uniform_tourk': (uniform_tour_crossover, self._parents_num)}
 
-        self._m_pool = {'weak':  (flip_mutation, 1/(3*self._str_len)),
+        self._mutation_pool = {'weak':  (flip_mutation, 1/(3*self._str_len)),
                         'average':  (flip_mutation, 1/(self._str_len)),
                         'strong': (flip_mutation, min(1, 3/self._str_len)),
                         'custom_rate': (flip_mutation, self._mutation_rate)}
@@ -124,9 +124,9 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
         self._update_pool()
 
-        self._specified_selection = self._s_pool[selection_oper]
-        self._specified_crossover = self._c_pool[crossover_oper]
-        self._specified_mutation = self._m_pool[mutation_oper]
+        self._specified_selection = self._selection_pool[selection_oper]
+        self._specified_crossover = self._crossover_pool[crossover_oper]
+        self._specified_mutation = self._mutation_pool[mutation_oper]
 
     def fit(self):
         if self._initial_population is None:
@@ -136,7 +136,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             population_g = self.initial_population
 
         for i in range(self._iters):
-            population_ph = self.get_phenotype(population_g)
+            population_ph = self._get_phenotype(population_g)
             fitness = self._evaluate(population_ph)
 
             self._update_fittest(population_g, population_ph, fitness)
