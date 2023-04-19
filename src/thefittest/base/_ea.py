@@ -1,18 +1,22 @@
 import numpy as np
 from typing import Any
-from copy import copy
+from typing import Tuple
+from typing import Dict
+from typing import Callable
+from typing import Optional
 
 
 class LastBest:
-    def __init__(self):
+    def __init__(self) -> None:
         self.value = np.nan
-        self.no_increase = 0
+        self.no_increase_counter = 0
 
-    def update(self, current_value: float):
+    def update(self,
+               current_value: float):
         if self.value == current_value:
-            self.no_increase += 1
+            self.no_increase_counter += 1
         else:
-            self.no_increase = 0
+            self.no_increase_counter = 0
             self.value = current_value
         return self
 
@@ -23,23 +27,29 @@ class TheFittest:
         self.phenotype: Any
         self.fitness = -np.inf
 
-    def update(self, population_g, population_ph, fitness):
+    def update(self,
+               population_g: np.ndarray,
+               population_ph: np.ndarray,
+               fitness: np.ndarray):
         temp_best_id = np.argmax(fitness)
         temp_best_fitness = fitness[temp_best_id].copy()
         if temp_best_fitness > self.fitness:
             self.genotype = population_g[temp_best_id].copy()
             self.phenotype = population_ph[temp_best_id].copy()
             self.fitness = temp_best_fitness.copy()
-
         return self
 
-    def get(self):
-        return self.genotype.copy(), self.phenotype.copy(), self.fitness.copy()
+    def get(self) -> Tuple:
+        to_return = (self.genotype.copy(),
+                     self.phenotype.copy(),
+                     self.fitness.copy())
+        return to_return
 
 
 class Statistics(dict):
-    def update(self, dict_args):
-        for key, value in dict_args.items():
+    def update(self,
+               arg: Dict):
+        for key, value in arg.items():
             if key not in self.keys():
                 self[key] = [value]
             else:
@@ -49,16 +59,16 @@ class Statistics(dict):
 
 class EvolutionaryAlgorithm:
     def __init__(self,
-                 fitness_function,
-                 genotype_to_phenotype,
-                 iters,
-                 pop_size,
-                 optimal_value=None,
-                 termination_error_value=0.,
-                 no_increase_num=None,
-                 minimization=False,
-                 show_progress_each=None,
-                 keep_history=False):
+                 fitness_function: Callable,
+                 genotype_to_phenotype: Callable,
+                 iters: int,
+                 pop_size: int,
+                 optimal_value: Optional[float] = None,
+                 termination_error_value: float = 0.,
+                 no_increase_num: Optional[int] = None,
+                 minimization: bool = False,
+                 show_progress_each: Optional[int] = None,
+                 keep_history: bool = False):
         self.fitness_function = fitness_function
         self.genotype_to_phenotype = genotype_to_phenotype
         self.iters = iters
@@ -76,16 +86,21 @@ class EvolutionaryAlgorithm:
 
         self.calls = 0
 
-    def evaluate(self, population_ph):
+    def evaluate(self,
+                 population_ph: np.ndarray) -> np.ndarray:
         self.calls += len(population_ph)
         return self.sign*self.fitness_function(population_ph)
 
-    def show_progress(self, i):
-        if (self.show_progress_each is not None) and (i % self.show_progress_each == 0):
-            print(f'{i} iteration with fitness = {self.thefittest.fitness}')
+    def show_progress(self, iteration_number: int) -> None:
+        cond_show_progress_switch = self.show_progress_each is not None
+        cond_show_progress_now = iteration_number % self.show_progress_each == 0
+        if cond_show_progress_switch and cond_show_progress_now:
+            print(f'{iteration_number} iteration with fitness = {self.thefittest.fitness}')
 
-    def termitation_check(self, no_increase):
-        return (self.thefittest.fitness >= self.aim) or (no_increase == self.no_increase_num)
+    def termitation_check(self, no_increase_counter):
+        cond_aim_achieved = self.thefittest.fitness >= self.aim
+        cond_no_increase_achieved = no_increase_counter == self.no_increase_num
+        return cond_aim_achieved or cond_no_increase_achieved
 
     def get_remains_calls(self):
         return (self.pop_size + (self.iters-1)*(self.pop_size-1)) - self.calls

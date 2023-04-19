@@ -22,7 +22,7 @@ class SelfCGP(GeneticProgramming):
                  pop_size,
                  optimal_value=None,
                  termination_error_value=0,
-                 no_increase_num=None,
+                 no_increase_counter_num=None,
                  minimization=False,
                  show_progress_each=None,
                  keep_history=False):
@@ -32,7 +32,7 @@ class SelfCGP(GeneticProgramming):
                          pop_size,
                          optimal_value,
                          termination_error_value,
-                         no_increase_num,
+                         no_increase_counter_num,
                          minimization,
                          show_progress_each,
                          keep_history)
@@ -184,7 +184,7 @@ class SelfCGP(GeneticProgramming):
                                                 'm_proba': m_proba.copy()})
         for i in range(self.iters-1):
             self.show_progress(i)
-            if self.termitation_check(lastbest.no_increase):
+            if self.termitation_check(lastbest.no_increase_counter):
                 break
             else:
                 s_operators = self.choice_operators(s_proba)

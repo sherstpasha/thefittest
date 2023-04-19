@@ -158,7 +158,7 @@ class JADE(DifferentialEvolution):
 
         for i in range(self.iters-1):
             self.show_progress(i)
-            if self.termitation_check(lastbest.no_increase):
+            if self.termitation_check(lastbest.no_increase_counter):
                 break
             else:
                 F_i = self.generate_F(u_F)

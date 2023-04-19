@@ -171,7 +171,7 @@ class SelfCGA(GeneticAlgorithm):
 
         for i in range(self.iters-1):
             self.show_progress(i)
-            if self.termitation_check(lastbest.no_increase):
+            if self.termitation_check(lastbest.no_increase_counter):
                 break
             else:
                 s_operators = self.choice_operators(s_proba)

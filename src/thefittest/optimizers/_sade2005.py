@@ -171,7 +171,7 @@ class SaDE2005(DifferentialEvolution):
         CR_s_pool = np.array([], dtype=float)
         for i in range(self.iters-1):
             self.show_progress(i)
-            if self.termitation_check(lastbest.no_increase):
+            if self.termitation_check(lastbest.no_increase_counter):
                 break
             else:
                 m_operators = self.choice_operators(m_proba)
