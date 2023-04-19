@@ -1,9 +1,8 @@
-import numpy as np
 from typing import Callable
-from ..base import TheFittest
+from typing import Optional
+from typing import Tuple
+import numpy as np
 from ..base import EvolutionaryAlgorithm
-from ..base import LastBest
-from ..base import Statistics
 from functools import partial
 from ..tools.operators import binomial
 from ..tools.operators import best_1
@@ -21,18 +20,18 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
     Adaptive Scheme for Global Optimization Over Continuous Spaces. Journal of Global Optimization. 23'''
 
     def __init__(self,
-                 fitness_function,
-                 genotype_to_phenotype,
-                 iters,
-                 pop_size,
-                 left,
-                 right,
-                 optimal_value=None,
-                 termination_error_value=0.,
-                 no_increase_num=None,
-                 minimization=False,
-                 show_progress_each=None,
-                 keep_history=False):
+                 fitness_function: Callable,
+                 genotype_to_phenotype: Callable,
+                 iters: int,
+                 pop_size: int,
+                 left: np.ndarray,
+                 right: np.ndarray,
+                 optimal_value: Optional[float] = None,
+                 termination_error_value: float = 0.,
+                 no_increase_num: Optional[int] = None,
+                 minimization: bool = False,
+                 show_progress_each: Optional[int] = None,
+                 keep_history: bool = False):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -46,128 +45,111 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             show_progress_each=show_progress_each,
             keep_history=keep_history)
 
-        self.left = left
-        self.right = right
-        self.thefittest: TheFittest
-        self.stats: Statistics
-        self.initial_population: np.ndarray
-        self.m_function: Callable
-        self.F: float
-        self.CR: float
-        self.elitism: bool
+        self._left = left
+        self._right = right
+        self._initial_population: np.ndarray
+        self._mutation_pool: dict
+        self._specified_mutation: Callable
+        self._F: float
+        self._CR: float
+        self._elitism: bool
 
         self.set_strategy()
 
-    def generate_init_pop(self):
-        if self.initial_population is None:
-            population_g = float_population(
-                self.pop_size, self.left, self.right)
-        else:
-            population_g = self.initial_population
-        return population_g
+    def _update_pool(self):
+        self._mutation_pool = {'best_1': best_1,
+                               'rand_1': rand_1,
+                               'current_to_best_1': current_to_best_1,
+                               'current_to_pbest_1': current_to_pbest_1,
+                               'rand_to_best1': rand_to_best1,
+                               'best_2': best_2,
+                               'rand_2': rand_2}
 
-    def update_pool(self):
-        self.m_pool = {'best_1': best_1,
-                       'rand_1': rand_1,
-                       'current_to_best_1': current_to_best_1,
-                       'current_to_pbest_1': current_to_pbest_1,
-                       'rand_to_best1': rand_to_best1,
-                       'best_2': best_2,
-                       'rand_2': rand_2}
-
-    def set_strategy(self,
-                     mutation_oper='rand_1',
-                     F_param=0.5,
-                     CR_param=0.5,
-                     elitism_param=True,
-                     initial_population=None):
-
-        self.update_pool()
-        self.m_function = self.m_pool[mutation_oper]
-        self.F = F_param
-        self.CR = CR_param
-        self.elitism = elitism_param
-        self.initial_population = initial_population
-        return self
-
-    def mutation_and_crossover(self, popuation_g, individ_g, F_i, CR_i):
-        mutant = self.m_function(individ_g, popuation_g, F_i)
-
-        mutant_cr_g = binomial(individ_g, mutant, CR_i)
-        mutant_cr_g = self.bounds_control(mutant_cr_g)
+    def _mutation_and_crossover(self,
+                                popuation_g: np.ndarray,
+                                individ_g: np.ndarray,
+                                F: float,
+                                CR: float) -> np.ndarray:
+        mutant = self._specified_mutation(individ_g, popuation_g, F)
+        mutant_cr_g = binomial(individ_g, mutant, CR)
+        mutant_cr_g = self._bounds_control(mutant_cr_g)
         return mutant_cr_g
 
-    def evaluate_and_selection(self, mutant_cr_g, population_g, population_ph, fitness):
-        offspring_g = population_g.copy()
-        offspring_ph = population_ph.copy()
-        offspring_fit = fitness.copy()
+    def _evaluate_and_selection(self,
+                                mutant_cr_g: np.ndarray,
+                                population_g: np.ndarray,
+                                population_ph: np.ndarray,
+                                fitness: np.ndarray) -> Tuple:
+        offspring_g = population_g
+        offspring_ph = population_ph
+        offspring_fit = fitness
 
-        mutant_cr_ph = self.genotype_to_phenotype(mutant_cr_g)
-        mutant_cr_fit = self.evaluate(mutant_cr_ph)
+        mutant_cr_ph = self._get_phenotype(mutant_cr_g)
+        mutant_cr_fit = self._evaluate(mutant_cr_ph)
         mask = mutant_cr_fit >= fitness
         offspring_g[mask] = mutant_cr_g[mask]
         offspring_ph[mask] = mutant_cr_ph[mask]
         offspring_fit[mask] = mutant_cr_fit[mask]
-        return offspring_g, offspring_ph, offspring_fit
+        return offspring_g, offspring_ph, offspring_fit, mask
 
-    def bounds_control(self, individ_g):
+    def _bounds_control(self,
+                        individ_g: np.ndarray) -> np.ndarray:
         individ_g = individ_g.copy()
-        low_mask = individ_g < self.left
-        high_mask = individ_g > self.right
+        low_mask = individ_g < self._left
+        high_mask = individ_g > self._right
 
-        individ_g[low_mask] = self.left[low_mask]
-        individ_g[high_mask] = self.right[high_mask]
+        individ_g[low_mask] = self._left[low_mask]
+        individ_g[high_mask] = self._right[high_mask]
         return individ_g
 
+    def set_strategy(self,
+                     mutation_oper: str = 'rand_1',
+                     F_param: float = 0.5,
+                     CR_param: float = 0.5,
+                     elitism_param: bool = True,
+                     initial_population: Optional[np.ndarray] = None) -> None:
+        self._update_pool()
+        self._specified_mutation = self._mutation_pool[mutation_oper]
+        self._F = F_param
+        self._CR = CR_param
+        self._elitism = elitism_param
+        self._initial_population = initial_population
+
     def fit(self):
-        population_g = self.generate_init_pop()
-        population_ph = self.genotype_to_phenotype(population_g)
-        fitness = self.evaluate(population_ph)
+        if self._initial_population is None:
+            population_g = float_population(
+                self._pop_size, self._left, self._right)
+        else:
+            population_g = self._initial_population
+            
+        for i in range(self._iters):
+            population_ph = self._get_phenotype(population_g)
+            fitness = self._evaluate(population_ph)
+            argsort = np.argsort(fitness)
+            population_g = population_g[argsort]
+            population_ph = population_ph[argsort]
+            fitness = fitness[argsort]
 
-        argsort = np.argsort(fitness)
-        population_g = population_g[argsort]
-        population_ph = population_ph[argsort]
-        fitness = fitness[argsort]
-
-        self.thefittest = TheFittest().update(population_g,
-                                              population_ph,
-                                              fitness)
-        lastbest = LastBest().update(self.thefittest.fitness)
-        if self.keep_history:
-            self.stats = Statistics(
-                mode=self.keep_history).update({'population_g': population_g.copy(),
-                                                'fitness_max': self.thefittest.fitness})
-
-        for i in range(self.iters-1):
-            self.show_progress(i)
-            if self.termitation_check(lastbest.no_increase_counter):
+            self._update_fittest(population_g, population_ph, fitness)
+            self._update_stats({'population_g': population_g.copy(),
+                               'fitness_max': self._thefittest._fitness})
+            if self._elitism:
+                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+            self._show_progress(i)
+            if self._termitation_check():
                 break
             else:
-                F_i = np.full(self.pop_size, self.F)
-                CR_i = np.full(self.pop_size, self.CR)
+                F_i = np.full(self._pop_size, self._F)
+                CR_i = np.full(self._pop_size, self._CR)
 
-                partial_mut_and_cross = partial(self.mutation_and_crossover,
-                                                population_g)
-                mutant_cr_g = np.array(list(map(partial_mut_and_cross,
-                                                population_g,
-                                                F_i, CR_i)))
+                mutation_and_crossover = partial(self._mutation_and_crossover,
+                                                 population_g)
+                mutant_cr_g = np.array(list(map(mutation_and_crossover,
+                                                population_g, F_i, CR_i)))
 
-                stack = self.evaluate_and_selection(mutant_cr_g,
-                                                    population_g,
-                                                    population_ph,
-                                                    fitness)
-                population_g, population_ph, fitness = stack
-
-                if self.elitism:
-                    population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
-                argsort = np.argsort(fitness)
-                population_g = population_g[argsort]
-                population_ph = population_ph[argsort]
-                fitness = fitness[argsort]
-
-                self.thefittest.update(population_g, population_ph, fitness)
-                lastbest.update(self.thefittest.fitness)
-                if self.keep_history:
-                    self.stats.update({'population_g': population_g.copy(),
-                                       'fitness_max': self.thefittest.fitness})
+                stack = self._evaluate_and_selection(mutant_cr_g,
+                                                     population_g,
+                                                     population_ph,
+                                                     fitness)
+                population_g, population_ph, fitness, _ = stack
         return self
