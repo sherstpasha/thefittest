@@ -1,5 +1,7 @@
 # thefittest
 
+![PyPI - Downloads](https://img.shields.io/pypi/dm/thefittest?label=PyPI%20Downloads)
+
 ## Installation
 ```bash
 pip install thefittest
