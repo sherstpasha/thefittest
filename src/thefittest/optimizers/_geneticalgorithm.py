@@ -133,7 +133,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             population_g = binary_string_population(
                 self._pop_size, self._str_len)
         else:
-            population_g = self.initial_population
+            population_g = self._initial_population
 
         for i in range(self._iters):
             population_ph = self._get_phenotype(population_g)

@@ -87,24 +87,24 @@ class jDE(DifferentialEvolution):
                 self._pop_size, self._left, self._right)
         else:
             population_g = self._initial_population
+
+        population_ph = self._get_phenotype(population_g)
+        fitness = self._evaluate(population_ph)
+
+        argsort = np.argsort(fitness)
+        population_g = population_g[argsort]
+        population_ph = population_ph[argsort]
+        fitness = fitness[argsort]
+
         F_i = np.full(self._pop_size, 0.5)
         CR_i = np.full(self._pop_size, 0.9)
 
-        for i in range(self._iters):
-            population_ph = self._get_phenotype(population_g)
-            fitness = self._evaluate(population_ph)
-            argsort = np.argsort(fitness)
-            population_g = population_g[argsort]
-            population_ph = population_ph[argsort]
-            fitness = fitness[argsort]
-
+        for i in range(self._iters-1):
             self._update_fittest(population_g, population_ph, fitness)
             self._update_stats({'population_g': population_g,
                                 'fitness_max': self._thefittest._fitness,
                                 'F': F_i.copy(),
                                 'CR': CR_i.copy()})
-            if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
             self._show_progress(i)
             if self._termitation_check():
                 break
@@ -121,8 +121,20 @@ class jDE(DifferentialEvolution):
                                                      population_g,
                                                      population_ph,
                                                      fitness)
-                population_g, population_ph, fitness, succeses = stack
+                population_g = stack[0]
+                population_ph = stack[1]
+                fitness = stack[2]
+
+                succeses = stack[3]
                 F_i[succeses] = F_i_new[succeses]
                 CR_i[succeses] = CR_i_new[succeses]
+
+                if self._elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+
+                argsort = np.argsort(fitness)
+                population_g = population_g[argsort]
+                population_ph = population_ph[argsort]
+                fitness = fitness[argsort]
 
         return self

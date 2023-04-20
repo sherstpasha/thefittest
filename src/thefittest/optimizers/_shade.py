@@ -92,8 +92,8 @@ class SHADE(JADE):
             r_i = np.random.randint(0, len(H_F_i))
             u_F = H_F_i[r_i]
             u_CR = H_CR_i[r_i]
-            F_i[i] = self.randc01(u_F)
-            CR_i[i] = self.randn01(u_CR)
+            F_i[i] = self._randc01(u_F)
+            CR_i[i] = self._randn01(u_CR)
         return F_i, CR_i
 
     def _randc01(self,
@@ -115,16 +115,16 @@ class SHADE(JADE):
         return value
 
     def _update_u_F(self,
-                   u_F: float,
-                   S_F: np.ndarray) -> float:
+                    u_F: float,
+                    S_F: np.ndarray) -> float:
         if len(S_F):
             return lehmer_mean(S_F)
         return u_F
 
     def _update_u_CR(self,
-                    u_CR: float,
-                    S_CR: np.ndarray,
-                    df: np.ndarray) -> float:
+                     u_CR: float,
+                     S_CR: np.ndarray,
+                     df: np.ndarray) -> float:
         if len(S_CR):
             sum_ = np.sum(df)
             if sum_ > 0:
@@ -141,153 +141,85 @@ class SHADE(JADE):
         return self
 
     def fit(self):
+
         if self._initial_population is None:
             population_g = float_population(
                 self._pop_size, self._left, self._right)
         else:
             population_g = self._initial_population
 
-        H_F = np.full(self.H_size, 0.5)
-        H_CR = np.full(self.H_size, 0.5)
+        H_F = np.full(self._H_size, 0.5)
+        H_CR = np.full(self._H_size, 0.5)
         k = 0
         next_k = 1
 
-        external_archive = np.zeros(shape=(0, len(self.left)))
+        external_archive = np.zeros(shape=(0, len(self._left)))
 
-        # for i in range(self._iters):
-        #     population_ph = self._get_phenotype(population_g)
-        #     fitness = self._evaluate(population_ph)
-        #     argsort = np.argsort(fitness)
-        #     population_g = population_g[argsort]
-        #     population_ph = population_ph[argsort]
-        #     fitness = fitness[argsort]
+        population_ph = self._get_phenotype(population_g)
+        fitness = self._evaluate(population_ph)
 
-        #     self._update_fittest(population_g, population_ph, fitness)
-        #     self._update_stats({'population_g': population_g.copy(),
-        #                        'fitness_max': self._thefittest._fitness})
+        argsort = np.argsort(fitness)
+        population_g = population_g[argsort]
+        population_ph = population_ph[argsort]
+        fitness = fitness[argsort]
 
-        #     if i > 0:
-        #         u_F = self._update_u_F(u_F, s_F)
-        #         u_CR = self._update_u_CR(u_CR, s_CR)
-        #     if self._elitism:
-        #         population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
-        #     self._show_progress(i)
-        #     if self._termitation_check():
-        #         break
-        #     else:
-        #         F_i = self._generate_F(u_F)
-        #         CR_i = self._generate_CR(u_CR)
-        #         pop_archive = np.vstack([population_g.copy(),
-        #                                  external_archive.copy()])
+        for i in range(self._iters-1):
+            self._update_fittest(population_g, population_ph, fitness)
+            self._update_stats({'population_g': population_g.copy(),
+                                'fitness_max': self._thefittest._fitness,
+                                'H_F': H_F.copy(),
+                                'H_CR': H_CR.copy()})
+            self._show_progress(i)
+            if self._termitation_check():
+                break
+            else:
+                F_i, CR_i = self._generate_F_CR(H_F, H_CR, self._pop_size)
+                pop_archive = np.vstack([population_g, external_archive])
 
-        #         mutation_and_crossover = partial(self._mutation_and_crossover,
-        #                                          population_g, pop_archive)
-        #         mutant_cr_g = np.array(list(map(mutation_and_crossover,
-        #                                         population_g, F_i, CR_i)))
+                mutation_and_crossover = partial(self._mutation_and_crossover,
+                                                 population_g, pop_archive)
+                mutant_cr_g = np.array(list(map(mutation_and_crossover,
+                                                population_g, F_i, CR_i)))
 
-        #         stack = self._evaluate_and_selection(mutant_cr_g,
-        #                                              population_g,
-        #                                              population_ph,
-        #                                              fitness)
-        #         population_g, population_ph, fitness, succeses = stack
-        #         will_be_replaced = population_g[succeses].copy()
+                stack = self._evaluate_and_selection(mutant_cr_g,
+                                                     population_g,
+                                                     population_ph,
+                                                     fitness)
 
-        #         s_F = F_i[succeses]
-        #         s_CR = CR_i[succeses]
+                succeses = stack[3]
+                will_be_replaced_pop = population_g[succeses].copy()
+                will_be_replaced_fit = fitness[succeses].copy()
+                s_F = F_i[succeses]
+                s_CR = CR_i[succeses]
 
-        #         external_archive = self._append_archive(external_archive,
-        #                                                 will_be_replaced)
+                external_archive = self._append_archive(external_archive,
+                                                        will_be_replaced_pop)
 
-        # return self
-        # H_F = np.full(self.H_size, 0.5)
-        # H_CR = np.full(self.H_size, 0.5)
-        # k = 0
-        # next_k = 1
+                population_g = stack[0]
+                population_ph = stack[1]
+                fitness = stack[2]
 
-        # external_archive = np.zeros(shape=(0, len(self.left)))
+                df = np.abs(will_be_replaced_fit - fitness[succeses])
 
-        # population_g = self.generate_init_pop()
-        # population_ph = self.genotype_to_phenotype(population_g)
-        # fitness = self.evaluate(population_ph)
+                if self._elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
 
-        # argsort = np.argsort(fitness)
-        # population_g = population_g[argsort]
-        # population_ph = population_ph[argsort]
-        # fitness = fitness[argsort]
+                argsort = np.argsort(fitness)
+                population_g = population_g[argsort]
+                population_ph = population_ph[argsort]
+                fitness = fitness[argsort]
 
-        # self.thefittest = TheFittest().update(population_g,
-        #                                       population_ph,
-        #                                       fitness)
-        # lastbest = LastBest().update(self.thefittest.fitness)
-        # if self.keep_history:
-        #     self.stats = Statistics(
-        #         mode=self.keep_history).update({'population_g': population_g.copy(),
-        #                                         'fitness_max': self.thefittest.fitness,
-        #                                         'H_F': H_F.copy(),
-        #                                         'H_CR': H_CR.copy()})
+                if next_k == self._H_size:
+                    next_k = 0
 
-        # for i in range(self.iters-1):
-        #     self.show_progress(i)
-        #     if self.termitation_check(lastbest.no_increase_counter):
-        #         break
-        #     else:
-        #         F_i, CR_i = self.generate_F_CR(H_F, H_CR, self.pop_size)
-        #         pop_archive = np.vstack(
-        #             [population_g.copy(), external_archive.copy()])
+                H_F[next_k] = self._update_u_F(H_F[k], s_F)
+                H_CR[next_k] = self._update_u_CR(H_CR[k], s_CR, df)
 
-        #         partial_mut_and_cross = partial(self.mutation_and_crossover,
-        #                                         population_g.copy(), pop_archive.copy())
-        #         mutant_cr_g = np.array(list(map(partial_mut_and_cross,
-        #                                         population_g.copy(),
-        #                                         F_i.copy(), CR_i.copy())))
+                if k == self._H_size - 1:
+                    k = 0
+                    next_k = 1
+                else:
+                    k += 1
+                    next_k += 1
 
-        #         stack = self.evaluate_and_selection(mutant_cr_g.copy(),
-        #                                             population_g.copy(),
-        #                                             population_ph.copy(),
-        #                                             fitness.copy())
-
-        #         succeses = stack[3]
-        #         will_be_replaced_pop = population_g[succeses].copy()
-        #         will_be_replaced_fit = fitness[succeses].copy()
-        #         s_F = F_i[succeses].copy()
-        #         s_CR = CR_i[succeses].copy()
-
-        #         external_archive = self.append_archive(
-        #             external_archive, will_be_replaced_pop)
-
-        #         population_g = stack[0]
-        #         population_ph = stack[1]
-        #         fitness = stack[2]
-
-        #         df = np.abs(will_be_replaced_fit - fitness[succeses])
-
-        #         if self.elitism:
-        #             population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
-        #         argsort = np.argsort(fitness)
-        #         population_g = population_g[argsort]
-        #         population_ph = population_ph[argsort]
-        #         fitness = fitness[argsort]
-
-        #         if next_k == self.H_size:
-        #             next_k = 0
-
-        #         H_F[next_k] = self.update_u_F(H_F[k], s_F)
-        #         H_CR[next_k] = self.update_u_CR(H_CR[k], s_CR, df)
-
-        #         self.thefittest.update(population_g, population_ph, fitness)
-        #         lastbest.update(self.thefittest.fitness)
-
-        #         if self.keep_history:
-        #             self.stats.update({'population_g': population_g.copy(),
-        #                                'fitness_max': self.thefittest.fitness,
-        #                                'H_F': H_F.copy(),
-        #                                'H_CR': H_CR.copy()})
-
-        #         if k == self.H_size - 1:
-        #             k = 0
-        #             next_k = 1
-        #         else:
-        #             k += 1
-        #             next_k += 1
-
-        # return self
+        return self

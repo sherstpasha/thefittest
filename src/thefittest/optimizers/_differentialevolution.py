@@ -121,26 +121,26 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                 self._pop_size, self._left, self._right)
         else:
             population_g = self._initial_population
-            
-        for i in range(self._iters):
-            population_ph = self._get_phenotype(population_g)
-            fitness = self._evaluate(population_ph)
-            argsort = np.argsort(fitness)
-            population_g = population_g[argsort]
-            population_ph = population_ph[argsort]
-            fitness = fitness[argsort]
 
+        population_ph = self._get_phenotype(population_g)
+        fitness = self._evaluate(population_ph)
+
+        argsort = np.argsort(fitness)
+        population_g = population_g[argsort]
+        population_ph = population_ph[argsort]
+        fitness = fitness[argsort]
+
+        for i in range(self._iters-1):
             self._update_fittest(population_g, population_ph, fitness)
             self._update_stats({'population_g': population_g.copy(),
                                'fitness_max': self._thefittest._fitness})
-            if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+
             self._show_progress(i)
             if self._termitation_check():
                 break
             else:
-                F_i = np.full(self._pop_size, self._F)
-                CR_i = np.full(self._pop_size, self._CR)
+                F_i = [self._F]*self._pop_size
+                CR_i = [self._CR]*self._pop_size
 
                 mutation_and_crossover = partial(self._mutation_and_crossover,
                                                  population_g)
@@ -152,4 +152,13 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                                                      population_ph,
                                                      fitness)
                 population_g, population_ph, fitness, _ = stack
+
+                if self._elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+
+                argsort = np.argsort(fitness)
+                population_g = population_g[argsort]
+                population_ph = population_ph[argsort]
+                fitness = fitness[argsort]
+
         return self

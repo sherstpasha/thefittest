@@ -44,7 +44,7 @@ class JADE(DifferentialEvolution):
 
         self._c: float = 0.1
         self._p: float = 0.05
-        
+
         self.set_strategy()
 
     def _current_to_pbest_1_archive(self,
@@ -141,41 +141,37 @@ class JADE(DifferentialEvolution):
         self._initial_population = initial_population
 
     def fit(self):
+
         if self._initial_population is None:
             population_g = float_population(
                 self._pop_size, self._left, self._right)
         else:
             population_g = self._initial_population
 
-        u_F = 0.5
-        u_CR = 0.5
+        u_F = u_CR = 0.5
         external_archive = np.zeros(shape=(0, len(self._left)))
 
-        for i in range(self._iters):
-            population_ph = self._get_phenotype(population_g)
-            fitness = self._evaluate(population_ph)
-            argsort = np.argsort(fitness)
-            population_g = population_g[argsort]
-            population_ph = population_ph[argsort]
-            fitness = fitness[argsort]
+        population_ph = self._get_phenotype(population_g)
+        fitness = self._evaluate(population_ph)
 
+        argsort = np.argsort(fitness)
+        population_g = population_g[argsort]
+        population_ph = population_ph[argsort]
+        fitness = fitness[argsort]
+
+        for i in range(self._iters-1):
             self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats({'population_g': population_g.copy(),
-                               'fitness_max': self._thefittest._fitness})
-
-            if i > 0:
-                u_F = self._update_u_F(u_F, s_F)
-                u_CR = self._update_u_CR(u_CR, s_CR)
-            if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+            self._update_stats({'population_g': population_g,
+                                'fitness_max': self._thefittest._fitness,
+                                'u_F': u_F,
+                                'u_CR': u_CR})
             self._show_progress(i)
             if self._termitation_check():
                 break
             else:
                 F_i = self._generate_F(u_F)
                 CR_i = self._generate_CR(u_CR)
-                pop_archive = np.vstack([population_g.copy(),
-                                         external_archive.copy()])
+                pop_archive = np.vstack([population_g, external_archive])
 
                 mutation_and_crossover = partial(self._mutation_and_crossover,
                                                  population_g, pop_archive)
@@ -183,16 +179,30 @@ class JADE(DifferentialEvolution):
                                                 population_g, F_i, CR_i)))
 
                 stack = self._evaluate_and_selection(mutant_cr_g,
-                                                     population_g,
-                                                     population_ph,
-                                                     fitness)
-                population_g, population_ph, fitness, succeses = stack
-                will_be_replaced = population_g[succeses].copy()
+                                                    population_g,
+                                                    population_ph,
+                                                    fitness)
 
+                succeses = stack[3]
+                will_be_replaced = population_g[succeses].copy()
                 s_F = F_i[succeses]
                 s_CR = CR_i[succeses]
 
                 external_archive = self._append_archive(external_archive,
                                                         will_be_replaced)
+
+                population_g = stack[0]
+                population_ph = stack[1]
+                fitness = stack[2]
+
+                if self._elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+                argsort = np.argsort(fitness)
+                population_g = population_g[argsort]
+                population_ph = population_ph[argsort]
+                fitness = fitness[argsort]
+
+                u_F = self._update_u_F(u_F, s_F)
+                u_CR = self._update_u_CR(u_CR, s_CR)
 
         return self

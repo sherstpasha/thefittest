@@ -1,16 +1,16 @@
 import numpy as np
-from thefittest.optimizers import SHADE
+from thefittest.optimizers import SHADE, JADE, DifferentialEvolution, jDE, SaDE2005
 from thefittest.benchmarks import Rastrigin
 from thefittest.tools.transformations import donothing
 
 
-n_dimension = 100
+n_dimension = 30
 left_border = -4.5
 right_border = 4.5
 
 
 number_of_iterations = 1500
-population_size = 300
+population_size = 100
 
 
 left_border_array = np.full(
@@ -29,6 +29,8 @@ model = SHADE(fitness_function=Rastrigin(),
               keep_history=True)
 
 model.fit()
+
+print(model.get_remains_calls())
 
 # stats = model.get_stats()
 # # print('The fittest individ:', model.thefittest.phenotype)

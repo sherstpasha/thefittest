@@ -164,14 +164,14 @@ class SaDE2005(DifferentialEvolution):
                   np.zeros(z_mutation, dtype=int)))
         CR_s_pool = np.array([], dtype=float)
 
-        for i in range(self._iters):
-            population_ph = self._get_phenotype(population_g)
-            fitness = self._evaluate(population_ph)
-            argsort = np.argsort(fitness)
-            population_g = population_g[argsort]
-            population_ph = population_ph[argsort]
-            fitness = fitness[argsort]
+        population_ph = self._get_phenotype(population_g)
+        fitness = self._evaluate(population_ph)
+        argsort = np.argsort(fitness)
+        population_g = population_g[argsort]
+        population_ph = population_ph[argsort]
+        fitness = fitness[argsort]
 
+        for i in range(self._iters):
             self._update_fittest(population_g, population_ph, fitness)
             self._update_stats({'population_g': population_g,
                                 'fitness_max': self._thefittest._fitness,
@@ -214,4 +214,80 @@ class SaDE2005(DifferentialEvolution):
                 ns, nf = self._update_ns_nf(m_operators, succeses, ns, nf)
                 CR_s_pool = np.append(CR_s_pool, CR_i[succeses])
 
+        return self
+
+    def fit(self):
+        if self._initial_population is None:
+            population_g = float_population(
+                self._pop_size, self._left, self._right)
+        else:
+            population_g = self._initial_population
+
+        z_mutation = len(self._mutation_pool)
+        m_proba = dict(zip(self._mutation_pool.keys(),
+                           np.full(z_mutation, 1/z_mutation)))
+        CRm = 0.5
+        CR_i = self._generate_CR( CRm)
+
+        population_ph = self._get_phenotype(population_g)
+        fitness = self._evaluate(population_ph)
+
+        argsort = np.argsort(fitness)
+        population_g = population_g[argsort]
+        population_ph = population_ph[argsort]
+        fitness = fitness[argsort]
+
+        ns = dict(zip(self._mutation_pool.keys(),
+                  np.zeros(z_mutation, dtype=int)))
+        nf = dict(zip(self._mutation_pool.keys(),
+                  np.zeros(z_mutation, dtype=int)))
+        CR_s_pool = np.array([], dtype=float)
+        for i in range(self._iters-1):
+            self._update_fittest(population_g, population_ph, fitness)
+            self._update_stats({'population_g': population_g,
+                                'fitness_max': self._thefittest._fitness,
+                                'm_proba': m_proba.copy(),
+                                'CRm': CRm})
+            self._show_progress(i)
+            if self._termitation_check():
+                break
+            else:
+                m_operators = self._choice_operators(m_proba)
+
+                mutation_and_crossover = partial(self._mutation_and_crossover,
+                                                 population_g)
+                mutant_cr_g = np.array(list(map(mutation_and_crossover,
+                                                population_g,  m_operators, CR_i)))
+
+                stack = self._evaluate_and_selection(mutant_cr_g,
+                                                    population_g,
+                                                    population_ph,
+                                                    fitness)
+
+                population_g, population_ph, fitness, succeses = stack
+
+                if self._elitism:
+                    population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+
+                argsort = np.argsort(fitness)
+                population_g = population_g[argsort]
+                population_ph = population_ph[argsort]
+                fitness = fitness[argsort]
+
+                ns, nf = self._update_ns_nf(m_operators, succeses, ns, nf)
+                CR_s_pool = np.append(CR_s_pool, CR_i[succeses])
+
+                if self._if_period_ended(i, self._m_learning_period):
+                    m_proba = self._update_proba(ns, nf)
+                    ns = dict(zip(self._mutation_pool.keys(),
+                                np.zeros(z_mutation, dtype=int)))
+                    nf = dict(zip(self._mutation_pool.keys(),
+                                np.zeros(z_mutation, dtype=int)))
+
+                if self._if_period_ended(i, self._CR_update_timer):
+                    CR_i = self._generate_CR(CRm)
+                    if self._if_period_ended(i, self._CR_m_learning_period):
+                        if len(CR_s_pool):
+                            CRm = np.mean(CR_s_pool)
+                        CR_s_pool = np.array([], dtype=float)
         return self

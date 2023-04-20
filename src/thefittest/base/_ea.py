@@ -133,7 +133,7 @@ class EvolutionaryAlgorithm:
         return self._genotype_to_phenotype(popultion_g)
 
     def get_remains_calls(self):
-        return (self._pop_size + (self._iters-1)*(self._pop_size-1)) - self._calls
+        return (self._pop_size*self._iters) - self._calls
 
     def get_fittest(self) -> TheFittest:
         return self._thefittest
