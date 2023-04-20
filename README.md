@@ -3,10 +3,6 @@
 [![PyPI](https://img.shields.io/pypi/v/thefittest?label=PyPI%20-%20Package%20version)](https://pypi.org/project/thefittest/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/thefittest?label=PyPI%20Downloads)]((https://pypi.org/project/thefittest/))
 
-![GitHub last commit](https://img.shields.io/github/last-commit/sherstpasha/thefittest)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/sherstpasha/thefittest)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/sherstpasha/thefittest)
-
 ## Installation
 ```bash
 pip install thefittest
