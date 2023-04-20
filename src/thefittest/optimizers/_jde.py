@@ -44,6 +44,8 @@ class jDE(DifferentialEvolution):
         self._t_f: float
         self._t_cr: float
 
+        self.set_strategy()
+
     def _get_new_F(self,
                    F: np.ndarray) -> np.ndarray:
         F = F.copy()
@@ -124,68 +126,3 @@ class jDE(DifferentialEvolution):
                 CR_i[succeses] = CR_i_new[succeses]
 
         return self
-        # population_g = self.generate_init_pop()
-        # population_ph = self.genotype_to_phenotype(population_g)
-        # fitness = self.evaluate(population_ph)
-
-        # argsort = np.argsort(fitness)
-        # population_g = population_g[argsort]
-        # population_ph = population_ph[argsort]
-        # fitness = fitness[argsort]
-
-        # F_i = np.full(self.pop_size, 0.5)
-        # CR_i = np.full(self.pop_size, 0.9)
-
-        # self.thefittest = TheFittest().update(population_g,
-        #                                       population_ph,
-        #                                       fitness)
-        # lastbest = LastBest().update(self.thefittest.fitness)
-        # if self.keep_history:
-        #     self.stats = Statistics(
-        #         mode=self.keep_history).update({'population_g': population_g,
-        #                                         'fitness_max': self.thefittest.fitness,
-        #                                         'F': F_i.copy(),
-        #                                         'CR': CR_i.copy()})
-
-        # for i in range(self.iters-1):
-        #     self.show_progress(i)
-        #     if self.termitation_check(lastbest.no_increase_counter):
-        #         break
-        #     else:
-
-        #         F_i_new = self.regenerate_F(F_i.copy())
-        #         CR_i_new = self.regenerate_CR(CR_i.copy())
-
-        #         partial_mut_and_cross = partial(self.mutation_and_crossover,
-        #                                         population_g)
-        #         mutant_cr_g = np.array(list(map(partial_mut_and_cross,
-        #                                         population_g,
-        #                                         F_i_new, CR_i_new)))
-
-        #         stack = self.evaluate_and_selection(mutant_cr_g,
-        #                                             population_g,
-        #                                             population_ph,
-        #                                             fitness)
-        #         population_g = stack[0]
-        #         population_ph = stack[1]
-        #         fitness = stack[2]
-
-        #         succeses = stack[3]
-        #         F_i[succeses] = F_i_new[succeses]
-        #         CR_i[succeses] = CR_i_new[succeses]
-
-        #         if self.elitism:
-        #             population_g[-1], population_ph[-1], fitness[-1] = self.thefittest.get()
-        #         argsort = np.argsort(fitness)
-        #         population_g = population_g[argsort]
-        #         population_ph = population_ph[argsort]
-        #         fitness = fitness[argsort]
-
-        #         self.thefittest.update(population_g, population_ph, fitness)
-        #         lastbest.update(self.thefittest.fitness)
-        #         if self.keep_history:
-        #             self.stats.update({'population_g': population_g,
-        #                                'fitness_max': self.thefittest.fitness,
-        #                                'F': F_i.copy(),
-        #                                'CR': CR_i.copy()})
-        # return self
