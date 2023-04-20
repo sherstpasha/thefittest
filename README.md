@@ -1,6 +1,7 @@
 # thefittest
 
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/thefittest?label=PyPI%20Downloads)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/sherstpasha/thefittest)
 
 ## Installation
 ```bash
