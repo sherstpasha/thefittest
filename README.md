@@ -1,4 +1,4 @@
-# thefittest
+# thefittest 
 
 ![PyPI](https://img.shields.io/pypi/v/thefittest?label=PyPI%20-%20Package%20version)
 ![PyPI - Format](https://img.shields.io/pypi/format/thefittest)
