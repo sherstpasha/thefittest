@@ -1,8 +1,6 @@
 # thefittest 
 
 [![PyPI](https://img.shields.io/pypi/v/thefittest?label=PyPI%20-%20Package%20version)](https://pypi.org/project/thefittest/)
-![PyPI - Format](https://img.shields.io/pypi/format/thefittest)
-![PyPI - License](https://img.shields.io/pypi/l/thefittest)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/thefittest?label=PyPI%20Downloads)]((https://pypi.org/project/thefittest/))
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/sherstpasha/thefittest)
