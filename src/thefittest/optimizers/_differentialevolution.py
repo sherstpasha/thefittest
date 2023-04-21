@@ -80,9 +80,9 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                                 population_g: np.ndarray,
                                 population_ph: np.ndarray,
                                 fitness: np.ndarray) -> Tuple:
-        offspring_g = population_g
-        offspring_ph = population_ph
-        offspring_fit = fitness
+        offspring_g = population_g.copy()
+        offspring_ph = population_ph.copy()
+        offspring_fit = fitness.copy()
 
         mutant_cr_ph = self._get_phenotype(mutant_cr_g)
         mutant_cr_fit = self._evaluate(mutant_cr_ph)
