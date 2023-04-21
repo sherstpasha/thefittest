@@ -1,9 +1,10 @@
-import numpy as np
-from .numba_funcs import find_first_difference_between_two
-from .numba_funcs import find_end_subtree_from_i
 from typing import List
 from typing import Tuple
 from typing import Any
+from typing import Optional
+import numpy as np
+from .numba_funcs import find_first_difference_between_two
+from .numba_funcs import find_end_subtree_from_i
 
 
 def root_mean_square_error(y_true: np.ndarray,
@@ -120,9 +121,12 @@ def numpy_group_by(group: np.ndarray,
 
 
 def lehmer_mean(x: np.ndarray,
-                power: int = 2) -> float:
-    x_up = np.power(x, power)
-    x_down = np.power(x, power-1)
+                power: int = 2,
+                weight: Optional[np.ndarray] = None) -> float:
+    if weight is None:
+        weight = 1
+    x_up = weight*np.power(x, power)
+    x_down = weight*np.power(x, power-1)
     return np.sum(x_up)/np.sum(x_down)
 
 
