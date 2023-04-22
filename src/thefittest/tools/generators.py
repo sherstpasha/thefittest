@@ -51,11 +51,11 @@ def full_growing_method(uniset: UniversalSet,
             level_i = previous_levels[-1] + 1
         levels.append(level_i)
         if level_i == max_level:
-            nodes.append(uniset.random_terminal_or_ephemeral())
+            nodes.append(uniset._random_terminal_or_ephemeral())
             n_args.append(0)
         else:
-            nodes.append(uniset.random_functional())
-            n_i = nodes[-1].n_args
+            nodes.append(uniset._random_functional())
+            n_i = nodes[-1]._n_args
             n_args.append(n_i)
             possible_steps.append(n_i)
             previous_levels.append(level_i)
@@ -86,7 +86,7 @@ def growing_method(uniset: UniversalSet,
             n_args.append(0)
         elif level_i == 0:
             nodes.append(uniset.random_functional())
-            n_i = nodes[-1].n_args
+            n_i = nodes[-1]._n_args
             n_args.append(n_i)
             possible_steps.append(n_i)
             previous_levels.append(level_i)
@@ -95,7 +95,7 @@ def growing_method(uniset: UniversalSet,
                 nodes.append(uniset.random_terminal_or_ephemeral())
             else:
                 nodes.append(uniset.random_functional())
-            n_i = nodes[-1].n_args
+            n_i = nodes[-1]._n_args
             n_args.append(n_i)
 
             if n_i > 0:

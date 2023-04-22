@@ -28,7 +28,7 @@ def common_region(trees: List) -> Tuple:
     common_indexes = []
     border_indexes = []
     for tree in trees:
-        indexes.append(list(range(len(tree.nodes))))
+        indexes.append(list(range(len(tree._nodes))))
         common_indexes.append([])
         border_indexes.append([])
 
@@ -37,11 +37,11 @@ def common_region(trees: List) -> Tuple:
         iters = min(list(map(len, indexes)))
 
         for i in range(iters):
-            first_n_args = trees[0].nodes[indexes[0][i]].n_args
+            first_n_args = trees[0]._nodes[indexes[0][i]]._n_args
             common_indexes[0].append(indexes[0][i])
             for j in range(1, len(indexes)):
                 common_indexes[j].append(indexes[j][i])
-                if first_n_args != trees[j].nodes[indexes[j][i]].n_args:
+                if first_n_args != trees[j]._nodes[indexes[j][i]]._n_args:
                     inner_break = True
 
             if inner_break:
@@ -97,7 +97,7 @@ def common_region_two_trees(n_args_array_1: np.ndarray,
 
 def common_region_(trees: List) -> Tuple:
     if len(trees) == 2:
-        to_return = common_region_two_trees(trees[0].n_args, trees[1].n_args)
+        to_return = common_region_two_trees(trees[0]._n_args, trees[1]._n_args)
     else:
         to_return = common_region_(trees)
 

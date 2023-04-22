@@ -8,6 +8,7 @@ from .transformations import protect_norm
 from .transformations import common_region
 import random
 from .numba_funcs import select_quantity_id_by_tournament
+from typing import Union
 
 
 min_value = np.finfo(np.float64).min
@@ -131,12 +132,12 @@ def point_mutation(tree: Tree,
     to_return = tree.copy()
     if random.random() < proba:
         i = random.randrange(len(to_return))
-        if type(to_return.nodes[i]) != FunctionalNode:
+        if type(to_return._nodes[i]) != FunctionalNode:
             new_node = uniset.random_terminal_or_ephemeral()
         else:
-            n_args = to_return.nodes[i].n_args
+            n_args = to_return._nodes[i]._n_args
             new_node = uniset.random_functional(n_args)
-        to_return.nodes[i] = new_node
+        to_return._nodes[i] = new_node
     return to_return
 
 
@@ -147,7 +148,7 @@ def growing_mutation(tree: Tree,
     to_return = tree.copy()
     if random.random() < proba:
         i = random.randrange(len(to_return))
-        new_tree = growing_method(uniset,  max(to_return.get_levels(i)))
+        new_tree = growing_method(uniset,  max(to_return._get_levels(i)))
         to_return = to_return.concat(i, new_tree)
     return to_return
 
@@ -158,10 +159,10 @@ def swap_mutation(tree: Tree,
                   max_level) -> Tree:
     to_return = tree.copy()
     if random.random() < proba:
-        indexes = np.arange(len(tree))[to_return.n_args > 1]
+        indexes = np.arange(len(tree))[to_return._n_args > 1]
         if len(indexes) > 0:
             i = random.choice(indexes)
-            args_id = to_return.get_args_id(i)
+            args_id = to_return._get_args_id(i)
             new_arg_id = args_id.copy()
             sattolo_shuffle(new_arg_id)
             for old_j, new_j in zip(args_id, new_arg_id):
@@ -177,10 +178,10 @@ def shrink_mutation(tree: Tree,
     to_return = tree.copy()
     if len(to_return) > 2:
         if random.random() < proba:
-            indexes = np.arange(len(tree))[to_return.n_args > 0]
+            indexes = np.arange(len(tree))[to_return._n_args > 0]
             if len(indexes) > 0:
                 i = random.choice(indexes)
-                args_id = to_return.get_args_id(i)
+                args_id = to_return._get_args_id(i)
                 choosen = random.choice(args_id)
                 to_return = to_return.concat(i, tree.subtree(
                     choosen, return_class=True))
@@ -349,22 +350,22 @@ def uniform_crossoverGP(individs: np.ndarray,
             if random.random() < 0.5:
                 id_ = common_indexes[0][i]
                 left, right = individ_1.subtree(index=id_)
-                new_nodes.extend(individ_1.nodes[left:right])
-                new_n_args.extend(individ_1.n_args[left:right])
+                new_nodes.extend(individ_1._nodes[left:right])
+                new_n_args.extend(individ_1._n_args[left:right])
             else:
                 id_ = common_indexes[1][i]
                 left, right = individ_2.subtree(index=id_)
-                new_nodes.extend(individ_2.nodes[left:right])
-                new_n_args.extend(individ_2.n_args[left:right])
+                new_nodes.extend(individ_2._nodes[left:right])
+                new_n_args.extend(individ_2._n_args[left:right])
         else:
             if random.random() < 0.5:
                 id_ = common_indexes[0][i]
-                new_nodes.append(individ_1.nodes[id_])
-                new_n_args.append(individ_1.n_args[id_])
+                new_nodes.append(individ_1._nodes[id_])
+                new_n_args.append(individ_1._n_args[id_])
             else:
                 id_ = common_indexes[1][i]
-                new_nodes.append(individ_2.nodes[id_])
-                new_n_args.append(individ_2.n_args[id_])
+                new_nodes.append(individ_2._nodes[id_])
+                new_n_args.append(individ_2._n_args[id_])
     to_return = Tree(new_nodes.copy(),
                      np.array(new_n_args.copy(), dtype=np.int32))
     return to_return
@@ -385,14 +386,14 @@ def uniform_crossoverGP_prop(individs: np.ndarray,
         id_ = common[j][i]
         if common_0_i in border[0]:
             subtree = individs[j].subtree(id_, return_class=True)
-            to_return.nodes.extend(subtree.nodes)
-            new_n_args.extend(subtree.n_args)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
         else:
-            to_return.nodes.append(individs[j].nodes[id_])
-            new_n_args.append(individs[j].n_args[id_])
+            to_return._nodes.append(individs[j]._nodes[id_])
+            new_n_args.append(individs[j]._n_args[id_])
 
     to_return = to_return.copy()
-    to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int32)
     return to_return
 
 
@@ -411,11 +412,11 @@ def uniform_crossoverGP_rank(individs: np.ndarray,
         id_ = common[j][i]
         if common_0_i in border[0]:
             subtree = individs[j].subtree(id_, return_class=True)
-            to_return.nodes.extend(subtree.nodes)
-            new_n_args.extend(subtree.n_args)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
         else:
-            to_return.nodes.append(individs[j].nodes[id_])
-            new_n_args.append(individs[j].n_args[id_])
+            to_return._nodes.append(individs[j]._nodes[id_])
+            new_n_args.append(individs[j]._n_args[id_])
 
     to_return = to_return.copy()
     to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
@@ -435,14 +436,14 @@ def uniform_crossoverGP_tour(individs: np.ndarray,
         id_ = common[j][i]
         if common_0_i in border[0]:
             subtree = individs[j].subtree(id_, return_class=True)
-            to_return.nodes.extend(subtree.nodes)
-            new_n_args.extend(subtree.n_args)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
         else:
-            to_return.nodes.append(individs[j].nodes[id_])
-            new_n_args.append(individs[j].n_args[id_])
+            to_return._nodes.append(individs[j]._nodes[id_])
+            new_n_args.append(individs[j]._n_args[id_])
 
     to_return = to_return.copy()
-    to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int32)
     return to_return
 
 
@@ -493,162 +494,190 @@ def tournament_selection_(fitness: np.ndarray,
 
 ##################################### GP MATH #####################################
 class Operator:
-    def write(self, *args):
-        return self.formula.format(*args)
+    def _write(self,
+               *args) -> str:
+        formula = self._formula.format(*args)
+        return formula
 
 
 class Cos(Operator):
-    def __init__(self):
-        self.formula = 'cos({})'
+    def __init__(self) -> None:
+        self._formula = 'cos({})'
         self.__name__ = 'cos'
-        self.sign = 'cos'
+        self._sign = 'cos'
 
-    def __call__(self, x):
-        return np.cos(x)
+    def __call__(self,
+                 x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.cos(x)
+        return result
 
 
 class Sin(Operator):
-    def __init__(self):
-        self.formula = 'sin({})'
+    def __init__(self) -> None:
+        self._formula = 'sin({})'
         self.__name__ = 'sin'
-        self.sign = 'sin'
+        self._sign = 'sin'
 
-    def __call__(self, x):
-        return np.sin(x)
+    def __call__(self,
+                 x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.sin(x)
+        return result
 
 
 class Add(Operator):
-    def __init__(self):
-        self.formula = '({} + {})'
+    def __init__(self) -> None:
+        self._formula = '({} + {})'
         self.__name__ = 'add'
-        self.sign = '+'
+        self._sign = '+'
 
-    def __call__(self, x, y):
-        return x + y
+    def __call__(self,
+                 x: Union[float, np.ndarray],
+                 y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = x + y
+        return result
 
 
 class Sub(Operator):
-    def __init__(self):
-        self.formula = '({} - {})'
+    def __init__(self) -> None:
+        self._formula = '({} - {})'
         self.__name__ = 'sub'
-        self.sign = '-'
+        self._sign = '-'
 
-    def __call__(self, x, y):
-        return x - y
+    def __call__(self,
+                 x: Union[float, np.ndarray],
+                 y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = x - y
+        return result
 
 
 class Neg(Operator):
-    def __init__(self):
-        self.formula = '-{}'
+    def __init__(self) -> None:
+        self._formula = '-{}'
         self.__name__ = 'neg'
-        self.sign = '-'
+        self._sign = '-'
 
-    def __call__(self, x):
-        return -x
+    def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = -x
+        return result
 
 
 class Mul(Operator):
-    def __init__(self):
-        self.formula = '({} * {})'
+    def __init__(self) -> None:
+        self._formula = '({} * {})'
         self.__name__ = 'mul'
-        self.sign = '*'
+        self._sign = '*'
 
-    def __call__(self, x, y):
-        return x * y
+    def __call__(self,
+                 x: Union[float, np.ndarray],
+                 y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = x * y
+        return result
 
 
 class Pow2(Operator):
-    def __init__(self):
-        self.formula = '({}**2)'
+    def __init__(self) -> None:
+        self._formula = '({}**2)'
         self.__name__ = 'pow2'
-        self.sign = '**2'
+        self._sign = '**2'
 
-    def __call__(self, x):
-        res = x**2
-        return np.clip(res, min_value, max_value)
+    def __call__(self,
+                 x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.clip(x**2, min_value, max_value)
+        return result
 
 
 class Div(Operator):
-    def __init__(self):
-        self.formula = '({}/{})'
+    def __init__(self) -> None:
+        self._formula = '({}/{})'
         self.__name__ = 'div'
-        self.sign = '/'
+        self._sign = '/'
 
-    def __call__(self, x, y):
+    def __call__(self,
+                 x: Union[float, np.ndarray],
+                 y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         if type(y) == np.ndarray:
-            res = np.divide(x, y, out=np.ones_like(
+            result = np.divide(x, y, out=np.ones_like(
                 y, dtype=np.float64), where=y != 0)
         else:
             if y == 0:
-                res = 0
+                result = 0
             else:
-                res = x/y
-        return np.clip(res, min_value, max_value)
+                result = x/y
+        result = np.clip(result, min_value, max_value)
+        return result
 
 
 class Inv(Operator):
-    def __init__(self):
-        self.formula = '(1/{})'
+    def __init__(self) -> None:
+        self._formula = '(1/{})'
         self.__name__ = 'Inv'
-        self.sign = '1/'
+        self._sign = '1/'
 
-    def __call__(self, y):
+    def __call__(self,
+                 y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         if type(y) == np.ndarray:
-            res = np.divide(1, y, out=np.ones_like(
+            result = np.divide(1, y, out=np.ones_like(
                 y, dtype=np.float64), where=y != 0)
         else:
             if y == 0:
-                res = 1
+                result = 1
             else:
-                res = 1/y
-        return res
+                result = 1/y
+        result = np.clip(result, min_value, max_value)
+        return result
 
 
 class LogAbs(Operator):
-    def __init__(self):
-        self.formula = 'log(abs({}))'
+    def __init__(self) -> None:
+        self._formula = 'log(abs({}))'
         self.__name__ = 'log(abs)'
-        self.sign = 'log(abs)'
+        self._sign = 'log(abs)'
 
-    def __call__(self, y):
+    def __call__(self,
+                 y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         y_ = np.abs(y)
         if type(y_) == np.ndarray:
-            res = np.log(y_, out=np.ones_like(
+            result = np.log(y_, out=np.ones_like(
                 y_, dtype=np.float64), where=y_ != 0)
         else:
             if y_ == 0:
-                res = 1
+                result = 1
             else:
-                res = np.log(y_)
-        return res
+                result = np.log(y_)
+        return result
 
 
 class Exp(Operator):
-    def __init__(self):
-        self.formula = 'exp({})'
+    def __init__(self) -> None:
+        self._formula = 'exp({})'
         self.__name__ = 'exp'
-        self.sign = 'exp'
+        self._sign = 'exp'
 
-    def __call__(self, x):
-        to_return = np.exp(x)
-        return np.clip(to_return, min_value, max_value)
+    def __call__(self,
+                 x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.clip(np.exp(x), min_value, max_value)
+        return result
 
 
 class SqrtAbs(Operator):
-    def __init__(self):
-        self.formula = 'sqrt(abs({}))'
+    def __init__(self) -> None:
+        self._formula = 'sqrt(abs({}))'
         self.__name__ = 'sqrt(abs)'
-        self.sign = 'sqrt(abs)'
+        self._sign = 'sqrt(abs)'
 
-    def __call__(self, x):
-        return np.sqrt(np.abs(x))
+    def __call__(self,
+                 x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.sqrt(np.abs(x))
+        return result
 
 
 class Abs(Operator):
-    def __init__(self):
-        self.formula = 'abs({})'
+    def __init__(self) -> None:
+        self._formula = 'abs({})'
         self.__name__ = 'abs()'
-        self.sign = 'abs()'
+        self._sign = 'abs()'
 
-    def __call__(self, x):
-        return np.abs(x)
+    def __call__(self,
+                 x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.abs(x)
+        return result
