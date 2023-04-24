@@ -1,7 +1,7 @@
 from functools import partial
 from typing import Callable
 from typing import Optional
-from typing import List
+from typing import Tuple
 from typing import Dict
 import numpy as np
 from ..tools.transformations import scale_data
@@ -107,20 +107,20 @@ class SelfCGP(GeneticProgramming):
         return offspring
 
     def set_strategy(self,
-                     select_opers: List = ['proportional',
-                                           'rank',
-                                           'tournament_3',
-                                           'tournament_5',
-                                           'tournament_7'],
-                     crossover_opers: List = ['standart',
-                                              'one_point',
-                                              'uniform_rank2'],
-                     mutation_opers: List = ['weak_point',
-                                             'average_point',
-                                             'strong_point',
-                                             'weak_grow',
-                                             'average_grow',
-                                             'strong_grow'],
+                     select_opers: Tuple = ('proportional',
+                                            'rank',
+                                            'tournament_3',
+                                            'tournament_5',
+                                            'tournament_7'),
+                     crossover_opers: Tuple = ('standart',
+                                               'one_point',
+                                               'uniform_rank2'),
+                     mutation_opers: Tuple = ('weak_point',
+                                              'average_point',
+                                              'strong_point',
+                                              'weak_grow',
+                                              'average_grow',
+                                              'strong_grow'),
                      tour_size_param:  int = 2,
                      initial_population: Optional[np.ndarray] = None,
                      elitism_param: bool = True,
@@ -130,6 +130,19 @@ class SelfCGP(GeneticProgramming):
                      threshold_param: float = 0.05,
                      max_level_param: int = 16,
                      init_level_param: int = 4) -> None:
+        '''
+        - selection_oper: must be a Tuple of:
+            'proportional', 'rank', 'tournament_k', 'tournament_3', 'tournament_5', 'tournament_7'
+        - crossover oper: must be a Tuple of:
+            'empty', 'standart', 'one_point', 'uniform2', 'uniform7', 'uniformk', 'uniform_prop2',
+            'uniform_prop7', 'uniform_propk', 'uniform_rank2', 'uniform_rank7', 'uniform_rankk',
+            'uniform_tour3', 'uniform_tour7', 'uniform_tourk'
+        - mutation oper: must be a Tuple of:
+            'weak_point', 'average_point', 'strong_point', 'custom_rate_point',
+            'weak_grow', 'average_grow', 'strong_grow', 'custom_rate_grow',
+            'weak_swap', 'average_swap', 'strong_swap', 'custom_rate_swap',
+            'weak_shrink', 'average_shrink', 'strong_shrink', 'custom_rate_shrink',
+        '''
         self._tour_size = tour_size_param
         self._initial_population = initial_population
         self._elitism = elitism_param

@@ -115,7 +115,16 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                      elitism_param: bool = True,
                      parents_num_param: int = 7,
                      mutation_rate_param: float = 0.05) -> None:
-
+        '''
+        - selection_oper: should be one of:
+            'proportional', 'rank', 'tournament_k', 'tournament_3', 'tournament_5', 'tournament_7'
+        - crossover oper: should be one of:
+            'empty', 'one_point', 'two_point', 'uniform2', 'uniform7', 'uniformk', 'uniform_prop2',
+            'uniform_prop7', 'uniform_propk', 'uniform_rank2', 'uniform_rank7', 'uniform_rankk',
+            'uniform_tour3', 'uniform_tour7', 'uniform_tourk'
+        - mutation oper: should be one of:
+            'weak', 'average', 'strong', 'custom_rate'
+        '''
         self._tour_size = tour_size_param
         self._initial_population = initial_population
         self._elitism = elitism_param

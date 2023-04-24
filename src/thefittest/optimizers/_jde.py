@@ -72,6 +72,11 @@ class jDE(DifferentialEvolution):
                      t_cr_param: float = 0.1,
                      elitism_param: bool = True,
                      initial_population: Optional[np.ndarray] = None) -> None:
+        '''
+        - mutation oper: must be a Tuple of:
+            'best_1', 'rand_1', 'current_to_best_1', 'current_to_pbest_1',
+            'rand_to_best1', 'best_2', 'rand_2', 
+        '''
         self._update_pool()
         self._specified_mutation = self._mutation_pool[mutation_oper]
         self._F_left = F_left_param

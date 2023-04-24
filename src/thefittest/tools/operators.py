@@ -197,7 +197,7 @@ def shrink_mutation(tree: Tree,
 def empty_crossover(individs: np.ndarray,
                     fitness: np.ndarray,
                     rank: np.ndarray,
-                    args) -> np.ndarray:
+                    *args) -> np.ndarray:
     offspring = individs[0].copy()
     return offspring
 

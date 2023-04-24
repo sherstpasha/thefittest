@@ -1,7 +1,7 @@
 from functools import partial
 from typing import Callable
 from typing import Optional
-from typing import List
+from typing import Tuple
 from typing import Dict
 import numpy as np
 from ._geneticalgorithm import GeneticAlgorithm
@@ -92,25 +92,25 @@ class SelfCGA(GeneticAlgorithm):
         return fittest_operator
 
     def set_strategy(self,
-                     selection_opers: List = ['proportional',
-                                              'rank',
-                                              'tournament_3',
-                                              'tournament_5',
-                                              'tournament_7'],
-                     crossover_opers: List = ['empty',
-                                              'one_point',
-                                              'two_point',
-                                              'uniform2',
-                                              'uniform7',
-                                              'uniform_prop2',
-                                              'uniform_prop7',
-                                              'uniform_rank2',
-                                              'uniform_rank7',
-                                              'uniform_tour3',
-                                              'uniform_tour7'],
-                     mutation_opers: List = ['weak',
-                                             'average',
-                                             'strong'],
+                     selection_opers: Tuple = ('proportional',
+                                               'rank',
+                                               'tournament_3',
+                                               'tournament_5',
+                                               'tournament_7'),
+                     crossover_opers: Tuple = ('empty',
+                                               'one_point',
+                                               'two_point',
+                                               'uniform2',
+                                               'uniform7',
+                                               'uniform_prop2',
+                                               'uniform_prop7',
+                                               'uniform_rank2',
+                                               'uniform_rank7',
+                                               'uniform_tour3',
+                                               'uniform_tour7'),
+                     mutation_opers: Tuple = ('weak',
+                                              'average',
+                                              'strong'),
                      tour_size_param: int = 2,
                      initial_population: Optional[np.ndarray] = None,
                      elitism_param: bool = True,
@@ -118,7 +118,16 @@ class SelfCGA(GeneticAlgorithm):
                      mutation_rate_param: float = 0.05,
                      K_param: float = 2,
                      threshold_param: float = 0.05) -> None:
-
+        '''
+        - selection_oper: must be a Tuple of:
+            'proportional', 'rank', 'tournament_k', 'tournament_3', 'tournament_5', 'tournament_7'
+        - crossover oper: must be a Tuple of:
+            'empty', 'one_point', 'two_point', 'uniform2', 'uniform7', 'uniformk', 'uniform_prop2',
+            'uniform_prop7', 'uniform_propk', 'uniform_rank2', 'uniform_rank7', 'uniform_rankk',
+            'uniform_tour3', 'uniform_tour7', 'uniform_tourk'
+        - mutation oper: must be a Tuple of:
+            'weak', 'average', 'strong', 'custom_rate'
+        '''
         self._tour_size = tour_size_param
         self._initial_population = initial_population
         self._elitism = elitism_param
