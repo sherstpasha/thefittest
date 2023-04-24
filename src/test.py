@@ -1,11 +1,10 @@
 import numpy as np
-from thefittest.optimizers import SelfCGP
+from thefittest.optimizers import SelfCGP, GeneticProgramming
 from thefittest.tools.transformations import donothing
 from thefittest.base import FunctionalNode
 from thefittest.base import TerminalNode
 from thefittest.base import EphemeralNode
 from thefittest.base import UniversalSet
-from thefittest.base._tree import Node
 from thefittest.tools.operators import Mul
 from thefittest.tools.operators import Add
 from thefittest.tools.operators import Inv
@@ -15,7 +14,6 @@ from thefittest.tools.operators import Cos
 from thefittest.tools.operators import Sin
 from thefittest.tools.transformations import coefficient_determination
 from thefittest.benchmarks.symbolicregression17 import problems_dict
-from thefittest.tools.generators import full_growing_method
 
 
 def generator1():
@@ -58,37 +56,23 @@ terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
 uniset = UniversalSet(functional_set, terminal_set)
 
 
-tree = full_growing_method(uniset, 5)
-print(tree)
-print(tree.compile())
-# print(uniset._functional_set)
+def fitness_function(trees):
+    fitness = []
+    for tree in trees:
+        y_pred = tree()*np.ones(len(y))
+        fitness.append(coefficient_determination(y, y_pred))
+    return np.array(fitness)
 
 
+model = SelfCGP(fitness_function=fitness_function,
+                genotype_to_phenotype=donothing,
+                uniset=uniset,
+                pop_size=population_size,
+                iters=number_of_iterations,
+                show_progress_each=10,
+                minimization=False,
+                keep_history=True)
 
-# print(tree)
+# model.set_strategy(crossover_opers=['standart', 'one_point', 'uniform_prop2'])
 
-# arr = list(range(10000))
-# range_ = range(10000)
-# import time
-# import random
-# n = 10000
-
-# begin = time.time()
-# for i in range(n):
-#     for jj, j in enumerate(arr):
-#         j
-# print((time.time() - begin))
-
-# arr = tuple(arr)
-# begin = time.time()
-# for i in range(n):
-#     for jj, j in enumerate(arr):
-#         j
-# print((time.time() - begin))
-
-# begin = time.time()
-# for i in range(n):
-#     for j in range_:
-#         j
-# print((time.time() - begin))
-
+model.fit()

@@ -119,7 +119,6 @@ class SHAGA(EvolutionaryAlgorithm):
                      initial_population: Optional[np.ndarray] = None) -> None:
         self._elitism = elitism_param
         self._initial_population = initial_population
-        return self
 
     def fit(self):
         H_MR = np.full(self._H_size, 1/(self._str_len))

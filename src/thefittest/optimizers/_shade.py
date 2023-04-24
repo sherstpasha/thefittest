@@ -138,7 +138,6 @@ class SHADE(JADE):
         self._update_pool()
         self._elitism = elitism_param
         self._initial_population = initial_population
-        return self
 
     def fit(self):
 

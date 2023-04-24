@@ -62,38 +62,38 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
     def _update_pool(self):
         self._selection_pool = {'proportional': (proportional_selection, None),
-                        'rank': (rank_selection, None),
-                        'tournament_k': (tournament_selection, self._tour_size),
-                        'tournament_3': (tournament_selection, 3),
-                        'tournament_5': (tournament_selection, 5),
-                        'tournament_7': (tournament_selection, 7)}
+                                'rank': (rank_selection, None),
+                                'tournament_k': (tournament_selection, self._tour_size),
+                                'tournament_3': (tournament_selection, 3),
+                                'tournament_5': (tournament_selection, 5),
+                                'tournament_7': (tournament_selection, 7)}
 
         self._crossover_pool = {'empty': (empty_crossover, 1),
-                        'one_point': (one_point_crossover, 2),
-                        'two_point': (two_point_crossover, 2),
-                        'uniform2': (uniform_crossover, 2),
-                        'uniform7': (uniform_crossover, 7),
-                        'uniformk': (uniform_crossover, self._parents_num),
-                        'uniform_prop2': (uniform_prop_crossover, 2),
-                        'uniform_prop7': (uniform_prop_crossover, 7),
-                        'uniform_propk': (uniform_prop_crossover, self._parents_num),
-                        'uniform_rank2': (uniform_rank_crossover, 2),
-                        'uniform_rank7': (uniform_rank_crossover, 7),
-                        'uniform_rankk': (uniform_rank_crossover, self._parents_num),
-                        'uniform_tour3': (uniform_tour_crossover, 3),
-                        'uniform_tour7': (uniform_tour_crossover, 7),
-                        'uniform_tourk': (uniform_tour_crossover, self._parents_num)}
+                                'one_point': (one_point_crossover, 2),
+                                'two_point': (two_point_crossover, 2),
+                                'uniform2': (uniform_crossover, 2),
+                                'uniform7': (uniform_crossover, 7),
+                                'uniformk': (uniform_crossover, self._parents_num),
+                                'uniform_prop2': (uniform_prop_crossover, 2),
+                                'uniform_prop7': (uniform_prop_crossover, 7),
+                                'uniform_propk': (uniform_prop_crossover, self._parents_num),
+                                'uniform_rank2': (uniform_rank_crossover, 2),
+                                'uniform_rank7': (uniform_rank_crossover, 7),
+                                'uniform_rankk': (uniform_rank_crossover, self._parents_num),
+                                'uniform_tour3': (uniform_tour_crossover, 3),
+                                'uniform_tour7': (uniform_tour_crossover, 7),
+                                'uniform_tourk': (uniform_tour_crossover, self._parents_num)}
 
         self._mutation_pool = {'weak':  (flip_mutation, 1/(3*self._str_len)),
-                        'average':  (flip_mutation, 1/(self._str_len)),
-                        'strong': (flip_mutation, min(1, 3/self._str_len)),
-                        'custom_rate': (flip_mutation, self._mutation_rate)}
+                               'average':  (flip_mutation, 1/(self._str_len)),
+                               'strong': (flip_mutation, min(1, 3/self._str_len)),
+                               'custom_rate': (flip_mutation, self._mutation_rate)}
 
-    def _get_new_population_g(self,
-                              population_g: np.ndarray,
-                              fitness_scale: np.ndarray,
-                              fitness_rank: np.ndarray,
-                              _) -> np.ndarray:
+    def _get_new_individ_g(self,
+                           population_g: np.ndarray,
+                           fitness_scale: np.ndarray,
+                           fitness_rank: np.ndarray,
+                           _) -> np.ndarray:
         selection_func, tour_size = self._specified_selection
         crossover_func, quantity = self._specified_crossover
         mutation_func, proba = self._specified_mutation
@@ -149,10 +149,10 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             if self._termitation_check():
                 break
             else:
-                get_new_population_g = partial(self._get_new_population_g,
-                                               population_g,
-                                               scale_data(fitness),
-                                               rank_data(fitness))
-                map_ = map(get_new_population_g, range(self._pop_size))
+                get_new_individ_g = partial(self._get_new_individ_g,
+                                            population_g,
+                                            scale_data(fitness),
+                                            rank_data(fitness))
+                map_ = map(get_new_individ_g, range(self._pop_size))
                 population_g = np.array(list(map_), dtype=np.byte)
         return self

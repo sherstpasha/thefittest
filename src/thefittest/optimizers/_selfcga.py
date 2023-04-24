@@ -24,18 +24,19 @@ class SelfCGA(GeneticAlgorithm):
                  minimization: bool = False,
                  show_progress_each: Optional[int] = None,
                  keep_history: bool = False):
-        GeneticAlgorithm.__init__(self,
-                                  fitness_function=fitness_function,
-                                  genotype_to_phenotype=genotype_to_phenotype,
-                                  iters=iters,
-                                  pop_size=pop_size,
-                                  str_len=str_len,
-                                  optimal_value=optimal_value,
-                                  termination_error_value=termination_error_value,
-                                  no_increase_num=no_increase_num,
-                                  minimization=minimization,
-                                  show_progress_each=show_progress_each,
-                                  keep_history=keep_history)
+        GeneticAlgorithm.__init__(
+            self,
+            fitness_function=fitness_function,
+            genotype_to_phenotype=genotype_to_phenotype,
+            iters=iters,
+            pop_size=pop_size,
+            str_len=str_len,
+            optimal_value=optimal_value,
+            termination_error_value=termination_error_value,
+            no_increase_num=no_increase_num,
+            minimization=minimization,
+            show_progress_each=show_progress_each,
+            keep_history=keep_history)
 
         self._selection_set: dict
         self._crossover_set: dict
@@ -45,13 +46,13 @@ class SelfCGA(GeneticAlgorithm):
 
         self.set_strategy()
 
-    def _get_new_population_g(self,
-                              population_g: np.ndarray,
-                              fitness_scale: np.ndarray,
-                              fitness_rank: np.ndarray,
-                              selection: str,
-                              crossover: str,
-                              mutation: str) -> np.ndarray:
+    def _get_new_individ_g(self,
+                           population_g: np.ndarray,
+                           fitness_scale: np.ndarray,
+                           fitness_rank: np.ndarray,
+                           selection: str,
+                           crossover: str,
+                           mutation: str) -> np.ndarray:
         selection_func, tour_size = self._selection_set[selection]
         crossover_func, quantity = self._crossover_set[crossover]
         mutation_func, proba = self._mutation_set[mutation]
@@ -205,11 +206,11 @@ class SelfCGA(GeneticAlgorithm):
                 c_operators = self._choice_operators(c_proba)
                 m_operators = self._choice_operators(m_proba)
 
-                get_new_population_g = partial(self._get_new_population_g,
-                                               population_g,
-                                               fitness_scale,
-                                               rank_data(fitness))
-                map_ = map(get_new_population_g,
+                get_new_individ_g = partial(self._get_new_individ_g,
+                                            population_g,
+                                            fitness_scale,
+                                            rank_data(fitness))
+                map_ = map(get_new_individ_g,
                            s_operators, c_operators, m_operators)
                 population_g = np.array(list(map_), dtype=np.byte)
 

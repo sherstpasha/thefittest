@@ -132,11 +132,11 @@ def point_mutation(tree: Tree,
     to_return = tree.copy()
     if random.random() < proba:
         i = random.randrange(len(to_return))
-        if type(to_return._nodes[i]) != FunctionalNode:
-            new_node = uniset.random_terminal_or_ephemeral()
-        else:
+        if to_return._nodes[i].is_functional():
             n_args = to_return._nodes[i]._n_args
-            new_node = uniset.random_functional(n_args)
+            new_node = uniset._random_functional(n_args)
+        else:
+            new_node = uniset._random_terminal_or_ephemeral()
         to_return._nodes[i] = new_node
     return to_return
 
@@ -148,8 +148,10 @@ def growing_mutation(tree: Tree,
     to_return = tree.copy()
     if random.random() < proba:
         i = random.randrange(len(to_return))
-        new_tree = growing_method(uniset,  max(to_return._get_levels(i)))
-        to_return = to_return.concat(i, new_tree)
+        # print(to_return._nodes)
+        # print(to_return._n_args)
+        grown_tree = growing_method(uniset,  max(to_return.get_levels(i)))
+        to_return = to_return.concat(i, grown_tree)
     return to_return
 
 
@@ -159,10 +161,11 @@ def swap_mutation(tree: Tree,
                   max_level) -> Tree:
     to_return = tree.copy()
     if random.random() < proba:
-        indexes = np.arange(len(tree))[to_return._n_args > 1]
+        more_one_args_cond = to_return._n_args > 1
+        indexes = np.arange(len(tree), dtype=int)[more_one_args_cond]
         if len(indexes) > 0:
             i = random.choice(indexes)
-            args_id = to_return._get_args_id(i)
+            args_id = to_return.get_args_id(i)
             new_arg_id = args_id.copy()
             sattolo_shuffle(new_arg_id)
             for old_j, new_j in zip(args_id, new_arg_id):
@@ -178,13 +181,14 @@ def shrink_mutation(tree: Tree,
     to_return = tree.copy()
     if len(to_return) > 2:
         if random.random() < proba:
-            indexes = np.arange(len(tree))[to_return._n_args > 0]
+            no_terminal_cond = to_return._n_args > 0
+            indexes = np.arange(len(tree), dtype=int)[no_terminal_cond]
             if len(indexes) > 0:
                 i = random.choice(indexes)
-                args_id = to_return._get_args_id(i)
-                choosen = random.choice(args_id)
+                args_id = to_return.get_args_id(i)
+                choosen_id = random.choice(args_id)
                 to_return = to_return.concat(i, tree.subtree(
-                    choosen, return_class=True))
+                    choosen_id, return_class=True))
     return to_return
 
 
@@ -192,7 +196,8 @@ def shrink_mutation(tree: Tree,
 # genetic algorithm
 def empty_crossover(individs: np.ndarray,
                     fitness: np.ndarray,
-                    rank: np.ndarray) -> np.ndarray:
+                    rank: np.ndarray,
+                    args) -> np.ndarray:
     offspring = individs[0].copy()
     return offspring
 
@@ -367,7 +372,7 @@ def uniform_crossoverGP(individs: np.ndarray,
                 new_nodes.append(individ_2._nodes[id_])
                 new_n_args.append(individ_2._n_args[id_])
     to_return = Tree(new_nodes.copy(),
-                     np.array(new_n_args.copy(), dtype=np.int32))
+                     new_n_args.copy())
     return to_return
 
 
@@ -393,7 +398,7 @@ def uniform_crossoverGP_prop(individs: np.ndarray,
             new_n_args.append(individs[j]._n_args[id_])
 
     to_return = to_return.copy()
-    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int32)
+    to_return._n_args = new_n_args.copy()
     return to_return
 
 
@@ -419,7 +424,7 @@ def uniform_crossoverGP_rank(individs: np.ndarray,
             new_n_args.append(individs[j]._n_args[id_])
 
     to_return = to_return.copy()
-    to_return.n_args = np.array(new_n_args.copy(), dtype=np.int32)
+    to_return._n_args = new_n_args.copy()
     return to_return
 
 
@@ -443,7 +448,7 @@ def uniform_crossoverGP_tour(individs: np.ndarray,
             new_n_args.append(individs[j]._n_args[id_])
 
     to_return = to_return.copy()
-    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int32)
+    to_return._n_args = new_n_args.copy()
     return to_return
 
 

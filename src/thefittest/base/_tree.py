@@ -14,58 +14,60 @@ from ..tools.numba_funcs import get_levels_tree_from_i
 
 
 class Tree:
-    def __init__(self, nodes, n_args):
+    def __init__(self,
+                 nodes: list,
+                 n_args: list) -> None:
         self._nodes = nodes
-        self._n_args = n_args
+        self._n_args = np.array(n_args, dtype=np.int32)
 
     def __len__(self):
         return len(self._nodes)
 
     def __str__(self):
-        reverse_nodes = self._nodes[::-1].copy()
-        pack = []
-        for node in reverse_nodes:
-            args = []
-            for _ in range(node._n_args):
-                args.append(pack.pop())
-            if type(node) != FunctionalNode:
-                pack.append(node._name)
-            else:
-                pack.append(node._value._write(*args))
-        return pack[0]
-
-    def __eq__(self, other):
-        if len(self) != len(other):
-            return False
-        else:
-            for node_1, node_2 in zip(self._nodes, other._nodes):
-                if np.all(node_1._value != node_2._value):
-                    return False
-        return True
-
-    def compile(self):
         pack = []
         for node in reversed(self._nodes):
             args = []
             for _ in range(node._n_args):
                 args.append(pack.pop())
-            if type(node) != FunctionalNode:
-                pack.append(node._value)
+            if node.is_functional():
+                pack.append(node._value._write(*args))
             else:
+                pack.append(node._name)
+        return pack[0]
+
+    def __eq__(self, other) -> bool:
+        if len(self) != len(other):
+            return False
+        else:
+            for node_1, node_2 in zip(self._nodes, other._nodes):
+                if node_1 != node_2:
+                    return False
+        return True
+
+    def __call__(self):
+        pack = []
+        for node in reversed(self._nodes):
+            args = []
+            for _ in range(node._n_args):
+                args.append(pack.pop())
+            if node.is_functional():
                 pack.append(node._value(*args))
+            else:
+                pack.append(node._value)
         return pack[0]
 
     def copy(self):
         return Tree(self._nodes.copy(), self._n_args.copy())
 
-    def change_terminals(self, change_list):
+    def set_terminals(self,
+                      **kwargs):
         tree_copy = self.copy()
         for i, node in enumerate(tree_copy._nodes):
-            if type(node) is TerminalNode:
-                for key, value in change_list.items():
-                    if node.name == key:
+            if node.is_terminal():
+                for name, value in kwargs.items():
+                    if node._name == name:
                         tree_copy._nodes[i] = TerminalNode(value=value,
-                                                           name=node.name + '_')
+                                                           name=node._name)
         return tree_copy
 
     def subtree(self, index: np.int32, return_class=False):
@@ -85,15 +87,15 @@ class Tree:
                                   to_return._n_args[right:]]
         return to_return
 
-    def _get_args_id(self, index):
+    def get_args_id(self, index):
         args_id = find_id_args_from_i(np.int32(index), self._n_args)
         return args_id
 
-    def _get_levels(self, index):
+    def get_levels(self, index):
         return get_levels_tree_from_i(np.int32(index), self._n_args)
 
     def get_max_level(self):
-        return max(self._get_levels(0))
+        return max(self.get_levels(0))
 
     def get_graph(self, keep_id=False):
         pack = []
@@ -103,9 +105,9 @@ class Tree:
         for i, node in enumerate(reversed(self._nodes)):
             index = len(self) - i - 1
             if keep_id:
-                labels[index] = str(index) + '. ' + node.sign[:6]
+                labels[index] = str(index) + '. ' + node._sign[:6]
             else:
-                labels[index] = node.sign[:6]
+                labels[index] = node._sign[:6]
 
             nodes.append(index)
 
@@ -116,7 +118,7 @@ class Tree:
         edges.reverse()
         nodes.reverse()
 
-        levels = self._get_levels(0)
+        levels = self.get_levels(0)
         colors = np.zeros(shape=(len(nodes), 4))
         pos = np.zeros(shape=(len(self), 2))
         for i, lvl_i in enumerate(levels):
@@ -125,13 +127,13 @@ class Tree:
             h = 1/(1 + np.sum(cond))
             arange = np.arange(len(pos))[cond]
 
-            for j, a_j in enumerate(arange):
+            for a_j in arange:
                 total += h
                 pos[a_j][0] = total
 
             pos[i][1] = -lvl_i
 
-            if type(self._nodes[i]) is FunctionalNode:
+            if self._nodes[i].is_functional():
                 colors[i] = (1, 0.72, 0.43, 1)
             else:
                 colors[i] = (0.21, 0.76, 0.56, 1)
@@ -213,8 +215,8 @@ class EphemeralNode(Node):
                       n_args=0)
 
     def __call__(self) -> EphemeralConstantNode:
-        node = EphemeralConstantNode(
-            value=self._generator(), name=self._generator.__name__)
+        value = self._generator()
+        node = EphemeralConstantNode(value=value, name=str(value))
         return node
 
 
