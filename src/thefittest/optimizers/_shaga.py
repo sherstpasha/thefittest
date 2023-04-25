@@ -3,10 +3,7 @@ from typing import Callable
 from typing import Optional
 from typing import Tuple
 import numpy as np
-from ..base import TheFittest
-from ..base import EvolutionaryAlgorithm
-from ..base import LastBest
-from ..base import Statistics
+from ..base._ea import EvolutionaryAlgorithm
 from ..tools.generators import cauchy_distribution
 from ..tools.generators import binary_string_population
 from ..tools.operators import tournament_selection

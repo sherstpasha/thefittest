@@ -8,9 +8,6 @@ from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 from ..base import Tree
 from ..base import UniversalSet
-from ..base import TheFittest
-from ..base import LastBest
-from ..base import Statistics
 from ..tools.transformations import numpy_group_by
 from ._geneticprogramming import GeneticProgramming
 from ..tools.generators import half_and_half

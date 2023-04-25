@@ -60,11 +60,11 @@ class Tree:
         return Tree(self._nodes.copy(), self._n_args.copy())
 
     def set_terminals(self,
-                      **kwargs):
+                      args: Dict):
         tree_copy = self.copy()
         for i, node in enumerate(tree_copy._nodes):
             if node.is_terminal():
-                for name, value in kwargs.items():
+                for name, value in args.items():
                     if node._name == name:
                         tree_copy._nodes[i] = TerminalNode(value=value,
                                                            name=node._name)

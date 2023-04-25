@@ -1,7 +1,3 @@
-from ._ea import LastBest
-from ._ea import TheFittest
-from ._ea import EvolutionaryAlgorithm
-from ._ea import Statistics
 from ._tree import Tree
 from ._tree import FunctionalNode
 from ._tree import TerminalNode

@@ -2,7 +2,7 @@ from typing import Callable
 from typing import Optional
 from typing import Tuple
 import numpy as np
-from ..base import EvolutionaryAlgorithm
+from ..base._ea import EvolutionaryAlgorithm
 from functools import partial
 from ..tools.operators import binomial
 from ..tools.operators import best_1

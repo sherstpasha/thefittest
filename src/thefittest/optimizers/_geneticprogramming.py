@@ -4,7 +4,7 @@ from typing import Optional
 import numpy as np
 from ..base import Tree
 from ..base import UniversalSet
-from ..base import EvolutionaryAlgorithm
+from ..base._ea import EvolutionaryAlgorithm
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection

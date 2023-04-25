@@ -1,7 +1,6 @@
 import numpy as np
 from ..base import Tree
 from ..base import UniversalSet
-from ..base import FunctionalNode
 from .generators import growing_method
 from .generators import sattolo_shuffle
 from .transformations import protect_norm
