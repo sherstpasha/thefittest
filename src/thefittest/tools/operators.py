@@ -498,6 +498,14 @@ def tournament_selection_(fitness: np.ndarray,
 
 ##################################### GP MATH #####################################
 class Operator:
+    def __init__(self,
+                 formula: str,
+                 name: str,
+                 sign: str) -> None:
+        self._formula = formula
+        self.__name__ = name
+        self._sign = sign
+
     def _write(self,
                *args) -> str:
         formula = self._formula.format(*args)
@@ -506,9 +514,10 @@ class Operator:
 
 class Cos(Operator):
     def __init__(self) -> None:
-        self._formula = 'cos({})'
-        self.__name__ = 'cos'
-        self._sign = 'cos'
+        Operator.__init__(self,
+                          formula='cos({})',
+                          name='cos',
+                          sign='cos')
 
     def __call__(self,
                  x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
@@ -518,9 +527,10 @@ class Cos(Operator):
 
 class Sin(Operator):
     def __init__(self) -> None:
-        self._formula = 'sin({})'
-        self.__name__ = 'sin'
-        self._sign = 'sin'
+        Operator.__init__(self,
+                          formula='sin({})',
+                          name='sin',
+                          sign='sin')
 
     def __call__(self,
                  x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
@@ -530,9 +540,10 @@ class Sin(Operator):
 
 class Add(Operator):
     def __init__(self) -> None:
-        self._formula = '({} + {})'
-        self.__name__ = 'add'
-        self._sign = '+'
+        Operator.__init__(self,
+                          formula='({} + {})',
+                          name='add',
+                          sign='+')
 
     def __call__(self,
                  x: Union[float, np.ndarray],
@@ -543,9 +554,10 @@ class Add(Operator):
 
 class Sub(Operator):
     def __init__(self) -> None:
-        self._formula = '({} - {})'
-        self.__name__ = 'sub'
-        self._sign = '-'
+        Operator.__init__(self,
+                          formula='({} - {})',
+                          name='sub',
+                          sign='-')
 
     def __call__(self,
                  x: Union[float, np.ndarray],
@@ -556,9 +568,10 @@ class Sub(Operator):
 
 class Neg(Operator):
     def __init__(self) -> None:
-        self._formula = '-{}'
-        self.__name__ = 'neg'
-        self._sign = '-'
+        Operator.__init__(self,
+                          formula='-{}',
+                          name='neg',
+                          sign='-')
 
     def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         result = -x
@@ -567,9 +580,10 @@ class Neg(Operator):
 
 class Mul(Operator):
     def __init__(self) -> None:
-        self._formula = '({} * {})'
-        self.__name__ = 'mul'
-        self._sign = '*'
+        Operator.__init__(self,
+                          formula='({} * {})',
+                          name='mul',
+                          sign='*')
 
     def __call__(self,
                  x: Union[float, np.ndarray],
@@ -580,9 +594,10 @@ class Mul(Operator):
 
 class Pow2(Operator):
     def __init__(self) -> None:
-        self._formula = '({}**2)'
-        self.__name__ = 'pow2'
-        self._sign = '**2'
+        Operator.__init__(self,
+                          formula='({}**2)',
+                          name='pow2',
+                          sign='**2')
 
     def __call__(self,
                  x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
@@ -592,9 +607,10 @@ class Pow2(Operator):
 
 class Div(Operator):
     def __init__(self) -> None:
-        self._formula = '({}/{})'
-        self.__name__ = 'div'
-        self._sign = '/'
+        Operator.__init__(self,
+                          formula='({}/{})',
+                          name='div',
+                          sign='/')
 
     def __call__(self,
                  x: Union[float, np.ndarray],
@@ -613,9 +629,10 @@ class Div(Operator):
 
 class Inv(Operator):
     def __init__(self) -> None:
-        self._formula = '(1/{})'
-        self.__name__ = 'Inv'
-        self._sign = '1/'
+        Operator.__init__(self,
+                          formula='(1/{})',
+                          name='Inv',
+                          sign='1/')
 
     def __call__(self,
                  y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
@@ -633,9 +650,10 @@ class Inv(Operator):
 
 class LogAbs(Operator):
     def __init__(self) -> None:
-        self._formula = 'log(abs({}))'
-        self.__name__ = 'log(abs)'
-        self._sign = 'log(abs)'
+        Operator.__init__(self,
+                          formula='log(abs({}))',
+                          name='log(abs)',
+                          sign='log(abs)')
 
     def __call__(self,
                  y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
@@ -653,9 +671,10 @@ class LogAbs(Operator):
 
 class Exp(Operator):
     def __init__(self) -> None:
-        self._formula = 'exp({})'
-        self.__name__ = 'exp'
-        self._sign = 'exp'
+        Operator.__init__(self,
+                          formula='exp({})',
+                          name='exp',
+                          sign='exp')
 
     def __call__(self,
                  x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
@@ -665,9 +684,10 @@ class Exp(Operator):
 
 class SqrtAbs(Operator):
     def __init__(self) -> None:
-        self._formula = 'sqrt(abs({}))'
-        self.__name__ = 'sqrt(abs)'
-        self._sign = 'sqrt(abs)'
+        Operator.__init__(self,
+                          formula='sqrt(abs({}))',
+                          name='sqrt(abs)',
+                          sign='sqrt(abs)')
 
     def __call__(self,
                  x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
@@ -677,11 +697,50 @@ class SqrtAbs(Operator):
 
 class Abs(Operator):
     def __init__(self) -> None:
-        self._formula = 'abs({})'
-        self.__name__ = 'abs()'
-        self._sign = 'abs()'
+        Operator.__init__(self,
+                          formula='abs({})',
+                          name='abs()',
+                          sign='abs()')
 
     def __call__(self,
                  x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         result = np.abs(x)
         return result
+
+
+############################## Activation functions ###############################
+class ActivationFunction:
+    def __init__(self):
+        pass
+
+    def __call__(self, X):
+        return self._f(X)
+
+
+class LogisticSigmoid(ActivationFunction):
+    def __init__(self):
+        ActivationFunction.__init__(self)
+
+    def _f(self, X):
+        result = 1/(1+np.exp(-X))
+        return result
+
+
+class ReLU(ActivationFunction):
+    def __init__(self):
+        ActivationFunction.__init__(self)
+
+    def _f(self, X):
+        result = np.maximum(X, 0)
+        return result
+
+
+class SoftMax(ActivationFunction):
+    def __init__(self):
+        ActivationFunction.__init__(self)
+
+    def _f(self, X):
+        exps = np.exp(X - X.max(axis=0))
+        sum_ = np.sum(exps, axis=1)[:, np.newaxis]
+        sum_[sum_ == 0] = 1
+        return np.nan_to_num(exps/sum_)

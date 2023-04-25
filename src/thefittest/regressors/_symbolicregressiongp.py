@@ -29,11 +29,6 @@ class SymbolicRegressionGP(Model):
                  keep_history: bool = False,
                  optimizer: Union[SelfCGP, GeneticProgramming] = SelfCGP) -> None:
 
-        self._iters = iters
-        self._pop_size = pop_size
-        self._no_increase_num = no_increase_num
-        self._show_progress_each = show_progress_each
-        self._keep_history = keep_history
         self.optimizer = optimizer(fitness_function=donothing,
                                    genotype_to_phenotype=donothing,
                                    uniset=UniversalSet,
@@ -49,7 +44,8 @@ class SymbolicRegressionGP(Model):
                        tree: Tree,
                        y: np.ndarray) -> float:
         y_pred = tree()*np.ones(len(y))
-        return coefficient_determination(y, y_pred)
+        fitness = coefficient_determination(y, y_pred)
+        return fitness
 
     def _fitness_function(self,
                           trees: np.ndarray,
@@ -58,10 +54,12 @@ class SymbolicRegressionGP(Model):
         return np.array(fitness)
 
     def _generator1(self) -> float:
-        return np.round(np.random.uniform(0, 10), 4)
+        value = np.round(np.random.uniform(0, 10), 4)
+        return value
 
     def _generator2(self) -> int:
-        return np.random.randint(0, 10)
+        value = np.random.randint(0, 10)
+        return value
 
     def _define_uniset(self,
                        X: np.ndarray) -> UniversalSet:

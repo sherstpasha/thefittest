@@ -22,6 +22,14 @@ def coefficient_determination(y_true: np.ndarray,
     return 1 - residual_sum/total_sum
 
 
+def categorical_crossentropy(target: np.ndarray,
+                             output: np.ndarray):
+    output /= output.sum(axis=-1, keepdims=True)
+    output = np.clip(output, 1e-7, 1 - 1e-7)
+    return np.mean(np.sum(target * -np.log(output),
+                          axis=-1, keepdims=False))
+
+
 def common_region(trees: List) -> Tuple:
     terminate = False
     indexes = []
