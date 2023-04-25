@@ -17,17 +17,7 @@ from ..tools.operators import Pow2
 from ..tools.operators import Cos
 from ..tools.operators import Sin
 from ..tools.transformations import donothing
-
-
-class Model:
-    def __init__(self):
-        pass
-
-    def fit(self, X, y):
-        return self._fit(X, y)
-
-    def predict(self, X):
-        return self._predict(X)
+from ..base._model import Model
 
 
 class SymbolicRegressionGP(Model):
@@ -67,10 +57,10 @@ class SymbolicRegressionGP(Model):
         fitness = [self._evaluate_tree(tree, y) for tree in trees]
         return np.array(fitness)
 
-    def _generator1(self):
+    def _generator1(self) -> float:
         return np.round(np.random.uniform(0, 10), 4)
 
-    def _generator2(self):
+    def _generator2(self) -> int:
         return np.random.randint(0, 10)
 
     def _define_uniset(self,
@@ -100,7 +90,8 @@ class SymbolicRegressionGP(Model):
         self.optimizer.fit()
         return self
 
-    def _predict(self, X):
+    def _predict(self,
+                 X: np.ndarray) -> np.ndarray:
         n_dimension = X.shape[1]
         solution = self.optimizer.get_fittest()
         genotype, *_ = solution.get()
