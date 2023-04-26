@@ -16,7 +16,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 model = MLPClassifierEA(iters=300, 
                         pop_size=300,
-                        hidden_layers=(150,),
+                        hidden_layers=(10,),
                         show_progress_each=10)
 
 model.fit(X_train, y_train)

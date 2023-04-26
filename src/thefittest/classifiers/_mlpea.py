@@ -25,7 +25,7 @@ class MLPClassifierEA(MultilayerPerceptron):
             no_increase_num: Optional[int] = None,
             show_progress_each: Optional[int] = None,
             keep_history: bool = False,
-            optimizer: DifferentialEvolution = JADE):
+            optimizer: DifferentialEvolution = DifferentialEvolution):
 
         MultilayerPerceptron.__init__(self,
                                       hidden_layers=hidden_layers,
@@ -56,10 +56,11 @@ class MLPClassifierEA(MultilayerPerceptron):
                       weights: np.ndarray,
                       X: np.ndarray,
                       targets: np.ndarray) -> float:
-        shaped_weight = self._weight_from_flat(weights)
-        output = self.forward(X, weights=shaped_weight)
-        error = categorical_crossentropy(targets, output)
-        return error
+        # shaped_weight = self._weight_from_flat(weights)
+        # output = self.forward(X, weights=shaped_weight)
+        # error = categorical_crossentropy(targets, output)
+        # return error
+        return 100
 
     def _weight_from_flat(self,
                           flat_array: np.ndarray) -> List:

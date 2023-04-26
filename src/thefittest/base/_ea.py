@@ -97,10 +97,11 @@ class EvolutionaryAlgorithm:
 
     def _show_progress(self, iter_number: int) -> None:
         cond_show_switch = self._show_progress_each is not None
-        cond_show_now = iter_number % self._show_progress_each == 0
-        if cond_show_switch and cond_show_now:
-            print(
-                f'{iter_number} iteration with fitness = {self._thefittest._fitness}')
+        if cond_show_switch:
+            cond_show_now = iter_number % self._show_progress_each == 0
+            if cond_show_now:
+                print(
+                    f'{iter_number} iteration with fitness = {self._thefittest._fitness}')
 
     def _termitation_check(self):
         cond_aim = self._thefittest._fitness >= self._aim
@@ -108,9 +109,9 @@ class EvolutionaryAlgorithm:
         return cond_aim or cond_no_increase
 
     def _update_fittest(self,
-                       population_g: np.ndarray,
-                       population_ph: np.ndarray,
-                       fitness: np.ndarray) -> None:
+                        population_g: np.ndarray,
+                        population_ph: np.ndarray,
+                        fitness: np.ndarray) -> None:
         if self._thefittest is None:
             self._thefittest = TheFittest()._update(population_g,
                                                     population_ph,
@@ -122,7 +123,7 @@ class EvolutionaryAlgorithm:
             self._lastbest._update(self._thefittest._fitness)
 
     def _update_stats(self,
-                     statistic_args: Dict) -> None:
+                      statistic_args: Dict) -> None:
         if self._keep_history:
             if self._stats is None:
                 self._stats = Statistics()._update(statistic_args)

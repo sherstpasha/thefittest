@@ -1,4 +1,5 @@
 import numpy as np
+import random
 from numba import njit
 from numba import int32
 from numba import float32
@@ -63,3 +64,28 @@ def find_first_difference_between_two(array_1, array_2):
         if array_1[i] != array_2[i]:
             break
     return i
+
+
+@njit
+def random_sample_set(arr, k=-1):
+    n = arr.size
+    if k < 0:
+        k = arr.size
+    seen = {0}
+    seen.clear()
+    index = np.empty(k, dtype=arr.dtype)
+    for i in range(k):
+        j = random.randint(i, n - 1)
+        while j in seen:
+            j = random.randint(0, n - 1)
+        seen.add(j)
+        index[i] = j
+    return arr[index]
+
+@njit
+def rand_1_(current, population, F):
+    range_ = np.arange(len(population), dtype = np.int32)
+    r1, r2, r3 = random_sample_set(range_, k=3)
+
+    offspring = population[r3] + F*(population[r1] - population[r2])
+    return offspring

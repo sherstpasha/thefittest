@@ -5,6 +5,7 @@ from .generators import growing_method
 from .generators import sattolo_shuffle
 from .transformations import protect_norm
 from .transformations import common_region
+from .numba_funcs import random_sample_set
 import random
 from .numba_funcs import select_quantity_id_by_tournament
 from typing import Union
@@ -24,18 +25,27 @@ def flip_mutation(individ: np.ndarray,
 
 
 # differential evolution
-def best_1(current: np.ndarray,
-           population: np.ndarray,
-           F: float) -> np.ndarray:
-    best = population[-1]
-    range_ = np.arange(len(population))
-    r1, r2 = np.random.choice(range_, size=2, replace=False)
+# def best_1(current: np.ndarray,
+#            population: np.ndarray,
+#            F: float) -> np.ndarray:
+#     best = population[-1]
+#     range_ = np.arange(len(population))
+#     r1, r2 = random_sample_set(range_, k=2)
 
-    offspring = best + F*(population[r1] - population[r2])
-    return offspring
+#     offspring = best + F*(population[r1] - population[r2])
+#     return offspring
 
 
 def rand_1(current: np.ndarray,
+           population: np.ndarray,
+           F: float) -> np.ndarray:
+    range_ = np.arange(len(population))
+    r1, r2, r3 = random_sample_set(range_, k=3)
+
+    offspring = population[r3] + F*(population[r1] - population[r2])
+    return offspring
+
+def best_1(current: np.ndarray,
            population: np.ndarray,
            F: float) -> np.ndarray:
     range_ = np.arange(len(population))
@@ -50,7 +60,7 @@ def rand_to_best1(current: np.ndarray,
                   F: float) -> np.ndarray:
     best = population[-1]
     range_ = np.arange(len(population))
-    r1, r2, r3 = np.random.choice(range_, size=3, replace=False)
+    r1, r2, r3 = random_sample_set(range_, k=3)
 
     offspring = population[r1] +\
         F*(best - population[r1]) + F*(population[r2] - population[r3])
@@ -62,7 +72,7 @@ def current_to_best_1(current: np.ndarray,
                       F: float) -> np.ndarray:
     best = population[-1]
     range_ = np.arange(len(population))
-    r1, r2 = np.random.choice(range_, size=2, replace=False)
+    r1, r2 = random_sample_set(range_, k=2)
 
     offspring = current + F*(best - current) +\
         F*(population[r1] - population[r2])
@@ -74,7 +84,7 @@ def best_2(current: np.ndarray,
            F: float) -> np.ndarray:
     best = population[-1]
     range_ = np.arange(len(population))
-    r1, r2, r3, r4 = np.random.choice(range_, size=4, replace=False)
+    r1, r2, r3, r4 = random_sample_set(range_, k=4)
 
     offspring = best + F*(population[r1] - population[r2]) +\
         F*(population[r3] - population[r4])
@@ -85,7 +95,7 @@ def rand_2(current: np.ndarray,
            population: np.ndarray,
            F: float) -> np.ndarray:
     range_ = np.arange(len(population))
-    r1, r2, r3, r4, r5 = np.random.choice(range_, size=5, replace=False)
+    r1, r2, r3, r4, r5 = random_sample_set(range_, k=5)
 
     offspring = population[r5] + F*(population[r1] - population[r2]) +\
         F*(population[r3] - population[r4])
@@ -105,7 +115,7 @@ def current_to_pbest_1(current: np.ndarray,
 
     best = pbest[p_best_ind]
 
-    r1, r2 = np.random.choice(range_, size=2, replace=False)
+    r1, r2 = random_sample_set(range_, size=2)
 
     offspring = current + F*(best - current) +\
         F*(population[r1] - population[r2])
@@ -116,7 +126,7 @@ def current_to_rand_1(current: np.ndarray,
                       population: np.ndarray,
                       F: float) -> np.ndarray:
     range_ = np.arange(len(population))
-    r1, r2, r3 = np.random.choice(range_, size=3, replace=False)
+    r1, r2, r3 = random_sample_set(range_, k=3)
 
     offspring = population[r1] + F*(population[r3] - current) +\
         F*(population[r1] - population[r2])
