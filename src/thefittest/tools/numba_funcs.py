@@ -81,11 +81,3 @@ def random_sample_set(arr, k=-1):
         seen.add(j)
         index[i] = j
     return arr[index]
-
-@njit
-def rand_1_(current, population, F):
-    range_ = np.arange(len(population), dtype = np.int32)
-    r1, r2, r3 = random_sample_set(range_, k=3)
-
-    offspring = population[r3] + F*(population[r1] - population[r2])
-    return offspring

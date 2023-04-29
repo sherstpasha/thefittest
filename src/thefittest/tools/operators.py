@@ -25,25 +25,25 @@ def flip_mutation(individ: np.ndarray,
 
 
 # differential evolution
-# def best_1(current: np.ndarray,
-#            population: np.ndarray,
-#            F: float) -> np.ndarray:
-#     best = population[-1]
-#     range_ = np.arange(len(population))
-#     r1, r2 = random_sample_set(range_, k=2)
-
-#     offspring = best + F*(population[r1] - population[r2])
-#     return offspring
-
-
-def rand_1(current: np.ndarray,
+def best_1(current: np.ndarray,
            population: np.ndarray,
            F: float) -> np.ndarray:
+    best = population[-1]
     range_ = np.arange(len(population))
-    r1, r2, r3 = random_sample_set(range_, k=3)
+    r1, r2 = random_sample_set(range_, k=2)
 
-    offspring = population[r3] + F*(population[r1] - population[r2])
+    offspring = best + F*(population[r1] - population[r2])
     return offspring
+
+
+# def rand_1(current: np.ndarray,
+#            population: np.ndarray,
+#            F: float) -> np.ndarray:
+#     range_ = np.arange(len(population))
+#     r1, r2, r3 = random_sample_set(range_, k=3)
+
+#     offspring = population[r3] + F*(population[r1] - population[r2])
+#     return offspring
 
 def best_1(current: np.ndarray,
            population: np.ndarray,
