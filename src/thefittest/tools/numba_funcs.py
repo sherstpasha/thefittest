@@ -81,3 +81,45 @@ def random_sample_set(arr, k=-1):
         seen.add(j)
         index[i] = j
     return arr[index]
+
+
+@njit
+def nb_choice(max_n, k=1, weights=None, replace=False):
+    '''
+    https://stackoverflow.com/questions/64135020/speed-up-random-weighted-choice-without-replacement-in-python
+    Choose k samples from max_n values, with optional weights and replacement.
+    Args:
+        max_n (int): the maximum index to choose
+        k (int): number of samples
+        weights (array): weight of each index, if not uniform
+        replace (bool): whether to sample with replacement
+    '''
+    # Get cumulative weights
+    if weights is None:
+        weights = np.full(int(max_n), 1.0)
+    cumweights = np.cumsum(weights)
+
+    maxweight = cumweights[-1]  # Total of weights
+    # Arrays of sample and sampled indices
+    inds = np.full(k, -1, dtype=np.int64)
+
+    # Sample
+    i = 0
+    while i < k:
+        # Find the index
+        r = maxweight * np.random.rand()  # Pick random weight value
+        # Get corresponding index
+        ind = np.searchsorted(cumweights, r, side='right')
+
+        # Optionally sample without replacement
+        found = False
+        if not replace:
+            for j in range(i):
+                if inds[j] == ind:
+                    found = True
+                    continue
+        if not found:
+            inds[i] = ind
+            i += 1
+
+    return inds

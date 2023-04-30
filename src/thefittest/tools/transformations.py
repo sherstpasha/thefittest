@@ -5,7 +5,7 @@ from typing import Optional
 import numpy as np
 from .numba_funcs import find_first_difference_between_two
 from .numba_funcs import find_end_subtree_from_i
-
+from numba import njit
 
 def root_mean_square_error(y_true: np.ndarray,
                            y_predict: np.ndarray) -> float:
@@ -149,19 +149,23 @@ def rank_data(arr: np.ndarray) -> np.ndarray:
     ranks = (raw_ranks[1:] + raw_ranks[:-1] + 1)/2
     count = raw_ranks[1:] - raw_ranks[:-1]
 
-    retults = np.empty_like(arr, dtype=float)
+    retults = np.empty_like(arr, dtype=np.float64)
     retults[argsort] = ranks.repeat(count)
     return retults
 
 
+@njit
 def protect_norm(x: np.ndarray) -> np.ndarray:
+    result = np.empty(len(x), dtype=np.float64)
     sum_ = x.sum()
     if sum_ > 0:
-        to_return = x/sum_
+        for i in range(result.size):
+            result[i] = x[i]/sum_
     else:
-        len_ = len(x)
-        to_return = np.full(len_, 1/len_)
-    return to_return
+        value = 1/len(x)
+        for i in range(result.size):
+            result[i] = value
+    return result
 
 
 def scale_data(arr: np.ndarray) -> np.ndarray:
@@ -169,9 +173,9 @@ def scale_data(arr: np.ndarray) -> np.ndarray:
     max_ = arr.max()
     min_ = arr.min()
     if max_ == min_:
-        to_return = np.ones_like(arr)
+        to_return = np.ones_like(arr, dtype = np.float64)
     else:
-        to_return = (arr - min_)/(max_ - min_)
+        to_return = ((arr - min_)/(max_ - min_)).astype(np.float64)
     return to_return
 
 
