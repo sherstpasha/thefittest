@@ -114,10 +114,10 @@ def nb_choice(max_n, k=1, weights=None, replace=False):
         # Optionally sample without replacement
         found = False
         if not replace:
-            for j in range(i):
+            for j in range(i): # этот цикл короткий и увеличивается в процессе генерации. Почему тут continue а не break?
                 if inds[j] == ind:
                     found = True
-                    continue
+                    continue # может continue адресован к while?
         if not found:
             inds[i] = ind
             i += 1
