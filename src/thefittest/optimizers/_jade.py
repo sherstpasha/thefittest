@@ -5,9 +5,9 @@ from functools import partial
 import numpy as np
 from ._differentialevolution import DifferentialEvolution
 from ..tools.operators import binomial
-from ..tools.generators import cauchy_distribution
+from ..tools.random import cauchy_distribution
+from ..tools.random import float_population
 from ..tools.transformations import lehmer_mean
-from ..tools.generators import float_population
 
 
 class JADE(DifferentialEvolution):

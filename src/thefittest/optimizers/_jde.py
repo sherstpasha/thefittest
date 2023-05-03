@@ -3,7 +3,7 @@ from functools import partial
 from typing import Callable
 from typing import Optional
 from ._differentialevolution import DifferentialEvolution
-from ..tools.generators import float_population
+from ..tools.random import float_population
 
 
 class jDE(DifferentialEvolution):

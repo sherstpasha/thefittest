@@ -14,7 +14,7 @@ from ..tools.operators import uniform_prop_crossover
 from ..tools.operators import uniform_rank_crossover
 from ..tools.operators import uniform_tour_crossover
 from ..tools.operators import flip_mutation
-from ..tools.generators import binary_string_population
+from ..tools.random import binary_string_population
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 

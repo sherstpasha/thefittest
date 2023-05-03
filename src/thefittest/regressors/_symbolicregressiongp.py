@@ -16,7 +16,7 @@ from ..tools.operators import Inv
 from ..tools.operators import Pow2
 from ..tools.operators import Cos
 from ..tools.operators import Sin
-from ..tools.transformations import donothing
+from ..tools import donothing
 from ..base._model import Model
 
 

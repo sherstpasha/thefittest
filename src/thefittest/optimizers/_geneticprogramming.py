@@ -19,7 +19,7 @@ from ..tools.operators import point_mutation
 from ..tools.operators import growing_mutation
 from ..tools.operators import swap_mutation
 from ..tools.operators import shrink_mutation
-from ..tools.generators import half_and_half
+from ..tools.random import half_and_half
 from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
 

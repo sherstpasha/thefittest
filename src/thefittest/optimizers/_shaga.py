@@ -4,8 +4,8 @@ from typing import Optional
 from typing import Tuple
 import numpy as np
 from ..base._ea import EvolutionaryAlgorithm
-from ..tools.generators import cauchy_distribution
-from ..tools.generators import binary_string_population
+from ..tools.random import cauchy_distribution
+from ..tools.random import binary_string_population
 from ..tools.operators import tournament_selection
 from ..tools.operators import binomial
 from ..tools.operators import flip_mutation

@@ -8,9 +8,10 @@ from typing import Tuple
 from typing import Dict
 import numpy as np
 from inspect import signature
-from ..tools.numba_funcs import find_end_subtree_from_i
-from ..tools.numba_funcs import find_id_args_from_i
-from ..tools.numba_funcs import get_levels_tree_from_i
+from ..tools import find_end_subtree_from_i
+from ..tools import find_id_args_from_i
+from ..tools import get_levels_tree_from_i
+from numpy.typing import NDArray
 
 
 class Tree:
@@ -70,8 +71,10 @@ class Tree:
                                                            name=node._name)
         return tree_copy
 
-    def subtree(self, index: np.int32, return_class=False):
-        n_index = find_end_subtree_from_i(index, self._n_args)
+    def subtree(self,
+                index: int,
+                return_class: bool = False) -> Tuple:
+        n_index = find_end_subtree_from_i(np.int64(index), self._n_args)
         if return_class:
             new_tree = Tree(self._nodes[index:n_index].copy(),
                             self._n_args[index:n_index].copy())
@@ -87,17 +90,20 @@ class Tree:
                                   to_return._n_args[right:]]
         return to_return
 
-    def get_args_id(self, index):
-        args_id = find_id_args_from_i(np.int32(index), self._n_args)
+    def get_args_id(self,
+                    index: int) -> NDArray[np.int64]:
+        args_id = find_id_args_from_i(np.int64(index), self._n_args)
         return args_id
 
-    def get_levels(self, index):
-        return get_levels_tree_from_i(np.int32(index), self._n_args)
+    def get_levels(self,
+                   index: int) -> NDArray[np.int64]:
+        return get_levels_tree_from_i(np.int64(index), self._n_args)
 
-    def get_max_level(self):
+    def get_max_level(self) -> np.int64:
         return max(self.get_levels(0))
 
-    def get_graph(self, keep_id=False):
+    def get_graph(self,
+                  keep_id: bool = False) -> Dict:
         pack = []
         edges = []
         nodes = []

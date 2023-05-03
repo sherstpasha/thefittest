@@ -10,9 +10,8 @@ from ..tools.operators import best_2
 from ..tools.operators import rand_to_best1
 from ..tools.operators import current_to_best_1
 from ..tools.operators import rand_1
-from ..tools.operators import current_to_pbest_1
 from ..tools.operators import rand_2
-from ..tools.generators import float_population
+from ..tools.random import float_population
 
 
 class DifferentialEvolution(EvolutionaryAlgorithm):
@@ -60,7 +59,6 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         self._mutation_pool = {'best_1': best_1,
                                'rand_1': rand_1,
                                'current_to_best_1': current_to_best_1,
-                               'current_to_pbest_1': current_to_pbest_1,
                                'rand_to_best1': rand_to_best1,
                                'best_2': best_2,
                                'rand_2': rand_2}
@@ -70,8 +68,11 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                                 individ_g: np.ndarray,
                                 F: float,
                                 CR: float) -> np.ndarray:
-        mutant = self._specified_mutation(individ_g, popuation_g, F)
-        mutant_cr_g = binomial(individ_g, mutant, CR)
+        mutant = self._specified_mutation(individ_g,
+                                          self._thefittest._genotype,
+                                          popuation_g,
+                                          np.float64(F))
+        mutant_cr_g = binomial(individ_g, mutant, np.float64(CR))
         mutant_cr_g = self._bounds_control(mutant_cr_g)
         return mutant_cr_g
 
@@ -130,11 +131,6 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         population_ph = self._get_phenotype(population_g)
         fitness = self._evaluate(population_ph)
 
-        argsort = np.argsort(fitness)
-        population_g = population_g[argsort]
-        population_ph = population_ph[argsort]
-        fitness = fitness[argsort]
-
         for i in range(self._iters-1):
             self._update_fittest(population_g, population_ph, fitness)
             self._update_stats({'population_g': population_g.copy(),
@@ -160,10 +156,5 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
                 if self._elitism:
                     population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
-
-                argsort = np.argsort(fitness)
-                population_g = population_g[argsort]
-                population_ph = population_ph[argsort]
-                fitness = fitness[argsort]
 
         return self

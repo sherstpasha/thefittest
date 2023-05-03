@@ -9,7 +9,7 @@ from ..tools.operators import binomial
 from ..tools.operators import rand_1
 from ..tools.operators import current_to_best_1
 from ..tools.transformations import numpy_group_by
-from ..tools.generators import float_population
+from ..tools.random import float_population
 
 
 class SaDE2005(DifferentialEvolution):

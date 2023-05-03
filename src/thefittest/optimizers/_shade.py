@@ -4,9 +4,9 @@ from typing import Optional
 from typing import Tuple
 import numpy as np
 from ._jade import JADE
-from ..tools.generators import cauchy_distribution
+from ..tools.random import cauchy_distribution
+from ..tools.random import float_population
 from ..tools.transformations import lehmer_mean
-from ..tools.generators import float_population
 
 
 class SHADE(JADE):

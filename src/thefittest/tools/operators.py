@@ -1,18 +1,17 @@
-import numpy as np
-from ..base import Tree
-from ..base import UniversalSet
-from .generators import growing_method
-from .generators import sattolo_shuffle
-from .transformations import protect_norm
-from .transformations import common_region
-from .numba_funcs import random_sample_set
 import random
-from .numba_funcs import select_quantity_id_by_tournament
-from .numba_funcs import nb_choice
 from typing import Union
+import numpy as np
+from numpy.typing import NDArray
 from numba import njit
 from numba import float64
 from numba import int8
+from ..base import Tree
+from ..base import UniversalSet
+from .random import growing_method
+from .random import sattolo_shuffle
+from .random import random_sample
+from .transformations import protect_norm
+from .transformations import common_region
 
 
 min_value = np.finfo(np.float64).min
@@ -31,114 +30,85 @@ def flip_mutation(individ: np.ndarray,
     return offspring
 
 
-# differential evolution
-def best_1(current: np.ndarray,
-           population: np.ndarray,
-           F: float) -> np.ndarray:
-    best = population[-1]
-    range_ = np.arange(len(population))
-    r1, r2 = random_sample_set(range_, k=2)
-
-    offspring = best + F*(population[r1] - population[r2])
-    return offspring
-
-
-def rand_1(current: np.ndarray,
-           population: np.ndarray,
-           F: float) -> np.ndarray:
-    range_ = np.arange(len(population))
-    r1, r2, r3 = random_sample_set(range_, k=3)
-
-    offspring = population[r3] + F*(population[r1] - population[r2])
-    return offspring
+@njit(float64[:](float64[:], float64[:], float64[:, :], float64))
+def best_1(current: NDArray[np.float64],
+           best: NDArray[np.float64],
+           population: NDArray[np.float64],
+           F: np.float64) -> NDArray[np.float64]:
+    size = np.int64(len(population))
+    r1, r2 = random_sample(
+        range_size=size, quantity=np.int64(2), replace=False)
+    return best + F*(population[r1] - population[r2])
 
 
-def best_1(current: np.ndarray,
-           population: np.ndarray,
-           F: float) -> np.ndarray:
-    range_ = np.arange(len(population))
-    r1, r2, r3 = np.random.choice(range_, size=3, replace=False)
-
-    offspring = population[r3] + F*(population[r1] - population[r2])
-    return offspring
-
-
-def rand_to_best1(current: np.ndarray,
-                  population: np.ndarray,
-                  F: float) -> np.ndarray:
-    best = population[-1]
-    range_ = np.arange(len(population))
-    r1, r2, r3 = random_sample_set(range_, k=3)
-
-    offspring = population[r1] +\
-        F*(best - population[r1]) + F*(population[r2] - population[r3])
-    return offspring
+@njit(float64[:](float64[:], float64[:], float64[:, :], float64))
+def rand_1(current: NDArray[np.float64],
+           best: NDArray[np.float64],
+           population: NDArray[np.float64],
+           F: np.float64) -> NDArray[np.float64]:
+    size = np.int64(len(population))
+    r1, r2, r3 = random_sample(
+        range_size=size, quantity=np.int64(3), replace=False)
+    return population[r3] + F*(population[r1] - population[r2])
 
 
-def current_to_best_1(current: np.ndarray,
-                      population: np.ndarray,
-                      F: float) -> np.ndarray:
-    best = population[-1]
-    range_ = np.arange(len(population))
-    r1, r2 = random_sample_set(range_, k=2)
+@njit(float64[:](float64[:], float64[:], float64[:, :], float64))
+def rand_to_best1(current: NDArray[np.float64],
+                  best: NDArray[np.float64],
+                  population: NDArray[np.float64],
+                  F: np.float64) -> NDArray[np.float64]:
+    size = np.int64(len(population))
+    r1, r2, r3 = random_sample(
+        range_size=size, quantity=np.int64(3), replace=False)
+    return population[r1] + F*(
+        population[r1]) + F*(population[r2] - population[r3])
 
-    offspring = current + F*(best - current) +\
-        F*(population[r1] - population[r2])
-    return offspring
+
+@njit(float64[:](float64[:], float64[:], float64[:, :], float64))
+def current_to_best_1(current: NDArray[np.float64],
+                      best: NDArray[np.float64],
+                      population: NDArray[np.float64],
+                      F: np.float64) -> NDArray[np.float64]:
+    size = np.int64(len(population))
+    r1, r2 = random_sample(
+        range_size=size, quantity=np.int64(2), replace=False)
+    return current + F*(best - current) + F*(population[r1] - population[r2])
 
 
-def best_2(current: np.ndarray,
-           population: np.ndarray,
-           F: float) -> np.ndarray:
-    best = population[-1]
-    range_ = np.arange(len(population))
-    r1, r2, r3, r4 = random_sample_set(range_, k=4)
-
-    offspring = best + F*(population[r1] - population[r2]) +\
+@njit(float64[:](float64[:], float64[:], float64[:, :], float64))
+def best_2(current: NDArray[np.float64],
+           best: NDArray[np.float64],
+           population: NDArray[np.float64],
+           F: np.float64) -> NDArray[np.float64]:
+    size = np.int64(len(population))
+    r1, r2, r3, r4 = random_sample(
+        range_size=size, quantity=np.int64(4), replace=False)
+    return best + F*(population[r1] - population[r2]) +\
         F*(population[r3] - population[r4])
-    return offspring
 
 
-def rand_2(current: np.ndarray,
-           population: np.ndarray,
-           F: float) -> np.ndarray:
-    range_ = np.arange(len(population))
-    r1, r2, r3, r4, r5 = random_sample_set(range_, k=5)
-
-    offspring = population[r5] + F*(population[r1] - population[r2]) +\
+@njit(float64[:](float64[:], float64[:], float64[:, :], float64))
+def rand_2(current: NDArray[np.float64],
+           best: NDArray[np.float64],
+           population: NDArray[np.float64],
+           F: np.float64) -> NDArray[np.float64]:
+    size = np.int64(len(population))
+    r1, r2, r3, r4, r5 = random_sample(
+        range_size=size, quantity=np.int64(5), replace=False)
+    return population[r5] + F*(population[r1] - population[r2]) +\
         F*(population[r3] - population[r4])
-    return offspring
 
 
-def current_to_pbest_1(current: np.ndarray,
-                       population: np.ndarray,
-                       F: float) -> np.ndarray:
-    range_ = np.arange(len(population))
-    p_min = 2/len(population)
-    p_i = np.random.uniform(p_min, 0.2)
-
-    value = int(p_i*len(population))
-    pbest = population[-value:]
-    p_best_ind = np.random.randint(0, len(pbest))
-
-    best = pbest[p_best_ind]
-
-    r1, r2 = random_sample_set(range_, size=2)
-
-    offspring = current + F*(best - current) +\
+@njit(float64[:](float64[:], float64[:], float64[:, :], float64))
+def current_to_rand_1_(current: NDArray[np.float64],
+                       best: NDArray[np.float64],
+                       population: NDArray[np.float64],
+                       F: np.float64) -> NDArray[np.float64]:
+    size = np.int64(len(population))
+    r1, r2, r3 = random_sample(
+        range_size=size, quantity=np.int64(3), replace=False)
+    return population[r1] + F*(population[r3] - current) +\
         F*(population[r1] - population[r2])
-    return offspring
-
-
-def current_to_rand_1(current: np.ndarray,
-                      population: np.ndarray,
-                      F: float) -> np.ndarray:
-    range_ = np.arange(len(population))
-    r1, r2, r3 = random_sample_set(range_, k=3)
-
-    offspring = population[r1] + F*(population[r3] - current) +\
-        F*(population[r1] - population[r2])
-    return offspring
 
 
 # genetic propramming
@@ -219,7 +189,7 @@ def empty_crossover(individs: np.ndarray,
     return offspring
 
 
-@njit(int8[:](int8[:,:], float64[:], float64[:]))
+@njit(int8[:](int8[:, :], float64[:], float64[:]))
 def one_point_crossover(individs: np.ndarray,
                         fitness: np.ndarray,
                         rank: np.ndarray) -> np.ndarray:
@@ -237,60 +207,64 @@ def one_point_crossover(individs: np.ndarray,
     return offspring
 
 
-@njit(int8[:](int8[:,:], float64[:], float64[:]))
+# @njit(int8[:](int8[:, :], float64[:], float64[:]))
 def two_point_crossover(individs: np.ndarray,
                         fitness: np.ndarray,
                         rank: np.ndarray) -> np.ndarray:
-    c_points = sorted(nb_choice(len(individs[0]), k=2))
+    pass
+#     c_points = sorted(nb_choice(len(individs[0]), k=2))
 
-    if random.random() > 0.5:
-        offspring = individs[0].copy()
-        for i in range(individs.shape[1]):
-            if c_points[0] <= i <= c_points[1]:
-                offspring[i] = individs[1][i]
-    else:
-        offspring = individs[1].copy()
-        for i in range(individs.shape[1]):
-            if c_points[0] <= i <= c_points[1]:
-                offspring[i] = individs[0][i]
-    return offspring
+#     if random.random() > 0.5:
+#         offspring = individs[0].copy()
+#         for i in range(individs.shape[1]):
+#             if c_points[0] <= i <= c_points[1]:
+#                 offspring[i] = individs[1][i]
+#     else:
+#         offspring = individs[1].copy()
+#         for i in range(individs.shape[1]):
+#             if c_points[0] <= i <= c_points[1]:
+#                 offspring[i] = individs[0][i]
+#     return offspring
 
 
-@njit(int8[:](int8[:,:], float64[:], float64[:]))
+# @njit(int8[:](int8[:, :], float64[:], float64[:]))
 def uniform_crossover(individs: np.ndarray,
                       fitness: np.ndarray,
                       rank: np.ndarray) -> np.ndarray:
-    choosen = nb_choice(len(fitness), len(individs[0]), replace=True)
-    offspring = np.zeros_like(individs[0])
-    for i in range(individs.shape[1]):
-        offspring[i] = individs[choosen[i]][i]
-    return offspring
+    pass
+#     choosen = nb_choice(len(fitness), len(individs[0]), replace=True)
+#     offspring = np.zeros_like(individs[0])
+#     for i in range(individs.shape[1]):
+#         offspring[i] = individs[choosen[i]][i]
+#     return offspring
 
 
-@njit(int8[:](int8[:,:], float64[:], float64[:]))
+# @njit(int8[:](int8[:, :], float64[:], float64[:]))
 def uniform_prop_crossover(individs: np.ndarray,
                            fitness: np.ndarray,
                            rank: np.ndarray) -> np.ndarray:
-    probability = protect_norm(fitness)
-    choosen = nb_choice(len(fitness), len(individs[0]),
-                        weights=probability, replace=True)
-    offspring = np.zeros_like(individs[0])
-    for i in range(individs.shape[1]):
-        offspring[i] = individs[choosen[i]][i]
-    return offspring
+    pass
+#     probability = protect_norm(fitness)
+#     choosen = nb_choice(len(fitness), len(individs[0]),
+#                         weights=probability, replace=True)
+#     offspring = np.zeros_like(individs[0])
+#     for i in range(individs.shape[1]):
+#         offspring[i] = individs[choosen[i]][i]
+#     return offspring
 
 
-@njit(int8[:](int8[:,:], float64[:], float64[:]))
+# @njit(int8[:](int8[:, :], float64[:], float64[:]))
 def uniform_rank_crossover(individs: np.ndarray,
                            fitness: np.ndarray,
                            rank: np.ndarray) -> np.ndarray:
-    probability = protect_norm(rank)
-    choosen = nb_choice(len(fitness), len(individs[0]),
-                        weights=probability, replace=True)
-    offspring = np.zeros_like(individs[0])
-    for i in range(individs.shape[1]):
-        offspring[i] = individs[choosen[i]][i]
-    return offspring
+    pass
+#     probability = protect_norm(rank)
+#     choosen = nb_choice(len(fitness), len(individs[0]),
+#                         weights=probability, replace=True)
+#     offspring = np.zeros_like(individs[0])
+#     for i in range(individs.shape[1]):
+#         offspring[i] = individs[choosen[i]][i]
+#     return offspring
 
 
 def uniform_tour_crossover(individs: np.ndarray,
@@ -307,17 +281,17 @@ def uniform_tour_crossover(individs: np.ndarray,
 
 
 # differential evolution
-def binomial(individ: np.ndarray,
-             mutant: np.ndarray,
-             CR: float) -> np.ndarray:
-    individ = individ.copy()
-
-    j = random.randrange(len(individ))
-    mask_random = np.random.random(len(individ)) <= CR
-    mask_j = np.arange(len(individ)) == j
-    mask_union = mask_random | mask_j
-    individ[mask_union] = mutant[mask_union].copy()
+@njit(float64[:](float64[:], float64[:], float64))
+def binomial(individ: NDArray[np.float64],
+             mutant: NDArray[np.float64],
+             CR: np.float64):
+    size = len(individ)
     offspring = individ.copy()
+    j = random.randrange(size)
+
+    for i in range(size):
+        if np.random.rand() <= CR or i == j:
+            offspring[i] = mutant[i]
     return offspring
 
 
@@ -484,20 +458,22 @@ def proportional_selection(fitness: np.ndarray,
                            rank: np.ndarray,
                            tour_size: int,
                            quantity: int) -> np.ndarray:
-    proba_fitness = protect_norm(fitness)
-    choosen = nb_choice(max_n=len(proba_fitness),
-                        k=quantity, weights=proba_fitness, replace=True)
-    return choosen
+    pass
+#     proba_fitness = protect_norm(fitness)
+#     choosen = nb_choice(max_n=len(proba_fitness),
+#                         k=quantity, weights=proba_fitness, replace=True)
+#     return choosen
 
 
 def rank_selection(fitness: np.ndarray,
                    rank: np.ndarray,
                    tour_size: int,
                    quantity: int) -> np.ndarray:
-    proba_rank = protect_norm(rank)
-    choosen = nb_choice(max_n=len(proba_rank),
-                        k=quantity, weights=proba_rank, replace=True)
-    return choosen
+    pass
+#     proba_rank = protect_norm(rank)
+#     choosen = nb_choice(max_n=len(proba_rank),
+#                         k=quantity, weights=proba_rank, replace=True)
+#     return choosen
 
 
 def tournament_selection(fitness: np.ndarray,

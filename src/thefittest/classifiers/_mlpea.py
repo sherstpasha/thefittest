@@ -4,7 +4,7 @@ from typing import Optional
 from typing import Union
 import numpy as np
 from ..base._net import MultilayerPerceptron
-from ..tools.transformations import donothing
+from ..tools import donothing
 from ..tools.operators import LogisticSigmoid
 from ..tools.operators import SoftMax
 from ..tools.operators import ReLU

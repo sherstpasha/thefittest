@@ -1,33 +1,11 @@
 from typing import List
 from typing import Tuple
-from typing import Any
 from typing import Optional
 import numpy as np
-from .numba_funcs import find_first_difference_between_two
-from .numba_funcs import find_end_subtree_from_i
+from ..tools import find_first_difference_between_two
+from ..tools import find_end_subtree_from_i
 from numba import njit
-
-def root_mean_square_error(y_true: np.ndarray,
-                           y_predict: np.ndarray) -> float:
-    error = y_true - y_predict
-    return np.sqrt(np.mean((error)**2))
-
-
-def coefficient_determination(y_true: np.ndarray,
-                              y_predict: np.ndarray) -> float:
-    error = y_true - y_predict
-    mean_y_true = np.mean(y_true)
-    residual_sum = np.sum((error)**2)
-    total_sum = np.sum((y_true - mean_y_true)**2)
-    return 1 - residual_sum/total_sum
-
-
-def categorical_crossentropy(target: np.ndarray,
-                             output: np.ndarray):
-    output /= output.sum(axis=-1, keepdims=True)
-    output = np.clip(output, 1e-7, 1 - 1e-7)
-    return np.mean(np.sum(target * -np.log(output),
-                          axis=-1, keepdims=False))
+from numba import float64
 
 
 def common_region(trees: List) -> Tuple:
@@ -73,8 +51,8 @@ def common_region_two_trees(n_args_array_1: np.ndarray,
                             n_args_array_2: np.ndarray) -> Tuple:
     index_list_1 = range(len(n_args_array_1))
     index_list_2 = range(len(n_args_array_2))
-    index_1 = 0
-    index_2 = 0
+    index_1 = np.int64(0)
+    index_2 = np.int64(0)
 
     common_1 = []
     common_2 = []
@@ -110,11 +88,6 @@ def common_region_(trees: List) -> Tuple:
         to_return = common_region_(trees)
 
     return to_return
-
-
-def donothing(x: Any) -> Any:
-    return x
-
 
 def numpy_group_by(group: np.ndarray,
                    by: np.ndarray) -> Tuple:
@@ -154,10 +127,10 @@ def rank_data(arr: np.ndarray) -> np.ndarray:
     return retults
 
 
-@njit
+@njit(float64[:](float64[:]))
 def protect_norm(x: np.ndarray) -> np.ndarray:
     result = np.empty(len(x), dtype=np.float64)
-    sum_ = x.sum()
+    sum_ = np.sum(x, dtype=np.float64)
     if sum_ > 0:
         for i in range(result.size):
             result[i] = x[i]/sum_
@@ -173,7 +146,7 @@ def scale_data(arr: np.ndarray) -> np.ndarray:
     max_ = arr.max()
     min_ = arr.min()
     if max_ == min_:
-        to_return = np.ones_like(arr, dtype = np.float64)
+        to_return = np.ones_like(arr, dtype=np.float64)
     else:
         to_return = ((arr - min_)/(max_ - min_)).astype(np.float64)
     return to_return

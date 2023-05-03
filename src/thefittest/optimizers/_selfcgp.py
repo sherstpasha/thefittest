@@ -10,7 +10,7 @@ from ..base import Tree
 from ..base import UniversalSet
 from ..tools.transformations import numpy_group_by
 from ._geneticprogramming import GeneticProgramming
-from ..tools.generators import half_and_half
+from ..tools.random import half_and_half
 
 
 class SelfCGP(GeneticProgramming):
