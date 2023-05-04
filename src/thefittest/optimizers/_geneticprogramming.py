@@ -81,7 +81,6 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             'standart': (standart_crossover, 2),
             'one_point': (one_point_crossoverGP, 2),
             'uniform2': (uniform_crossoverGP, 2),
-            'uniform7': (uniform_crossoverGP, 7),
             'uniformk': (uniform_crossoverGP, self._parents_num),
             'uniform_prop2': (uniform_crossoverGP_prop, 2),
             'uniform_prop7': (uniform_crossoverGP_prop, 7),

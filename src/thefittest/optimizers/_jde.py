@@ -96,11 +96,6 @@ class jDE(DifferentialEvolution):
         population_ph = self._get_phenotype(population_g)
         fitness = self._evaluate(population_ph)
 
-        argsort = np.argsort(fitness)
-        population_g = population_g[argsort]
-        population_ph = population_ph[argsort]
-        fitness = fitness[argsort]
-
         F_i = np.full(self._pop_size, 0.5)
         CR_i = np.full(self._pop_size, 0.9)
 
@@ -136,10 +131,5 @@ class jDE(DifferentialEvolution):
 
                 if self._elitism:
                     population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
-
-                argsort = np.argsort(fitness)
-                population_g = population_g[argsort]
-                population_ph = population_ph[argsort]
-                fitness = fitness[argsort]
 
         return self

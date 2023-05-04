@@ -2,10 +2,11 @@ from typing import List
 from typing import Tuple
 from typing import Optional
 import numpy as np
-from ..tools import find_first_difference_between_two
-from ..tools import find_end_subtree_from_i
+from numpy.typing import NDArray
 from numba import njit
 from numba import float64
+from ..tools import find_first_difference_between_two
+from ..tools import find_end_subtree_from_i
 
 
 def common_region(trees: List) -> Tuple:
@@ -89,6 +90,7 @@ def common_region_(trees: List) -> Tuple:
 
     return to_return
 
+
 def numpy_group_by(group: np.ndarray,
                    by: np.ndarray) -> Tuple:
 
@@ -112,7 +114,7 @@ def lehmer_mean(x: np.ndarray,
 
 
 def rank_data(arr: np.ndarray) -> np.ndarray:
-    arange = np.arange(len(arr), dtype=int)
+    arange = np.arange(len(arr), dtype=np.int64)
 
     argsort = np.argsort(arr)
     arr_sorted = arr.copy()[argsort]
@@ -122,9 +124,9 @@ def rank_data(arr: np.ndarray) -> np.ndarray:
     ranks = (raw_ranks[1:] + raw_ranks[:-1] + 1)/2
     count = raw_ranks[1:] - raw_ranks[:-1]
 
-    retults = np.empty_like(arr, dtype=np.float64)
-    retults[argsort] = ranks.repeat(count)
-    return retults
+    results = np.empty_like(arr, dtype=np.float64)
+    results[argsort] = ranks.repeat(count)
+    return results
 
 
 @njit(float64[:](float64[:]))
@@ -285,3 +287,31 @@ class GrayCode(SamplingGrid):
         bit_array = numpy_int_to_bit(int_array)
         gray_array = numpy_bit_to_gray(bit_array)
         return gray_array
+
+
+@njit(float64[:](float64[:], float64[:], float64[:]))
+def bounds_control(array: NDArray[np.float64],
+                   left: NDArray[np.float64],
+                   right: NDArray[np.float64]) -> NDArray[np.float64]:
+    to_return = array.copy()
+
+    size = len(array)
+    for i in range(size):
+        if array[i] < left[i]:
+            to_return[i] = left[i]
+        elif array[i] > right[i]:
+            to_return[i] = right[i]
+    return to_return
+    
+@njit(float64[:](float64[:], float64[:], float64[:]))
+def bounds_control_mean(array: NDArray[np.float64],
+                        left: NDArray[np.float64],
+                        right: NDArray[np.float64]) -> NDArray[np.float64]:
+    to_return = array.copy()
+    size = len(array)
+    for i in range(size):
+        if array[i] < left[i]:
+            to_return[i] = (left[i] + array[i])/2
+        elif array[i] > right[i]:
+            to_return[i] = (right[i] + array[i])/2
+    return to_return

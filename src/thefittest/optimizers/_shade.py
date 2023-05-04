@@ -4,9 +4,14 @@ from typing import Optional
 from typing import Tuple
 import numpy as np
 from ._jade import JADE
-from ..tools.random import cauchy_distribution
+from ..tools.random import randc01
+from ..tools.random import randn01
 from ..tools.random import float_population
 from ..tools.transformations import lehmer_mean
+from ..tools.operators import current_to_pbest_1_archive_p_min
+from ..tools.operators import binomial
+from ..tools import find_pbest_id
+from ..tools.transformations import bounds_control_mean
 
 
 class SHADE(JADE):
@@ -44,25 +49,21 @@ class SHADE(JADE):
 
         self._H_size: int = pop_size
 
-    def _current_to_pbest_1_archive(self,
-                                    current: np.ndarray,
-                                    population: np.ndarray,
-                                    F: float,
-                                    pop_archive: np.ndarray) -> np.ndarray:
-        range_pop = range(len(population))
-        range_pop_arch = range(len(pop_archive))
-        p_min = 2/len(population)
-        p_i = np.random.uniform(p_min, 0.2)
-        value = int(p_i*len(population))
-        pbest = population[-value:]
-        p_best_ind = np.random.randint(0, len(pbest))
-        best = pbest[p_best_ind]
+    def _mutation_and_crossover(self,
+                                popuation_g: np.ndarray,
+                                popuation_g_archive: np.ndarray,
+                                pbest_id: np.ndarray,
+                                individ_g: np.ndarray,
+                                F: float,
+                                CR: float) -> np.ndarray:
+        mutant = current_to_pbest_1_archive_p_min(individ_g, popuation_g,
+                                                  pbest_id, F, popuation_g_archive)
 
-        r1 = np.random.choice(range_pop, size=1, replace=False)[0]
-        r2 = np.random.choice(range_pop_arch, size=1, replace=False)[0]
-        offspring = current + F*(best - current) + \
-            F*(population[r1] - pop_archive[r2])
-        return offspring
+        mutant_cr_g = binomial(individ_g, mutant, CR)
+        mutant_cr_g = bounds_control_mean(mutant_cr_g,
+                                          self._left,
+                                          self._right)
+        return mutant_cr_g
 
     def _evaluate_and_selection(self,
                                 mutant_cr_g: np.ndarray,
@@ -92,27 +93,9 @@ class SHADE(JADE):
             r_i = np.random.randint(0, len(H_F_i))
             u_F = H_F_i[r_i]
             u_CR = H_CR_i[r_i]
-            F_i[i] = self._randc01(u_F)
-            CR_i[i] = self._randn01(u_CR)
+            F_i[i] = randc01(np.float64(u_F))
+            CR_i[i] = randn01(np.float64(u_CR))
         return F_i, CR_i
-
-    def _randc01(self,
-                 u: float) -> float:
-        value = cauchy_distribution(loc=u, scale=0.1)[0]
-        while value <= 0:
-            value = cauchy_distribution(loc=u, scale=0.1)[0]
-        if value > 1:
-            value = 1
-        return value
-
-    def _randn01(self,
-                 u: float) -> float:
-        value = np.random.normal(u, 0.1)
-        if value < 0:
-            value = 0
-        elif value > 1:
-            value = 1
-        return value
 
     def _update_u_F(self,
                     u_F: float,
@@ -156,11 +139,7 @@ class SHADE(JADE):
 
         population_ph = self._get_phenotype(population_g)
         fitness = self._evaluate(population_ph)
-
-        argsort = np.argsort(fitness)
-        population_g = population_g[argsort]
-        population_ph = population_ph[argsort]
-        fitness = fitness[argsort]
+        pbest_id = find_pbest_id(fitness, np.float64(self._p))
 
         for i in range(self._iters-1):
             self._update_fittest(population_g, population_ph, fitness)
@@ -176,7 +155,7 @@ class SHADE(JADE):
                 pop_archive = np.vstack([population_g, external_archive])
 
                 mutation_and_crossover = partial(self._mutation_and_crossover,
-                                                 population_g, pop_archive)
+                                                 population_g, pop_archive, pbest_id)
                 mutant_cr_g = np.array(list(map(mutation_and_crossover,
                                                 population_g, F_i, CR_i)))
 
@@ -202,11 +181,7 @@ class SHADE(JADE):
 
                 if self._elitism:
                     population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
-
-                argsort = np.argsort(fitness)
-                population_g = population_g[argsort]
-                population_ph = population_ph[argsort]
-                fitness = fitness[argsort]
+                pbest_id = find_pbest_id(fitness, np.float64(self._p))
 
                 if next_k == self._H_size:
                     next_k = 0

@@ -5,9 +5,12 @@ from functools import partial
 import numpy as np
 from ._differentialevolution import DifferentialEvolution
 from ..tools.operators import binomial
+from ..tools.operators import current_to_pbest_1_archive
+from ..tools import find_pbest_id
 from ..tools.random import cauchy_distribution
 from ..tools.random import float_population
 from ..tools.transformations import lehmer_mean
+from ..tools.transformations import bounds_control_mean
 
 
 class JADE(DifferentialEvolution):
@@ -46,34 +49,6 @@ class JADE(DifferentialEvolution):
         self._p: float = 0.05
 
         self.set_strategy()
-
-    def _current_to_pbest_1_archive(self,
-                                    current: np.ndarray,
-                                    population: np.ndarray,
-                                    F: float,
-                                    pop_archive: np.ndarray) -> np.ndarray:
-        range_pop = range(len(population))
-        range_pop_arch = range(len(pop_archive))
-
-        value = int(self._p*len(population))
-        pbest = population[-value:]
-        p_best_ind = np.random.randint(0, len(pbest))
-        best = pbest[p_best_ind]
-
-        r1 = np.random.choice(range_pop, size=1, replace=False)[0]
-        r2 = np.random.choice(range_pop_arch, size=1, replace=False)[0]
-        offspring = current + F*(best - current) + \
-            F*(population[r1] - pop_archive[r2])
-        return offspring
-
-    def _bounds_control(self, individ_g):
-        low_mask = individ_g < self._left
-        high_mask = individ_g > self._right
-
-        individ_g[low_mask] = (self._left[low_mask] + individ_g[low_mask])/2
-        individ_g[high_mask] = (
-            self._right[high_mask] + individ_g[high_mask])/2
-        return individ_g
 
     def _generate_F(self,
                     u_F: float) -> np.ndarray:
@@ -119,14 +94,17 @@ class JADE(DifferentialEvolution):
     def _mutation_and_crossover(self,
                                 popuation_g: np.ndarray,
                                 popuation_g_archive: np.ndarray,
+                                pbest_id: np.ndarray,
                                 individ_g: np.ndarray,
                                 F: float,
                                 CR: float) -> np.ndarray:
-        mutant = self._current_to_pbest_1_archive(individ_g, popuation_g, F,
-                                                  popuation_g_archive)
+        mutant = current_to_pbest_1_archive(individ_g, popuation_g,
+                                            pbest_id, F, popuation_g_archive)
 
         mutant_cr_g = binomial(individ_g, mutant, CR)
-        mutant_cr_g = self._bounds_control(mutant_cr_g)
+        mutant_cr_g = bounds_control_mean(mutant_cr_g,
+                                          self._left,
+                                          self._right)
         return mutant_cr_g
 
     def set_strategy(self,
@@ -153,11 +131,7 @@ class JADE(DifferentialEvolution):
 
         population_ph = self._get_phenotype(population_g)
         fitness = self._evaluate(population_ph)
-
-        argsort = np.argsort(fitness)
-        population_g = population_g[argsort]
-        population_ph = population_ph[argsort]
-        fitness = fitness[argsort]
+        pbest_id = find_pbest_id(fitness, np.float64(self._p))
 
         for i in range(self._iters-1):
             self._update_fittest(population_g, population_ph, fitness)
@@ -174,14 +148,14 @@ class JADE(DifferentialEvolution):
                 pop_archive = np.vstack([population_g, external_archive])
 
                 mutation_and_crossover = partial(self._mutation_and_crossover,
-                                                 population_g, pop_archive)
+                                                 population_g, pop_archive, pbest_id)
                 mutant_cr_g = np.array(list(map(mutation_and_crossover,
                                                 population_g, F_i, CR_i)))
 
                 stack = self._evaluate_and_selection(mutant_cr_g,
-                                                    population_g,
-                                                    population_ph,
-                                                    fitness)
+                                                     population_g,
+                                                     population_ph,
+                                                     fitness)
 
                 succeses = stack[3]
                 will_be_replaced = population_g[succeses].copy()
@@ -197,10 +171,7 @@ class JADE(DifferentialEvolution):
 
                 if self._elitism:
                     population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
-                argsort = np.argsort(fitness)
-                population_g = population_g[argsort]
-                population_ph = population_ph[argsort]
-                fitness = fitness[argsort]
+                pbest_id = find_pbest_id(fitness, np.float64(self._p))
 
                 u_F = self._update_u_F(u_F, s_F)
                 u_CR = self._update_u_CR(u_CR, s_CR)

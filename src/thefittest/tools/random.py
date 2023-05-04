@@ -33,11 +33,34 @@ def float_population(pop_size: int,
                      for left_i, right_i in zip(left, right)]).T
 
 
-def cauchy_distribution(loc: int = 0,
-                        scale: int = 1,
-                        size: int = 1) -> NDArray[np.float64]:
-    x_ = np.random.standard_cauchy(size=size)
+@njit(float64[:](float64, float64, int64))
+def cauchy_distribution(loc: np.float64,
+                        scale: np.float64,
+                        size: np.int64) -> NDArray[np.float64]:
+    x_ = np.random.standard_cauchy(size=size).astype(np.float64)
     return loc + scale*x_
+
+
+@njit(float64(float64))
+def randc01(u):
+    value = cauchy_distribution(
+        loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
+    while value <= 0:
+        value = cauchy_distribution(
+            loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
+    if value > 1:
+        value = 1
+    return value
+
+
+@njit(float64(float64))
+def randn01(u):
+    value = np.random.normal(u, 0.1)
+    if value < 0:
+        value = 0
+    elif value > 1:
+        value = 1
+    return value
 
 
 def full_growing_method(uniset: UniversalSet,

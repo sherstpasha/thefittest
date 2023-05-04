@@ -58,11 +58,11 @@ class SelfCGA(GeneticAlgorithm):
         mutation_func, proba = self._mutation_set[mutation]
 
         selected_id = selection_func(fitness_scale, fitness_rank,
-                                     tour_size, quantity)
+                                     np.int64(tour_size), np.int64(quantity))
         offspring_no_mutated = crossover_func(population_g[selected_id],
                                               fitness_scale[selected_id],
                                               fitness_rank[selected_id])
-        offspring = mutation_func(offspring_no_mutated, proba)
+        offspring = mutation_func(offspring_no_mutated, np.float64(proba))
         return offspring
 
     def _choice_operators(self,

@@ -61,8 +61,8 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         self.set_strategy()
 
     def _update_pool(self):
-        self._selection_pool = {'proportional': (proportional_selection, None),
-                                'rank': (rank_selection, None),
+        self._selection_pool = {'proportional': (proportional_selection, 0),
+                                'rank': (rank_selection, 0),
                                 'tournament_k': (tournament_selection, self._tour_size),
                                 'tournament_3': (tournament_selection, 3),
                                 'tournament_5': (tournament_selection, 5),
@@ -99,11 +99,12 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         mutation_func, proba = self._specified_mutation
 
         selected_id = selection_func(fitness_scale, fitness_rank,
-                                     tour_size, quantity)
+                                     np.int64(tour_size),
+                                    np.int64(quantity))
         offspring_no_mutated = crossover_func(population_g[selected_id],
                                               fitness_scale[selected_id],
                                               fitness_rank[selected_id])
-        offspring = mutation_func(offspring_no_mutated, proba)
+        offspring = mutation_func(offspring_no_mutated, np.float64(proba))
         return offspring
 
     def set_strategy(self,

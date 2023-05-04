@@ -12,6 +12,7 @@ from ..tools.operators import current_to_best_1
 from ..tools.operators import rand_1
 from ..tools.operators import rand_2
 from ..tools.random import float_population
+from ..tools.transformations import bounds_control
 
 
 class DifferentialEvolution(EvolutionaryAlgorithm):
@@ -68,12 +69,12 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                                 individ_g: np.ndarray,
                                 F: float,
                                 CR: float) -> np.ndarray:
-        mutant = self._specified_mutation(individ_g,
-                                          self._thefittest._genotype,
-                                          popuation_g,
+        mutant = self._specified_mutation(individ_g.copy(),
+                                          self._thefittest._genotype.copy(),
+                                          popuation_g.copy(),
                                           np.float64(F))
-        mutant_cr_g = binomial(individ_g, mutant, np.float64(CR))
-        mutant_cr_g = self._bounds_control(mutant_cr_g)
+        mutant_cr_g = binomial(individ_g.copy(), mutant, np.float64(CR))
+        mutant_cr_g = bounds_control(mutant_cr_g, self._left, self._right)
         return mutant_cr_g
 
     def _evaluate_and_selection(self,
@@ -92,16 +93,6 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         offspring_ph[mask] = mutant_cr_ph[mask]
         offspring_fit[mask] = mutant_cr_fit[mask]
         return offspring_g, offspring_ph, offspring_fit, mask
-
-    def _bounds_control(self,
-                        individ_g: np.ndarray) -> np.ndarray:
-        individ_g = individ_g.copy()
-        low_mask = individ_g < self._left
-        high_mask = individ_g > self._right
-
-        individ_g[low_mask] = self._left[low_mask]
-        individ_g[high_mask] = self._right[high_mask]
-        return individ_g
 
     def set_strategy(self,
                      mutation_oper: str = 'rand_1',
@@ -132,7 +123,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         fitness = self._evaluate(population_ph)
 
         for i in range(self._iters-1):
-            self._update_fittest(population_g, population_ph, fitness)
+            self._update_fittest(population_g, population_ph.copy(), fitness.copy())
             self._update_stats({'population_g': population_g.copy(),
                                'fitness_max': self._thefittest._fitness})
 
@@ -144,14 +135,14 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                 CR_i = [self._CR]*self._pop_size
 
                 mutation_and_crossover = partial(self._mutation_and_crossover,
-                                                 population_g)
+                                                 population_g.copy())
                 mutant_cr_g = np.array(list(map(mutation_and_crossover,
-                                                population_g, F_i, CR_i)))
+                                                population_g.copy(), F_i, CR_i)))
 
-                stack = self._evaluate_and_selection(mutant_cr_g,
-                                                     population_g,
-                                                     population_ph,
-                                                     fitness)
+                stack = self._evaluate_and_selection(mutant_cr_g.copy(),
+                                                     population_g.copy(),
+                                                     population_ph.copy(),
+                                                     fitness.copy())
                 population_g, population_ph, fitness, _ = stack
 
                 if self._elitism:

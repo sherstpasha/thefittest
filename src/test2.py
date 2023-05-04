@@ -1,32 +1,25 @@
 import numpy as np
-from thefittest.optimizers import DifferentialEvolution
-from thefittest.benchmarks import Griewank
+from thefittest.optimizers import GeneticAlgorithm
+from thefittest.benchmarks import OneMax
 from thefittest.tools import donothing
 
+number_of_iterations = 100
+population_size = 200
+string_length = 1000
 
-n_dimension = 100
-left_border = -100.
-right_border = 100.
+model = GeneticAlgorithm(fitness_function=OneMax(),
+                         genotype_to_phenotype=donothing,
+                         iters=number_of_iterations,
+                         pop_size=population_size,
+                         str_len=string_length,
+                         show_progress_each=10,
+                         minimization=False)
 
-
-number_of_iterations = 500
-population_size = 500
-
-
-left_border_array = np.full(
-    shape=n_dimension, fill_value=left_border, dtype=np.float64)
-right_border_array = np.full(
-    shape=n_dimension, fill_value=right_border, dtype=np.float64)
-
-model = DifferentialEvolution(fitness_function=Griewank(),
-                              genotype_to_phenotype=donothing,
-                              iters=number_of_iterations,
-                              pop_size=population_size,
-                              left=left_border_array,
-                              right=right_border_array,
-                              show_progress_each=10,
-                              minimization=True)
-
-model.set_strategy(mutation_oper='rand_1', F_param=0.1, CR_param=0.5)
+model.set_strategy(selection_oper='rank',
+                   crossover_oper='uniform2',
+                   mutation_oper='custom_rate',
+                   elitism_param=True,
+                   parents_num_param=7,
+                   mutation_rate_param=0.001)
 
 model.fit()

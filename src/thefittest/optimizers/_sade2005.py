@@ -10,6 +10,7 @@ from ..tools.operators import rand_1
 from ..tools.operators import current_to_best_1
 from ..tools.transformations import numpy_group_by
 from ..tools.random import float_population
+from ..tools.transformations import bounds_control
 
 
 class SaDE2005(DifferentialEvolution):
@@ -67,10 +68,13 @@ class SaDE2005(DifferentialEvolution):
                                 mutation: str,
                                 CR: float) -> np.ndarray:
         F = np.random.normal(self._Fm, self._F_sigma)
-        mutant = self._mutation_pool[mutation](individ_g, popuation_g, F)
+        mutant = self._mutation_pool[mutation](individ_g,
+                                               self._thefittest._genotype,
+                                               popuation_g,
+                                               np.float64(F))
 
         mutant_cr_g = binomial(individ_g, mutant, CR)
-        mutant_cr_g = self._bounds_control(mutant_cr_g)
+        mutant_cr_g = bounds_control(mutant_cr_g, self._left, self._right)
         return mutant_cr_g
 
     def _choice_operators(self,
@@ -160,11 +164,6 @@ class SaDE2005(DifferentialEvolution):
         population_ph = self._get_phenotype(population_g)
         fitness = self._evaluate(population_ph)
 
-        argsort = np.argsort(fitness)
-        population_g = population_g[argsort]
-        population_ph = population_ph[argsort]
-        fitness = fitness[argsort]
-
         ns = dict(zip(self._mutation_pool.keys(),
                   np.zeros(z_mutation, dtype=int)))
         nf = dict(zip(self._mutation_pool.keys(),
@@ -196,11 +195,6 @@ class SaDE2005(DifferentialEvolution):
 
                 if self._elitism:
                     population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
-
-                argsort = np.argsort(fitness)
-                population_g = population_g[argsort]
-                population_ph = population_ph[argsort]
-                fitness = fitness[argsort]
 
                 ns, nf = self._update_ns_nf(m_operators, succeses, ns, nf)
                 CR_s_pool = np.append(CR_s_pool, CR_i[succeses])

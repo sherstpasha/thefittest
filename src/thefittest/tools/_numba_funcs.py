@@ -52,23 +52,10 @@ def get_levels_tree_from_i(
     return np.array(result_list, dtype=np.int64)
 
 
-@njit(int64[:](float64[:], int64, int64))
-def select_quantity_id_by_tournament(fitness: NDArray[np.float64],
-                                     tour_size: np.int64,
-                                     quantity: np.int64) -> NDArray[np.int64]:
-    indexes = np.arange(len(fitness))
-    to_return = np.empty(quantity, dtype=np.int64)
-    for i in range(quantity):
-        tournament = np.random.choice(indexes, size=tour_size, replace=False)
-        argmax = np.argmax(fitness[tournament])
-        to_return[i] = tournament[argmax]
-    return to_return
-
-
 @njit(int64(int64[:], int64[:]))
 def find_first_difference_between_two(array_1: NDArray[np.int64],
                                       array_2: NDArray[np.int64]) -> np.int64:
-    for i in np.arange(min(len(array_1), len(array_2)), dtype = np.int64):
+    for i in np.arange(min(len(array_1), len(array_2)), dtype=np.int64):
         if array_1[i] != array_2[i]:
             break
     return i
@@ -102,3 +89,31 @@ def check_for_value(value: np.int64,
             found = True
             break
     return found
+
+
+@njit(int64[:](float64[:], int64))
+def argsort_k(array: NDArray[np.float64],
+              k: np.int64) -> NDArray[np.int64]:
+    size = len(array)
+    array_copy = array.copy()
+    to_return = np.arange(size, dtype=np.int64)
+    for i in range(k):
+        max_ = array_copy[i]
+        min_id = i
+        for j in range(i, size):
+            if array_copy[j] > max_:
+                max_ = array_copy[j]
+                max_id = j
+        array_copy[i], array_copy[max_id] = array_copy[max_id], array_copy[i]
+        to_return[i], to_return[max_id] = to_return[max_id], to_return[i]
+    return to_return
+
+
+@njit(int64[:](float64[:], float64))
+def find_pbest_id(array: NDArray[np.float64],
+                  p: np.float64) -> NDArray[np.int64]:
+    size = len(array)
+    count = np.int64(p*size)
+    argsort = argsort_k(array, count)
+    to_return = argsort[:count]
+    return to_return
