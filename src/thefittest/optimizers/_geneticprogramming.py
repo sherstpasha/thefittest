@@ -69,8 +69,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
     def _update_pool(self):
         self._selection_pool = {
-            'proportional': (proportional_selection, None),
-            'rank': (rank_selection, None),
+            'proportional': (proportional_selection, 0),
+            'rank': (rank_selection, 0),
             'tournament_k': (tournament_selection, self._tour_size),
             'tournament_3': (tournament_selection, 3),
             'tournament_5': (tournament_selection, 5),
@@ -81,6 +81,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             'standart': (standart_crossover, 2),
             'one_point': (one_point_crossoverGP, 2),
             'uniform2': (uniform_crossoverGP, 2),
+            'uniform7': (uniform_crossoverGP, 7),
             'uniformk': (uniform_crossoverGP, self._parents_num),
             'uniform_prop2': (uniform_crossoverGP_prop, 2),
             'uniform_prop7': (uniform_crossoverGP_prop, 7),
@@ -121,8 +122,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
         selected_id = selection_func(fitness_scale,
                                      fitness_rank,
-                                     tour_size,
-                                     quantity)
+                                     np.int64(tour_size),
+                                     np.int64(quantity))
 
         offspring_no_mutated = crossover_func(population_g[selected_id],
                                               fitness_scale[selected_id],

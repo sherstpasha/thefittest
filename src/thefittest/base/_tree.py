@@ -19,7 +19,7 @@ class Tree:
                  nodes: list,
                  n_args: list) -> None:
         self._nodes = nodes
-        self._n_args = np.array(n_args, dtype=np.int32)
+        self._n_args = np.array(n_args, dtype=np.int64)
 
     def __len__(self):
         return len(self._nodes)

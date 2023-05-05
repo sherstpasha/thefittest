@@ -386,35 +386,25 @@ def uniform_crossoverGP(individs: np.ndarray,
                         max_level: int) -> Tree:
     '''Poli, Riccardo & Langdon, W.. (2001). On the Search
     Properties of Different Crossover Operators in Genetic Programming. '''
-    new_nodes = []
+    to_return = Tree([], [])
     new_n_args = []
-    individ_1 = individs[0]
-    individ_2 = individs[1]
-    common_indexes, border = common_region([individ_1, individ_2])
-
-    for i in range(len(common_indexes[0])):
-        if common_indexes[0][i] in border[0]:
-            if random.random() < 0.5:
-                id_ = common_indexes[0][i]
-                left, right = individ_1.subtree(index=id_)
-                new_nodes.extend(individ_1._nodes[left:right])
-                new_n_args.extend(individ_1._n_args[left:right])
-            else:
-                id_ = common_indexes[1][i]
-                left, right = individ_2.subtree(index=id_)
-                new_nodes.extend(individ_2._nodes[left:right])
-                new_n_args.extend(individ_2._n_args[left:right])
+    common, border = common_region(individs)
+    pool = random_sample(range_size=len(fitness),
+                         quantity=len(common[0]),
+                         replace=True)
+    for i, common_0_i in enumerate(common[0]):
+        j = pool[i]
+        id_ = common[j][i]
+        if common_0_i in border[0]:
+            subtree = individs[j].subtree(id_, return_class=True)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
         else:
-            if random.random() < 0.5:
-                id_ = common_indexes[0][i]
-                new_nodes.append(individ_1._nodes[id_])
-                new_n_args.append(individ_1._n_args[id_])
-            else:
-                id_ = common_indexes[1][i]
-                new_nodes.append(individ_2._nodes[id_])
-                new_n_args.append(individ_2._n_args[id_])
-    to_return = Tree(new_nodes.copy(),
-                     new_n_args.copy())
+            to_return._nodes.append(individs[j]._nodes[id_])
+            new_n_args.append(individs[j]._n_args[id_])
+
+    to_return = to_return.copy()
+    to_return._n_args = new_n_args.copy()
     return to_return
 
 
@@ -425,11 +415,11 @@ def uniform_crossoverGP_prop(individs: np.ndarray,
     to_return = Tree([], [])
     new_n_args = []
     common, border = common_region(individs)
-    range_ = range(len(individs))
-    probability = protect_norm(fitness)
-
+    pool = random_weighted_sample(weights=fitness,
+                                  quantity=len(common[0]),
+                                  replace=True)
     for i, common_0_i in enumerate(common[0]):
-        j = random.choices(range_, weights=probability)[0]
+        j = pool[i]
         id_ = common[j][i]
         if common_0_i in border[0]:
             subtree = individs[j].subtree(id_, return_class=True)
@@ -451,11 +441,12 @@ def uniform_crossoverGP_rank(individs: np.ndarray,
     to_return = Tree([], [])
     new_n_args = []
     common, border = common_region(individs)
-    range_ = range(len(individs))
-    probability = protect_norm(rank)
+    pool = random_weighted_sample(weights=fitness,
+                                  quantity=len(common[0]),
+                                  replace=True)
 
     for i, common_0_i in enumerate(common[0]):
-        j = random.choices(range_, weights=probability)[0]
+        j = pool[i]
         id_ = common[j][i]
         if common_0_i in border[0]:
             subtree = individs[j].subtree(id_, return_class=True)
@@ -477,9 +468,10 @@ def uniform_crossoverGP_tour(individs: np.ndarray,
     to_return = Tree([], [])
     new_n_args = []
     common, border = common_region(individs)
+    pool = tournament_selection(fitness, rank, 2, len(common[0]))
 
     for i, common_0_i in enumerate(common[0]):
-        j = tournament_selection(fitness, rank, 2, 1)[0]
+        j = pool[i]
         id_ = common[j][i]
         if common_0_i in border[0]:
             subtree = individs[j].subtree(id_, return_class=True)
@@ -498,9 +490,9 @@ def uniform_crossoverGP_tour(individs: np.ndarray,
 # genetic algorithm
 @njit(int64[:](float64[:], float64[:], int64, int64))
 def proportional_selection(fitness: np.ndarray,
-                            rank: np.ndarray,
-                            tour_size: int,
-                            quantity: int) -> np.ndarray:
+                           rank: np.ndarray,
+                           tour_size: int,
+                           quantity: int) -> np.ndarray:
     choosen = random_weighted_sample(weights=fitness,
                                      quantity=quantity,
                                      replace=True)
@@ -509,9 +501,9 @@ def proportional_selection(fitness: np.ndarray,
 
 @njit(int64[:](float64[:], float64[:], int64, int64))
 def rank_selection(fitness: np.ndarray,
-                    rank: np.ndarray,
-                    tour_size: int,
-                    quantity: int) -> np.ndarray:
+                   rank: np.ndarray,
+                   tour_size: int,
+                   quantity: int) -> np.ndarray:
     choosen = random_weighted_sample(weights=fitness,
                                      quantity=quantity,
                                      replace=True)
@@ -520,9 +512,9 @@ def rank_selection(fitness: np.ndarray,
 
 @njit(int64[:](float64[:], float64[:], int64, int64))
 def tournament_selection(fitness: NDArray[np.float64],
-                          rank: NDArray[np.float64],
-                          tour_size: np.int64,
-                          quantity: np.int64) -> NDArray[np.int64]:
+                         rank: NDArray[np.float64],
+                         tour_size: np.int64,
+                         quantity: np.int64) -> NDArray[np.int64]:
     to_return = np.empty(quantity, dtype=np.int64)
     for i in range(quantity):
         tournament = random_sample(range_size=len(fitness),
