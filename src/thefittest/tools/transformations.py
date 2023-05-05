@@ -302,7 +302,8 @@ def bounds_control(array: NDArray[np.float64],
         elif array[i] > right[i]:
             to_return[i] = right[i]
     return to_return
-    
+
+
 @njit(float64[:](float64[:], float64[:], float64[:]))
 def bounds_control_mean(array: NDArray[np.float64],
                         left: NDArray[np.float64],
@@ -315,3 +316,4 @@ def bounds_control_mean(array: NDArray[np.float64],
         elif array[i] > right[i]:
             to_return[i] = (right[i] + array[i])/2
     return to_return
+

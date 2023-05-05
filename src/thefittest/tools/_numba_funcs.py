@@ -113,7 +113,7 @@ def argsort_k(array: NDArray[np.float64],
 def find_pbest_id(array: NDArray[np.float64],
                   p: np.float64) -> NDArray[np.int64]:
     size = len(array)
-    count = np.int64(p*size)
+    count = max(np.int64(1), np.int64(p*size))
     argsort = argsort_k(array, count)
     to_return = argsort[:count]
     return to_return

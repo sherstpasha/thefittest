@@ -8,10 +8,19 @@ from ..tools import donothing
 from ..tools.operators import LogisticSigmoid
 from ..tools.operators import SoftMax
 from ..tools.operators import ReLU
-from ..tools.transformations import categorical_crossentropy
-from ..optimizers import DifferentialEvolution
+from ..tools.metrics import categorical_crossentropy
 from ..optimizers import SHADE
+from ..optimizers import DifferentialEvolution
 from ..optimizers import JADE
+from ..optimizers import jDE
+from ..optimizers import SaDE2005
+
+
+class_optimizer = Union[DifferentialEvolution,
+                        JADE,
+                        SHADE,
+                        jDE,
+                        SaDE2005]
 
 
 class MLPClassifierEA(MultilayerPerceptron):
@@ -25,7 +34,7 @@ class MLPClassifierEA(MultilayerPerceptron):
             no_increase_num: Optional[int] = None,
             show_progress_each: Optional[int] = None,
             keep_history: bool = False,
-            optimizer: DifferentialEvolution = DifferentialEvolution):
+            optimizer: class_optimizer = SHADE):
 
         MultilayerPerceptron.__init__(self,
                                       hidden_layers=hidden_layers,
@@ -50,17 +59,16 @@ class MLPClassifierEA(MultilayerPerceptron):
                           X,
                           targets: np.ndarray) -> np.ndarray:
         fitness = [self._evaluate_net(net, X, targets) for net in population]
-        return np.array(fitness)
+        return np.array(fitness, dtype=np.float64)
 
     def _evaluate_net(self,
                       weights: np.ndarray,
                       X: np.ndarray,
                       targets: np.ndarray) -> float:
-        # shaped_weight = self._weight_from_flat(weights)
-        # output = self.forward(X, weights=shaped_weight)
-        # error = categorical_crossentropy(targets, output)
-        # return error
-        return 100
+        shaped_weight = self._weight_from_flat(weights)
+        output = self.forward(X, weights=shaped_weight)
+        error = categorical_crossentropy(targets, output)
+        return error
 
     def _weight_from_flat(self,
                           flat_array: np.ndarray) -> List:
@@ -78,8 +86,8 @@ class MLPClassifierEA(MultilayerPerceptron):
         return shape, np.multiply.reduce(shape)
 
     def _fit(self,
-            X: np.ndarray,
-            y: np.ndarray):
+             X: np.ndarray,
+             y: np.ndarray):
         n_inputs = X.shape[1]
         n_outputs = len(set(y))
         eye = np.eye(n_outputs)
@@ -104,9 +112,9 @@ class MLPClassifierEA(MultilayerPerceptron):
         genotype, phenotype, fitness = solution.get()
         self._weights = self._weight_from_flat(phenotype)
         return self
-    
+
     def _predict(self,
                  X: np.ndarray) -> np.ndarray:
         output = self.forward(X)
-        y_pred = np.argmax(output, axis = 1)
+        y_pred = np.argmax(output, axis=1)
         return y_pred
