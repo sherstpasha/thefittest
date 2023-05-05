@@ -1,7 +1,7 @@
 # thefittest 
 
 [![PyPI](https://img.shields.io/pypi/v/thefittest?label=PyPI%20-%20Package%20version)]((https://pypi.org/project/thefittest/))
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/thefittest?label=PyPI%20Downloads)]((https://pypi.org/project/thefittest/))
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/thefittest?label=PyPI%20Downloads)](https://pypi.org/project/thefittest/)
 
 ## Installation
 ```bash
