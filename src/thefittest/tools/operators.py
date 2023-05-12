@@ -26,9 +26,9 @@ max_value = np.finfo(np.float64).max
 def flip_mutation(individ: np.ndarray,
                   proba: float):
     offspring = individ.copy()
-    for i in range(individ.size):
+    for i in range(offspring.size):
         if random.random() < proba:
-            offspring[i] = 1 - individ[i]
+            offspring[i] = 1 - offspring[i]
     return offspring
 
 
@@ -252,21 +252,20 @@ def one_point_crossover(individs: np.ndarray,
 def two_point_crossover(individs: np.ndarray,
                         fitness: np.ndarray,
                         rank: np.ndarray) -> np.ndarray:
-
+    size = len(individs[0])
     c_points = random_sample(range_size=len(individs[0]),
                              quantity=2, replace=False)
     c_points = sorted(c_points)
 
     if random.random() > 0.5:
         offspring = individs[0].copy()
-        for i in range(individs.shape[1]):
-            if c_points[0] <= i <= c_points[1]:
-                offspring[i] = individs[1][i]
+        other_individ = individs[1]
     else:
         offspring = individs[1].copy()
-        for i in range(individs.shape[1]):
-            if c_points[0] <= i <= c_points[1]:
-                offspring[i] = individs[0][i]
+        other_individ = individs[0]
+    for i in range(size):
+        if c_points[0] <= i <= c_points[1]:
+            offspring[i] = other_individ[i]
     return offspring
 
 
@@ -504,7 +503,7 @@ def rank_selection(fitness: np.ndarray,
                    rank: np.ndarray,
                    tour_size: int,
                    quantity: int) -> np.ndarray:
-    choosen = random_weighted_sample(weights=fitness,
+    choosen = random_weighted_sample(weights=rank,
                                      quantity=quantity,
                                      replace=True)
     return choosen
