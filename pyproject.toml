@@ -13,7 +13,7 @@ where = ["src"]
 
 [project]
 name = "thefittest"
-version = "0.1.12"
+version = "0.1.13"
 authors = [
   { name="Pavel Sherstnev", email="sherstpasha99@gmail.com" },
 ]
