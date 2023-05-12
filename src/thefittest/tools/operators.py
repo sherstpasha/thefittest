@@ -440,7 +440,7 @@ def uniform_crossoverGP_rank(individs: np.ndarray,
     to_return = Tree([], [])
     new_n_args = []
     common, border = common_region(individs)
-    pool = random_weighted_sample(weights=fitness,
+    pool = random_weighted_sample(weights=rank,
                                   quantity=len(common[0]),
                                   replace=True)
 
