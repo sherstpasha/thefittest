@@ -69,11 +69,11 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                                 individ_g: np.ndarray,
                                 F: float,
                                 CR: float) -> np.ndarray:
-        mutant = self._specified_mutation(individ_g.copy(),
-                                          self._thefittest._genotype.copy(),
-                                          popuation_g.copy(),
+        mutant = self._specified_mutation(individ_g,
+                                          self._thefittest._genotype,
+                                          popuation_g,
                                           np.float64(F))
-        mutant_cr_g = binomial(individ_g.copy(), mutant, np.float64(CR))
+        mutant_cr_g = binomial(individ_g, mutant, np.float64(CR))
         mutant_cr_g = bounds_control(mutant_cr_g, self._left, self._right)
         return mutant_cr_g
 
@@ -123,7 +123,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         fitness = self._evaluate(population_ph)
 
         for i in range(self._iters-1):
-            self._update_fittest(population_g, population_ph.copy(), fitness.copy())
+            self._update_fittest(population_g, population_ph, fitness)
             self._update_stats({'population_g': population_g.copy(),
                                'fitness_max': self._thefittest._fitness})
 
@@ -135,14 +135,14 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                 CR_i = [self._CR]*self._pop_size
 
                 mutation_and_crossover = partial(self._mutation_and_crossover,
-                                                 population_g.copy())
+                                                 population_g)
                 mutant_cr_g = np.array(list(map(mutation_and_crossover,
-                                                population_g.copy(), F_i, CR_i)))
+                                                population_g, F_i, CR_i)))
 
-                stack = self._evaluate_and_selection(mutant_cr_g.copy(),
-                                                     population_g.copy(),
-                                                     population_ph.copy(),
-                                                     fitness.copy())
+                stack = self._evaluate_and_selection(mutant_cr_g,
+                                                     population_g,
+                                                     population_ph,
+                                                     fitness)
                 population_g, population_ph, fitness, _ = stack
 
                 if self._elitism:
