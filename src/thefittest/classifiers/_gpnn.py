@@ -90,21 +90,31 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         return error
 
 # итерации и популяция в параметры алгоритма вывыести. Написать возможность обучать с помошью ГА линейное увеличение как параметр алгоритма
-# добавить смешение в набор X 
+# добавить смешение в набор X
     def _train_net(self, net, X_train, proba_train):
+        net._get_order()
 
         def fitness_function(population): return self._evaluate_nets(
             population, net, X_train, proba_train)
-        
-        left = np.full(shape = len(net._weights), fill_value=-2, dtype=np.float64)
-        right = np.full(shape = len(net._weights), fill_value=2, dtype=np.float64)
-        optimizer_weights = self._optimizer_weights(
-            fitness_function, donothing, 100, 100, left, right, minimization = True)
+
+        left = np.full(shape=len(net._weights),
+                       fill_value=-2, dtype=np.float64)
+        right = np.full(shape=len(net._weights),
+                        fill_value=2, dtype=np.float64)
+        optimizer_weights = self._optimizer_weights(fitness_function=fitness_function,
+                                                    genotype_to_phenotype=donothing,
+                                                    iters=100,
+                                                    pop_size=100,
+                                                    left=left,
+                                                    right=right,
+                                                    optimal_value=1e-7,
+                                                    minimization=True)
         optimizer_weights.fit()
         fittest = optimizer_weights.get_fittest()
         genotype, phenotype, fitness = fittest.get()
         return phenotype
 
+#проверка если такая я сеть уже обучалась то просто заменяется на копию уже существующей (копируются веса)
     def _genotype_to_phenotype(self,
                                X_train: NDArray[np.float64],
                                proba_train: NDArray[np.float64],
@@ -154,10 +164,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
     def _fit(self,
              X: np.ndarray,
              y: np.ndarray):
-        n_inputs = X.shape[1]
         n_outputs = len(set(y))
         eye = np.eye(n_outputs)
-        # target_probas = eye[y]
 
         X_train, X_test, y_train, y_test = train_test_split_stratified(
             X, y, self._test_sample_ratio)
@@ -176,13 +184,12 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         self._optimizer.fit()
 
         return self
-    
+
     def _predict(self, X):
         fittest = self._optimizer.get_fittest()
         genotype, phenotype, fitness = fittest.get()
+        phenotype._get_order()
 
         output = phenotype.forward_softmax(X)[0]
         y_pred = np.argmax(output, axis=1)
         return y_pred
-
-

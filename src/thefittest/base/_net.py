@@ -14,6 +14,7 @@ from ..base._model import Model
 from thefittest.tools.transformations import scale_data
 from itertools import product
 import random
+from ..tools.operators import forward_softmax2d
 
 
 INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
@@ -86,6 +87,14 @@ class Net:
         self._weights = weights
         self._activs = activs
 
+        self._forward_inputs_array: NDArray[np.int64]
+        self._forward_outputs_array: NDArray[np.int64]
+        self._forward_cond_h: NDArray[np.bool]
+        self._forward_cond_o = NDArray[np.bool]
+        self._forward_culc_order_h = NDArray[np.int64]
+        self._forward_culc_order_o = NDArray[np.int64]
+        self._forward_activ_code = NDArray[np.int64]
+
     def __len__(self):
         return len(self._weights)
 
@@ -111,8 +120,8 @@ class Net:
                  left: Union[Set, int],
                  right: Union[Set, int]) -> Tuple:
         if len(left) and len(right):
-            connects = np.array(list(product(left, right)))
-            weights = np.random.normal(0, 1, len(connects))
+            connects = np.array(list(product(left, right)), dtype=np.int64)
+            weights = np.random.normal(0, 1, len(connects)).astype(np.float64)
             return (connects, weights)
         else:
             return (np.zeros((0, 2), dtype=int),
@@ -188,30 +197,12 @@ class Net:
         self._weights = self._weights[:len(self._connects)]
         return self
 
-    def _map_dot(self, left, right):
-        def fdot(x, y): return x.T@y
-        return np.array(list(map(fdot, left, right)))
-
-    def forward_softmax(self,
-                        X: NDArray[np.float64],
-                        weights: Optional[NDArray[np.float64]] = None) -> NDArray[np.float64]:
-        n_dim = X.shape[1]
-
-        if weights is None:
-            weights = self._weights.reshape(1, -1)
-        else:
-            weights = weights
-
+    def _get_order(self):
+        activs_code = []
         hidden = self._assemble_hiddens()
-        nodes = np.zeros((n_dim +
-                          len(hidden) + len(self._outputs),
-                          X.shape[0]))
+
         from_ = self._connects[:, 0]
         to_ = self._connects[:, 1]
-        list_inputs = list(self._inputs)
-
-        nodes[list_inputs] = X.T[list_inputs]
-        nodes = np.array([nodes.copy() for _ in weights])
 
         calculated = self._inputs.copy()
 
@@ -219,32 +210,60 @@ class Net:
         order = {j: set(from_[bool_hidden[:, i]])
                  for i, j in enumerate(hidden)}
 
+        hidden_conds = np.full((len(hidden), len(to_)), fill_value=False)
+        hidden_culc_order = np.zeros(shape=(len(hidden)), dtype=np.int64)
+        output_conds = np.full(
+            (len(self._outputs), len(to_)), fill_value=False)
+        output_culc_order = np.zeros(
+            shape=(len(self._outputs)), dtype=np.int64)
+
+        k = 0
         current = self._inputs.union(hidden)
         while calculated != current:
             for i in hidden:
                 if order[i].issubset(calculated) and i not in calculated:
-                    cond = to_ == i
-                    from_i = from_[cond]
-                    weight_i = weights[:, cond]
-
-                    i_dot_w_sum = self._map_dot(nodes[:, from_i], weight_i)
-                    i_dot_w_sum = np.clip(i_dot_w_sum, -700, 700)
-
-                    f = self._activs[i]
-
-                    nodes[:, i] = f(i_dot_w_sum)
+                    hidden_conds[k] = to_ == i
+                    hidden_culc_order[k] = i
                     calculated.add(i)
+                    k += 1
+                    activs_code.append(self._activs[i].id_)
 
+        k = 0
         for i in self._outputs:
-            cond = to_ == i
-            from_i = from_[cond]
-            weight_i = weights[:, cond]
-            i_dot_w_sum = self._map_dot(nodes[:, from_i], weight_i)
-            i_dot_w_sum = np.clip(i_dot_w_sum, -700, 700)
-            nodes[:, i] = i_dot_w_sum
+            output_conds[k] = to_ == i
+            output_culc_order[k] = i
+            k += 1
 
-        out = SOFTMAX_F(nodes[:, list(self._outputs)].T)
-        return np.transpose(out, axes = (2, 0, 1))
+        self._forward_inputs_array = np.array(
+            list(self._inputs), dtype=np.int64)
+        self._forward_outputs_array = np.array(
+            list(self._outputs), dtype=np.int64)
+        self._forward_cond_h = hidden_conds
+        self._forward_cond_o = output_conds
+        self._forward_culc_order_h = hidden_culc_order
+        self._forward_culc_order_o = output_culc_order
+        self._forward_activ_code = np.array(activs_code, dtype=np.int64)
+
+    def forward_softmax(self,
+                        X: NDArray[np.float64],
+                        weights: Optional[NDArray[np.float64]] = None) -> NDArray[np.float64]:
+
+        if weights is None:
+            weights = self._weights.reshape(1, -1)
+        else:
+            weights = weights
+
+        outputs = forward_softmax2d(X,
+                                    self._forward_inputs_array,
+                                    self._forward_outputs_array,
+                                    self._forward_cond_h,
+                                    self._forward_cond_o,
+                                    self._forward_culc_order_h,
+                                    self._forward_culc_order_o,
+                                    weights,
+                                    self._connects[:, 0],
+                                    self._forward_activ_code)
+        return outputs
 
     def get_graph(self) -> Dict:
         weights_scale = scale_data(self._weights)
@@ -259,17 +278,13 @@ class Net:
         colors = np.zeros((sum_, 4))
         w_colors = np.zeros((len(weights_scale), 4))
         labels = {**dict(zip(self._inputs, self._inputs)),
-                #   **dict(zip(self._assemble_hiddens(), self._assemble_hiddens())),
                   **{key: value.string for key, value in self._activs.items()},
-                  **dict(zip(self._outputs, range(len_o))),
-                #   **dict(zip(self._outputs,  self._outputs))
-        }
+                  **dict(zip(self._outputs, range(len_o)))}
 
         w_colors[:, 0] = 1 - weights_scale
         w_colors[:, 2] = weights_scale
         w_colors[:, 3] = 0.8
         positions[:len_i][:, 1] = np.arange(len_i) - (len_i)/2
-        # positions[len_i][1] = np.max(positions[:len_i-1][:, 1]) + 1
         colors[:len_i] = INPUT_COLOR_CODE
 
         n = len_i

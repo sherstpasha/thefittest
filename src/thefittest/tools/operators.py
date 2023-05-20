@@ -13,6 +13,9 @@ from .random import sattolo_shuffle
 from .random import random_sample
 from .random import random_weighted_sample
 from .transformations import common_region
+from ._numba_funcs import max_axis
+from ._numba_funcs import map_dot
+from numba import boolean
 
 
 min_value = np.finfo(np.float64).min
@@ -777,12 +780,117 @@ class ReLU(ActivationFunction):
         return result
 
 
+class Gauss(ActivationFunction):
+    def __init__(self):
+        ActivationFunction.__init__(self, 2, 'gs')
+
+    def _f(self, X):
+        result = np.exp(-(X**2))
+        return result
+
+
+class Gauss(ActivationFunction):
+    def __init__(self):
+        ActivationFunction.__init__(self, 3, 'gs')
+
+    def _f(self, X):
+        result = np.tanh(X)
+        return result
+
+
 class SoftMax(ActivationFunction):
     def __init__(self):
-        ActivationFunction.__init__(self, 2, 'sm')
+        ActivationFunction.__init__(self, 4, 'sm')
 
     def _f(self, X):
         exps = np.exp(X - X.max(axis=0))
         sum_ = np.sum(exps, axis=1)[:, np.newaxis]
         sum_[sum_ == 0] = 1
         return np.nan_to_num(exps/sum_)
+
+
+@njit(float64[:, :](float64[:, :]))
+def softmax_numba(X: NDArray[np.float64]) -> NDArray[np.float64]:
+    exps = np.exp(X - max_axis(X))
+    sum_ = np.sum(exps, axis=1)
+    for j in range(sum_.shape[0]):
+        if sum_[j] == 0:
+            sum_[j] = 1
+    result = ((exps).T/sum_).T
+    return result
+
+
+@njit(float64[:](float64[:], int64))
+def multiactivation(X: NDArray[np.float64],
+                    activ_id: np.int64) -> NDArray[np.float64]:
+    if activ_id == 0:
+        result = 1/(1+np.exp(-X))
+    elif activ_id == 1:
+        result = X*(X > 0)
+    elif activ_id == 2:
+        result = np.exp(-(X**2))
+    elif activ_id == 3:
+        result = np.tanh(X)
+    return result
+
+
+@njit(float64[:, :](float64[:, :], int64[:], int64[:], boolean[:, :],
+                    boolean[:, :], int64[:], int64[:],
+                    float64[:], int64[:], int64[:]))
+def forward_softmax(X: NDArray[np.float64],
+                    inputs: NDArray[np.int64],
+                    outputs: NDArray[np.int64],
+                    h_conds: NDArray[np.bool8],
+                    o_conds: NDArray[np.bool8],
+                    order_h: NDArray[np.int64],
+                    order_o: NDArray[np.int64],
+                    weights: NDArray[np.float64],
+                    from_: NDArray[np.int64],
+                    activs: NDArray[np.int64]) -> NDArray[np.float64]:
+    num_nodes = X.shape[1] + len(h_conds) + len(outputs)
+    shape = (num_nodes, len(X))
+    nodes = np.empty(shape, dtype=np.float64)
+
+    nodes[inputs] = X.T[inputs]
+    for i, node_i in enumerate(order_h):
+        from_i = from_[h_conds[i]]
+        weight_i = weights[h_conds[i]]
+        i_dot_w_sum = np.dot(nodes[from_i].T, weight_i)
+        nodes[node_i] = multiactivation(i_dot_w_sum, activs[i])
+
+    for i, order_o_i in enumerate(order_o):
+        from_i = from_[o_conds[i]]
+        weight_i = weights[o_conds[i]]
+        i_dot_w_sum = np.dot(nodes[from_i].T, weight_i)
+        nodes[order_o_i] = i_dot_w_sum
+
+    return softmax_numba(nodes[outputs].T)
+
+
+@njit(float64[:, :, :](float64[:, :], int64[:], int64[:], boolean[:, :],
+                       boolean[:, :], int64[:], int64[:],
+                       float64[:, :], int64[:], int64[:]))
+def forward_softmax2d(X: NDArray[np.float64],
+                      inputs: NDArray[np.int64],
+                      outputs: NDArray[np.int64],
+                      h_conds: NDArray[np.bool8],
+                      o_conds: NDArray[np.bool8],
+                      order_h: NDArray[np.int64],
+                      order_o: NDArray[np.int64],
+                      weights: NDArray[np.float64],
+                      from_: NDArray[np.int64],
+                      activs: NDArray[np.int64]) -> NDArray[np.float64]:
+
+    outs = np.empty(shape=(len(weights), X.shape[0], len(outputs)))
+    for n in range(outs.shape[0]):
+        outs[n] = forward_softmax(X,
+                                  inputs,
+                                  outputs,
+                                  h_conds,
+                                  o_conds,
+                                  order_h,
+                                  order_o,
+                                  weights[n],
+                                  from_,
+                                  activs)
+    return outs

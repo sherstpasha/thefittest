@@ -2,21 +2,23 @@
 import matplotlib.pyplot as plt
 from thefittest.tools.print import print_net
 from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_iris, load_breast_cancer, load_digits, load_wine
 from thefittest.tools.print import print_tree
 from thefittest.tools.random import train_test_split_stratified
 from thefittest.tools.metrics import confusion_matrix
 from thefittest.tools.metrics import f1_score
 
-
-data = load_iris()
+data = load_wine()
 X = data.data
 y = data.target
 
 X_train, X_test, y_train, y_test = train_test_split_stratified(
-            X, y, 0.3)
+    X, y, 0.3)
 
-model = GeneticProgrammingNeuralNetClassifier(50, 20, show_progress_each=1)
+model = GeneticProgrammingNeuralNetClassifier(50, 50,
+                                              show_progress_each=1,
+                                              input_block_size=3,
+                                              keep_history=True)
 
 model.fit(X_train, y_train)
 
@@ -34,6 +36,7 @@ print_tree(genotype, ax[0])
 print_net(phenotype, ax[1])
 fig.savefig('net.png')
 
+stats = model._optimizer.get_stats()
 
-
-
+for i in range(len(stats)):
+    print(stats['fitness_max'][i],  stats['individ_max'][i])

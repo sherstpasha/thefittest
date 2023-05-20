@@ -122,7 +122,10 @@ def recall_score(y_true: NDArray[np.int64],
         else:
             down[y_true[i]] += 1
 
-    return np.mean(up/(down + up))
+    recall = up/(down + up)
+    recall[np.isnan(recall)] = 1
+
+    return np.mean(recall)
 
 
 @njit(float64[:](int64[:], int64[:, :]))
@@ -155,7 +158,10 @@ def precision_score(y_true: NDArray[np.int64],
         else:
             down[y_predict[i]] += 1
 
-    return np.mean(up / (down + up))
+    precision = up / (down + up)
+    precision[np.isnan(precision)] = 1
+
+    return np.mean(precision)
 
 
 @njit(float64[:](int64[:], int64[:, :]))
@@ -192,6 +198,9 @@ def f1_score(y_true: NDArray[np.int64],
 
     precision = up/(down_precision + up)
     recall = up/(down_recall + up)
+
+    precision[np.isnan(precision)] = 1
+    recall[np.isnan(recall)] = 1
 
     f1 = 2 * (precision * recall) / (precision + recall)
     return np.mean(f1)
