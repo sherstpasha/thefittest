@@ -100,8 +100,8 @@ class EvolutionaryAlgorithm:
         if cond_show_switch:
             cond_show_now = iter_number % self._show_progress_each == 0
             if cond_show_now:
-                print(
-                    f'{iter_number} iteration with fitness = {self._thefittest._fitness}')
+                current_best = self._sign*self._thefittest._fitness
+                print(f'{iter_number} iteration with fitness = {current_best}')
 
     def _termitation_check(self):
         cond_aim = self._thefittest._fitness >= self._aim

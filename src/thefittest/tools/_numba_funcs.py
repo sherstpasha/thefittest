@@ -99,7 +99,6 @@ def argsort_k(array: NDArray[np.float64],
     to_return = np.arange(size, dtype=np.int64)
     for i in range(k):
         max_ = array_copy[i]
-        min_id = i
         for j in range(i, size):
             if array_copy[j] > max_:
                 max_ = array_copy[j]

@@ -14,6 +14,10 @@ from ..tools import get_levels_tree_from_i
 from numpy.typing import NDArray
 
 
+FUNCTIONAL_COLOR_CODE = (1, 0.72, 0.43, 1)
+TERMINAL_COLOR_CODE = (0.21, 0.76, 0.56, 1)
+
+
 class Tree:
     def __init__(self,
                  nodes: list,
@@ -21,10 +25,10 @@ class Tree:
         self._nodes = nodes
         self._n_args = np.array(n_args, dtype=np.int64)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._nodes)
 
-    def __str__(self):
+    def __str__(self) -> str:
         pack = []
         for node in reversed(self._nodes):
             args = []
@@ -111,9 +115,9 @@ class Tree:
         for i, node in enumerate(reversed(self._nodes)):
             index = len(self) - i - 1
             if keep_id:
-                labels[index] = str(index) + '. ' + node._sign[:6]
+                labels[index] = str(index) + '. ' + node._sign[:60]
             else:
-                labels[index] = node._sign[:6]
+                labels[index] = node._sign[:60]
 
             nodes.append(index)
 
@@ -140,9 +144,9 @@ class Tree:
             pos[i][1] = -lvl_i
 
             if self._nodes[i].is_functional():
-                colors[i] = (1, 0.72, 0.43, 1)
+                colors[i] = FUNCTIONAL_COLOR_CODE
             else:
-                colors[i] = (0.21, 0.76, 0.56, 1)
+                colors[i] = TERMINAL_COLOR_CODE
 
         to_return = {'edges': edges,
                      'labels': labels,

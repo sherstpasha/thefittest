@@ -8,3 +8,17 @@ from ._jde import jDE
 from ._jade import JADE
 from ._shade import SHADE
 from ._shaga import SHAGA
+from typing import Union
+
+
+OptimizerTreeType = Union[GeneticProgramming,
+                          SelfCGP]
+
+OptimizerStringType = Union[DifferentialEvolution,
+                            JADE,
+                            SHADE,
+                            jDE,
+                            SaDE2005,
+                            GeneticAlgorithm,
+                            SelfCGA,
+                            SHAGA]

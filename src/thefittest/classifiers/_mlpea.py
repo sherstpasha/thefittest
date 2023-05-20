@@ -14,13 +14,7 @@ from ..optimizers import DifferentialEvolution
 from ..optimizers import JADE
 from ..optimizers import jDE
 from ..optimizers import SaDE2005
-
-
-class_optimizer = Union[DifferentialEvolution,
-                        JADE,
-                        SHADE,
-                        jDE,
-                        SaDE2005]
+from ..optimizers import OptimizerStringType
 
 
 class MLPClassifierEA(MultilayerPerceptron):
@@ -34,23 +28,23 @@ class MLPClassifierEA(MultilayerPerceptron):
             no_increase_num: Optional[int] = None,
             show_progress_each: Optional[int] = None,
             keep_history: bool = False,
-            optimizer: class_optimizer = SHADE):
+            optimizer: OptimizerStringType = SHADE):
 
         MultilayerPerceptron.__init__(self,
                                       hidden_layers=hidden_layers,
                                       activation=activation,
                                       activation_output=activation_output)
-        self.optimizer = optimizer(fitness_function=donothing,
-                                   genotype_to_phenotype=donothing,
-                                   iters=iters,
-                                   pop_size=pop_size,
-                                   left=-2,
-                                   right=2,
-                                   optimal_value=0.,
-                                   minimization=True,
-                                   no_increase_num=no_increase_num,
-                                   show_progress_each=show_progress_each,
-                                   keep_history=keep_history)
+        self._optimizer = optimizer(fitness_function=donothing,
+                                    genotype_to_phenotype=donothing,
+                                    iters=iters,
+                                    pop_size=pop_size,
+                                    left=-2,
+                                    right=2,
+                                    optimal_value=0.,
+                                    minimization=True,
+                                    no_increase_num=no_increase_num,
+                                    show_progress_each=show_progress_each,
+                                    keep_history=keep_history)
         self._weight_shapes: Tuple
         self._sizes: Tuple
 

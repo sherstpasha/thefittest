@@ -2,12 +2,24 @@ from typing import Tuple
 from typing import List
 from typing import Optional
 from typing import Union
+from typing import Set
+from typing import Dict
 from functools import reduce
 import numpy as np
+from numpy.typing import NDArray
 from ..tools.operators import LogisticSigmoid
 from ..tools.operators import ReLU
 from ..tools.operators import SoftMax
 from ..base._model import Model
+from thefittest.tools.transformations import scale_data
+from itertools import product
+import random
+
+
+INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
+HIDDEN_COLOR_CODE = (0.0, 0.74, 0.99, 1)
+OUTPUT_COLOR_CODE = (0.94, 0.50, 0.50, 1)
+SOFTMAX_F = SoftMax()
 
 
 class MultilayerPerceptron(Model):
@@ -26,8 +38,8 @@ class MultilayerPerceptron(Model):
     def _define_structure(self,
                           n_inputs: int,
                           n_outputs: int) -> None:
-        self._structure = tuple([n_inputs] + list(self._hidden_layers) + [n_outputs])
-
+        self._structure = tuple(
+            [n_inputs] + list(self._hidden_layers) + [n_outputs])
 
     def _define_weights(self) -> List:
         weights = []
@@ -57,3 +69,248 @@ class MultilayerPerceptron(Model):
         hidden_output = reduce(self._culc_hidden_layer, weights[:-1], X)
         output = self._culc_output_layer(hidden_output, weights[-1])
         return output
+
+
+class Net:
+    def __init__(self,
+                 inputs: Set = set(),
+                 hidden_layers: Optional[List] = None,
+                 outputs: Set = set(),
+                 connects:  NDArray = np.empty((0, 2), dtype=np.int64),
+                 weights: NDArray = np.empty((0), dtype=np.float64),
+                 activs: Dict = dict()):
+        self._inputs = inputs
+        self._hidden_layers = hidden_layers or []
+        self._outputs = outputs
+        self._connects = connects
+        self._weights = weights
+        self._activs = activs
+
+    def __len__(self):
+        return len(self._weights)
+
+    def copy(self):
+        return Net(inputs=self._inputs.copy(),
+                   hidden_layers=self._hidden_layers.copy(),
+                   outputs=self._outputs.copy(),
+                   connects=self._connects.copy(),
+                   weights=self._weights.copy(),
+                   activs=self._activs.copy())
+
+    def _assemble_hiddens(self) -> Set:
+        if len(self._hidden_layers) > 0:
+            return set.union(*self._hidden_layers)
+        else:
+            return set([])
+
+    def _merge_layers(self,
+                      layers: List) -> Set:
+        return layers[0].union(layers[1])
+
+    def _connect(self,
+                 left: Union[Set, int],
+                 right: Union[Set, int]) -> Tuple:
+        if len(left) and len(right):
+            connects = np.array(list(product(left, right)))
+            weights = np.random.normal(0, 1, len(connects))
+            return (connects, weights)
+        else:
+            return (np.zeros((0, 2), dtype=int),
+                    np.zeros((0), dtype=float))
+
+    def __add__(self, other):
+        len_i_1, len_i_2 = len(self._inputs), len(other._inputs)
+        len_h_1, len_h_2 = len(self._hidden_layers), len(other._hidden_layers)
+
+        if (len_i_1 > 0 and len_i_2 == 0) and (len_h_1 == 0 and len_h_2 > 0):
+            return self > other
+        elif (len_i_1 == 0 and len_i_2 > 0) and (len_h_1 > 0 and len_h_2 == 0):
+            return other > self
+
+        map_res = map(self._merge_layers, zip(
+            self._hidden_layers, other._hidden_layers))
+        if len_h_1 < len_h_2:
+            excess = other._hidden_layers[len_h_1:]
+        elif len_h_1 > len_h_2:
+            excess = self._hidden_layers[len_h_2:]
+        else:
+            excess = []
+
+        hidden = list(map_res) + excess
+        return Net(inputs=self._inputs.union(other._inputs),
+                   hidden_layers=hidden,
+                   outputs=self._outputs.union(other._outputs),
+                   connects=np.vstack([self._connects, other._connects]),
+                   weights=np.hstack([self._weights, other._weights]),
+                   activs={**self._activs, **other._activs})
+
+    def __gt__(self, other):
+        len_i_1, len_i_2 = len(self._inputs), len(other._inputs)
+        len_h_1, len_h_2 = len(self._hidden_layers), len(other._hidden_layers)
+
+        if (len_i_1 > 0 and len_h_1 == 0) and (len_i_2 > 0 and len_h_2 == 0):
+            return self + other
+        elif (len_i_1 == 0 and len_h_1 > 0) and (len_i_2 > 0 and len_h_2 == 0):
+            return other > self
+
+        inputs_hidden = self._inputs.union(self._assemble_hiddens())
+        from_ = inputs_hidden.difference(self._connects[:, 0])
+
+        cond = other._connects[:, 0][:, np.newaxis] == np.array(
+            list(other._inputs))
+        cond = np.any(cond, axis=1)
+
+        connects_no_i = other._connects[:, 1][~cond]
+        hidden_outputs = other._assemble_hiddens().union(other._outputs)
+        to_ = hidden_outputs.difference(connects_no_i)
+
+        connects, weights = self._connect(from_, to_)
+        return Net(inputs=self._inputs.union(other._inputs),
+                   hidden_layers=self._hidden_layers + other._hidden_layers,
+                   outputs=self._outputs.union(other._outputs),
+                   connects=np.vstack(
+                       [self._connects, other._connects, connects]),
+                   weights=np.hstack([self._weights, other._weights, weights]),
+                   activs={**self._activs, **other._activs})
+
+    def _fix(self, inputs):
+        hidden_outputs = self._assemble_hiddens().union(self._outputs)
+        to_ = hidden_outputs.difference(self._connects[:, 1])
+        if len(to_) > 0:
+            if not len(self._inputs):
+                self._inputs = inputs
+
+            connects, weights = self._connect(self._inputs, to_)
+            self._connects = np.vstack([self._connects, connects])
+            self._weights = np.hstack([self._weights, weights])
+
+        self._connects = np.unique(self._connects, axis=0)
+        self._weights = self._weights[:len(self._connects)]
+        return self
+
+    def _map_dot(self, left, right):
+        def fdot(x, y): return x.T@y
+        return np.array(list(map(fdot, left, right)))
+
+    def forward_softmax(self,
+                        X: NDArray[np.float64],
+                        weights: Optional[NDArray[np.float64]] = None) -> NDArray[np.float64]:
+        n_dim = X.shape[1]
+
+        if weights is None:
+            weights = self._weights.reshape(1, -1)
+        else:
+            weights = weights
+
+        hidden = self._assemble_hiddens()
+        nodes = np.zeros((n_dim +
+                          len(hidden) + len(self._outputs),
+                          X.shape[0]))
+        from_ = self._connects[:, 0]
+        to_ = self._connects[:, 1]
+        list_inputs = list(self._inputs)
+
+        nodes[list_inputs] = X.T[list_inputs]
+        nodes = np.array([nodes.copy() for _ in weights])
+
+        calculated = self._inputs.copy()
+
+        bool_hidden = to_[:, np.newaxis] == np.array(list(hidden))
+        order = {j: set(from_[bool_hidden[:, i]])
+                 for i, j in enumerate(hidden)}
+
+        current = self._inputs.union(hidden)
+        while calculated != current:
+            for i in hidden:
+                if order[i].issubset(calculated) and i not in calculated:
+                    cond = to_ == i
+                    from_i = from_[cond]
+                    weight_i = weights[:, cond]
+
+                    i_dot_w_sum = self._map_dot(nodes[:, from_i], weight_i)
+                    i_dot_w_sum = np.clip(i_dot_w_sum, -700, 700)
+
+                    f = self._activs[i]
+
+                    nodes[:, i] = f(i_dot_w_sum)
+                    calculated.add(i)
+
+        for i in self._outputs:
+            cond = to_ == i
+            from_i = from_[cond]
+            weight_i = weights[:, cond]
+            i_dot_w_sum = self._map_dot(nodes[:, from_i], weight_i)
+            i_dot_w_sum = np.clip(i_dot_w_sum, -700, 700)
+            nodes[:, i] = i_dot_w_sum
+
+        out = SOFTMAX_F(nodes[:, list(self._outputs)].T)
+        return np.transpose(out, axes = (2, 0, 1))
+
+    def get_graph(self) -> Dict:
+        weights_scale = scale_data(self._weights)
+        nodes = list(self._inputs)
+
+        len_i = len(self._inputs)
+        len_h = len(self._assemble_hiddens())
+        len_o = len(self._outputs)
+        sum_ = len_i + len_h + len_o
+
+        positions = np.zeros((sum_, 2), dtype=float)
+        colors = np.zeros((sum_, 4))
+        w_colors = np.zeros((len(weights_scale), 4))
+        labels = {**dict(zip(self._inputs, self._inputs)),
+                #   **dict(zip(self._assemble_hiddens(), self._assemble_hiddens())),
+                  **{key: value.string for key, value in self._activs.items()},
+                  **dict(zip(self._outputs, range(len_o))),
+                #   **dict(zip(self._outputs,  self._outputs))
+        }
+
+        w_colors[:, 0] = 1 - weights_scale
+        w_colors[:, 2] = weights_scale
+        w_colors[:, 3] = 0.8
+        positions[:len_i][:, 1] = np.arange(len_i) - (len_i)/2
+        # positions[len_i][1] = np.max(positions[:len_i-1][:, 1]) + 1
+        colors[:len_i] = INPUT_COLOR_CODE
+
+        n = len_i
+        for i, layer in enumerate(self._hidden_layers):
+            nodes.extend(list(layer))
+            positions[n:n + len(layer)][:, 0] = i + 1
+            positions[n:n + len(layer)][:, 1] = np.arange(len(layer)) \
+                - len(layer)/2
+            colors[n:n + len(layer)] = HIDDEN_COLOR_CODE
+            n += len(layer)
+
+        nodes.extend(list(self._outputs))
+        positions[n: n + len_o][:, 0] = len(self._hidden_layers) + 1
+        positions[n: n + len_o][:, 1] = np.arange(len_o) - len_o/2
+        colors[n: n + len_o] = OUTPUT_COLOR_CODE
+
+        positions_dict = dict(zip(nodes, positions))
+
+        to_return = {'nodes': nodes,
+                     'labels': labels,
+                     'positions': positions_dict,
+                     'colors': colors,
+                     'weights_colors': w_colors,
+                     'connects': self._connects}
+
+        return to_return
+
+
+class HiddenBlock:
+    def __init__(self,
+                 activ: Optional[Union[LogisticSigmoid, ReLU]] = None,
+                 size: Optional[int] = None) -> None:
+        self.activ = activ
+        self.size = size
+        self.__name__ = 'HiddenBlock'
+
+    def __str__(self) -> str:
+        return '{}{}'.format(self.activ.string, self.size)
+
+    def __call__(self,
+                 max_size: int):
+        size = random.randrange(1, max_size)
+        activ = random.sample([LogisticSigmoid, ReLU], k=1)[0]
+        return HiddenBlock(activ(),  size)

@@ -1,5 +1,6 @@
 import random
 from typing import List
+from typing import Tuple
 from numba import njit
 from numba import int64
 from numba import float64
@@ -10,6 +11,7 @@ from ..base import Tree
 from ..base import UniversalSet
 from ..tools import binary_search_interval
 from ..tools import check_for_value
+from ..tools.transformations import numpy_group_by
 
 
 def sattolo_shuffle(items: List) -> None:
@@ -193,3 +195,35 @@ def random_sample(range_size: np.int64,
         to_return[i] = ind
         i += 1
     return to_return
+
+
+def stratified_sample(data: NDArray[np.int64],
+                      sample_ratio: float) -> NDArray[np.int64]:
+    to_return = []
+    data_size = len(data)
+    sample_size = int(sample_ratio*data_size)
+    indexes = np.arange(len(data), dtype=np.int64)
+    keys, groups = numpy_group_by(indexes, data)
+    assert sample_size >= len(keys)
+
+    for group in groups:
+        group_size = len(group)
+        sample_size_i = int((group_size/data_size)*sample_size)
+        sample_i_id = random_sample(group_size, sample_size_i, False)
+        sample_i = group[sample_i_id]
+        to_return.extend(sample_i)
+
+    return np.array(to_return, dtype=np.int64)
+
+
+def train_test_split_stratified(X: NDArray[np.float64],
+                                y: NDArray[np.int64],
+                                tests_size: float) -> Tuple:
+    indexes = np.arange(len(y), dtype=np.int64)
+    sample_id = stratified_sample(y,  tests_size)
+    test_id = sample_id
+    train_id = np.setdiff1d(indexes, test_id)
+    return (X[train_id].astype(np.float64),
+            X[test_id].astype(np.float64),
+            y[train_id].astype(np.int64),
+            y[test_id].astype(np.int64))

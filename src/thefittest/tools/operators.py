@@ -12,7 +12,6 @@ from .random import growing_method
 from .random import sattolo_shuffle
 from .random import random_sample
 from .random import random_weighted_sample
-from .transformations import protect_norm
 from .transformations import common_region
 
 
@@ -573,8 +572,8 @@ class Add(Operator):
                           sign='+')
 
     def __call__(self,
-                 x: Union[float, np.ndarray],
-                 y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+                 x: Union[float, NDArray[np.float64]],
+                 y: Union[float, NDArray[np.float64]]) -> Union[float, NDArray[np.float64]]:
         result = x + y
         return result
 
@@ -735,10 +734,26 @@ class Abs(Operator):
         return result
 
 
+class More(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self,
+                          formula='({} > {})',
+                          name='more',
+                          sign='>')
+
+    def __call__(self,
+                 x: Union[float, NDArray[np.float64]],
+                 y: Union[float, NDArray[np.float64]]) -> Union[bool, NDArray[np.bool]]:
+        result = x > y
+        return result
+
 ############################## Activation functions ###############################
+
+
 class ActivationFunction:
-    def __init__(self):
-        pass
+    def __init__(self, id_, string):
+        self.id_ = id_
+        self.string = string
 
     def __call__(self, X):
         return self._f(X)
@@ -746,7 +761,7 @@ class ActivationFunction:
 
 class LogisticSigmoid(ActivationFunction):
     def __init__(self):
-        ActivationFunction.__init__(self)
+        ActivationFunction.__init__(self, 0, 'sg')
 
     def _f(self, X):
         result = 1/(1+np.exp(-X))
@@ -755,7 +770,7 @@ class LogisticSigmoid(ActivationFunction):
 
 class ReLU(ActivationFunction):
     def __init__(self):
-        ActivationFunction.__init__(self)
+        ActivationFunction.__init__(self, 1, 'rl')
 
     def _f(self, X):
         result = np.maximum(X, 0)
@@ -764,7 +779,7 @@ class ReLU(ActivationFunction):
 
 class SoftMax(ActivationFunction):
     def __init__(self):
-        ActivationFunction.__init__(self)
+        ActivationFunction.__init__(self, 2, 'sm')
 
     def _f(self, X):
         exps = np.exp(X - X.max(axis=0))

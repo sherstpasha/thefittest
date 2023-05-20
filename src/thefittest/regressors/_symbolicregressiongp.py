@@ -1,9 +1,7 @@
 from typing import Optional
-from typing import Union
 import numpy as np
 from ..tools.transformations import coefficient_determination
 from ..optimizers import SelfCGP
-from ..optimizers import GeneticProgramming
 from ..base import FunctionalNode
 from ..base import TerminalNode
 from ..base import EphemeralNode
@@ -18,6 +16,7 @@ from ..tools.operators import Cos
 from ..tools.operators import Sin
 from ..tools import donothing
 from ..base._model import Model
+from ..optimizers import OptimizerTreeType
 
 
 class SymbolicRegressionGP(Model):
@@ -27,17 +26,17 @@ class SymbolicRegressionGP(Model):
                  no_increase_num: Optional[int] = None,
                  show_progress_each: Optional[int] = None,
                  keep_history: bool = False,
-                 optimizer: Union[SelfCGP, GeneticProgramming] = SelfCGP) -> None:
+                 optimizer: OptimizerTreeType = SelfCGP) -> None:
 
-        self.optimizer = optimizer(fitness_function=donothing,
-                                   genotype_to_phenotype=donothing,
-                                   uniset=UniversalSet,
-                                   iters=iters,
-                                   pop_size=pop_size,
-                                   optimal_value=1.,
-                                   no_increase_num=no_increase_num,
-                                   show_progress_each=show_progress_each,
-                                   keep_history=keep_history)
+        self._optimizer = optimizer(fitness_function=donothing,
+                                    genotype_to_phenotype=donothing,
+                                    uniset=UniversalSet,
+                                    iters=iters,
+                                    pop_size=pop_size,
+                                    optimal_value=1.,
+                                    no_increase_num=no_increase_num,
+                                    show_progress_each=show_progress_each,
+                                    keep_history=keep_history)
         Model.__init__(self)
 
     def _evaluate_tree(self,
@@ -64,16 +63,16 @@ class SymbolicRegressionGP(Model):
     def _define_uniset(self,
                        X: np.ndarray) -> UniversalSet:
         n_dimension = X.shape[1]
-        functional_set = [FunctionalNode(Add()),
+        functional_set = (FunctionalNode(Add()),
                           FunctionalNode(Mul()),
                           FunctionalNode(Neg()),
                           FunctionalNode(Inv()),
                           FunctionalNode(Pow2()),
                           FunctionalNode(Cos()),
-                          FunctionalNode(Sin())]
+                          FunctionalNode(Sin()))
 
-        terminal_set = [TerminalNode(X[:, i], f'x{i}')
-                        for i in range(n_dimension)]
+        terminal_set = (TerminalNode(X[:, i], f'x{i}')
+                        for i in range(n_dimension))
         terminal_set.extend([EphemeralNode(self._generator1),
                              EphemeralNode(self._generator2)])
         uniset = UniversalSet(functional_set, terminal_set)
@@ -82,19 +81,19 @@ class SymbolicRegressionGP(Model):
     def _fit(self,
              X: np.ndarray,
              y: np.ndarray):
-        self.optimizer._fitness_function = lambda trees: self._fitness_function(
+        self._optimizer._fitness_function = lambda trees: self._fitness_function(
             trees, y)
-        self.optimizer._uniset = self._define_uniset(X)
-        self.optimizer.fit()
+        self._optimizer._uniset = self._define_uniset(X)
+        self._optimizer.fit()
         return self
 
     def _predict(self,
                  X: np.ndarray) -> np.ndarray:
         n_dimension = X.shape[1]
-        solution = self.optimizer.get_fittest()
+        solution = self._optimizer.get_fittest()
         genotype, *_ = solution.get()
         genotype_for_pred = genotype.set_terminals(
-            {f'x{i}': X[:, i]for i in range(n_dimension)})
+            {f'x{i}': X[:, i] for i in range(n_dimension)})
 
         y_pred = genotype_for_pred()*np.ones(len(X))
         return y_pred
