@@ -8,16 +8,16 @@ from thefittest.tools.random import train_test_split_stratified
 from thefittest.tools.metrics import confusion_matrix
 from thefittest.tools.metrics import f1_score
 
-data = load_wine()
+data = load_iris()
 X = data.data
 y = data.target
 
 X_train, X_test, y_train, y_test = train_test_split_stratified(
     X, y, 0.3)
 
-model = GeneticProgrammingNeuralNetClassifier(50, 50,
+model = GeneticProgrammingNeuralNetClassifier(15, 50,
                                               show_progress_each=1,
-                                              input_block_size=3,
+                                              input_block_size=1,
                                               keep_history=True)
 
 model.fit(X_train, y_train)
@@ -38,5 +38,5 @@ fig.savefig('net.png')
 
 stats = model._optimizer.get_stats()
 
-for i in range(len(stats)):
+for i in range(len(stats['fitness_max'])):
     print(stats['fitness_max'][i],  stats['individ_max'][i])

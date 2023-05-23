@@ -14,7 +14,6 @@ from .random import random_sample
 from .random import random_weighted_sample
 from .transformations import common_region
 from ._numba_funcs import max_axis
-from ._numba_funcs import map_dot
 from numba import boolean
 
 

@@ -125,11 +125,3 @@ def max_axis(array):
         res[i] = np.max(array[:, i])
     return res
 
-
-@njit(float64[:, :](float64[:, :, ::1], float64[:, ::1]))
-def map_dot(left: NDArray[np.float64],
-            right: NDArray[np.float64]) -> NDArray[np.float64]:
-    res = np.empty((left.shape[0], left.shape[2]), dtype=np.float64)
-    for i in range(len(left)):
-        res[i] = np.dot(left[i].T, right[i])
-    return res

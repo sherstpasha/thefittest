@@ -64,8 +64,7 @@ def categorical_crossentropy3d(
     size = len(output3d)
     to_return = np.empty(size, dtype=np.float64)
     for i in range(size):
-        output_c_i = np.clip(output3d[i], 1e-7, 1 - 1e-7)
-        to_return[i] = np.mean(np.sum(target*(-np.log(output_c_i)), axis=1))
+        to_return[i] = categorical_crossentropy(target, output3d[i])
     return to_return
 
 
