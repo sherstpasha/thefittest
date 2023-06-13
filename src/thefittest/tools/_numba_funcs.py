@@ -125,3 +125,26 @@ def max_axis(array):
         res[i] = np.max(array[:, i])
     return res
 
+
+@njit(int64[:](int64[:], boolean[:, :]))
+def mask2dint(X, cond):
+    to_return = np.empty(shape=np.sum(cond), dtype=np.int64)
+    begin = 0
+    for i in range(cond.shape[0]):
+        values = X[cond[i]]
+        end = begin + len(values)
+        to_return[begin: end] = values
+        begin = end
+    return to_return
+
+
+@njit(float64[:](float64[:], boolean[:, :]))
+def mask2dfloat(X, cond):
+    to_return = np.empty(shape=np.sum(cond), dtype=np.float64)
+    begin = 0
+    for i in range(cond.shape[0]):
+        values = X[cond[i]]
+        end = begin + len(values)
+        to_return[begin: end] = values
+        begin = end
+    return to_return

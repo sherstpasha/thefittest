@@ -14,6 +14,8 @@ from .random import random_sample
 from .random import random_weighted_sample
 from .transformations import common_region
 from ._numba_funcs import max_axis
+from ._numba_funcs import mask2dint
+from ._numba_funcs import mask2dfloat
 from numba import boolean
 
 
@@ -865,6 +867,49 @@ def forward_softmax(X: NDArray[np.float64],
 
     return softmax_numba(nodes[outputs].T)
 
+@njit(float64[:, :](float64[:, :], int64[:], int64[:], boolean[:, :],
+                    boolean[:, :], int64[:], int64[:],
+                    float64[:], int64[:], int64[:]))
+def forward_softmax2(X: NDArray[np.float64],
+                    inputs: NDArray[np.int64],
+                    outputs: NDArray[np.int64],
+                    h_conds: NDArray[np.bool8],
+                    o_conds: NDArray[np.bool8],
+                    order_h: NDArray[np.int64],
+                    order_o: NDArray[np.int64],
+                    weights: NDArray[np.float64],
+                    from_: NDArray[np.int64],
+                    activs: NDArray[np.int64]) -> NDArray[np.float64]:
+    num_nodes = X.shape[1] + len(h_conds) + len(outputs)
+    shape = (num_nodes, len(X))
+    nodes = np.empty(shape, dtype=np.float64)
+
+    nodes[inputs] = X.T[inputs]
+    for i, node_i in enumerate(order_h):
+        from_i = from_[h_conds[i]]
+        weight_i = weights[h_conds[i]]
+        i_dot_w_sum = np.dot(nodes[from_i].T, weight_i)
+        nodes[node_i] = multiactivation(i_dot_w_sum, activs[i])
+
+
+    # from_o_conds = mask2dint(from_, o_conds)
+    weights_o_conds = mask2dfloat(weights, o_conds).copy().reshape(len(outputs), -1).T
+    # print(from_o_conds)
+    # print(weights_o_conds)
+    # print(o_conds)
+    # print(nodes[from_[o_conds[0]]].shape, weights_o_conds.shape)
+
+    i_dot_w_sum = np.dot(nodes[from_[o_conds[0]]].T, weights_o_conds) 
+    # print(res.shape, nodes[outputs].shape)
+    nodes[outputs] = i_dot_w_sum.T
+    # for i, order_o_i in enumerate(order_o):
+    #     from_i = from_[o_conds[i]]
+    #     weight_i = weights[o_conds[i]]
+    #     i_dot_w_sum = np.dot(nodes[from_i].T, weight_i)
+    #     nodes[order_o_i] = i_dot_w_sum
+    
+
+    return softmax_numba(nodes[outputs].T)
 
 @njit(float64[:, :, :](float64[:, :], int64[:], int64[:], boolean[:, :],
                        boolean[:, :], int64[:], int64[:],

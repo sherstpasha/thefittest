@@ -15,6 +15,9 @@ from thefittest.tools.transformations import scale_data
 from itertools import product
 import random
 from ..tools.operators import forward_softmax2d
+from numba.typed import Dict as numbaDict
+from numba import int64
+from numba.typed import List as numbaList
 
 
 INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
@@ -244,6 +247,80 @@ class Net:
         self._forward_culc_order_o = output_culc_order
         self._forward_activ_code = np.array(activs_code, dtype=np.int64)
 
+    def _get_order2(self):
+
+        from_ = self._connects[:, 0]
+        to_ = self._connects[:, 1]
+
+        hidden_outputs = self._assemble_hiddens().union(self._outputs.copy())
+
+        bool_hidden_outputs = to_[
+            :, np.newaxis] == np.array(list(hidden_outputs))
+        order = {j: set(from_[bool_hidden_outputs[:, i]])
+                 for i, j in enumerate(hidden_outputs)}
+        print(order, sep='\n')
+
+        order_key = []
+        order_value = []
+
+        for value in order.values():
+            list_keys = []
+            for other_key, other_value in order.items():
+                if value == other_value:
+                    list_keys.append(other_key) 
+            new_key = np.array(list_keys, dtype = np.int64)
+            new_value = np.array(list(value), dtype = np.int64)
+
+            found = False
+            for order_key_i in order_key:
+                if np.all(order_key_i == new_key):
+                    found = True
+                    break
+            if not found:
+                order_key.append(new_key)
+                order_value.append(new_value)
+
+        order_key = numbaList(order_key)
+        order_values = numbaList(order_value)
+        activ_code = np.array([self._activs[i].id_ for i in self._assemble_hiddens()], dtype = np.int64)
+        print(order_key)
+        print(order_values)
+        print(activ_code)
+
+        # hidden_conds = np.full((len(hidden), len(to_)), fill_value=False)
+        # hidden_culc_order = np.zeros(shape=(len(hidden)), dtype=np.int64)
+        # output_conds = np.full(
+        #     (len(self._outputs), len(to_)), fill_value=False)
+        # output_culc_order = np.zeros(
+        #     shape=(len(self._outputs)), dtype=np.int64)
+
+        # k = 0
+        # current = self._inputs.union(hidden)
+        # while calculated != current:
+        #     for i in hidden:
+        #         if order[i].issubset(calculated) and i not in calculated:
+        #             hidden_conds[k] = to_ == i
+        #             hidden_culc_order[k] = i
+        #             calculated.add(i)
+        #             k += 1
+        #             activs_code.append(self._activs[i].id_)
+
+        # k = 0
+        # for i in self._outputs:
+        #     output_conds[k] = to_ == i
+        #     output_culc_order[k] = i
+        #     k += 1
+
+        # self._forward_inputs_array = np.array(
+        #     list(self._inputs), dtype=np.int64)
+        # self._forward_outputs_array = np.array(
+        #     list(self._outputs), dtype=np.int64)
+        # self._forward_cond_h = hidden_conds
+        # self._forward_cond_o = output_conds
+        # self._forward_culc_order_h = hidden_culc_order
+        # self._forward_culc_order_o = output_culc_order
+        # self._forward_activ_code = np.array(activs_code, dtype=np.int64)
+
     def forward_softmax(self,
                         X: NDArray[np.float64],
                         weights: Optional[NDArray[np.float64]] = None) -> NDArray[np.float64]:
@@ -278,8 +355,11 @@ class Net:
         colors = np.zeros((sum_, 4))
         w_colors = np.zeros((len(weights_scale), 4))
         labels = {**dict(zip(self._inputs, self._inputs)),
-                  **{key: value.string for key, value in self._activs.items()},
-                  **dict(zip(self._outputs, range(len_o)))}
+                  **dict(zip(self._assemble_hiddens(), self._assemble_hiddens())),
+                #   **{key: value.string for key, value in self._activs.items()},
+                #   **dict(zip(self._outputs, range(len_o)))
+                  **dict(zip(self._outputs, self._outputs))
+                  }
 
         w_colors[:, 0] = 1 - weights_scale
         w_colors[:, 2] = weights_scale
