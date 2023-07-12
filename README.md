@@ -26,8 +26,8 @@ thefittest requires:
 * **Genetic programming** (Koza, John R.. “Genetic programming - on the programming of computers by means
     of natural selection.” Complex Adaptive Systems (1993)):
     * **Self-configuring genetic programming** (Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm with modified uniform crossover. 1-6. 10.1109/CEC.2012.6256587).
-* **Genetic programming of neural networks (GPNN)** (3. Lipinsky L., Semenkin E., Bulletin of the Siberian State Aerospace University., 3(10), 22-26 (2006). In Russian);
-* **Multilayer perceptron trained by evolutionary algorithms** (Cotta, Carlos & Alba, Enrique & Sagarna, R. & Larranaga, Pedro. (2002). Adjusting Weights in Artificial Neural Networks using Evolutionary Algorithms. 10.1007/978-1-4615-1539-5_18. )
+* **Genetic programming of neural networks (GPNN)** (Lipinsky L., Semenkin E., Bulletin of the Siberian State Aerospace University., 3(10), 22-26 (2006). In Russian);
+* **Multilayer perceptron trained by evolutionary algorithms** (Cotta, Carlos & Alba, Enrique & Sagarna, R. & Larranaga, Pedro. (2002). Adjusting Weights in Artificial Neural Networks using Evolutionary Algorithms. 10.1007/978-1-4615-1539-5_18. );
 
 ## Benchmarks
 * **CEC2005** (Suganthan, Ponnuthurai & Hansen, Nikolaus & Liang, Jing & Deb, Kalyan & Chen, Ying-ping & Auger, Anne & Tiwari, Santosh. (2005). Problem Definitions and Evaluation Criteria for the CEC 2005 Special Session on Real-Parameter Optimization. Natural Computing. 341-357);
