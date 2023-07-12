@@ -26,15 +26,15 @@ thefittest requires:
 * **Genetic programming** (Koza, John R.. “Genetic programming - on the programming of computers by means
     of natural selection.” Complex Adaptive Systems (1993)):
     * **Self-configuring genetic programming** (Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm with modified uniform crossover. 1-6. 10.1109/CEC.2012.6256587).
-* **gpnn**
-* **MLP by EA**
+* **Genetic programming of neural networks (GPNN)** (3. Lipinsky L., Semenkin E., Bulletin of the Siberian State Aerospace University., 3(10), 22-26 (2006). In Russian);
+* **Multilayer perceptron trained by evolutionary algorithms** (Cotta, Carlos & Alba, Enrique & Sagarna, R. & Larranaga, Pedro. (2002). Adjusting Weights in Artificial Neural Networks using Evolutionary Algorithms. 10.1007/978-1-4615-1539-5_18. )
 
 ## Benchmarks
 * **CEC2005** (Suganthan, Ponnuthurai & Hansen, Nikolaus & Liang, Jing & Deb, Kalyan & Chen, Ying-ping & Auger, Anne & Tiwari, Santosh. (2005). Problem Definitions and Evaluation Criteria for the CEC 2005 Special Session on Real-Parameter Optimization. Natural Computing. 341-357);
 * **Symbolicregression17. 17 test regression problem from the paper** (Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm with modified uniform crossover. 1-6. 10.1109/CEC.2012.6256587).
-* **iris**
-* **wine**
-* **breast**
-* **digits**
+* **Iris** (Fisher,R. A.. (1988). Iris. UCI Machine Learning Repository. https://doi.org/10.24432/C56C76.);
+* **Wine** (Aeberhard,Stefan and Forina,M.. (1991). Wine. UCI Machine Learning Repository. https://doi.org/10.24432/C5PC7J.);
+* **Breast Cancer Wisconsin (Diagnostic)** (Wolberg,William, Mangasarian,Olvi, Street,Nick, and Street,W.. (1995). Breast Cancer Wisconsin (Diagnostic). UCI Machine Learning Repository. https://doi.org/10.24432/C5DW2B.);
+* **Optical Recognition of Handwritten Digits** (Alpaydin,E. and Kaynak,C.. (1998). Optical Recognition of Handwritten Digits. UCI Machine Learning Repository. https://doi.org/10.24432/C50P49.);
 
 You can also look at [**notebooks**](https://github.com/sherstpasha/thefittest-notebooks) with examples of how to use thefittest.
