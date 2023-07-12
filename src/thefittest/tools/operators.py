@@ -14,10 +14,8 @@ from .random import random_sample
 from .random import random_weighted_sample
 from .transformations import common_region
 from ._numba_funcs import max_axis
-from ._numba_funcs import mask2dint
-from ._numba_funcs import mask2dfloat
 from numba import boolean
-
+from numba.types import List as numbaListType
 
 min_value = np.finfo(np.float64).min
 max_value = np.finfo(np.float64).max
@@ -229,6 +227,20 @@ def empty_crossover(individs: np.ndarray,
                     rank: np.ndarray,
                     *args) -> np.ndarray:
     offspring = individs[0].copy()
+    return offspring
+
+
+@njit(int8[:](int8[:], int8[:], float64))
+def binomialGA(individ: NDArray[np.int8],
+               mutant: NDArray[np.int8],
+               CR: np.float64):
+    size = len(individ)
+    offspring = individ.copy()
+    j = random.randrange(size)
+
+    for i in range(size):
+        if np.random.rand() <= CR or i == j:
+            offspring[i] = mutant[i]
     return offspring
 
 
@@ -751,65 +763,8 @@ class More(Operator):
         result = x > y
         return result
 
+
 ############################## Activation functions ###############################
-
-
-class ActivationFunction:
-    def __init__(self, id_, string):
-        self.id_ = id_
-        self.string = string
-
-    def __call__(self, X):
-        return self._f(X)
-
-
-class LogisticSigmoid(ActivationFunction):
-    def __init__(self):
-        ActivationFunction.__init__(self, 0, 'sg')
-
-    def _f(self, X):
-        result = 1/(1+np.exp(-X))
-        return result
-
-
-class ReLU(ActivationFunction):
-    def __init__(self):
-        ActivationFunction.__init__(self, 1, 'rl')
-
-    def _f(self, X):
-        result = np.maximum(X, 0)
-        return result
-
-
-class Gauss(ActivationFunction):
-    def __init__(self):
-        ActivationFunction.__init__(self, 2, 'gs')
-
-    def _f(self, X):
-        result = np.exp(-(X**2))
-        return result
-
-
-class Gauss(ActivationFunction):
-    def __init__(self):
-        ActivationFunction.__init__(self, 3, 'gs')
-
-    def _f(self, X):
-        result = np.tanh(X)
-        return result
-
-
-class SoftMax(ActivationFunction):
-    def __init__(self):
-        ActivationFunction.__init__(self, 4, 'sm')
-
-    def _f(self, X):
-        exps = np.exp(X - X.max(axis=0))
-        sum_ = np.sum(exps, axis=1)[:, np.newaxis]
-        sum_[sum_ == 0] = 1
-        return np.nan_to_num(exps/sum_)
-
-
 @njit(float64[:, :](float64[:, :]))
 def softmax_numba(X: NDArray[np.float64]) -> NDArray[np.float64]:
     exps = np.exp(X - max_axis(X))
@@ -821,9 +776,9 @@ def softmax_numba(X: NDArray[np.float64]) -> NDArray[np.float64]:
     return result
 
 
-@njit(float64[:](float64[:], int64))
-def multiactivation(X: NDArray[np.float64],
-                    activ_id: np.int64) -> NDArray[np.float64]:
+@njit(float64[:, :](float64[:, :], int64))
+def multiactivation2d(X: NDArray[np.float64],
+                      activ_id: np.int64) -> NDArray[np.float64]:
     if activ_id == 0:
         result = 1/(1+np.exp(-X))
     elif activ_id == 1:
@@ -832,109 +787,71 @@ def multiactivation(X: NDArray[np.float64],
         result = np.exp(-(X**2))
     elif activ_id == 3:
         result = np.tanh(X)
+    elif activ_id == 4:
+        result = softmax_numba(X)
     return result
 
 
-@njit(float64[:, :](float64[:, :], int64[:], int64[:], boolean[:, :],
-                    boolean[:, :], int64[:], int64[:],
-                    float64[:], int64[:], int64[:]))
-def forward_softmax(X: NDArray[np.float64],
-                    inputs: NDArray[np.int64],
-                    outputs: NDArray[np.int64],
-                    h_conds: NDArray[np.bool8],
-                    o_conds: NDArray[np.bool8],
-                    order_h: NDArray[np.int64],
-                    order_o: NDArray[np.int64],
-                    weights: NDArray[np.float64],
-                    from_: NDArray[np.int64],
-                    activs: NDArray[np.int64]) -> NDArray[np.float64]:
-    num_nodes = X.shape[1] + len(h_conds) + len(outputs)
-    shape = (num_nodes, len(X))
-    nodes = np.empty(shape, dtype=np.float64)
-
-    nodes[inputs] = X.T[inputs]
-    for i, node_i in enumerate(order_h):
-        from_i = from_[h_conds[i]]
-        weight_i = weights[h_conds[i]]
-        i_dot_w_sum = np.dot(nodes[from_i].T, weight_i)
-        nodes[node_i] = multiactivation(i_dot_w_sum, activs[i])
-
-    for i, order_o_i in enumerate(order_o):
-        from_i = from_[o_conds[i]]
-        weight_i = weights[o_conds[i]]
-        i_dot_w_sum = np.dot(nodes[from_i].T, weight_i)
-        nodes[order_o_i] = i_dot_w_sum
-
-    return softmax_numba(nodes[outputs].T)
-
-@njit(float64[:, :](float64[:, :], int64[:], int64[:], boolean[:, :],
-                    boolean[:, :], int64[:], int64[:],
-                    float64[:], int64[:], int64[:]))
-def forward_softmax2(X: NDArray[np.float64],
-                    inputs: NDArray[np.int64],
-                    outputs: NDArray[np.int64],
-                    h_conds: NDArray[np.bool8],
-                    o_conds: NDArray[np.bool8],
-                    order_h: NDArray[np.int64],
-                    order_o: NDArray[np.int64],
-                    weights: NDArray[np.float64],
-                    from_: NDArray[np.int64],
-                    activs: NDArray[np.int64]) -> NDArray[np.float64]:
-    num_nodes = X.shape[1] + len(h_conds) + len(outputs)
-    shape = (num_nodes, len(X))
-    nodes = np.empty(shape, dtype=np.float64)
-
-    nodes[inputs] = X.T[inputs]
-    for i, node_i in enumerate(order_h):
-        from_i = from_[h_conds[i]]
-        weight_i = weights[h_conds[i]]
-        i_dot_w_sum = np.dot(nodes[from_i].T, weight_i)
-        nodes[node_i] = multiactivation(i_dot_w_sum, activs[i])
+@njit(float64[:, ::1](float64[:], int64[:, :]))
+def mask2d(arr, mask):
+    arr_mask = arr[mask.flatten()]
+    arr_mask_reshape = arr_mask.reshape(mask.shape)
+    return arr_mask_reshape
 
 
-    # from_o_conds = mask2dint(from_, o_conds)
-    weights_o_conds = mask2dfloat(weights, o_conds).copy().reshape(len(outputs), -1).T
-    # print(from_o_conds)
-    # print(weights_o_conds)
-    # print(o_conds)
-    # print(nodes[from_[o_conds[0]]].shape, weights_o_conds.shape)
+@njit
+def forward(X: NDArray[np.float64],
+            weights: NDArray[np.float64],
+            nodes: NDArray[np.float64],
+            from_: numbaListType(NDArray[np.int64]),
+            to_: numbaListType(NDArray[np.int64]),
+            weights_id: numbaListType(NDArray[np.int64]),
+            activs_code: numbaListType(NDArray[np.int64]),
+            activs_nodes: numbaListType(numbaListType(NDArray[np.int64]))) -> NDArray[np.float64]:
 
-    i_dot_w_sum = np.dot(nodes[from_[o_conds[0]]].T, weights_o_conds) 
-    # print(res.shape, nodes[outputs].shape)
-    nodes[outputs] = i_dot_w_sum.T
-    # for i, order_o_i in enumerate(order_o):
-    #     from_i = from_[o_conds[i]]
-    #     weight_i = weights[o_conds[i]]
-    #     i_dot_w_sum = np.dot(nodes[from_i].T, weight_i)
-    #     nodes[order_o_i] = i_dot_w_sum
-    
+    for from_i, to_i, weights_id_i, a_code_i, a_nodes_i in zip(from_,
+                                                               to_,
+                                                               weights_id,
+                                                               activs_code,
+                                                               activs_nodes):
+        weights_i = mask2d(weights, weights_id_i)
+        out = nodes[from_i].T@weights_i.T
+        nodes[to_i] = out.T
 
-    return softmax_numba(nodes[outputs].T)
+        for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
+            nodes[a_nodes_i_i] = multiactivation2d(
+                nodes[a_nodes_i_i].T, a_code_i_i).T
 
-@njit(float64[:, :, :](float64[:, :], int64[:], int64[:], boolean[:, :],
-                       boolean[:, :], int64[:], int64[:],
-                       float64[:, :], int64[:], int64[:]))
-def forward_softmax2d(X: NDArray[np.float64],
-                      inputs: NDArray[np.int64],
-                      outputs: NDArray[np.int64],
-                      h_conds: NDArray[np.bool8],
-                      o_conds: NDArray[np.bool8],
-                      order_h: NDArray[np.int64],
-                      order_o: NDArray[np.int64],
-                      weights: NDArray[np.float64],
-                      from_: NDArray[np.int64],
-                      activs: NDArray[np.int64]) -> NDArray[np.float64]:
+    return nodes
+
+
+@njit
+def forward2d(X: NDArray[np.float64],
+              inputs: NDArray[np.int64],
+              n_hiddens: np.int64,
+              outputs: NDArray[np.int64],
+              from_: numbaListType(NDArray[np.int64]),
+              to_: numbaListType(NDArray[np.int64]),
+              weights_id: numbaListType(NDArray[np.int64]),
+              activs_code: numbaListType(NDArray[np.int64]),
+              activs_nodes: numbaListType(numbaListType(NDArray[np.int64])),
+              weights: NDArray[np.float64]) -> NDArray[np.float64]:
 
     outs = np.empty(shape=(len(weights), X.shape[0], len(outputs)))
+    num_nodes = X.shape[1] + n_hiddens + len(outputs)
+    shape = (num_nodes, len(X))
+    nodes = np.empty(shape, dtype=np.float64)
+    nodes[inputs] = X.T[inputs]
+
     for n in range(outs.shape[0]):
-        outs[n] = forward_softmax(X,
-                                  inputs,
-                                  outputs,
-                                  h_conds,
-                                  o_conds,
-                                  order_h,
-                                  order_o,
-                                  weights[n],
-                                  from_,
-                                  activs)
+        forward(X,
+                weights[n],
+                nodes,
+                from_,
+                to_,
+                weights_id,
+                activs_code,
+                activs_nodes)
+
+        outs[n] = nodes[outputs].T
     return outs

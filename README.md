@@ -26,8 +26,15 @@ thefittest requires:
 * **Genetic programming** (Koza, John R.. “Genetic programming - on the programming of computers by means
     of natural selection.” Complex Adaptive Systems (1993)):
     * **Self-configuring genetic programming** (Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm with modified uniform crossover. 1-6. 10.1109/CEC.2012.6256587).
+* **gpnn**
+* **MLP by EA**
+
 ## Benchmarks
 * **CEC2005** (Suganthan, Ponnuthurai & Hansen, Nikolaus & Liang, Jing & Deb, Kalyan & Chen, Ying-ping & Auger, Anne & Tiwari, Santosh. (2005). Problem Definitions and Evaluation Criteria for the CEC 2005 Special Session on Real-Parameter Optimization. Natural Computing. 341-357);
 * **Symbolicregression17. 17 test regression problem from the paper** (Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm with modified uniform crossover. 1-6. 10.1109/CEC.2012.6256587).
+* **iris**
+* **wine**
+* **breast**
+* **digits**
 
 You can also look at [**notebooks**](https://github.com/sherstpasha/thefittest-notebooks) with examples of how to use thefittest.

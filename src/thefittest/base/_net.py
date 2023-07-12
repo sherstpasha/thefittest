@@ -7,72 +7,19 @@ from typing import Dict
 from functools import reduce
 import numpy as np
 from numpy.typing import NDArray
-from ..tools.operators import LogisticSigmoid
-from ..tools.operators import ReLU
-from ..tools.operators import SoftMax
 from ..base._model import Model
 from thefittest.tools.transformations import scale_data
 from itertools import product
 import random
-from ..tools.operators import forward_softmax2d
-from numba.typed import Dict as numbaDict
-from numba import int64
+from ..tools.operators import forward2d
 from numba.typed import List as numbaList
+from collections import defaultdict
 
 
 INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
 HIDDEN_COLOR_CODE = (0.0, 0.74, 0.99, 1)
 OUTPUT_COLOR_CODE = (0.94, 0.50, 0.50, 1)
-SOFTMAX_F = SoftMax()
-
-
-class MultilayerPerceptron(Model):
-    def __init__(
-            self,
-            hidden_layers: Tuple,
-            activation: Union[LogisticSigmoid, ReLU] = LogisticSigmoid,
-            activation_output: Union[LogisticSigmoid, SoftMax] = SoftMax) -> None:
-        Model.__init__(self)
-        self._hidden_layers = hidden_layers
-        self._structure: Tuple
-        self._weights: List
-        self._activation = activation()
-        self._activation_output = activation_output()
-
-    def _define_structure(self,
-                          n_inputs: int,
-                          n_outputs: int) -> None:
-        self._structure = tuple(
-            [n_inputs] + list(self._hidden_layers) + [n_outputs])
-
-    def _define_weights(self) -> List:
-        weights = []
-        for i in range(len(self._structure) - 1):
-            size = (self._structure[i]+1, self._structure[i+1])
-            weights_i = np.random.uniform(low=-1, high=1, size=size)
-            weights.append(weights_i)
-        self._weights = weights
-
-    def _culc_hidden_layer(self,
-                           X_i: np.ndarray,
-                           w_i: np.ndarray) -> np.ndarray:
-        output = self._activation(np.dot(X_i, w_i[:-1]) + w_i[-1])
-        return output
-
-    def _culc_output_layer(self,
-                           X_i: np.ndarray,
-                           w_i: np.ndarray) -> np.ndarray:
-        output = self._activation_output(np.dot(X_i, w_i[:-1]) + w_i[-1])
-        return output
-
-    def forward(self,
-                X: np.ndarray,
-                weights: Optional[List] = None):
-        if weights is None:
-            weights = self._weights
-        hidden_output = reduce(self._culc_hidden_layer, weights[:-1], X)
-        output = self._culc_output_layer(hidden_output, weights[-1])
-        return output
+ACTIVATION_NAME = {0: 'sg', 1: 'rl', 2: 'gs', 3: 'th', 4: 'sm'}
 
 
 class Net:
@@ -90,13 +37,15 @@ class Net:
         self._weights = weights
         self._activs = activs
 
-        self._forward_inputs_array: NDArray[np.int64]
-        self._forward_outputs_array: NDArray[np.int64]
-        self._forward_cond_h: NDArray[np.bool]
-        self._forward_cond_o = NDArray[np.bool]
-        self._forward_culc_order_h = NDArray[np.int64]
-        self._forward_culc_order_o = NDArray[np.int64]
-        self._forward_activ_code = NDArray[np.int64]
+        self._numpy_inputs: Optional[NDArray[np.int64]] = None
+        self._numpy_outputs: NDArray[np.int64]
+        self._n_hiddens: np.int64
+
+        self._numba_from: numbaList[NDArray[np.int64]]
+        self._numba_to: numbaList[NDArray[np.int64]]
+        self._numba_weights_id: numbaList[NDArray[np.int64]]
+        self._numba_activs_code: numbaList[NDArray[np.int64]]
+        self._numba_activs_nodes: numbaList[numbaList[NDArray[np.int64]]]
 
     def __len__(self):
         return len(self._weights)
@@ -124,7 +73,8 @@ class Net:
                  right: Union[Set, int]) -> Tuple:
         if len(left) and len(right):
             connects = np.array(list(product(left, right)), dtype=np.int64)
-            weights = np.random.normal(0, 1, len(connects)).astype(np.float64)
+            weights = np.random.uniform(-2, 2,
+                                        len(connects)).astype(np.float64)
             return (connects, weights)
         else:
             return (np.zeros((0, 2), dtype=int),
@@ -201,145 +151,98 @@ class Net:
         return self
 
     def _get_order(self):
-        activs_code = []
         hidden = self._assemble_hiddens()
-
         from_ = self._connects[:, 0]
         to_ = self._connects[:, 1]
+        indexes = np.arange(len(from_), dtype=np.int64)
+
+        argsort = np.argsort(to_)
+
+        from_sort = from_[argsort]
+        to_sort = to_[argsort]
+        index_sort = indexes[argsort]
+
+        groups_to, cut_index = np.unique(to_sort, return_index=True)
+        groups_from = np.split(from_sort, cut_index)[1:]
+        group_index = np.split(index_sort, cut_index)[1:]
+
+        pairs = defaultdict(list)
+        weights_id = defaultdict(list)
+
+        for groups_to_i, groups_from_i, group_index_i in zip(groups_to,
+                                                             groups_from,
+                                                             group_index):
+
+            argsort = np.argsort(groups_from_i)
+            groups_from_i_sort = tuple(groups_from_i[argsort])
+            pairs[groups_from_i_sort].append(groups_to_i)
+            weights_id[groups_from_i_sort].append(group_index_i[argsort])
+
+        for key, value in weights_id.items():
+            weights_id[key] = np.array(value, dtype=np.int64)
+
+        numba_from = numbaList()
+        numba_to = numbaList()
+        numba_weight_id = numbaList()
+
+        activ_code = numbaList()
+        active_nodes = numbaList()
 
         calculated = self._inputs.copy()
+        purpose = self._inputs.union(hidden).union(self._outputs)
 
-        bool_hidden = to_[:, np.newaxis] == np.array(list(hidden))
-        order = {j: set(from_[bool_hidden[:, i]])
-                 for i, j in enumerate(hidden)}
+        while calculated != purpose:
+            for from_i, to_i in pairs.items():
+                if set(from_i).issubset(calculated) and not set(to_i).issubset(calculated):
+                    calculated = calculated.union(set(to_i))
+                    numba_from.append(np.array(from_i, dtype=np.int64))
+                    numba_to.append(np.array(to_i, dtype=np.int64))
+                    numba_weight_id.append(weights_id[from_i])
 
-        hidden_conds = np.full((len(hidden), len(to_)), fill_value=False)
-        hidden_culc_order = np.zeros(shape=(len(hidden)), dtype=np.int64)
-        output_conds = np.full(
-            (len(self._outputs), len(to_)), fill_value=False)
-        output_culc_order = np.zeros(
-            shape=(len(self._outputs)), dtype=np.int64)
+                    nodes_i = defaultdict(list)
+                    for to_i_i in to_i:
+                        nodes_i[self._activs[to_i_i]].append(to_i_i)
 
-        k = 0
-        current = self._inputs.union(hidden)
-        while calculated != current:
-            for i in hidden:
-                if order[i].issubset(calculated) and i not in calculated:
-                    hidden_conds[k] = to_ == i
-                    hidden_culc_order[k] = i
-                    calculated.add(i)
-                    k += 1
-                    activs_code.append(self._activs[i].id_)
+                    activ_code.append(
+                        np.array(list(nodes_i.keys()), dtype=np.int64))
 
-        k = 0
-        for i in self._outputs:
-            output_conds[k] = to_ == i
-            output_culc_order[k] = i
-            k += 1
+                    nodes_i_list = numbaList()
+                    for value in nodes_i.values():
+                        nodes_i_list.append(np.array(value, dtype=np.int64))
 
-        self._forward_inputs_array = np.array(
-            list(self._inputs), dtype=np.int64)
-        self._forward_outputs_array = np.array(
-            list(self._outputs), dtype=np.int64)
-        self._forward_cond_h = hidden_conds
-        self._forward_cond_o = output_conds
-        self._forward_culc_order_h = hidden_culc_order
-        self._forward_culc_order_o = output_culc_order
-        self._forward_activ_code = np.array(activs_code, dtype=np.int64)
+                    active_nodes.append(nodes_i_list)
 
-    def _get_order2(self):
+        self._numpy_inputs = np.array(list(self._inputs), dtype=np.int64)
+        self._numpy_outputs = np.array(list(self._outputs), dtype=np.int64)
+        self._n_hiddens = len(hidden)
+        self._numba_from = numba_from
+        self._numba_to = numba_to
+        self._numba_weights_id = numba_weight_id
+        self._numba_activs_code = activ_code
+        self._numba_activs_nodes = active_nodes
 
-        from_ = self._connects[:, 0]
-        to_ = self._connects[:, 1]
-
-        hidden_outputs = self._assemble_hiddens().union(self._outputs.copy())
-
-        bool_hidden_outputs = to_[
-            :, np.newaxis] == np.array(list(hidden_outputs))
-        order = {j: set(from_[bool_hidden_outputs[:, i]])
-                 for i, j in enumerate(hidden_outputs)}
-        print(order, sep='\n')
-
-        order_key = []
-        order_value = []
-
-        for value in order.values():
-            list_keys = []
-            for other_key, other_value in order.items():
-                if value == other_value:
-                    list_keys.append(other_key) 
-            new_key = np.array(list_keys, dtype = np.int64)
-            new_value = np.array(list(value), dtype = np.int64)
-
-            found = False
-            for order_key_i in order_key:
-                if np.all(order_key_i == new_key):
-                    found = True
-                    break
-            if not found:
-                order_key.append(new_key)
-                order_value.append(new_value)
-
-        order_key = numbaList(order_key)
-        order_values = numbaList(order_value)
-        activ_code = np.array([self._activs[i].id_ for i in self._assemble_hiddens()], dtype = np.int64)
-        print(order_key)
-        print(order_values)
-        print(activ_code)
-
-        # hidden_conds = np.full((len(hidden), len(to_)), fill_value=False)
-        # hidden_culc_order = np.zeros(shape=(len(hidden)), dtype=np.int64)
-        # output_conds = np.full(
-        #     (len(self._outputs), len(to_)), fill_value=False)
-        # output_culc_order = np.zeros(
-        #     shape=(len(self._outputs)), dtype=np.int64)
-
-        # k = 0
-        # current = self._inputs.union(hidden)
-        # while calculated != current:
-        #     for i in hidden:
-        #         if order[i].issubset(calculated) and i not in calculated:
-        #             hidden_conds[k] = to_ == i
-        #             hidden_culc_order[k] = i
-        #             calculated.add(i)
-        #             k += 1
-        #             activs_code.append(self._activs[i].id_)
-
-        # k = 0
-        # for i in self._outputs:
-        #     output_conds[k] = to_ == i
-        #     output_culc_order[k] = i
-        #     k += 1
-
-        # self._forward_inputs_array = np.array(
-        #     list(self._inputs), dtype=np.int64)
-        # self._forward_outputs_array = np.array(
-        #     list(self._outputs), dtype=np.int64)
-        # self._forward_cond_h = hidden_conds
-        # self._forward_cond_o = output_conds
-        # self._forward_culc_order_h = hidden_culc_order
-        # self._forward_culc_order_o = output_culc_order
-        # self._forward_activ_code = np.array(activs_code, dtype=np.int64)
-
-    def forward_softmax(self,
-                        X: NDArray[np.float64],
-                        weights: Optional[NDArray[np.float64]] = None) -> NDArray[np.float64]:
+    def forward(self,
+                X: NDArray[np.float64],
+                weights: Optional[NDArray[np.float64]] = None) -> NDArray[np.float64]:
 
         if weights is None:
             weights = self._weights.reshape(1, -1)
         else:
             weights = weights
 
-        outputs = forward_softmax2d(X,
-                                    self._forward_inputs_array,
-                                    self._forward_outputs_array,
-                                    self._forward_cond_h,
-                                    self._forward_cond_o,
-                                    self._forward_culc_order_h,
-                                    self._forward_culc_order_o,
-                                    weights,
-                                    self._connects[:, 0],
-                                    self._forward_activ_code)
+        if self._numpy_inputs is None:
+            self._get_order()
+
+        outputs = forward2d(X,
+                            self._numpy_inputs,
+                            self._n_hiddens,
+                            self._numpy_outputs,
+                            self._numba_from,
+                            self._numba_to,
+                            self._numba_weights_id,
+                            self._numba_activs_code,
+                            self._numba_activs_nodes,
+                            weights)
         return outputs
 
     def get_graph(self) -> Dict:
@@ -355,10 +258,8 @@ class Net:
         colors = np.zeros((sum_, 4))
         w_colors = np.zeros((len(weights_scale), 4))
         labels = {**dict(zip(self._inputs, self._inputs)),
-                  **dict(zip(self._assemble_hiddens(), self._assemble_hiddens())),
-                #   **{key: value.string for key, value in self._activs.items()},
-                #   **dict(zip(self._outputs, range(len_o)))
-                  **dict(zip(self._outputs, self._outputs))
+                  **{key: ACTIVATION_NAME[value] for key, value in self._activs.items()},
+                  **dict(zip(self._outputs, range(len_o)))
                   }
 
         w_colors[:, 0] = 1 - weights_scale
@@ -395,17 +296,17 @@ class Net:
 
 class HiddenBlock:
     def __init__(self,
-                 activ: Optional[Union[LogisticSigmoid, ReLU]] = None,
+                 activ: Optional[int] = None,
                  size: Optional[int] = None) -> None:
-        self.activ = activ
-        self.size = size
+        self._activ = activ
+        self._size = size
         self.__name__ = 'HiddenBlock'
 
     def __str__(self) -> str:
-        return '{}{}'.format(self.activ.string, self.size)
+        return '{}{}'.format(ACTIVATION_NAME[self._activ], self._size)
 
     def __call__(self,
                  max_size: int):
-        size = random.randrange(1, max_size)
-        activ = random.sample([LogisticSigmoid, ReLU], k=1)[0]
-        return HiddenBlock(activ(),  size)
+        self._activ = random.sample([0, 1, 2, 3], k=1)[0]
+        self._size = random.randrange(1, max_size)
+        return self

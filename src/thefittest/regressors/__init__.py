@@ -1,1 +1,2 @@
 from ._symbolicregressiongp import SymbolicRegressionGP
+from ._gpnnregression import GeneticProgrammingNeuralNetRegressor

@@ -7,3 +7,10 @@ from ._optproblems import HighConditionedElliptic
 from ._optproblems import Griewank
 from ._optproblems import Ackley
 from ._optproblems import Weierstrass
+from ._datasets import IrisDataset
+from ._datasets import WineDataset
+from ._datasets import BreastCancerDataset
+from ._datasets import DigitsDataset
+from ._datasets import CreditRiskDataset
+from ._datasets import UserKnowladgeDataset
+from ._datasets import BanknoteDataset

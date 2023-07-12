@@ -227,3 +227,19 @@ def train_test_split_stratified(X: NDArray[np.float64],
             X[test_id].astype(np.float64),
             y[train_id].astype(np.int64),
             y[test_id].astype(np.int64))
+
+
+def train_test_split(X: NDArray[np.float64],
+                                y: NDArray[np.int64],
+                                tests_size: float) -> Tuple:
+    
+    data_size = len(X)
+    sample_size = int(tests_size*data_size)
+    indexes = np.arange(data_size, dtype=np.int64)
+    sample_id = random_sample(range_size=data_size, quantity=sample_size, replace=False)
+    test_id = sample_id
+    train_id = np.setdiff1d(indexes, test_id)
+    return (X[train_id].astype(np.float64),
+            X[test_id].astype(np.float64),
+            y[train_id].astype(np.float64),
+            y[test_id].astype(np.float64))

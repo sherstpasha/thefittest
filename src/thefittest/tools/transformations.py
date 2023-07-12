@@ -157,7 +157,7 @@ def scale_data(arr: np.ndarray) -> np.ndarray:
 def numpy_bit_to_int(bit_array: np.ndarray,
                      powers: np.ndarray = None) -> np.ndarray:
     if powers is None:
-        powers = 2**np.arange(bit_array.shape[1], dtype=np.int64)
+        powers = 2**np.arange(bit_array.shape[1], dtype=np.int8)
     arange_ = powers[:bit_array.shape[1]][::-1]
     int_array = np.sum(bit_array*arange_, axis=1)
     return int_array
@@ -172,7 +172,7 @@ def numpy_int_to_bit(int_array: np.ndarray) -> np.ndarray:
         bit = remains % 2
         remains = remains//2
         result.append(bit)
-    bit_array = np.array(result)[::-1].T
+    bit_array = np.array(result, dtype=np.int8)[::-1].T
     return bit_array
 
 
@@ -316,4 +316,3 @@ def bounds_control_mean(array: NDArray[np.float64],
         elif array[i] > right[i]:
             to_return[i] = (right[i] + array[i])/2
     return to_return
-

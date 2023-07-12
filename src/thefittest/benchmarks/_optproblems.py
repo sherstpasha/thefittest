@@ -2,7 +2,7 @@ import numpy as np
 import os
 
 
-path = os.path.dirname(__file__) + '/shifts_data/'
+path = os.path.dirname(__file__) + '/_data/'
 
 fbias_data = np.loadtxt(path+'fbias_data.txt')
 # 1

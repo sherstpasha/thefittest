@@ -7,7 +7,7 @@ from ..base._ea import EvolutionaryAlgorithm
 from ..tools.random import cauchy_distribution
 from ..tools.random import binary_string_population
 from ..tools.operators import tournament_selection
-from ..tools.operators import binomial
+from ..tools.operators import binomialGA
 from ..tools.operators import flip_mutation
 from ..tools.transformations import lehmer_mean
 
@@ -56,7 +56,7 @@ class SHAGA(EvolutionaryAlgorithm):
                                       CR) -> np.ndarray:
         second_parent_id = tournament_selection(fitness, fitness, 2, 1)[0]
         second_parent = population_g[second_parent_id].copy()
-        offspring = binomial(current, second_parent, CR)
+        offspring = binomialGA(current, second_parent, CR)
         mutant = flip_mutation(offspring, MR)
         return mutant
 
@@ -90,9 +90,9 @@ class SHAGA(EvolutionaryAlgorithm):
         return MR_i, CR_i
 
     def _randc(self, u, scale):
-        value = cauchy_distribution(loc=u, scale=scale)[0]
+        value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
         while value <= 0 or value > 5/self._str_len:
-            value = cauchy_distribution(loc=u, scale=scale)[0]
+            value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
         return value
 
     def _randn(self, u, scale):

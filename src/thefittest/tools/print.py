@@ -7,6 +7,10 @@ def print_net(net, ax=None):
     G.add_nodes_from(graph['nodes'])
     G.add_edges_from(graph['connects'])
 
+    connects_label = {}
+    for i, connects_i in enumerate(graph['connects']):
+        connects_label[tuple(connects_i)] = i
+
     nx.draw_networkx_nodes(G,
                            pos=graph['positions'],
                            node_color=graph['colors'],
@@ -17,13 +21,20 @@ def print_net(net, ax=None):
                            pos=graph['positions'],
                            style='-',
                            edge_color=graph['weights_colors'],
-                           ax=ax)
+                           ax=ax,
+                           alpha=0.5)
 
     nx.draw_networkx_labels(G,
                             graph['positions'],
                             graph['labels'],
                             font_size=10,
                             ax=ax)
+    # nx.draw_networkx_edge_labels(G = G,
+    #                              pos = graph['positions'],
+    #                              edge_labels = connects_label,
+    #                              label_pos=0.7,
+    #                              alpha = 0.8,
+    #                              )
 
 
 def print_tree(some_tree, ax):

@@ -1,6 +1,6 @@
 from typing import Optional
 import numpy as np
-from ..tools.transformations import coefficient_determination
+from ..tools.metrics import coefficient_determination
 from ..optimizers import SelfCGP
 from ..base import FunctionalNode
 from ..base import TerminalNode
@@ -71,8 +71,8 @@ class SymbolicRegressionGP(Model):
                           FunctionalNode(Cos()),
                           FunctionalNode(Sin()))
 
-        terminal_set = (TerminalNode(X[:, i], f'x{i}')
-                        for i in range(n_dimension))
+        terminal_set = [TerminalNode(X[:, i], f'x{i}')
+                        for i in range(n_dimension)]
         terminal_set.extend([EphemeralNode(self._generator1),
                              EphemeralNode(self._generator2)])
         uniset = UniversalSet(functional_set, terminal_set)
