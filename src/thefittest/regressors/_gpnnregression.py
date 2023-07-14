@@ -1,19 +1,10 @@
 from ..classifiers import GeneticProgrammingNeuralNetClassifier
-from ..base._model import Model
 from typing import Optional
-from typing import Union
 from ..optimizers import SelfCGP
-from ..base import FunctionalNode
 from ..base import TerminalNode
-from ..base import EphemeralNode
-from ..base import UniversalSet
 from ..base import Tree
-from ..tools import donothing
 from numpy.typing import NDArray
 import numpy as np
-from ..tools.operators import Add
-from ..tools.operators import More
-from ..base._net import HiddenBlock
 from ..base._net import Net
 from ..tools.metrics import root_mean_square_error2d
 from ..optimizers import OptimizerAnyType
@@ -21,11 +12,8 @@ from ..optimizers import optimizer_binary_coded
 from ..optimizers import OptimizerTreeType
 from ..optimizers import SHADE
 from ..tools.random import train_test_split
-from ..tools.random import float_population
-from ..tools.transformations import GrayCode
 
 
-# на выходе будет просто сигма
 class GeneticProgrammingNeuralNetRegressor(
         GeneticProgrammingNeuralNetClassifier):
     def __init__(self,
@@ -34,6 +22,7 @@ class GeneticProgrammingNeuralNetRegressor(
                  input_block_size: int = 1,
                  max_hidden_block_size: int = 9,
                  offset: bool = True,
+                 output_activation: str = 'sigma',
                  test_sample_ratio: float = 0.5,
                  no_increase_num: Optional[int] = None,
                  show_progress_each: Optional[int] = None,
@@ -51,6 +40,7 @@ class GeneticProgrammingNeuralNetRegressor(
             input_block_size=input_block_size,
             max_hidden_block_size=max_hidden_block_size,
             offset=offset,
+            output_activation = output_activation,
             test_sample_ratio=test_sample_ratio,
             no_increase_num=no_increase_num,
             show_progress_each=show_progress_each,
@@ -61,37 +51,6 @@ class GeneticProgrammingNeuralNetRegressor(
             optimizer_weights_eval_num=optimizer_weights_eval_num,
             optimizer_weights_n_bit=optimizer_weights_n_bit,
             cache=cache)
-
-    def _genotype_to_phenotype_tree(self,
-                                    n_variables: int,
-                                    n_outputs: int,
-                                    tree: Tree) -> Net:
-        pack = []
-        n = n_variables
-        for node in reversed(tree._nodes):
-            args = []
-            for _ in range(node._n_args):
-                args.append(pack.pop())
-            if node.is_functional():
-                pack.append(node._value(*args))
-            else:
-                if type(node) is TerminalNode:
-                    unit = Net(inputs=node._value)
-                else:
-                    end = n + node._value._size
-                    hidden_id = set(range(n, end))
-                    activs = dict(
-                        zip(hidden_id, [node._value._activ]*len(hidden_id)))
-                    n = end
-                    unit = Net(hidden_layers=[hidden_id], activs=activs)
-                pack.append(unit)
-        end = n + n_outputs
-        output_id = set(range(n, end))
-        activs = dict(
-            zip(output_id, [0]*len(output_id)))
-        to_return = pack[0] > Net(outputs=output_id, activs=activs)
-        to_return = to_return._fix(set(range(n_variables)))
-        return to_return
 
     def _evaluate_nets(self,
                        weights: np.ndarray,

@@ -22,6 +22,7 @@ from ..optimizers import SHADE
 from ..tools.random import train_test_split_stratified
 from ..tools.random import float_population
 from ..tools.transformations import GrayCode
+from ..base._net import ACTIV_NAME_INV
 
 
 class GeneticProgrammingNeuralNetClassifier(Model):
@@ -31,20 +32,23 @@ class GeneticProgrammingNeuralNetClassifier(Model):
                  input_block_size: int = 1,
                  max_hidden_block_size: int = 9,
                  offset: bool = True,
+                 output_activation: str = 'softmax',
                  test_sample_ratio: float = 0.5,
                  no_increase_num: Optional[int] = None,
                  show_progress_each: Optional[int] = None,
                  keep_history: bool = False,
                  optimizer: OptimizerTreeType = SelfCGP,
                  optimizer_weights: OptimizerAnyType = SHADE,
-                 optimizer_weights_bounds: tuple = (-2, 2),
+                 optimizer_weights_bounds: tuple = (-10, 10),
                  optimizer_weights_eval_num: int = 10000,
                  optimizer_weights_n_bit: int = 16,
                  cache: bool = True):
 
+        Model.__init__(self)
         self._input_block_size = input_block_size
         self._max_hidden_block_size = max_hidden_block_size
         self._offset = offset
+        self._output_activation = output_activation
         self._test_sample_ratio = test_sample_ratio
         self._optimizer = optimizer(fitness_function=donothing,
                                     genotype_to_phenotype=donothing,
@@ -92,7 +96,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         end = n + n_outputs
         output_id = set(range(n, end))
         activs = dict(
-            zip(output_id, [4]*len(output_id)))
+            zip(output_id, [ACTIV_NAME_INV[self._output_activation]]*len(output_id)))
         to_return = pack[0] > Net(outputs=output_id, activs=activs)
         to_return = to_return._fix(set(range(n_variables)))
         return to_return
@@ -179,8 +183,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         fittest = optimizer_weights.get_fittest()
         genotype, phenotype, fitness = fittest.get()
 
-        net._weights = phenotype
-        return net
+        return phenotype
 
     def _genotype_to_phenotype(self,
                                X_train: NDArray[np.float64],
@@ -302,8 +305,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
 
 '''
-добавить регрессию метода gpnn
 добавить наборы данных по регрессии: 
-добавить только полносвязные сети классификация и регрессия
+f1 бывает nan
+функция
 
 '''

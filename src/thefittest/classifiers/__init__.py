@@ -1,2 +1,2 @@
-# from ._mlpea import MLPClassifierEA
+from ._mlpeaclassifier import MLPClassifierEA
 from ._gpnnclassifier import GeneticProgrammingNeuralNetClassifier

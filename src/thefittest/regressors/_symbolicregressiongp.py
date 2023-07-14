@@ -27,7 +27,8 @@ class SymbolicRegressionGP(Model):
                  show_progress_each: Optional[int] = None,
                  keep_history: bool = False,
                  optimizer: OptimizerTreeType = SelfCGP) -> None:
-
+        
+        Model.__init__(self)
         self._optimizer = optimizer(fitness_function=donothing,
                                     genotype_to_phenotype=donothing,
                                     uniset=UniversalSet,

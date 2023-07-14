@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 from thefittest.tools.print import print_net
 from thefittest.regressors import SymbolicRegressionGP
+from thefittest.regressors import GeneticProgrammingNeuralNetRegressor
 from thefittest.tools.print import print_tree
 from thefittest.tools.random import train_test_split
 from thefittest.tools.metrics import confusion_matrix
@@ -18,11 +19,19 @@ if __name__ == '__main__':
     X = data.data
     y = data.target
     X = scale_data(X)
+    y = scale_data(y)
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, 0.3)
 
-    model = SymbolicRegressionGP(iters=500, pop_size=500, show_progress_each=10)
+    model = GeneticProgrammingNeuralNetRegressor(50, 15,
+                                                 show_progress_each=1,
+                                                 input_block_size=1,
+                                                 max_hidden_block_size=5,
+                                                 keep_history=True,
+                                                 optimizer_weights=SHADE,
+                                                 optimizer_weights_eval_num=10000,
+                                                 cache=True)
     import time
     begin = time.time()
     model.fit(X_train, y_train)

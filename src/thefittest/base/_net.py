@@ -4,7 +4,6 @@ from typing import Optional
 from typing import Union
 from typing import Set
 from typing import Dict
-from functools import reduce
 import numpy as np
 from numpy.typing import NDArray
 from ..base._model import Model
@@ -14,12 +13,16 @@ import random
 from ..tools.operators import forward2d
 from numba.typed import List as numbaList
 from collections import defaultdict
+from ..optimizers import OptimizerAnyType
+from ..optimizers import optimizer_binary_coded
+from ..optimizers import optimizer_real_coded
 
 
 INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
 HIDDEN_COLOR_CODE = (0.0, 0.74, 0.99, 1)
 OUTPUT_COLOR_CODE = (0.94, 0.50, 0.50, 1)
 ACTIVATION_NAME = {0: 'sg', 1: 'rl', 2: 'gs', 3: 'th', 4: 'sm'}
+ACTIV_NAME_INV = {'sigma': 0, 'relu': 1, 'gauss': 2, 'tanh': 3, 'softmax': 4}
 
 
 class Net:

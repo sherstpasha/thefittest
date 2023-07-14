@@ -62,7 +62,7 @@ class WineDataset(Dataset):
         Dataset.__init__(
             self,
             X=wine_data[:, 1:].astype(np.float64),
-            y=wine_data[:, 0].astype(np.int64),
+            y=wine_data[:, 0].astype(np.int64) - 1,
             X_names={0: 'Alcohol',
                      1: 'Malic acid',
                      2: 'Ash',

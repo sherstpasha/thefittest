@@ -1,59 +1,48 @@
 
 import matplotlib.pyplot as plt
 from thefittest.tools.print import print_net
-from thefittest.regressors import GeneticProgrammingNeuralNetRegressor
+from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
 from thefittest.tools.print import print_tree
-from thefittest.tools.random import train_test_split
+from thefittest.tools.random import train_test_split_stratified
 from thefittest.tools.metrics import confusion_matrix
-from thefittest.tools.metrics import coefficient_determination
+from thefittest.tools.metrics import f1_score
 from thefittest.optimizers import SHADE
+from thefittest.optimizers import SelfCGA
+from thefittest.optimizers import SaDE2005
+from thefittest.benchmarks import DigitsDataset
 from thefittest.benchmarks import IrisDataset
+from thefittest.benchmarks import WineDataset
 from thefittest.tools.transformations import scale_data
+from thefittest.classifiers import MLPClassifierEA
+import numpy as np
 
-from sklearn.datasets import load_diabetes
 
-if __name__ == '__main__':
-    data = load_diabetes()
-    # print(data.feature_names)
-    X = data.data
-    y = data.target
-    X = scale_data(X)
-    y = scale_data(y)
+data = WineDataset()
+# print(data.feature_names)
+X = data.get_X()
+y = data.get_y()
+X = scale_data(X)
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, 0.3)
 
-    model = GeneticProgrammingNeuralNetRegressor(50, 500,
-                                                 show_progress_each=1,
-                                                 input_block_size=3,
-                                                 max_hidden_block_size=5,
-                                                 keep_history=True,
-                                                 optimizer_weights=SHADE,
-                                                 optimizer_weights_eval_num=20000,
-                                                 cache=True)
-    import time
-    begin = time.time()
-    model.fit(X_train, y_train)
+X_train, X_test, y_train, y_test = train_test_split_stratified(
+    X, y, 0.3)
+number_of_iterations = 10000
+model = MLPClassifierEA(iters=number_of_iterations, pop_size=300, activation='tanh',
+                        hidden_layers=(10, 10, 10), offset=True,
+                        show_progress_each=1, keep_history=True,
+                        optimizer_weights=SelfCGA)
 
-    y_pred = model.predict(X_test)
+model.fit(X_train, y_train)
 
-    print('coefficient_determination', coefficient_determination(y_test, y_pred))
+stats = model._optimizer_weights.get_stats()
+# print(stats.keys())
+# print(np.array(stats['fitness_max']))
 
-    fittest = model._optimizer.get_fittest()
-    genotype, phenotype, fitness = fittest.get()
+y_pred = model.predict(X_test)
+print(f1_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
 
-    fig, ax = plt.subplots(2)
-    print_tree(genotype, ax[0])
-    print_net(phenotype, ax[1])
-    plt.tight_layout()
-    fig.savefig('net.png')
-
-    stats = model._optimizer.get_stats()
-
-    showed = set()
-    for i in range(len(stats['fitness_max'])):
-        if stats['fitness_max'][i] not in showed:
-            print(stats['fitness_max'][i],  stats['individ_max'][i])
-            showed.add(stats['fitness_max'][i])
-
-    print(model._optimizer._calls)
+fig, ax = plt.subplots(1)
+print_net(model._net, ax)
+plt.tight_layout()
+plt.show()
