@@ -27,7 +27,7 @@ if __name__ == '__main__':
                                                   max_hidden_block_size=5,
                                                   keep_history=True,
                                                   optimizer_weights=SHADE,
-                                                  optimizer_weights_eval_num=20000,
+                                                  optimizer_weights_eval_num=10000,
                                                   cache=True)
     import time
     begin = time.time()
