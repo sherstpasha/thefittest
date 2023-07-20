@@ -37,6 +37,7 @@ thefittest requires:
 * **Breast Cancer Wisconsin (Diagnostic)** (Wolberg,William, Mangasarian,Olvi, Street,Nick, and Street,W.. (1995). Breast Cancer Wisconsin (Diagnostic). UCI Machine Learning Repository. https://doi.org/10.24432/C5DW2B.);
 * **Optical Recognition of Handwritten Digits** (Alpaydin,E. and Kaynak,C.. (1998). Optical Recognition of Handwritten Digits. UCI Machine Learning Repository. https://doi.org/10.24432/C50P49.);
 
+## Examples
 Notebooks on how to use thefittest:
  * [**Solving binary and real-valued optimization problems with a genetic algorithm;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb) 
  * [**Solving real-valued optimization problems with a differential evolution;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb) 
