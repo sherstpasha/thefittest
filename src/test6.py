@@ -8,58 +8,70 @@ from thefittest.tools.transformations import GrayCode
 from thefittest.benchmarks import Rastrigin
 
 
+n_dimension = 30
+left_border = -5.
+right_border = 5.
+n_bits_per_variable = 32
+
 number_of_iterations = 300
-population_size = 200
-string_length = 3000
+population_size = 500
 n = 50
 all_fitness = []
 
 for i in range(n):
     print(i)
-    model = SelfAGA(fitness_function=OneMax(),
-                    genotype_to_phenotype=donothing,
+    left_border_array = np.full(
+        shape=n_dimension, fill_value=left_border, dtype=np.float64)
+    right_border_array = np.full(
+        shape=n_dimension, fill_value=right_border, dtype=np.float64)
+    parts = np.full(
+        shape=n_dimension, fill_value=n_bits_per_variable, dtype=np.int64)
+
+    genotype_to_phenotype = GrayCode(fit_by='parts').fit(left=left_border_array,
+                                                         right=right_border_array,
+                                                         arg=parts)
+    model = SelfAGA(fitness_function=Rastrigin(),
+                    genotype_to_phenotype=genotype_to_phenotype.transform,
                     iters=number_of_iterations,
                     pop_size=population_size,
-                    str_len=string_length,
-                    # show_progress_each=10,
-                    minimization=False,
-                    # keep_history=True
-                    )
+                    str_len=sum(parts),
+                    show_progress_each=10,
+                    minimization=True)
 
     model.set_strategy(
         adapting_selection_operator='rank',
-        p_operator_param=0.2,
-        p_mutate_param=0.2,
+        p_operator_param=0.3,
+        p_mutate_param=0.3,
     )
 
     model.fit()
 
     fittest = model.get_fittest()
     genotype, phenotype, fitness = fittest.get()
-    all_fitness.append(fitness)
+    all_fitness.append(fitness*(-1))
     # stats = model.get_stats()
 print(np.max(all_fitness), np.mean(all_fitness), np.min(all_fitness))
-    # s_opers_dict = defaultdict(list)
-    # for s_opers in stats['s_opers']:
-    #     values, counts = np.unique(s_opers, return_counts=True)
-    #     for s_oper in model._selection_set.keys():
-    #         s_opers_dict[s_oper].append(0)
-    #     for values_i, counts_i in zip(values, counts):
-    #         s_opers_dict[values_i][-1] += counts_i
+# s_opers_dict = defaultdict(list)
+# for s_opers in stats['s_opers']:
+#     values, counts = np.unique(s_opers, return_counts=True)
+#     for s_oper in model._selection_set.keys():
+#         s_opers_dict[s_oper].append(0)
+#     for values_i, counts_i in zip(values, counts):
+#         s_opers_dict[values_i][-1] += counts_i
 
-    # c_opers_dict = defaultdict(list)
-    # for c_opers in stats['c_opers']:
-    #     values, counts = np.unique(c_opers, return_counts=True)
-    #     for c_oper in model._crossover_set.keys():
-    #         c_opers_dict[c_oper].append(0)
-    #     for values_i, counts_i in zip(values, counts):
-    #         c_opers_dict[values_i][-1] += counts_i
+# c_opers_dict = defaultdict(list)
+# for c_opers in stats['c_opers']:
+#     values, counts = np.unique(c_opers, return_counts=True)
+#     for c_oper in model._crossover_set.keys():
+#         c_opers_dict[c_oper].append(0)
+#     for values_i, counts_i in zip(values, counts):
+#         c_opers_dict[values_i][-1] += counts_i
 
-    # mutation_mean = []
-    # mutation_median = []
-    # for m_rate_i in stats['m_proba']:
-    #     mutation_mean.append(np.mean(m_rate_i))
-    #     mutation_median.append(np.median(m_rate_i))
+# mutation_mean = []
+# mutation_median = []
+# for m_rate_i in stats['m_proba']:
+#     mutation_mean.append(np.mean(m_rate_i))
+#     mutation_median.append(np.median(m_rate_i))
 
 # fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=2)
 

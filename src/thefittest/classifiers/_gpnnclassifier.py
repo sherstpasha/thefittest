@@ -302,11 +302,3 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         output = phenotype.forward(X)[0]
         y_pred = np.argmax(output, axis=1)
         return y_pred
-
-
-'''
-добавить наборы данных по регрессии: 
-f1 бывает nan
-функция
-
-'''
