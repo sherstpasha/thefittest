@@ -2,6 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/thefittest?label=PyPI%20-%20Package%20version)](https://pypi.org/project/thefittest/)
 [![Downloads](https://static.pepy.tech/badge/thefittest)](https://pepy.tech/project/thefittest)
+![codecov.io](https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master)
 
 ## Installation
 ```bash
