@@ -13,6 +13,7 @@ from ..tools.operators import rand_1
 from ..tools.operators import rand_2
 from ..tools.random import float_population
 from ..tools.transformations import bounds_control
+from ..tools import donothing
 
 
 class DifferentialEvolution(EvolutionaryAlgorithm):
@@ -21,11 +22,11 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
     def __init__(self,
                  fitness_function: Callable,
-                 genotype_to_phenotype: Callable,
                  iters: int,
                  pop_size: int,
                  left: np.ndarray,
                  right: np.ndarray,
+                 genotype_to_phenotype: Callable = donothing,
                  optimal_value: Optional[float] = None,
                  termination_error_value: float = 0.,
                  no_increase_num: Optional[int] = None,
