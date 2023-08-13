@@ -1,4 +1,4 @@
-from thefittest.base._ea import LastBest
+from ..base._ea import LastBest
 
 
 def test_lastbest():
