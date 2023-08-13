@@ -17,5 +17,6 @@ def test_lastbest():
     assert counter_1 == counter_2
     assert counter_2 == counter_3 - 1
     assert counter_4 == 0
+    
 
 
