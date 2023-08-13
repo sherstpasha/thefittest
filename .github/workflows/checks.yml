@@ -6,12 +6,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy: 
+      matrix:
+        python-version: [3.7, 3.8, 3.9, 3.10]
     steps:
       - uses: actions/checkout@v2
-      - name: Install python
+      - name: Install python ${{ matrix.python-verion}}
         uses: actions/setup-python@v2
         with:
-          python-version 3.7
+          python-version: ${{ matrix.python-verion}}
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
