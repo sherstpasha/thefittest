@@ -11,6 +11,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 "*" = ["*.txt"]
 
+
 [project]
 name = "thefittest"
 version = "0.1.14"
