@@ -1,4 +1,5 @@
 from ..optimizers import GeneticAlgorithm
+from ..optimizers import DifferentialEvolution
 import numpy as np
 from ..tools.random import binary_string_population
 from ..tools.operators import proportional_selection
@@ -119,9 +120,12 @@ def test_GeneticAlgorithm_set_strategy():
                            parents_num_param=7,
                            mutation_rate_param=0.1)
 
-    assert optimizer._specified_selection == (tournament_selection, optimizer._tour_size)
-    assert optimizer._specified_crossover == (uniform_crossover, optimizer._parents_num)
-    assert optimizer._specified_mutation == (flip_mutation, optimizer._mutation_rate)
+    assert optimizer._specified_selection == (
+        tournament_selection, optimizer._tour_size)
+    assert optimizer._specified_crossover == (
+        uniform_crossover, optimizer._parents_num)
+    assert optimizer._specified_mutation == (
+        flip_mutation, optimizer._mutation_rate)
 
     optimizer.fit()
 
@@ -129,3 +133,73 @@ def test_GeneticAlgorithm_set_strategy():
 
     assert np.all(stats['population_g'][0] == initial_population)
 
+
+def test_DifferentialEvolution_start_settings():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1)
+
+    iters = 100
+    pop_size = 50
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    # simple start
+    optimizer = DifferentialEvolution(fitness_function,
+                                      iters=iters,
+                                      pop_size=pop_size,
+                                      left=left,
+                                      right=right,
+                                      optimal_value=None,
+                                      termination_error_value=0,
+                                      no_increase_num=None,
+                                      minimization=True,
+                                      show_progress_each=1,
+                                      keep_history=True)
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats['fitness_max']) == iters
+    for i, fitness_max_i in enumerate(stats['fitness_max'][:-1]):
+        assert stats['fitness_max'][i] <= stats['fitness_max'][i+1]
+    assert optimizer._sign == -1
+
+    # # start with the no_increase_num is equal 15
+    # def fitness_function(x):
+    #     return np.ones(len(x), dtype=np.int64)
+    # no_increase_num = 15
+    # optimizer = GeneticAlgorithm(fitness_function,
+    #                              iters=iters,
+    #                              pop_size=pop_size,
+    #                              str_len=str_len,
+    #                              optimal_value=None,
+    #                              termination_error_value=0,
+    #                              no_increase_num=no_increase_num,
+    #                              minimization=False,
+    #                              show_progress_each=1,
+    #                              keep_history=True)
+
+    # optimizer.fit()
+
+    # assert optimizer.get_remains_calls() == pop_size*(iters - no_increase_num - 1)
+    # assert optimizer._sign == 1
+
+    # # start with the optimal_value is equal 1
+    # optimizer = GeneticAlgorithm(fitness_function,
+    #                              iters=iters,
+    #                              pop_size=pop_size,
+    #                              str_len=str_len,
+    #                              optimal_value=1,
+    #                              termination_error_value=0,
+    #                              no_increase_num=None,
+    #                              minimization=False,
+    #                              show_progress_each=1,
+    #                              keep_history=True)
+
+    # optimizer.fit()
+    # assert optimizer.get_remains_calls() == pop_size*(iters - 1)

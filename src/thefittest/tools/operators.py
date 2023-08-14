@@ -14,14 +14,13 @@ from .random import random_sample
 from .random import random_weighted_sample
 from .transformations import common_region
 from ._numba_funcs import max_axis
-from numba import boolean
 from numba.types import List as numbaListType
 
 min_value = np.finfo(np.float64).min
 max_value = np.finfo(np.float64).max
 
 
-################################## MUTATUIONS ##################################
+# MUTATUIONS
 # genetic algorithm
 @njit(int8[:](int8[:], float64))
 def flip_mutation(individ: np.ndarray,
@@ -220,7 +219,7 @@ def shrink_mutation(tree: Tree,
     return to_return
 
 
-################################## CROSSOVERS ##################################
+# CROSSOVERS
 # genetic algorithm
 def empty_crossover(individs: np.ndarray,
                     fitness: np.ndarray,
@@ -500,7 +499,7 @@ def uniform_crossoverGP_tour(individs: np.ndarray,
     return to_return
 
 
-################################## SELECTIONS ##################################
+# SELECTIONS
 # genetic algorithm
 @njit(int64[:](float64[:], float64[:], int64, int64))
 def proportional_selection(fitness: np.ndarray,
@@ -538,7 +537,7 @@ def tournament_selection(fitness: NDArray[np.float64],
     return to_return
 
 
-##################################### GP MATH #####################################
+# GP MATH
 class Operator:
     def __init__(self,
                  formula: str,
@@ -764,7 +763,7 @@ class More(Operator):
         return result
 
 
-############################## Activation functions ###############################
+# Activation functions
 @njit(float64[:, :](float64[:, :]))
 def softmax_numba(X: NDArray[np.float64]) -> NDArray[np.float64]:
     exps = np.exp(X - max_axis(X))

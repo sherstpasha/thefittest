@@ -1,7 +1,9 @@
 from typing import Callable
 from typing import Optional
 from typing import Tuple
+from typing import Any
 import numpy as np
+from numpy.typing import NDArray
 from ..base._ea import EvolutionaryAlgorithm
 from functools import partial
 from ..tools.operators import binomial
@@ -24,8 +26,8 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                  fitness_function: Callable,
                  iters: int,
                  pop_size: int,
-                 left: np.ndarray,
-                 right: np.ndarray,
+                 left: NDArray[np.float64],
+                 right: NDArray[np.float64],
                  genotype_to_phenotype: Callable = donothing,
                  optimal_value: Optional[float] = None,
                  termination_error_value: float = 0.,
@@ -36,9 +38,9 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
-            genotype_to_phenotype=genotype_to_phenotype,
             iters=iters,
             pop_size=pop_size,
+            genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
             no_increase_num=no_increase_num,
@@ -48,7 +50,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
         self._left = left
         self._right = right
-        self._initial_population: np.ndarray
+        self._initial_population: NDArray[np.float64]
         self._mutation_pool: dict
         self._specified_mutation: Callable
         self._F: float
@@ -66,10 +68,10 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                                'rand_2': rand_2}
 
     def _mutation_and_crossover(self,
-                                popuation_g: np.ndarray,
-                                individ_g: np.ndarray,
+                                popuation_g: NDArray[np.float64],
+                                individ_g: NDArray[np.float64],
                                 F: float,
-                                CR: float) -> np.ndarray:
+                                CR: float) -> NDArray[np.float64]:
         mutant = self._specified_mutation(individ_g,
                                           self._thefittest._genotype,
                                           popuation_g,
@@ -79,10 +81,10 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         return mutant_cr_g
 
     def _evaluate_and_selection(self,
-                                mutant_cr_g: np.ndarray,
-                                population_g: np.ndarray,
-                                population_ph: np.ndarray,
-                                fitness: np.ndarray) -> Tuple:
+                                mutant_cr_g: NDArray[np.float64],
+                                population_g: NDArray[np.float64],
+                                population_ph: NDArray[Any],
+                                fitness: NDArray[np.float64]) -> Tuple:
         offspring_g = population_g.copy()
         offspring_ph = population_ph.copy()
         offspring_fit = fitness.copy()
@@ -100,11 +102,11 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                      F_param: float = 0.5,
                      CR_param: float = 0.5,
                      elitism_param: bool = True,
-                     initial_population: Optional[np.ndarray] = None) -> None:
+                     initial_population: Optional[NDArray[np.float64]] = None) -> None:
         '''
         - mutation oper: must be a Tuple of:
             'best_1', 'rand_1', 'current_to_best_1', 'current_to_pbest_1',
-            'rand_to_best1', 'best_2', 'rand_2', 
+            'rand_to_best1', 'best_2', 'rand_2'
         '''
         self._update_pool()
         self._specified_mutation = self._mutation_pool[mutation_oper]
@@ -118,15 +120,15 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             population_g = float_population(
                 self._pop_size, self._left, self._right)
         else:
-            population_g = self._initial_population
+            population_g = self._initial_population.copy()
 
         population_ph = self._get_phenotype(population_g)
-        fitness = self._evaluate(population_ph)
+        fitness = self._get_fitness(population_ph)
 
         for i in range(self._iters-1):
             self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats({'population_g': population_g.copy(),
-                               'fitness_max': self._thefittest._fitness})
+            self._update_stats(population_g=population_g,
+                               fitness_max=self._thefittest._fitness)
 
             self._show_progress(i)
             if self._termitation_check():
@@ -147,6 +149,6 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                 population_g, population_ph, fitness, _ = stack
 
                 if self._elitism:
-                    population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+                    population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get().values()
 
         return self

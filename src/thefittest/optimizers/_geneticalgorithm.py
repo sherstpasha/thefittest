@@ -1,23 +1,25 @@
 from functools import partial
 from typing import Callable
 from typing import Optional
+
 import numpy as np
+
 from ..base._ea import EvolutionaryAlgorithm
 from ..tools import donothing
+from ..tools.operators import empty_crossover
+from ..tools.operators import flip_mutation
+from ..tools.operators import one_point_crossover
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
-from ..tools.operators import empty_crossover
-from ..tools.operators import one_point_crossover
 from ..tools.operators import two_point_crossover
 from ..tools.operators import uniform_crossover
 from ..tools.operators import uniform_prop_crossover
 from ..tools.operators import uniform_rank_crossover
 from ..tools.operators import uniform_tour_crossover
-from ..tools.operators import flip_mutation
 from ..tools.random import binary_string_population
-from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
+from ..tools.transformations import scale_data
 
 
 class GeneticAlgorithm(EvolutionaryAlgorithm):
@@ -101,7 +103,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
         selected_id = selection_func(fitness_scale, fitness_rank,
                                      np.int64(tour_size),
-                                    np.int64(quantity))
+                                     np.int64(quantity))
         offspring_no_mutated = crossover_func(population_g[selected_id],
                                               fitness_scale[selected_id],
                                               fitness_rank[selected_id])
@@ -151,8 +153,8 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             fitness = self._get_fitness(population_ph)
 
             self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats(population_g = population_g,
-                               fitness_max = self._thefittest._fitness)
+            self._update_stats(population_g=population_g,
+                               fitness_max=self._thefittest._fitness)
 
             if self._elitism:
                 population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get().values()

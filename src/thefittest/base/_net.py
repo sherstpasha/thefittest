@@ -1,21 +1,22 @@
-from typing import Tuple
+import random
+from collections import defaultdict
+from itertools import product
+from typing import Dict
 from typing import List
 from typing import Optional
-from typing import Union
 from typing import Set
-from typing import Dict
+from typing import Tuple
+from typing import Union
+
+
+from numba.typed import List as numbaList
+
 import numpy as np
 from numpy.typing import NDArray
-from ..base._model import Model
+
 from thefittest.tools.transformations import scale_data
-from itertools import product
-import random
+
 from ..tools.operators import forward2d
-from numba.typed import List as numbaList
-from collections import defaultdict
-from ..optimizers import OptimizerAnyType
-from ..optimizers import optimizer_binary_coded
-from ..optimizers import optimizer_real_coded
 
 
 INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
