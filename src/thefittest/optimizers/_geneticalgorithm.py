@@ -3,6 +3,7 @@ from typing import Callable
 from typing import Optional
 import numpy as np
 from ..base._ea import EvolutionaryAlgorithm
+from ..tools import donothing
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
@@ -22,10 +23,10 @@ from ..tools.transformations import rank_data
 class GeneticAlgorithm(EvolutionaryAlgorithm):
     def __init__(self,
                  fitness_function: Callable,
-                 genotype_to_phenotype: Callable,
                  iters: int,
                  pop_size: int,
                  str_len: int,
+                 genotype_to_phenotype: Callable = donothing,
                  optimal_value: Optional[float] = None,
                  termination_error_value: float = 0.,
                  no_increase_num: Optional[int] = None,
@@ -143,17 +144,18 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             population_g = binary_string_population(
                 self._pop_size, self._str_len)
         else:
-            population_g = self._initial_population
+            population_g = self._initial_population.copy()
 
         for i in range(self._iters):
             population_ph = self._get_phenotype(population_g)
-            fitness = self._evaluate(population_ph)
+            fitness = self._get_fitness(population_ph)
 
             self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats({'population_g': population_g.copy(),
-                               'fitness_max': self._thefittest._fitness})
+            self._update_stats(population_g = population_g,
+                               fitness_max = self._thefittest._fitness)
+
             if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get().values()
 
             self._show_progress(i)
             if self._termitation_check():

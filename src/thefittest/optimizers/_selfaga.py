@@ -90,7 +90,7 @@ class SelfAGA(GeneticAlgorithm):
         
         return np.array(to_return)
 
-    def _init_parameter_uniform_float(self, low: np.float64, high: np.float) -> NDArray[np.float64]:
+    def _init_parameter_uniform_float(self, low: np.float64, high: np.float64) -> NDArray[np.float64]:
         return np.linspace(low, high, self._pop_size)
         # return np.random.uniform(low=low, high=high, size=self._pop_size)
 

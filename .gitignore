@@ -21,3 +21,5 @@ MANIFEST
 # IDE stuff
 .idea
 .vscode
+.coverage
+cov.xml

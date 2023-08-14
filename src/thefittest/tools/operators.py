@@ -759,7 +759,7 @@ class More(Operator):
 
     def __call__(self,
                  x: Union[float, NDArray[np.float64]],
-                 y: Union[float, NDArray[np.float64]]) -> Union[bool, NDArray[np.bool]]:
+                 y: Union[float, NDArray[np.float64]]) -> Union[bool, NDArray[np.bool_]]:
         result = x > y
         return result
 
