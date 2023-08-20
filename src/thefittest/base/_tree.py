@@ -174,13 +174,13 @@ class Node:
         return self._name == other._name
 
     def is_functional(self) -> bool:
-        return type(self) == FunctionalNode
+        return isinstance(self, FunctionalNode)
 
     def is_ephemeral(self) -> bool:
-        return type(self) == EphemeralNode
+        return isinstance(self, EphemeralNode)
 
     def is_terminal(self) -> bool:
-        return type(self) == TerminalNode
+        return isinstance(self, TerminalNode)
 
 
 class FunctionalNode(Node):

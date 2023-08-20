@@ -1,10 +1,12 @@
 from typing import Any
-from typing import Dict
 from typing import Callable
+from typing import Dict
 from typing import Optional
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
+
 from ..tools import donothing
 
 

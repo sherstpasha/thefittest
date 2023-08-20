@@ -28,18 +28,18 @@ ACTIV_NAME_INV = {'sigma': 0, 'relu': 1, 'gauss': 2, 'tanh': 3, 'softmax': 4}
 
 class Net:
     def __init__(self,
-                 inputs: Set = set(),
+                 inputs: Optional[Set] = None,
                  hidden_layers: Optional[List] = None,
-                 outputs: Set = set(),
-                 connects:  NDArray = np.empty((0, 2), dtype=np.int64),
-                 weights: NDArray = np.empty((0), dtype=np.float64),
-                 activs: Dict = dict()):
-        self._inputs = inputs
+                 outputs: Optional[Set] = None,
+                 connects: Optional[NDArray[np.int64]] = None,
+                 weights: Optional[NDArray[np.float64]] = None,
+                 activs: Optional[Dict] = None):
+        self._inputs = inputs or set()
         self._hidden_layers = hidden_layers or []
-        self._outputs = outputs
-        self._connects = connects
-        self._weights = weights
-        self._activs = activs
+        self._outputs = outputs or set()
+        self._connects = connects or np.empty((0, 2), dtype=np.int64)
+        self._weights = weights or np.empty((0), dtype=np.float64)
+        self._activs = activs or dict()
 
         self._numpy_inputs: Optional[NDArray[np.int64]] = None
         self._numpy_outputs: NDArray[np.int64]

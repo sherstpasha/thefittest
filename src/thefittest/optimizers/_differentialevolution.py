@@ -1,26 +1,29 @@
+from functools import partial
+from typing import Any
 from typing import Callable
 from typing import Optional
 from typing import Tuple
-from typing import Any
+
 import numpy as np
 from numpy.typing import NDArray
+
 from ..base._ea import EvolutionaryAlgorithm
-from functools import partial
-from ..tools.operators import binomial
+from ..tools import donothing
 from ..tools.operators import best_1
 from ..tools.operators import best_2
-from ..tools.operators import rand_to_best1
+from ..tools.operators import binomial
 from ..tools.operators import current_to_best_1
 from ..tools.operators import rand_1
 from ..tools.operators import rand_2
+from ..tools.operators import rand_to_best1
 from ..tools.random import float_population
 from ..tools.transformations import bounds_control
-from ..tools import donothing
 
 
 class DifferentialEvolution(EvolutionaryAlgorithm):
     '''Storn, Rainer & Price, Kenneth. (1995). Differential Evolution: A Simple and Efficient
-    Adaptive Scheme for Global Optimization Over Continuous Spaces. Journal of Global Optimization. 23'''
+    Adaptive Scheme for Global Optimization Over Continuous Spaces.
+    Journal of Global Optimization. 23'''
 
     def __init__(self,
                  fitness_function: Callable,
@@ -90,7 +93,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         offspring_fit = fitness.copy()
 
         mutant_cr_ph = self._get_phenotype(mutant_cr_g)
-        mutant_cr_fit = self._evaluate(mutant_cr_ph)
+        mutant_cr_fit = self._get_fitness(mutant_cr_ph)
         mask = mutant_cr_fit >= fitness
         offspring_g[mask] = mutant_cr_g[mask]
         offspring_ph[mask] = mutant_cr_ph[mask]
@@ -149,6 +152,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                 population_g, population_ph, fitness, _ = stack
 
                 if self._elitism:
-                    population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get().values()
+                    population_g[-1], population_ph[-1], fitness[-1] =\
+                        self._thefittest.get().values()
 
         return self
