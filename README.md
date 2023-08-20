@@ -1,5 +1,6 @@
 # Thefittest 
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/630f5855f71c4171b4e8f43cdab18ffb)](https://app.codacy.com/gh/sherstpasha/thefittest?utm_source=github.com&utm_medium=referral&utm_content=sherstpasha/thefittest&utm_campaign=Badge_Grade)
 [![PyPI](https://img.shields.io/pypi/v/thefittest?label=PyPI%20-%20Package%20version)](https://pypi.org/project/thefittest/)
 [![Downloads](https://static.pepy.tech/badge/thefittest)](https://pepy.tech/project/thefittest)
 ![codecov.io](https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master)
