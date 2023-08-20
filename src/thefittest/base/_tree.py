@@ -1,17 +1,19 @@
 import random
 from collections import defaultdict
-from typing import Union
-from typing import Callable
-from typing import Optional
-from typing import Any
-from typing import Tuple
-from typing import Dict
-import numpy as np
 from inspect import signature
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Optional
+from typing import Tuple
+from typing import Union
+
+import numpy as np
+from numpy.typing import NDArray
+
 from ..tools import find_end_subtree_from_i
 from ..tools import find_id_args_from_i
 from ..tools import get_levels_tree_from_i
-from numpy.typing import NDArray
 
 
 FUNCTIONAL_COLOR_CODE = (1, 0.72, 0.43, 1)

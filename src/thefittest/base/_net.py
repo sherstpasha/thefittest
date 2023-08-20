@@ -37,8 +37,8 @@ class Net:
         self._inputs = inputs or set()
         self._hidden_layers = hidden_layers or []
         self._outputs = outputs or set()
-        self._connects = connects or np.empty((0, 2), dtype=np.int64)
-        self._weights = weights or np.empty((0), dtype=np.float64)
+        self._init_connects(connects=connects)
+        self._init_weights(weights=weights)
         self._activs = activs or dict()
 
         self._numpy_inputs: Optional[NDArray[np.int64]] = None
@@ -53,6 +53,20 @@ class Net:
 
     def __len__(self):
         return len(self._weights)
+
+    def _init_connects(self,
+                       connects: Optional[NDArray[np.int64]]) -> NDArray[np.int64]:
+        if connects is None:
+            self._connects = np.empty((0, 2), dtype=np.int64)
+        else:
+            self._connects = connects
+
+    def _init_weights(self,
+                      weights: Optional[NDArray[np.float64]]) -> NDArray[np.float64]:
+        if weights is None:
+            self._weights = np.empty((0), dtype=np.float64)
+        else:
+            self._weights = weights
 
     def copy(self):
         return Net(inputs=self._inputs.copy(),
@@ -72,9 +86,9 @@ class Net:
                       layers: List) -> Set:
         return layers[0].union(layers[1])
 
-    def _connect(self,
-                 left: Union[Set, int],
-                 right: Union[Set, int]) -> Tuple:
+    def _get_connect(self,
+                     left: Union[Set, int],
+                     right: Union[Set, int]) -> Tuple:
         if len(left) and len(right):
             connects = np.array(list(product(left, right)), dtype=np.int64)
             weights = np.random.uniform(-2, 2,
@@ -130,7 +144,7 @@ class Net:
         hidden_outputs = other._assemble_hiddens().union(other._outputs)
         to_ = hidden_outputs.difference(connects_no_i)
 
-        connects, weights = self._connect(from_, to_)
+        connects, weights = self._get_connect(from_, to_)
         return Net(inputs=self._inputs.union(other._inputs),
                    hidden_layers=self._hidden_layers + other._hidden_layers,
                    outputs=self._outputs.union(other._outputs),
@@ -146,7 +160,7 @@ class Net:
             if not len(self._inputs):
                 self._inputs = inputs
 
-            connects, weights = self._connect(self._inputs, to_)
+            connects, weights = self._get_connect(self._inputs, to_)
             self._connects = np.vstack([self._connects, connects])
             self._weights = np.hstack([self._weights, weights])
 

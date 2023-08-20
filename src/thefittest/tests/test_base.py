@@ -1,7 +1,8 @@
-from ..base._ea import TheFittest
-from ..base._ea import Statistics
-from ..base._net import Net
 import numpy as np
+
+from ..base._ea import Statistics
+from ..base._ea import TheFittest
+from ..base._net import Net
 
 
 def test_TheFittest():

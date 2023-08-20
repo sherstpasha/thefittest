@@ -108,7 +108,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                      initial_population: Optional[NDArray[np.float64]] = None) -> None:
         '''
         - mutation oper: must be a Tuple of:
-            'best_1', 'rand_1', 'current_to_best_1', 'current_to_pbest_1',
+            'best_1', 'rand_1', 'current_to_best_1',
             'rand_to_best1', 'best_2', 'rand_2'
         '''
         self._update_pool()
@@ -155,4 +155,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                     population_g[-1], population_ph[-1], fitness[-1] =\
                         self._thefittest.get().values()
 
+        self._update_fittest(population_g, population_ph, fitness)
+        self._update_stats(population_g=population_g,
+                           fitness_max=self._thefittest._fitness)
         return self

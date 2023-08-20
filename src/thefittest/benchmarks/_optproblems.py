@@ -1,5 +1,6 @@
-import numpy as np
 import os
+
+import numpy as np
 
 
 path = os.path.dirname(__file__) + '/_data/'
@@ -12,10 +13,10 @@ schwefel_102_data = np.loadtxt(path+'schwefel_102_data.txt')
 # 3
 high_cond_elliptic_rot_data = np.loadtxt(path
                                          + 'high_cond_elliptic_rot_data.txt')[:50]
-elliptic_M_D2 = np.loadtxt(path+'elliptic_M_D2.txt')
-elliptic_M_D10 = np.loadtxt(path+'elliptic_M_D10.txt')
-elliptic_M_D30 = np.loadtxt(path+'elliptic_M_D30.txt')
-elliptic_M_D50 = np.loadtxt(path+'elliptic_M_D50.txt')
+elliptic_m_d2 = np.loadtxt(path+'elliptic_M_D2.txt')
+elliptic_m_d10 = np.loadtxt(path+'elliptic_M_D10.txt')
+elliptic_m_d30 = np.loadtxt(path+'elliptic_M_D30.txt')
+elliptic_m_d50 = np.loadtxt(path+'elliptic_M_D50.txt')
 # 5
 schwefel_206_data = np.loadtxt(path+'schwefel_206_data.txt')
 o_206 = schwefel_206_data[0]
@@ -24,27 +25,27 @@ A_206 = schwefel_206_data[1:]
 rosenbrock_func_data = np.loadtxt(path+'rosenbrock_func_data.txt')
 # 7
 griewank_func_data = np.loadtxt(path+'griewank_func_data.txt')[:50]
-griewank_M_D2 = np.loadtxt(path+'griewank_M_D2.txt')
-griewank_M_D10 = np.loadtxt(path+'griewank_M_D10.txt')
-griewank_M_D30 = np.loadtxt(path+'griewank_M_D30.txt')
-griewank_M_D50 = np.loadtxt(path+'griewank_M_D50.txt')
+griewank_m_d2 = np.loadtxt(path+'griewank_M_D2.txt')
+griewank_m_d10 = np.loadtxt(path+'griewank_M_D10.txt')
+griewank_m_d30 = np.loadtxt(path+'griewank_M_D30.txt')
+griewank_m_d50 = np.loadtxt(path+'griewank_M_D50.txt')
 # 8
 ackley_func_data = np.loadtxt(path+'ackley_func_data.txt')[:50]
-ackley_M_D2 = np.loadtxt(path+'ackley_M_D2.txt')
-ackley_M_D10 = np.loadtxt(path+'ackley_M_D10.txt')
-ackley_M_D30 = np.loadtxt(path+'ackley_M_D30.txt')
-ackley_M_D50 = np.loadtxt(path+'ackley_M_D50.txt')
+ackley_m_d2 = np.loadtxt(path+'ackley_M_D2.txt')
+ackley_m_d10 = np.loadtxt(path+'ackley_M_D10.txt')
+ackley_m_d30 = np.loadtxt(path+'ackley_M_D30.txt')
+ackley_m_d50 = np.loadtxt(path+'ackley_M_D50.txt')
 # 9-10
 rastrigin_func_data = np.loadtxt(path+'rastrigin_func_data.txt')[:50]
-rastrigin_M_D2 = np.loadtxt(path+'rastrigin_M_D2.txt')
-rastrigin_M_D10 = np.loadtxt(path+'rastrigin_M_D10.txt')
-rastrigin_M_D30 = np.loadtxt(path+'rastrigin_M_D30.txt')
-rastrigin_M_D50 = np.loadtxt(path+'rastrigin_M_D50.txt')
+rastrigin_m_d2 = np.loadtxt(path+'rastrigin_M_D2.txt')
+rastrigin_m_d10 = np.loadtxt(path+'rastrigin_M_D10.txt')
+rastrigin_m_d30 = np.loadtxt(path+'rastrigin_M_D30.txt')
+rastrigin_m_d50 = np.loadtxt(path+'rastrigin_M_D50.txt')
 # 11
-weierstrass_M_D2 = np.loadtxt(path+'weierstrass_M_D2.txt')
-weierstrass_M_D10 = np.loadtxt(path+'weierstrass_M_D10.txt')
-weierstrass_M_D30 = np.loadtxt(path+'weierstrass_M_D30.txt')
-weierstrass_M_D50 = np.loadtxt(path+'weierstrass_M_D50.txt')
+weierstrass_m_d2 = np.loadtxt(path+'weierstrass_M_D2.txt')
+weierstrass_m_d10 = np.loadtxt(path+'weierstrass_M_D10.txt')
+weierstrass_m_d30 = np.loadtxt(path+'weierstrass_M_D30.txt')
+weierstrass_m_d50 = np.loadtxt(path+'weierstrass_M_D50.txt')
 weierstrass_data = np.loadtxt(path+'weierstrass_data.txt')[:50]
 # 12
 schwefel_213_data = np.loadtxt(path+'schwefel_213_data.txt')
@@ -55,40 +56,40 @@ b_213 = schwefel_213_data[100:200]
 alpha_213 = schwefel_213_data[-1]
 # 14
 E_ScafferF6_func_data = np.loadtxt(path+'E_ScafferF6_func_data.txt')[:50]
-E_ScafferF6_M_D2 = np.loadtxt(path+'E_ScafferF6_M_D2.txt')
-E_ScafferF6_M_D10 = np.loadtxt(path+'E_ScafferF6_M_D10.txt')
-E_ScafferF6_M_D30 = np.loadtxt(path+'E_ScafferF6_M_D30.txt')
-E_ScafferF6_M_D50 = np.loadtxt(path+'E_ScafferF6_M_D50.txt')
+E_ScafferF6_m_d2 = np.loadtxt(path+'E_ScafferF6_M_D2.txt')
+E_ScafferF6_m_d10 = np.loadtxt(path+'E_ScafferF6_M_D10.txt')
+E_ScafferF6_m_d30 = np.loadtxt(path+'E_ScafferF6_M_D30.txt')
+E_ScafferF6_m_d50 = np.loadtxt(path+'E_ScafferF6_M_D50.txt')
 # 15
 hybrid_func1_data = np.loadtxt(path+'hybrid_func1_data.txt')
 # 16
-hybrid_func1_M_D2 = np.loadtxt(path+'hybrid_func1_M_D2.txt')
-hybrid_func1_M_D10 = np.loadtxt(path+'hybrid_func1_M_D10.txt')
-hybrid_func1_M_D30 = np.loadtxt(path+'hybrid_func1_M_D30.txt')
-hybrid_func1_M_D50 = np.loadtxt(path+'hybrid_func1_M_D50.txt')
+hybrid_func1_m_d2 = np.loadtxt(path+'hybrid_func1_M_D2.txt')
+hybrid_func1_m_d10 = np.loadtxt(path+'hybrid_func1_M_D10.txt')
+hybrid_func1_m_d30 = np.loadtxt(path+'hybrid_func1_M_D30.txt')
+hybrid_func1_m_d50 = np.loadtxt(path+'hybrid_func1_M_D50.txt')
 # 18
 hybrid_func2_data = np.loadtxt(path+'hybrid_func2_data.txt')
-hybrid_func2_M_D2 = np.loadtxt(path+'hybrid_func2_M_D2.txt')
-hybrid_func2_M_D10 = np.loadtxt(path+'hybrid_func2_M_D10.txt')
-hybrid_func2_M_D30 = np.loadtxt(path+'hybrid_func2_M_D30.txt')
-hybrid_func2_M_D50 = np.loadtxt(path+'hybrid_func2_M_D50.txt')
+hybrid_func2_m_d2 = np.loadtxt(path+'hybrid_func2_M_D2.txt')
+hybrid_func2_m_d10 = np.loadtxt(path+'hybrid_func2_M_D10.txt')
+hybrid_func2_m_d30 = np.loadtxt(path+'hybrid_func2_M_D30.txt')
+hybrid_func2_m_d50 = np.loadtxt(path+'hybrid_func2_M_D50.txt')
 # 21
 hybrid_func3_data = np.loadtxt(path+'hybrid_func3_data.txt')
-hybrid_func3_M_D2 = np.loadtxt(path+'hybrid_func3_M_D2.txt')
-hybrid_func3_M_D10 = np.loadtxt(path+'hybrid_func3_M_D10.txt')
-hybrid_func3_M_D30 = np.loadtxt(path+'hybrid_func3_M_D30.txt')
-hybrid_func3_M_D50 = np.loadtxt(path+'hybrid_func3_M_D50.txt')
+hybrid_func3_m_d2 = np.loadtxt(path+'hybrid_func3_M_D2.txt')
+hybrid_func3_m_d10 = np.loadtxt(path+'hybrid_func3_M_D10.txt')
+hybrid_func3_m_d30 = np.loadtxt(path+'hybrid_func3_M_D30.txt')
+hybrid_func3_m_d50 = np.loadtxt(path+'hybrid_func3_M_D50.txt')
 # 22
-hybrid_func3_HM_D2 = np.loadtxt(path+'hybrid_func3_HM_D2.txt')
-hybrid_func3_HM_D10 = np.loadtxt(path+'hybrid_func3_HM_D10.txt')
-hybrid_func3_HM_D30 = np.loadtxt(path+'hybrid_func3_HM_D30.txt')
-hybrid_func3_HM_D50 = np.loadtxt(path+'hybrid_func3_HM_D50.txt')
+hybrid_func3_hm_d2 = np.loadtxt(path+'hybrid_func3_HM_D2.txt')
+hybrid_func3_hm_d10 = np.loadtxt(path+'hybrid_func3_HM_D10.txt')
+hybrid_func3_hm_d30 = np.loadtxt(path+'hybrid_func3_HM_D30.txt')
+hybrid_func3_hm_d50 = np.loadtxt(path+'hybrid_func3_HM_D50.txt')
 # 24
 hybrid_func4_data = np.loadtxt(path+'hybrid_func4_data.txt')
-hybrid_func4_M_D2 = np.loadtxt(path+'hybrid_func4_M_D2.txt')
-hybrid_func4_M_D10 = np.loadtxt(path+'hybrid_func4_M_D10.txt')
-hybrid_func4_M_D30 = np.loadtxt(path+'hybrid_func4_M_D30.txt')
-hybrid_func4_M_D50 = np.loadtxt(path+'hybrid_func4_M_D50.txt')
+hybrid_func4_m_d2 = np.loadtxt(path+'hybrid_func4_M_D2.txt')
+hybrid_func4_m_d10 = np.loadtxt(path+'hybrid_func4_M_D10.txt')
+hybrid_func4_m_d30 = np.loadtxt(path+'hybrid_func4_M_D30.txt')
+hybrid_func4_m_d50 = np.loadtxt(path+'hybrid_func4_M_D50.txt')
 
 
 class TestFunction:
@@ -239,8 +240,10 @@ class SampleHybridCompositionFunction():
         result = tuple(self.procces_i_function(x, func_i, sigma_i, lambda_i, shift_i,
                                                M_D2i, M_D10i, M_D30i, M_D50i, i)
                        for func_i, sigma_i, lambda_i, shift_i,
-                       M_D2i, M_D10i, M_D30i, M_D50i, i in zip(self.basic_functions, self.sigmas, self.lambdas, self.x_shift,
-                                                               self.M_D2, self.M_D10, self.M_D30, self.M_D50, range(len(self.M_D50))))
+                       M_D2i, M_D10i, M_D30i, M_D50i, i in zip(self.basic_functions, self.sigmas,
+                                                               self.lambdas, self.x_shift,
+                                                               self.M_D2, self.M_D10, self.M_D30,
+                                                               self.M_D50, range(len(self.M_D50))))
         w_i, fit_i = list(zip(*result))
         w_i = np.array(w_i, np.float64).T
         fit_i = np.array(fit_i, np.float64).T
@@ -425,10 +428,10 @@ class ShiftedRotatedHighConditionedElliptic(TestShiftedRotatedFunction,
             self,
             fbias=fbias_data[2],
             x_shift=high_cond_elliptic_rot_data,
-            rotate_M_D2=elliptic_M_D2,
-            rotate_M_D10=elliptic_M_D10,
-            rotate_M_D30=elliptic_M_D30,
-            rotate_M_D50=elliptic_M_D50)
+            rotate_M_D2=elliptic_m_d2,
+            rotate_M_D10=elliptic_m_d10,
+            rotate_M_D30=elliptic_m_d30,
+            rotate_M_D50=elliptic_m_d50)
 
 
 # CEC05 #4
@@ -488,10 +491,10 @@ class ShiftedRotatedGriewank(TestShiftedRotatedFunction,
             self,
             fbias=fbias_data[6],
             x_shift=griewank_func_data,
-            rotate_M_D2=griewank_M_D2,
-            rotate_M_D10=griewank_M_D10,
-            rotate_M_D30=griewank_M_D30,
-            rotate_M_D50=griewank_M_D50)
+            rotate_M_D2=griewank_m_d2,
+            rotate_M_D10=griewank_m_d10,
+            rotate_M_D30=griewank_m_d30,
+            rotate_M_D50=griewank_m_d50)
 
 
 # CEC05 #8
@@ -502,10 +505,10 @@ class ShiftedRotatedAckley(TestShiftedRotatedFunction,
             self,
             fbias=fbias_data[7],
             x_shift=ackley_func_data,
-            rotate_M_D2=ackley_M_D2,
-            rotate_M_D10=ackley_M_D10,
-            rotate_M_D30=ackley_M_D30,
-            rotate_M_D50=ackley_M_D50)
+            rotate_M_D2=ackley_m_d2,
+            rotate_M_D10=ackley_m_d10,
+            rotate_M_D30=ackley_m_d30,
+            rotate_M_D50=ackley_m_d50)
 
     def __call__(self, x):
         D = x.shape[1]
@@ -529,10 +532,10 @@ class ShiftedRotatedRastrigin(TestShiftedRotatedFunction,
             self,
             fbias=fbias_data[9],
             x_shift=rastrigin_func_data,
-            rotate_M_D2=rastrigin_M_D2,
-            rotate_M_D10=rastrigin_M_D10,
-            rotate_M_D30=rastrigin_M_D30,
-            rotate_M_D50=rastrigin_M_D50)
+            rotate_M_D2=rastrigin_m_d2,
+            rotate_M_D10=rastrigin_m_d10,
+            rotate_M_D30=rastrigin_m_d30,
+            rotate_M_D50=rastrigin_m_d50)
 
 
 # CEC05 #11
@@ -543,10 +546,10 @@ class ShiftedRotatedWeierstrass(TestShiftedRotatedFunction,
             self,
             fbias=fbias_data[10],
             x_shift=weierstrass_data,
-            rotate_M_D2=weierstrass_M_D2,
-            rotate_M_D10=weierstrass_M_D10,
-            rotate_M_D30=weierstrass_M_D30,
-            rotate_M_D50=weierstrass_M_D50)
+            rotate_M_D2=weierstrass_m_d2,
+            rotate_M_D10=weierstrass_m_d10,
+            rotate_M_D30=weierstrass_m_d30,
+            rotate_M_D50=weierstrass_m_d50)
 
 
 # CEC05 #12
@@ -564,14 +567,14 @@ class Schwefel2_13(TestShiftedFunction):
         b = b_213[:x.shape[1], :x.shape[1]]
         alpha = self.x_shift[:x.shape[1]]
 
-        A = np.sum(a*np.sin(alpha)[np.newaxis:,]
-                   + b*np.cos(alpha)[np.newaxis:,], axis=1)
+        A = np.sum(a*np.sin(alpha)[np.newaxis:, ]
+                   + b*np.cos(alpha)[np.newaxis:, ], axis=1)
 
         B1 = a[np.newaxis]*np.sin(x[:, np.newaxis])
         B2 = b[np.newaxis]*np.cos(x[:, np.newaxis])
         B = np.sum(B1 + B2, axis=-1)
 
-        return np.sum((A[np.newaxis:,] - B)**2, axis=-1)
+        return np.sum((A[np.newaxis:, ] - B)**2, axis=-1)
 
 
 # CEC05 #13
@@ -611,10 +614,10 @@ class ShiftedRotatedExpandedScaffes_F6(TestShiftedRotatedFunction):
             self,
             fbias=fbias_data[13],
             x_shift=E_ScafferF6_func_data,
-            rotate_M_D2=E_ScafferF6_M_D2,
-            rotate_M_D10=E_ScafferF6_M_D10,
-            rotate_M_D30=E_ScafferF6_M_D30,
-            rotate_M_D50=E_ScafferF6_M_D50)
+            rotate_M_D2=E_ScafferF6_m_d2,
+            rotate_M_D10=E_ScafferF6_m_d10,
+            rotate_M_D30=E_ScafferF6_m_d30,
+            rotate_M_D50=E_ScafferF6_m_d50)
 
     def Scaffes_F6(self, x):
         sum_of_power = x[:, 0]**2 + x[:, 1]**2
@@ -682,10 +685,10 @@ class RotatedVersionHybridCompositionFunction1(SampleHybridCompositionFunction):
                              5/32, 5/100, 5/100], dtype=np.float64),
             fbias=fbias_data[15],
             x_shift=hybrid_func1_data,
-            M_D2=hybrid_func1_M_D2,
-            M_D10=hybrid_func1_M_D10,
-            M_D30=hybrid_func1_M_D30,
-            M_D50=hybrid_func1_M_D50)
+            M_D2=hybrid_func1_m_d2,
+            M_D10=hybrid_func1_m_d10,
+            M_D30=hybrid_func1_m_d30,
+            M_D50=hybrid_func1_m_d50)
 
 
 # CEC05 #17
@@ -708,10 +711,10 @@ class RotatedVersionHybridCompositionFunction1Noise(SampleHybridCompositionFunct
                              5/32, 5/100, 5/100], dtype=np.float64),
             fbias=fbias_data[16],
             x_shift=hybrid_func1_data,
-            M_D2=hybrid_func1_M_D2,
-            M_D10=hybrid_func1_M_D10,
-            M_D30=hybrid_func1_M_D30,
-            M_D50=hybrid_func1_M_D50)
+            M_D2=hybrid_func1_m_d2,
+            M_D10=hybrid_func1_m_d10,
+            M_D30=hybrid_func1_m_d30,
+            M_D50=hybrid_func1_m_d50)
 
     def __call__(self, x):
         G_x = RotatedVersionHybridCompositionFunction1()(x) - fbias_data[15]
@@ -740,10 +743,10 @@ class RotatedHybridCompositionFunction(SampleHybridCompositionFunction):
                              5/100, 2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
             fbias=fbias_data[17],
             x_shift=hybrid_func2_data,
-            M_D2=hybrid_func2_M_D2,
-            M_D10=hybrid_func2_M_D10,
-            M_D30=hybrid_func2_M_D30,
-            M_D50=hybrid_func2_M_D50)
+            M_D2=hybrid_func2_m_d2,
+            M_D10=hybrid_func2_m_d10,
+            M_D30=hybrid_func2_m_d30,
+            M_D50=hybrid_func2_m_d50)
         self.x_shift[9] = 0
 
 
@@ -761,15 +764,17 @@ class RotatedHybridCompositionFunctionNarrowBasin(SampleHybridCompositionFunctio
                                                                         Griewank,
                                                                         Griewank),
                                                  sigmas=np.array(
-                                                     [0.1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float64),
-                                                 lambdas=np.array(
-                                                     [0.1*(5/32), 5/32, 2*1, 1, 2*(5/100), 5/100, 2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
-                                                 fbias=fbias_data[17],
-                                                 x_shift=hybrid_func2_data,
-                                                 M_D2=hybrid_func2_M_D2,
-                                                 M_D10=hybrid_func2_M_D10,
-                                                 M_D30=hybrid_func2_M_D30,
-                                                 M_D50=hybrid_func2_M_D50)
+                                                     [0.1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2],
+            dtype=np.float64),
+            lambdas=np.array(
+                                                     [0.1*(5/32), 5/32, 2*1, 1, 2*(5/100), 5/100,
+                                                      2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
+            fbias=fbias_data[17],
+            x_shift=hybrid_func2_data,
+            M_D2=hybrid_func2_m_d2,
+            M_D10=hybrid_func2_m_d10,
+            M_D30=hybrid_func2_m_d30,
+            M_D50=hybrid_func2_m_d50)
         self.x_shift[9] = 0
 
 
@@ -793,10 +798,10 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
                              5/100, 2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
             fbias=fbias_data[19],
             x_shift=hybrid_func2_data,
-            M_D2=hybrid_func2_M_D2,
-            M_D10=hybrid_func2_M_D10,
-            M_D30=hybrid_func2_M_D30,
-            M_D50=hybrid_func2_M_D50)
+            M_D2=hybrid_func2_m_d2,
+            M_D10=hybrid_func2_m_d10,
+            M_D30=hybrid_func2_m_d30,
+            M_D50=hybrid_func2_m_d50)
         self.x_shift[9] = 0
 
     def __call__(self, x):
@@ -826,10 +831,10 @@ class HybridCompositionFunction3(SampleHybridCompositionFunction):
                              5*10, 10, 5*5/200, 5/200], dtype=np.float64),
             fbias=fbias_data[20],
             x_shift=hybrid_func3_data,
-            M_D2=hybrid_func3_M_D2,
-            M_D10=hybrid_func3_M_D10,
-            M_D30=hybrid_func3_M_D30,
-            M_D50=hybrid_func3_M_D50)
+            M_D2=hybrid_func3_m_d2,
+            M_D10=hybrid_func3_m_d10,
+            M_D30=hybrid_func3_m_d30,
+            M_D50=hybrid_func3_m_d50)
 
 
 # CEC05 #22
@@ -853,10 +858,10 @@ class HybridCompositionFunction3H(SampleHybridCompositionFunction):
                              5*10, 10, 5*5/200, 5/200], dtype=np.float64),
             fbias=fbias_data[21],
             x_shift=hybrid_func3_data,
-            M_D2=hybrid_func3_HM_D2,
-            M_D10=hybrid_func3_HM_D10,
-            M_D30=hybrid_func3_HM_D30,
-            M_D50=hybrid_func3_HM_D50)
+            M_D2=hybrid_func3_hm_d2,
+            M_D10=hybrid_func3_hm_d10,
+            M_D30=hybrid_func3_hm_d30,
+            M_D50=hybrid_func3_hm_d50)
 
 
 # CEC05 #23
@@ -880,10 +885,10 @@ class NonContinuousHybridCompositionFunction3(SampleHybridCompositionFunction):
                              5*10, 10, 5*5/200, 5/200], dtype=np.float64),
             fbias=fbias_data[22],
             x_shift=hybrid_func3_data,
-            M_D2=hybrid_func3_M_D2,
-            M_D10=hybrid_func3_M_D10,
-            M_D30=hybrid_func3_M_D30,
-            M_D50=hybrid_func3_M_D50)
+            M_D2=hybrid_func3_m_d2,
+            M_D10=hybrid_func3_m_d10,
+            M_D30=hybrid_func3_m_d30,
+            M_D50=hybrid_func3_m_d50)
 
     def __call__(self, x):
         shape = x.shape
@@ -915,10 +920,10 @@ class HybridCompositionFunction4(SampleHybridCompositionFunction):
                              5/50, 1, 5/100, 5/100], dtype=np.float64),
             fbias=fbias_data[23],
             x_shift=hybrid_func4_data,
-            M_D2=hybrid_func4_M_D2,
-            M_D10=hybrid_func4_M_D10,
-            M_D30=hybrid_func4_M_D30,
-            M_D50=hybrid_func4_M_D50)
+            M_D2=hybrid_func4_m_d2,
+            M_D10=hybrid_func4_m_d10,
+            M_D30=hybrid_func4_m_d30,
+            M_D50=hybrid_func4_m_d50)
 
 
 # CEC05 #25
@@ -942,7 +947,7 @@ class HybridCompositionFunction4withoutbounds(SampleHybridCompositionFunction):
                              5/50, 1, 5/100, 5/100], dtype=np.float64),
             fbias=fbias_data[24],
             x_shift=hybrid_func4_data,
-            M_D2=hybrid_func4_M_D2,
-            M_D10=hybrid_func4_M_D10,
-            M_D30=hybrid_func4_M_D30,
-            M_D50=hybrid_func4_M_D50)
+            M_D2=hybrid_func4_m_d2,
+            M_D10=hybrid_func4_m_d10,
+            M_D30=hybrid_func4_m_d30,
+            M_D50=hybrid_func4_m_d50)
