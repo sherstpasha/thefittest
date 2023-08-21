@@ -96,7 +96,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                            population_g: np.ndarray,
                            fitness_scale: np.ndarray,
                            fitness_rank: np.ndarray,
-                           _) -> np.ndarray:
+                           *args) -> np.ndarray:
         selection_func, tour_size = self._specified_selection
         crossover_func, quantity = self._specified_crossover
         mutation_func, proba = self._specified_mutation

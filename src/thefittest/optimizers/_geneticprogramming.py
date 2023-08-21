@@ -1,27 +1,30 @@
 from functools import partial
 from typing import Callable
 from typing import Optional
+
 import numpy as np
+
 from ..base import Tree
 from ..base import UniversalSet
 from ..base._ea import EvolutionaryAlgorithm
+from ..tools import donothing
+from ..tools.operators import empty_crossover
+from ..tools.operators import growing_mutation
+from ..tools.operators import one_point_crossoverGP
+from ..tools.operators import point_mutation
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
-from ..tools.operators import tournament_selection
-from ..tools.operators import one_point_crossoverGP
+from ..tools.operators import shrink_mutation
 from ..tools.operators import standart_crossover
+from ..tools.operators import swap_mutation
+from ..tools.operators import tournament_selection
 from ..tools.operators import uniform_crossoverGP
 from ..tools.operators import uniform_crossoverGP_prop
 from ..tools.operators import uniform_crossoverGP_rank
 from ..tools.operators import uniform_crossoverGP_tour
-from ..tools.operators import empty_crossover
-from ..tools.operators import point_mutation
-from ..tools.operators import growing_mutation
-from ..tools.operators import swap_mutation
-from ..tools.operators import shrink_mutation
 from ..tools.random import half_and_half
-from ..tools.transformations import scale_data
 from ..tools.transformations import rank_data
+from ..tools.transformations import scale_data
 
 
 class GeneticProgramming(EvolutionaryAlgorithm):
@@ -30,10 +33,10 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
     def __init__(self,
                  fitness_function: Callable,
-                 genotype_to_phenotype: Callable,
                  uniset: UniversalSet,
                  iters: int,
                  pop_size: int,
+                 genotype_to_phenotype: Callable = donothing,
                  optimal_value: Optional[float] = None,
                  termination_error_value: float = 0.,
                  no_increase_num: Optional[int] = None,
@@ -43,9 +46,9 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
-            genotype_to_phenotype=genotype_to_phenotype,
             iters=iters,
             pop_size=pop_size,
+            genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
             no_increase_num=no_increase_num,
@@ -115,7 +118,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                            population_g: np.ndarray,
                            fitness_scale: np.ndarray,
                            fitness_rank: np.ndarray,
-                           _) -> Tree:
+                           *args) -> Tree:
         selection_func, tour_size = self._specified_selection
         crossover_func, quantity = self._specified_crossover
         mutation_func, proba_up, scale = self._specified_mutation
@@ -184,13 +187,13 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
         for i in range(self._iters-1):
             population_ph = self._get_phenotype(population_g)
-            fitness = self._evaluate(population_ph)
+            fitness = self._get_fitness(population_ph)
 
             self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats({'individ_max': self._thefittest._genotype.copy(),
-                                'fitness_max': self._thefittest._fitness})
+            self._update_stats(population_g=population_g,
+                               fitness_max=self._thefittest._fitness)
             if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get().values()
 
             self._show_progress(i)
             if self._termitation_check():

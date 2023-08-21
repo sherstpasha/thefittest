@@ -127,11 +127,11 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
         population_ph = self._get_phenotype(population_g)
         fitness = self._get_fitness(population_ph)
+        self._update_fittest(population_g, population_ph, fitness)
+        self._update_stats(population_g=population_g,
+                           fitness_max=self._thefittest._fitness)
 
         for i in range(self._iters-1):
-            self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats(population_g=population_g,
-                               fitness_max=self._thefittest._fitness)
 
             self._show_progress(i)
             if self._termitation_check():
@@ -154,8 +154,8 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
                 if self._elitism:
                     population_g[-1], population_ph[-1], fitness[-1] =\
                         self._thefittest.get().values()
+                self._update_fittest(population_g, population_ph, fitness)
+                self._update_stats(population_g=population_g,
+                                   fitness_max=self._thefittest._fitness)
 
-        self._update_fittest(population_g, population_ph, fitness)
-        self._update_stats(population_g=population_g,
-                           fitness_max=self._thefittest._fitness)
         return self
