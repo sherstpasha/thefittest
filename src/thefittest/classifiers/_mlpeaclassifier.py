@@ -1,20 +1,19 @@
-from typing import Tuple
-from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
+
 import numpy as np
-from ..tools import donothing
-from ..tools.metrics import categorical_crossentropy
-from ..optimizers import SHADE
-from ..base._net import Net
-from ..optimizers import OptimizerAnyType
-from ..optimizers import optimizer_binary_coded
-from ..tools.random import float_population
-from ..tools.metrics import categorical_crossentropy3d
-from ..tools.transformations import GrayCode
+
 from ..base._model import Model
 from ..base._net import ACTIV_NAME_INV
-
+from ..base._net import Net
+from ..optimizers import OptimizerAnyType
+from ..optimizers import SHADE
+from ..optimizers import optimizer_binary_coded
+from ..tools import donothing
+from ..tools.metrics import categorical_crossentropy3d
+from ..tools.random import float_population
+from ..tools.transformations import GrayCode
 
 
 class MLPClassifierEA(Model):
@@ -49,7 +48,6 @@ class MLPClassifierEA(Model):
         self._train_func: Union[self._train_net, self._train_net_bit]
 
         self._net: Net
-
 
     def _defitne_net(self, n_inputs, n_outputs):
         start = 0
@@ -114,16 +112,17 @@ class MLPClassifierEA(Model):
                         fill_value=self._optimizer_weights_bounds[1],
                         dtype=np.float64)
 
-        self._optimizer_weights = self._optimizer_weights(fitness_function=fitness_function,
-                                                          genotype_to_phenotype=donothing,
-                                                          iters=self._iters,
-                                                          pop_size=self._pop_size,
-                                                          left=left,
-                                                          right=right,
-                                                          minimization=True,
-                                                          no_increase_num=self._no_increase_num,
-                                                          keep_history=self._keep_history,
-                                                          show_progress_each=self._show_progress_each)
+        self._optimizer_weights = self._optimizer_weights(
+            fitness_function=fitness_function,
+            genotype_to_phenotype=donothing,
+            iters=self._iters,
+            pop_size=self._pop_size,
+            left=left,
+            right=right,
+            minimization=True,
+            no_increase_num=self._no_increase_num,
+            keep_history=self._keep_history,
+            show_progress_each=self._show_progress_each)
 
         initial_population = float_population(self._pop_size, left, right)
         initial_population[0] = net._weights.copy()
