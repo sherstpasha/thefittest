@@ -1,20 +1,24 @@
 import random
 from typing import Union
+
+from numba import float64
+from numba import int64
+from numba import int8
+from numba import njit
+from numba.types import List as numbaListType
+
 import numpy as np
 from numpy.typing import NDArray
-from numba import njit
-from numba import float64
-from numba import int8
-from numba import int64
-from ..base import Tree
-from ..base import UniversalSet
+
+from ._numba_funcs import max_axis
 from .random import growing_method
-from .random import sattolo_shuffle
 from .random import random_sample
 from .random import random_weighted_sample
+from .random import sattolo_shuffle
 from .transformations import common_region
-from ._numba_funcs import max_axis
-from numba.types import List as numbaListType
+from ..base import Tree
+from ..base import UniversalSet
+
 
 min_value = np.finfo(np.float64).min
 max_value = np.finfo(np.float64).max
@@ -656,7 +660,7 @@ class Div(Operator):
     def __call__(self,
                  x: Union[float, np.ndarray],
                  y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        if type(y) == np.ndarray:
+        if isinstance(y, np.ndarray):
             result = np.divide(x, y, out=np.ones_like(
                 y, dtype=np.float64), where=y != 0)
         else:
@@ -699,7 +703,7 @@ class LogAbs(Operator):
     def __call__(self,
                  y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         y_ = np.abs(y)
-        if type(y_) == np.ndarray:
+        if isinstance(y_, np.ndarray):
             result = np.log(y_, out=np.ones_like(
                 y_, dtype=np.float64), where=y_ != 0)
         else:

@@ -230,9 +230,8 @@ def train_test_split_stratified(X: NDArray[np.float64],
 
 
 def train_test_split(X: NDArray[np.float64],
-                                y: NDArray[np.int64],
-                                tests_size: float) -> Tuple:
-    
+                     y: NDArray[np.int64],
+                     tests_size: float) -> Tuple:
     data_size = len(X)
     sample_size = int(tests_size*data_size)
     indexes = np.arange(data_size, dtype=np.int64)
