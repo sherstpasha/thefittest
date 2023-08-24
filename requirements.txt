@@ -1,2 +1,13 @@
 numpy>=1.21.6,<=1.23
 numba>=0.56.4
+pytest
+pytest-cov
+flake8
+flake8-bugbear
+pep8-naming
+flake8-builtins
+flake8-comprehensions
+flake8-eradicate
+flake8-import-order
+mypy
+typing-extensions<=4.6.3
