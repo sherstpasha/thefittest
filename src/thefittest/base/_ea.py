@@ -87,14 +87,14 @@ class EvolutionaryAlgorithm:
                  optimal_value: Optional[float],
                  termination_error_value: float) -> None:
         if optimal_value is not None:
-            self._aim = self._sign*optimal_value - termination_error_value
+            self._aim = self._sign * optimal_value - termination_error_value
         else:
             self._aim = np.inf
 
     def _get_fitness(self,
                      population_ph: NDArray[Any]) -> NDArray[Any]:
         self._calls += len(population_ph)
-        return self._sign*self._fitness_function(population_ph)
+        return self._sign * self._fitness_function(population_ph)
 
     def _show_progress(self,
                        iter_number: int) -> None:
@@ -102,7 +102,7 @@ class EvolutionaryAlgorithm:
         if cond_show_switch:
             cond_show_now = iter_number % self._show_progress_each == 0
             if cond_show_now:
-                current_best = self._sign*self._thefittest._fitness
+                current_best = self._sign * self._thefittest._fitness
                 print(f'{iter_number} iteration with fitness = {current_best}',
                       self._thefittest._no_update_counter)
 
@@ -135,7 +135,7 @@ class EvolutionaryAlgorithm:
         return self._genotype_to_phenotype(popultion_g)
 
     def get_remains_calls(self):
-        return (self._pop_size*self._iters) - self._calls
+        return (self._pop_size * self._iters) - self._calls
 
     def get_fittest(self) -> TheFittest:
         return self._thefittest

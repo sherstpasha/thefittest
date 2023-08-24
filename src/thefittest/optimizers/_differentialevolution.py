@@ -131,14 +131,14 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         self._update_stats(population_g=population_g,
                            fitness_max=self._thefittest._fitness)
 
-        for i in range(self._iters-1):
+        for i in range(self._iters - 1):
 
             self._show_progress(i)
             if self._termitation_check():
                 break
             else:
-                F_i = [self._F]*self._pop_size
-                CR_i = [self._CR]*self._pop_size
+                F_i = [self._F] * self._pop_size
+                CR_i = [self._CR] * self._pop_size
 
                 mutation_and_crossover = partial(self._mutation_and_crossover,
                                                  population_g)

@@ -87,9 +87,9 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                                 'uniform_tour7': (uniform_tour_crossover, 7),
                                 'uniform_tourk': (uniform_tour_crossover, self._parents_num)}
 
-        self._mutation_pool = {'weak':  (flip_mutation, 1/(3*self._str_len)),
-                               'average':  (flip_mutation, 1/(self._str_len)),
-                               'strong': (flip_mutation, min(1, 3/self._str_len)),
+        self._mutation_pool = {'weak': (flip_mutation, 1 / (3 * self._str_len)),
+                               'average': (flip_mutation, 1 / (self._str_len)),
+                               'strong': (flip_mutation, min(1, 3 / self._str_len)),
                                'custom_rate': (flip_mutation, self._mutation_rate)}
 
     def _get_new_individ_g(self,

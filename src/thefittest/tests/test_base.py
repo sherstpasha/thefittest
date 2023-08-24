@@ -1,5 +1,6 @@
 import numpy as np
 
+from ..tools.operators import Sub
 from ..base._ea import Statistics
 from ..base._ea import TheFittest
 from ..base._net import Net
@@ -12,7 +13,8 @@ from ..base._tree import UniversalSet
 from ..tools.operators import Add
 from ..tools.operators import Mul
 from ..tools.operators import Operator
-from ..tools.operators import Sub
+
+
 
 
 class PlusOne(Operator):

@@ -9,7 +9,6 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
-
 import numpy as np
 from numpy.typing import NDArray
 
@@ -165,7 +164,7 @@ class Tree:
                     return False
         return True
 
-    def __call__(self):
+    def __call__(self) -> Any:
         pack = []
         for node in reversed(self._nodes):
             args = []
@@ -180,7 +179,8 @@ class Tree:
     def copy(self):
         return Tree(self._nodes.copy(), self._n_args.copy())
 
-    def set_terminals(self, **kwargs):
+    def set_terminals(self,
+                      **kwargs):
         tree_copy = self.copy()
         for i, node in enumerate(tree_copy._nodes):
             if node.is_terminal():
@@ -200,7 +200,9 @@ class Tree:
             return new_tree
         return index, n_index
 
-    def concat(self, index, other_tree):
+    def concat(self,
+               index: int,
+               other_tree):
         to_return = self.copy()
         left, right = self.subtree(index)
         to_return._nodes[left:right] = other_tree._nodes.copy()
@@ -249,7 +251,7 @@ class Tree:
         for i, lvl_i in enumerate(levels):
             total = 0
             cond = lvl_i == np.array(levels)
-            h = 1/(1 + np.sum(cond))
+            h = 1 / (1 + np.sum(cond))
             arange = np.arange(len(pos))[cond]
 
             for a_j in arange:

@@ -39,7 +39,7 @@ class Net:
         self._outputs = outputs or set()
         self._init_connects(connects=connects)
         self._init_weights(weights=weights)
-        self._activs = activs or dict()
+        self._activs = activs or {}
 
         self._numpy_inputs: Optional[NDArray[np.int64]] = None
         self._numpy_outputs: NDArray[np.int64]
@@ -80,7 +80,7 @@ class Net:
         if len(self._hidden_layers) > 0:
             return set.union(*self._hidden_layers)
         else:
-            return set([])
+            return set()
 
     def _merge_layers(self,
                       layers: List) -> Set:
@@ -283,7 +283,7 @@ class Net:
         w_colors[:, 0] = 1 - weights_scale
         w_colors[:, 2] = weights_scale
         w_colors[:, 3] = 0.8
-        positions[:len_i][:, 1] = np.arange(len_i) - (len_i)/2
+        positions[:len_i][:, 1] = np.arange(len_i) - (len_i) / 2
         colors[:len_i] = INPUT_COLOR_CODE
 
         n = len_i
@@ -291,13 +291,13 @@ class Net:
             nodes.extend(list(layer))
             positions[n:n + len(layer)][:, 0] = i + 1
             positions[n:n + len(layer)][:, 1] = np.arange(len(layer)) \
-                - len(layer)/2
+                - len(layer) / 2
             colors[n:n + len(layer)] = HIDDEN_COLOR_CODE
             n += len(layer)
 
         nodes.extend(list(self._outputs))
         positions[n: n + len_o][:, 0] = len(self._hidden_layers) + 1
-        positions[n: n + len_o][:, 1] = np.arange(len_o) - len_o/2
+        positions[n: n + len_o][:, 1] = np.arange(len_o) - len_o / 2
         colors[n: n + len_o] = OUTPUT_COLOR_CODE
 
         positions_dict = dict(zip(nodes, positions))

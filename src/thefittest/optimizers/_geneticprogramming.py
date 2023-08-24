@@ -133,7 +133,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
                                               fitness_rank[selected_id],
                                               self._max_level)
 
-        proba = proba_up/len(offspring_no_mutated) if scale else proba_up
+        proba = proba_up / len(offspring_no_mutated) if scale else proba_up
 
         offspring = mutation_func(offspring_no_mutated, self._uniset,
                                   proba, self._max_level)
@@ -185,7 +185,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         else:
             population_g = self._initial_population
 
-        for i in range(self._iters-1):
+        for i in range(self._iters - 1):
             population_ph = self._get_phenotype(population_g)
             fitness = self._get_fitness(population_ph)
 
