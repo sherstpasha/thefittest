@@ -23,7 +23,7 @@ def find_id_args_from_i(index: np.int64,
     out = np.empty(n_args_array[index], dtype=np.int64)
     out[0] = index + 1
     for i in range(1, len(out)):
-        next_stop = find_end_subtree_from_i(out[i-1], n_args_array)
+        next_stop = find_end_subtree_from_i(out[i - 1], n_args_array)
         out[i] = next_stop
     return out
 
@@ -70,7 +70,7 @@ def binary_search_interval(value: np.float64,
         left = 0
         right = len(intervals) - 1
         while right - left > 1:
-            mid = (left + right)//2
+            mid = (left + right) // 2
             if value <= intervals[mid]:
                 right = mid
             else:
@@ -112,7 +112,7 @@ def argsort_k(array: NDArray[np.float64],
 def find_pbest_id(array: NDArray[np.float64],
                   p: np.float64) -> NDArray[np.int64]:
     size = len(array)
-    count = max(np.int64(1), np.int64(p*size))
+    count = max(np.int64(1), np.int64(p * size))
     argsort = argsort_k(array, count)
     to_return = argsort[:count]
     return to_return

@@ -1,4 +1,5 @@
 import random
+from typing import Any
 from typing import Union
 
 from numba import float64
@@ -555,6 +556,9 @@ class Operator:
                *args) -> str:
         formula = self._formula.format(*args)
         return formula
+
+    def __call__(self, *args: Any) -> None:
+        pass
 
 
 class Cos(Operator):

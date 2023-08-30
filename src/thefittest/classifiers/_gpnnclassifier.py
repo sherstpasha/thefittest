@@ -238,7 +238,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         functional_set = (FunctionalNode(Add()),
                           FunctionalNode(More()))
 
-        def random_hidden_block(): return HiddenBlock()(self._max_hidden_block_size)
+        def random_hidden_block(): return HiddenBlock(self._max_hidden_block_size)
 
         terminal_set = [TerminalNode(set(variables), 'in{}'.format(i))
                         for i, variables in enumerate(variables_pool)]

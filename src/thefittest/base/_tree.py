@@ -15,6 +15,7 @@ from numpy.typing import NDArray
 from ..tools import find_end_subtree_from_i
 from ..tools import find_id_args_from_i
 from ..tools import get_levels_tree_from_i
+# from ..tools.operators import Operator
 
 
 FUNCTIONAL_COLOR_CODE = (1, 0.72, 0.43, 1)
@@ -35,7 +36,7 @@ class Node:
     def __str__(self) -> str:
         return str(self._sign)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         return self._name == other._name
 
     def is_functional(self) -> bool:
@@ -50,13 +51,13 @@ class Node:
 
 class FunctionalNode(Node):
     def __init__(self,
-                 value: Callable,
+                 value,
                  sign: Optional[str] = None) -> None:
         Node.__init__(self,
                       value=value,
                       name=value.__name__,
                       sign=sign or value._sign,
-                      n_args=len(signature(value).parameters))
+                      n_args=len(signature(value.__call__).parameters))
 
 
 class TerminalNode(Node):
@@ -114,11 +115,13 @@ class UniversalSet:
     def _random_terminal_or_ephemeral(
             self) -> Union[EphemeralConstantNode, TerminalNode]:
         choosen = random.choice(self._terminal_set)
-        node = choosen() if choosen.is_ephemeral() else choosen
-        return node
+        if isinstance(choosen, EphemeralNode):
+            return choosen()
+        else:
+            return choosen
 
     def _random_functional(self,
-                           n_args='any') -> FunctionalNode:
+                           n_args: Union[str, int] = 'any') -> FunctionalNode:
         n_args_functionals = self._functional_set[n_args]
         node = random.choice(n_args_functionals)
         return node
@@ -144,12 +147,12 @@ class Tree:
         return len(self._nodes)
 
     def __str__(self) -> str:
-        pack = []
+        pack: List[str] = []
         for node in reversed(self._nodes):
             args = []
             for _ in range(node._n_args):
                 args.append(pack.pop())
-            if node.is_functional():
+            if isinstance(node, FunctionalNode):
                 pack.append(node._value._write(*args))
             else:
                 pack.append(node._name)

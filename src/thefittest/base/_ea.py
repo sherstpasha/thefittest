@@ -11,7 +11,7 @@ from ..tools import donothing
 
 
 class TheFittest:
-    def __init__(self):
+    def __init__(self) -> None:
         self._genotype: Any
         self._phenotype: Any
         self._fitness: Union[float, np.float64] = -np.inf
@@ -48,7 +48,7 @@ class TheFittest:
 
 class Statistics(dict):
     def _update(self,
-                arg: Dict):
+                arg: Dict) -> None:
         for key, value in arg.items():
             if key not in self.keys():
                 self[key] = [value.copy()]
@@ -80,8 +80,8 @@ class EvolutionaryAlgorithm:
         self._get_aim(optimal_value, termination_error_value)
         self._calls = 0
 
-        self._thefittest: Optional[TheFittest] = None
-        self._stats: Optional[Statistics] = None
+        self._thefittest: TheFittest = TheFittest()
+        self._stats: Statistics = Statistics()
 
     def _get_aim(self,
                  optimal_value: Optional[float],
@@ -98,43 +98,37 @@ class EvolutionaryAlgorithm:
 
     def _show_progress(self,
                        iter_number: int) -> None:
-        cond_show_switch = self._show_progress_each is not None
-        if cond_show_switch:
+        if self._show_progress_each is not None:
             cond_show_now = iter_number % self._show_progress_each == 0
             if cond_show_now:
                 current_best = self._sign * self._thefittest._fitness
                 print(f'{iter_number} iteration with fitness = {current_best}',
                       self._thefittest._no_update_counter)
 
-    def _termitation_check(self):
+    def _termitation_check(self) -> bool:
         cond_aim = self._thefittest._fitness >= self._aim
         cond_no_increase =\
             self._thefittest._no_update_counter == self._no_increase_num
-        return cond_aim or cond_no_increase
+        return bool(cond_aim or cond_no_increase)
 
     def _update_fittest(self,
                         population_g: NDArray[Any],
                         population_ph: NDArray[Any],
                         fitness: NDArray[np.float64]) -> None:
-        if self._thefittest is None:
-            self._thefittest = TheFittest()
-
         self._thefittest._update(population_g=population_g,
                                  population_ph=population_ph,
                                  fitness=fitness)
 
     def _update_stats(self,
-                      **kwargs) -> None:
+                      **kwargs: Any) -> None:
         if self._keep_history:
-            if self._stats is None:
-                self._stats = Statistics()
             self._stats._update(kwargs)
 
     def _get_phenotype(self,
                        popultion_g: NDArray[Any]) -> NDArray[Any]:
         return self._genotype_to_phenotype(popultion_g)
 
-    def get_remains_calls(self):
+    def get_remains_calls(self) -> int:
         return (self._pop_size * self._iters) - self._calls
 
     def get_fittest(self) -> TheFittest:

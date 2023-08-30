@@ -1,6 +1,5 @@
 import numpy as np
 
-from ..tools.operators import Sub
 from ..base._ea import Statistics
 from ..base._ea import TheFittest
 from ..base._net import Net
@@ -13,8 +12,7 @@ from ..base._tree import UniversalSet
 from ..tools.operators import Add
 from ..tools.operators import Mul
 from ..tools.operators import Operator
-
-
+from ..tools.operators import Sub
 
 
 class PlusOne(Operator):
@@ -30,7 +28,7 @@ class PlusOne(Operator):
         return result
 
 
-def test_TheFittest():
+def test_thefittest_class():
     net_1 = Net()
     net_2 = Net()
     net_3 = Net()
@@ -62,7 +60,7 @@ def test_TheFittest():
     assert len(fittest) == 3
 
 
-def test_Statistic():
+def test_statistic_class():
     net_1 = Net()
     net_2 = Net()
     net_3 = Net()
@@ -89,7 +87,7 @@ def test_Statistic():
     assert len(statistics_['population_ph']) == 2
 
 
-def test_Nodes_Tree():
+def test_nodes_class():
 
     def generator():
         return 10
@@ -138,8 +136,15 @@ def test_Nodes_Tree():
     assert random_functional_1._n_args == 1
     assert random_functional_1 is functional_node2
 
+    universal_set = UniversalSet(functional_set=(functional_node,
+                                                 functional_node2,
+                                                 functional_node3),
+                                 terminal_set=(ephemeral_node,))
+    random_ephemeral = universal_set._random_terminal_or_ephemeral()
+    assert isinstance(random_ephemeral, EphemeralConstantNode)
+    assert random_ephemeral._value == 10
 
-def test_Tree():
+def test_tree_class():
     x = TerminalNode(value=5, name='x')
     y = TerminalNode(value=7, name='y')
     z = TerminalNode(value=11, name='z')
@@ -148,10 +153,10 @@ def test_Tree():
     functional_mul = FunctionalNode(value=Mul(), sign='*')
     functional_sub = FunctionalNode(value=Sub(), sign='-')
 
-    # z * (x + y) | mul(z, add(x, y))
+    ''' z * (x + y) | mul(z, add(x, y))'''
     tree = Tree(nodes=[functional_mul, z, functional_add, x, y])
 
-    # (x * x) + (z * (y - x)) | add(mul(x, x), mul(z, sub(y, x)))
+    '''(x * x) + (z * (y - x)) | add(mul(x, x), mul(z, sub(y, x)))'''
     tree2 = Tree(nodes=[functional_add, functional_mul, x, x,
                         functional_mul, z, functional_sub, y, x])
 
@@ -186,3 +191,22 @@ def test_Tree():
     assert tree4() == 22
     assert str(tree4) == '(z * (y - x))'
     assert len(tree) == 5
+
+    '''(z * (x + (z * (x + y))))'''
+    tree5 = tree.concat(index=4, other_tree=tree)
+    assert str(tree5) == '(z * (x + (z * (x + y))))'
+    assert tree5() == 1507
+
+    args_id = tree.get_args_id(index=2)
+    assert np.all(args_id == np.array([3, 4], dtype=np.int64))
+
+    levels = tree.get_levels(index=0)
+    assert np.all(levels == np.array([0, 1, 1, 2, 2], dtype=np.int64))
+
+    max_level = tree.get_max_level()
+    assert max_level == 2
+
+    graph = tree.get_graph()
+    graph = tree.get_graph(keep_id=True)
+
+    assert isinstance(graph, dict)

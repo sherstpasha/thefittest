@@ -1,13 +1,12 @@
 import random
 from collections import defaultdict
 from itertools import product
+from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Set
 from typing import Tuple
-from typing import Union
-
 
 from numba.typed import List as numbaList
 
@@ -37,8 +36,8 @@ class Net:
         self._inputs = inputs or set()
         self._hidden_layers = hidden_layers or []
         self._outputs = outputs or set()
-        self._init_connects(connects=connects)
-        self._init_weights(weights=weights)
+        self._connects = self._set_connects(values=connects)
+        self._weights = self._set_weights(values=weights)
         self._activs = activs or {}
 
         self._numpy_inputs: Optional[NDArray[np.int64]] = None
@@ -51,24 +50,27 @@ class Net:
         self._numba_activs_code: numbaList[NDArray[np.int64]]
         self._numba_activs_nodes: numbaList[numbaList[NDArray[np.int64]]]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._weights)
 
-    def _init_connects(self,
-                       connects: Optional[NDArray[np.int64]]) -> NDArray[np.int64]:
-        if connects is None:
-            self._connects = np.empty((0, 2), dtype=np.int64)
+    def _set_connects(self,
+                      values: Optional[NDArray[np.int64]]) -> NDArray[np.int64]:
+        if values is None:
+            to_return = np.empty((0, 2), dtype=np.int64)
         else:
-            self._connects = connects
+            to_return = values
+        return to_return
 
-    def _init_weights(self,
-                      weights: Optional[NDArray[np.float64]]) -> NDArray[np.float64]:
-        if weights is None:
-            self._weights = np.empty((0), dtype=np.float64)
+    def _set_weights(self,
+                     values: Optional[NDArray[np.float64]]) -> NDArray[np.float64]:
+        if values is None:
+            to_return = np.empty((0), dtype=np.float64)
         else:
-            self._weights = weights
+            to_return = values
 
-    def copy(self):
+        return to_return
+
+    def copy(self) -> Any:
         return Net(inputs=self._inputs.copy(),
                    hidden_layers=self._hidden_layers.copy(),
                    outputs=self._outputs.copy(),
@@ -76,7 +78,7 @@ class Net:
                    weights=self._weights.copy(),
                    activs=self._activs.copy())
 
-    def _assemble_hiddens(self) -> Set:
+    def _assemble_hiddens(self) -> Set[int]:
         if len(self._hidden_layers) > 0:
             return set.union(*self._hidden_layers)
         else:
@@ -87,8 +89,8 @@ class Net:
         return layers[0].union(layers[1])
 
     def _get_connect(self,
-                     left: Union[Set, int],
-                     right: Union[Set, int]) -> Tuple:
+                     left: Set[int],
+                     right: Set[int]) -> Tuple:
         if len(left) and len(right):
             connects = np.array(list(product(left, right)), dtype=np.int64)
             weights = np.random.uniform(-2, 2,
@@ -98,7 +100,7 @@ class Net:
             return (np.zeros((0, 2), dtype=int),
                     np.zeros((0), dtype=float))
 
-    def __add__(self, other):
+    def __add__(self, other: Any) -> Any:
         len_i_1, len_i_2 = len(self._inputs), len(other._inputs)
         len_h_1, len_h_2 = len(self._hidden_layers), len(other._hidden_layers)
 
@@ -109,6 +111,7 @@ class Net:
 
         map_res = map(self._merge_layers, zip(
             self._hidden_layers, other._hidden_layers))
+
         if len_h_1 < len_h_2:
             excess = other._hidden_layers[len_h_1:]
         elif len_h_1 > len_h_2:
@@ -124,7 +127,7 @@ class Net:
                    weights=np.hstack([self._weights, other._weights]),
                    activs={**self._activs, **other._activs})
 
-    def __gt__(self, other):
+    def __gt__(self, other: Any) -> Any:
         len_i_1, len_i_2 = len(self._inputs), len(other._inputs)
         len_h_1, len_h_2 = len(self._hidden_layers), len(other._hidden_layers)
 
@@ -153,7 +156,7 @@ class Net:
                    weights=np.hstack([self._weights, other._weights, weights]),
                    activs={**self._activs, **other._activs})
 
-    def _fix(self, inputs):
+    def _fix(self, inputs: Set[int]) -> Any:
         hidden_outputs = self._assemble_hiddens().union(self._outputs)
         to_ = hidden_outputs.difference(self._connects[:, 1])
         if len(to_) > 0:
@@ -168,7 +171,7 @@ class Net:
         self._weights = self._weights[:len(self._connects)]
         return self
 
-    def _get_order(self):
+    def _get_order(self) -> None:
         hidden = self._assemble_hiddens()
         from_ = self._connects[:, 0]
         to_ = self._connects[:, 1]
@@ -314,17 +317,9 @@ class Net:
 
 class HiddenBlock:
     def __init__(self,
-                 activ: Optional[int] = None,
-                 size: Optional[int] = None) -> None:
-        self._activ = activ
-        self._size = size
-        self.__name__ = 'HiddenBlock'
+                 max_size: int) -> None:
+        self._activ = random.sample([0, 1, 2, 3], k=1)[0]
+        self._size = random.randrange(1, max_size)
 
     def __str__(self) -> str:
         return '{}{}'.format(ACTIVATION_NAME[self._activ], self._size)
-
-    def __call__(self,
-                 max_size: int):
-        self._activ = random.sample([0, 1, 2, 3], k=1)[0]
-        self._size = random.randrange(1, max_size)
-        return self
