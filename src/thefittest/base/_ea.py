@@ -50,10 +50,14 @@ class Statistics(dict):
     def _update(self,
                 arg: Dict) -> None:
         for key, value in arg.items():
+            try:
+                value_to_append = value.copy()
+            except AttributeError:
+                value_to_append = value
             if key not in self.keys():
-                self[key] = [value.copy()]
+                self[key] = [value_to_append]
             else:
-                self[key].append(value.copy())
+                self[key].append(value_to_append)
 
 
 class EvolutionaryAlgorithm:
@@ -102,8 +106,7 @@ class EvolutionaryAlgorithm:
             cond_show_now = iter_number % self._show_progress_each == 0
             if cond_show_now:
                 current_best = self._sign * self._thefittest._fitness
-                print(f'{iter_number} iteration with fitness = {current_best}',
-                      self._thefittest._no_update_counter)
+                print(f'{iter_number} iteration with fitness = {current_best}')
 
     def _termitation_check(self) -> bool:
         cond_aim = self._thefittest._fitness >= self._aim

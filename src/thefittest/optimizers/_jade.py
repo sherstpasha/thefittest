@@ -1,29 +1,32 @@
-
+from functools import partial
 from typing import Callable
 from typing import Optional
-from functools import partial
+
 import numpy as np
+
 from ._differentialevolution import DifferentialEvolution
+from ..tools import donothing
+from ..tools import find_pbest_id
 from ..tools.operators import binomial
 from ..tools.operators import current_to_pbest_1_archive
-from ..tools import find_pbest_id
 from ..tools.random import cauchy_distribution
 from ..tools.random import float_population
-from ..tools.transformations import lehmer_mean
 from ..tools.transformations import bounds_control_mean
+from ..tools.transformations import lehmer_mean
 
 
 class JADE(DifferentialEvolution):
-    '''Zhang, Jingqiao & Sanderson, A.C.. (2009). JADE: Adaptive Differential Evolution With Optional External Archive.
+    '''Zhang, Jingqiao & Sanderson, A.C.. (2009). JADE: Adaptive Differential Evolution
+      With Optional External Archive.
      Evolutionary Computation, IEEE Transactions on. 13. 945 - 958. 10.1109/TEVC.2009.2014613. '''
 
     def __init__(self,
                  fitness_function: Callable,
-                 genotype_to_phenotype: Callable,
                  iters: int,
                  pop_size: int,
                  left: np.ndarray,
                  right: np.ndarray,
+                 genotype_to_phenotype: Callable = donothing,
                  optimal_value: Optional[float] = None,
                  termination_error_value: float = 0.,
                  no_increase_num: Optional[int] = None,
@@ -33,11 +36,11 @@ class JADE(DifferentialEvolution):
         DifferentialEvolution.__init__(
             self,
             fitness_function=fitness_function,
-            genotype_to_phenotype=genotype_to_phenotype,
             iters=iters,
             pop_size=pop_size,
             left=left,
             right=right,
+            genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
             no_increase_num=no_increase_num,
@@ -72,14 +75,14 @@ class JADE(DifferentialEvolution):
                     u_F: float,
                     S_F: np.ndarray) -> float:
         if len(S_F):
-            u_F = (1 - self._c)*u_F + self._c*lehmer_mean(S_F)
+            u_F = (1 - self._c) * u_F + self._c * lehmer_mean(S_F)
         return u_F
 
     def _update_u_CR(self,
                      u_CR: float,
                      S_CR: np.ndarray) -> float:
         if len(S_CR):
-            u_CR = (1 - self._c)*u_CR + self._c*np.mean(S_CR)
+            u_CR = (1 - self._c) * u_CR + self._c * np.mean(S_CR)
         return u_CR
 
     def _append_archive(self,
@@ -124,21 +127,22 @@ class JADE(DifferentialEvolution):
             population_g = float_population(
                 self._pop_size, self._left, self._right)
         else:
-            population_g = self._initial_population
+            population_g = self._initial_population.copy()
 
         u_F = u_CR = 0.5
         external_archive = np.zeros(shape=(0, len(self._left)))
 
         population_ph = self._get_phenotype(population_g)
-        fitness = self._evaluate(population_ph)
+        fitness = self._get_fitness(population_ph)
         pbest_id = find_pbest_id(fitness, np.float64(self._p))
+        self._update_fittest(population_g, population_ph, fitness)
+        self._update_stats(population_g=population_g,
+                           fitness_max=self._thefittest._fitness,
+                           u_F=u_F,
+                           u_CR=u_CR)
 
-        for i in range(self._iters-1):
-            self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats({'population_g': population_g,
-                                'fitness_max': self._thefittest._fitness,
-                                'u_F': u_F,
-                                'u_CR': u_CR})
+        for i in range(self._iters - 1):
+
             self._show_progress(i)
             if self._termitation_check():
                 break
@@ -170,10 +174,16 @@ class JADE(DifferentialEvolution):
                 fitness = stack[2]
 
                 if self._elitism:
-                    population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+                    population_g[-1], population_ph[-1], fitness[-1] =\
+                        self._thefittest.get().values()
                 pbest_id = find_pbest_id(fitness, np.float64(self._p))
 
                 u_F = self._update_u_F(u_F, s_F)
                 u_CR = self._update_u_CR(u_CR, s_CR)
+                self._update_fittest(population_g, population_ph, fitness)
+                self._update_stats(population_g=population_g,
+                                   fitness_max=self._thefittest._fitness,
+                                   u_F=u_F,
+                                   u_CR=u_CR)
 
         return self

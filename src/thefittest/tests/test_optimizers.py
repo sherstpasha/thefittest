@@ -4,10 +4,13 @@ from ..base._ea import TheFittest
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 # from ..optimizers import GeneticProgramming
+from ..optimizers import JADE
+from ..optimizers import jDE
 from ..tools.operators import best_1
 from ..tools.operators import current_to_best_1
 from ..tools.operators import flip_mutation
 from ..tools.operators import proportional_selection
+from ..tools.operators import rand_1
 from ..tools.operators import tournament_selection
 from ..tools.operators import uniform_crossover
 from ..tools.random import binary_string_population
@@ -44,8 +47,8 @@ def test_GeneticAlgorithm_start_settings():
 
     assert optimizer.get_remains_calls() == 0
     assert len(stats['fitness_max']) == iters
-    for i, fitness_max_i in enumerate(stats['fitness_max'][:-1]):
-        assert stats['fitness_max'][i] <= stats['fitness_max'][i+1]
+    for i in range(len(stats['fitness_max'][:-1])):
+        assert stats['fitness_max'][i] <= stats['fitness_max'][i + 1]
     assert optimizer._sign == -1
 
     # start with the no_increase_num is equal 15
@@ -65,7 +68,7 @@ def test_GeneticAlgorithm_start_settings():
 
     optimizer.fit()
 
-    assert optimizer.get_remains_calls() == pop_size*(iters - no_increase_num - 1)
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
     assert optimizer._sign == 1
 
     # start with the optimal_value is equal 1
@@ -81,7 +84,7 @@ def test_GeneticAlgorithm_start_settings():
                                  keep_history=True)
 
     optimizer.fit()
-    assert optimizer.get_remains_calls() == pop_size*(iters - 1)
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
 
 
 def test_GeneticAlgorithm_set_strategy():
@@ -117,7 +120,7 @@ def test_GeneticAlgorithm_set_strategy():
 
     assert optimizer._specified_selection == (proportional_selection, 0)
     assert optimizer._specified_crossover == (uniform_crossover, 2)
-    assert optimizer._specified_mutation == (flip_mutation, 1/(3*str_len))
+    assert optimizer._specified_mutation == (flip_mutation, 1 / (3 * str_len))
 
     optimizer.set_strategy(selection_oper='tournament_k',
                            crossover_oper='uniformk',
@@ -175,13 +178,13 @@ def test_DifferentialEvolution_start_settings():
 
     assert optimizer.get_remains_calls() == 0
     assert len(stats['fitness_max']) == iters
-    for i, fitness_max_i in enumerate(stats['fitness_max'][:-1]):
-        assert stats['fitness_max'][i] <= stats['fitness_max'][i+1]
+    for i in range(len(stats['fitness_max'][:-1])):
+        assert stats['fitness_max'][i] <= stats['fitness_max'][i + 1]
     assert optimizer._sign == -1
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.int64)
+        return np.ones(len(x), dtype=np.float64)
     no_increase_num = 15
     optimizer = DifferentialEvolution(fitness_function,
                                       iters=iters,
@@ -197,7 +200,7 @@ def test_DifferentialEvolution_start_settings():
 
     optimizer.fit()
 
-    assert optimizer.get_remains_calls() == pop_size*(iters - no_increase_num - 1)
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
     assert optimizer._sign == 1
 
     # start with the optimal_value is equal 1
@@ -214,7 +217,7 @@ def test_DifferentialEvolution_start_settings():
                                       keep_history=True)
 
     optimizer.fit()
-    assert optimizer.get_remains_calls() == pop_size*(iters - 1)
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
 
 
 def test_DifferentialEvolution_set_strategy():
@@ -271,71 +274,263 @@ def test_DifferentialEvolution_set_strategy():
     assert np.all(stats['population_g'][0] == initial_population)
 
 
-# def test_GeneticProgramming_start_settings():
+def test_JADE_start_settings():
 
-#     def fitness_function(x):
-#         return np.sum(x, axis=1)
+    def fitness_function(x):
+        return np.sum(x, axis=1)
 
-#     iters = 100
-#     pop_size = 50
-#     str_len = 200
+    iters = 100
+    pop_size = 50
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
 
-    # # simple start
-    # optimizer = GeneticAlgorithm(fitness_function,
-    #                              iters=iters,
-    #                              pop_size=pop_size,
-    #                              str_len=str_len,
-    #                              optimal_value=None,
-    #                              termination_error_value=0,
-    #                              no_increase_num=None,
-    #                              minimization=True,
-    #                              show_progress_each=1,
-    #                              keep_history=True)
+    # simple start
+    optimizer = JADE(fitness_function,
+                     iters=iters,
+                     pop_size=pop_size,
+                     left=left,
+                     right=right,
+                     optimal_value=None,
+                     termination_error_value=0,
+                     no_increase_num=None,
+                     minimization=True,
+                     show_progress_each=1,
+                     keep_history=True)
 
-    # optimizer.fit()
+    optimizer.fit()
 
-    # fittest = optimizer.get_fittest()
-    # assert isinstance(fittest, TheFittest)
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, TheFittest)
 
-    # stats = optimizer.get_stats()
+    stats = optimizer.get_stats()
 
-    # assert optimizer.get_remains_calls() == 0
-    # assert len(stats['fitness_max']) == iters
-    # for i, fitness_max_i in enumerate(stats['fitness_max'][:-1]):
-    #     assert stats['fitness_max'][i] <= stats['fitness_max'][i+1]
-    # assert optimizer._sign == -1
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats['fitness_max']) == iters
+    for i in range(len(stats['fitness_max'][:-1])):
+        assert stats['fitness_max'][i] <= stats['fitness_max'][i + 1]
+    assert optimizer._sign == -1
 
-    # # start with the no_increase_num is equal 15
-    # def fitness_function(x):
-    #     return np.ones(len(x), dtype=np.int64)
-    # no_increase_num = 15
-    # optimizer = GeneticAlgorithm(fitness_function,
-    #                              iters=iters,
-    #                              pop_size=pop_size,
-    #                              str_len=str_len,
-    #                              optimal_value=None,
-    #                              termination_error_value=0,
-    #                              no_increase_num=no_increase_num,
-    #                              minimization=False,
-    #                              show_progress_each=1,
-    #                              keep_history=True)
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+    no_increase_num = 15
+    optimizer = JADE(fitness_function,
+                     iters=iters,
+                     pop_size=pop_size,
+                     left=left,
+                     right=right,
+                     optimal_value=None,
+                     termination_error_value=0,
+                     no_increase_num=no_increase_num,
+                     minimization=False,
+                     show_progress_each=1,
+                     keep_history=True)
 
-    # optimizer.fit()
+    optimizer.fit()
 
-    # assert optimizer.get_remains_calls() == pop_size*(iters - no_increase_num - 1)
-    # assert optimizer._sign == 1
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
 
-    # # start with the optimal_value is equal 1
-    # optimizer = GeneticAlgorithm(fitness_function,
-    #                              iters=iters,
-    #                              pop_size=pop_size,
-    #                              str_len=str_len,
-    #                              optimal_value=1,
-    #                              termination_error_value=0,
-    #                              no_increase_num=None,
-    #                              minimization=False,
-    #                              show_progress_each=1,
-    #                              keep_history=True)
+    # start with the optimal_value is equal 1
+    optimizer = JADE(fitness_function,
+                     iters=iters,
+                     pop_size=pop_size,
+                     left=left,
+                     right=right,
+                     optimal_value=1,
+                     termination_error_value=0,
+                     no_increase_num=None,
+                     minimization=False,
+                     show_progress_each=1,
+                     keep_history=True)
 
-    # optimizer.fit()
-    # assert optimizer.get_remains_calls() == pop_size*(iters - 1)
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_JADE_set_strategy():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1)
+
+    iters = 10
+    pop_size = 10
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    optimizer = JADE(fitness_function,
+                     iters=iters,
+                     pop_size=pop_size,
+                     left=left,
+                     right=right,
+                     optimal_value=None,
+                     termination_error_value=0,
+                     no_increase_num=None,
+                     minimization=True,
+                     show_progress_each=1,
+                     keep_history=True)
+
+    initial_population = float_population(pop_size=pop_size, left=left, right=right)
+
+    optimizer.set_strategy(c_param=0.2,
+                           p_param=0.1,
+                           elitism_param=False,
+                           initial_population=initial_population)
+
+    assert optimizer._c == 0.2
+    assert optimizer._p == 0.1
+    assert optimizer._elitism is False
+
+    optimizer.set_strategy(c_param=0.33,
+                           p_param=0.22,
+                           elitism_param=True,
+                           initial_population=initial_population)
+
+    assert optimizer._c == 0.33
+    assert optimizer._p == 0.22
+    assert optimizer._elitism is True
+
+    optimizer.fit()
+
+    stats = optimizer.get_stats()
+
+    assert np.all(stats['population_g'][0] == initial_population)
+
+
+def test_jDE_start_settings():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1)
+
+    iters = 100
+    pop_size = 50
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    # simple start
+    optimizer = jDE(fitness_function,
+                    iters=iters,
+                    pop_size=pop_size,
+                    left=left,
+                    right=right,
+                    optimal_value=None,
+                    termination_error_value=0,
+                    no_increase_num=None,
+                    minimization=True,
+                    show_progress_each=1,
+                    keep_history=True)
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, TheFittest)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats['fitness_max']) == iters
+    for i in range(len(stats['fitness_max'][:-1])):
+        assert stats['fitness_max'][i] <= stats['fitness_max'][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+    no_increase_num = 15
+    optimizer = jDE(fitness_function,
+                    iters=iters,
+                    pop_size=pop_size,
+                    left=left,
+                    right=right,
+                    optimal_value=None,
+                    termination_error_value=0,
+                    no_increase_num=no_increase_num,
+                    minimization=False,
+                    show_progress_each=1,
+                    keep_history=True)
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = jDE(fitness_function,
+                    iters=iters,
+                    pop_size=pop_size,
+                    left=left,
+                    right=right,
+                    optimal_value=1,
+                    termination_error_value=0,
+                    no_increase_num=None,
+                    minimization=False,
+                    show_progress_each=1,
+                    keep_history=True)
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_jDE_set_strategy():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1)
+
+    iters = 10
+    pop_size = 10
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    optimizer = jDE(fitness_function,
+                    iters=iters,
+                    pop_size=pop_size,
+                    left=left,
+                    right=right,
+                    optimal_value=None,
+                    termination_error_value=0,
+                    no_increase_num=None,
+                    minimization=True,
+                    show_progress_each=1,
+                    keep_history=True)
+
+    initial_population = float_population(pop_size=pop_size, left=left, right=right)
+
+    optimizer.set_strategy(mutation_oper='rand_1',
+                           F_left_param=0.22,
+                           F_right_param=0.33,
+                           t_f_param=0.44,
+                           t_cr_param=0.55,
+                           elitism_param=False,
+                           initial_population=initial_population)
+
+    assert optimizer._specified_mutation == rand_1
+    assert optimizer._F_left == 0.22
+    assert optimizer._F_right == 0.33
+    assert optimizer._t_f == 0.44
+    assert optimizer._t_cr == 0.55
+    assert optimizer._elitism is False
+
+    optimizer.set_strategy(mutation_oper='best_1',
+                           F_left_param=0.222,
+                           F_right_param=0.333,
+                           t_f_param=0.444,
+                           t_cr_param=0.555,
+                           elitism_param=True,
+                           initial_population=initial_population)
+
+    assert optimizer._specified_mutation == best_1
+    assert optimizer._F_left == 0.222
+    assert optimizer._F_right == 0.333
+    assert optimizer._t_f == 0.444
+    assert optimizer._t_cr == 0.555
+    assert optimizer._elitism is True
+
+    optimizer.fit()
+
+    stats = optimizer.get_stats()
+
+    assert np.all(stats['population_g'][0] == initial_population)
