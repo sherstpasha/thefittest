@@ -15,7 +15,6 @@ from numpy.typing import NDArray
 from ..tools import find_end_subtree_from_i
 from ..tools import find_id_args_from_i
 from ..tools import get_levels_tree_from_i
-# from ..tools.operators import Operator
 
 
 FUNCTIONAL_COLOR_CODE = (1, 0.72, 0.43, 1)

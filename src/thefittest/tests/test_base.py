@@ -56,7 +56,7 @@ def test_thefittest_class():
     assert thefittest_._fitness == 4
 
     fittest = thefittest_.get()
-    assert type(fittest) is dict
+    assert isinstance(fittest, dict)
     assert len(fittest) == 3
 
 
@@ -144,6 +144,7 @@ def test_nodes_class():
     assert isinstance(random_ephemeral, EphemeralConstantNode)
     assert random_ephemeral._value == 10
 
+
 def test_tree_class():
     x = TerminalNode(value=5, name='x')
     y = TerminalNode(value=7, name='y')
@@ -153,10 +154,8 @@ def test_tree_class():
     functional_mul = FunctionalNode(value=Mul(), sign='*')
     functional_sub = FunctionalNode(value=Sub(), sign='-')
 
-    ''' z * (x + y) | mul(z, add(x, y))'''
     tree = Tree(nodes=[functional_mul, z, functional_add, x, y])
 
-    '''(x * x) + (z * (y - x)) | add(mul(x, x), mul(z, sub(y, x)))'''
     tree2 = Tree(nodes=[functional_add, functional_mul, x, x,
                         functional_mul, z, functional_sub, y, x])
 
@@ -192,7 +191,6 @@ def test_tree_class():
     assert str(tree4) == '(z * (y - x))'
     assert len(tree) == 5
 
-    '''(z * (x + (z * (x + y))))'''
     tree5 = tree.concat(index=4, other_tree=tree)
     assert str(tree5) == '(z * (x + (z * (x + y))))'
     assert tree5() == 1507
@@ -210,3 +208,55 @@ def test_tree_class():
     graph = tree.get_graph(keep_id=True)
 
     assert isinstance(graph, dict)
+
+
+def test_net():
+
+    net = Net(inputs={0, 1, 3})
+    net2 = Net(inputs={2})
+
+    net3 = net + net2
+    assert net3._inputs == {0, 1, 2, 3}
+
+    net4 = net > net2
+    assert net4._inputs == {0, 1, 2, 3}
+
+    net5 = Net(hidden_layers=[{4}])
+    net6 = Net(hidden_layers=[{5, 6}])
+
+    net7 = net5 + net6
+
+    assert net7._hidden_layers == [{4, 5, 6}]
+
+    net8 = net5 > net6
+    assert net8._hidden_layers == [{4}, {5, 6}]
+    assert np.all(net8._connects == np.array([[4, 5], [4, 6]], dtype=np.int64))
+
+    net9 = net2 + net5
+    assert np.all(net9._connects == np.array([[2, 4]], dtype=np.int64))
+
+    net10 = net5 + net2
+    assert np.all(net10._connects == np.array([[2, 4]], dtype=np.int64))
+
+    net11 = net5 > net2
+    assert np.all(net11._connects == np.array([[2, 4]], dtype=np.int64))
+
+    net12 = Net(hidden_layers=[{4}, {5, 6}])
+    net13 = Net(hidden_layers=[{7, 8}])
+
+    net14 = net12 + net13
+    assert net14._hidden_layers == [{4, 7, 8}, {5, 6}]
+
+    net15 = net13 + net12
+    assert net15._hidden_layers == [{4, 7, 8}, {5, 6}]
+
+    connects, weights = net._get_connect({1, 2}, {})
+    assert np.all(connects == np.zeros((0, 2), dtype=int))
+    assert np.all(weights == np.zeros((0), dtype=float))
+
+    assert len(net11) == 1
+
+    fixed = net5._fix(inputs={1, 2})
+
+    assert np.all(fixed._connects == np.array([[1, 4], [2, 4]], dtype=np.int64))
+    assert fixed._inputs == {1, 2}
