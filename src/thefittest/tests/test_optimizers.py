@@ -5,12 +5,16 @@ from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 # from ..optimizers import GeneticProgramming
 from ..optimizers import JADE
+from ..optimizers import SaDE2005
+from ..optimizers import SelfCGA
 from ..optimizers import jDE
 from ..tools.operators import best_1
 from ..tools.operators import current_to_best_1
 from ..tools.operators import flip_mutation
+from ..tools.operators import one_point_crossover
 from ..tools.operators import proportional_selection
 from ..tools.operators import rand_1
+from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
 from ..tools.operators import uniform_crossover
 from ..tools.random import binary_string_population
@@ -528,6 +532,301 @@ def test_jDE_set_strategy():
     assert optimizer._t_f == 0.444
     assert optimizer._t_cr == 0.555
     assert optimizer._elitism is True
+
+    optimizer.fit()
+
+    stats = optimizer.get_stats()
+
+    assert np.all(stats['population_g'][0] == initial_population)
+
+
+def test_SaDE2005_start_settings():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1)
+
+    iters = 100
+    pop_size = 50
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    # simple start
+    optimizer = SaDE2005(fitness_function,
+                         iters=iters,
+                         pop_size=pop_size,
+                         left=left,
+                         right=right,
+                         optimal_value=None,
+                         termination_error_value=0,
+                         no_increase_num=None,
+                         minimization=True,
+                         show_progress_each=1,
+                         keep_history=True)
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, TheFittest)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats['fitness_max']) == iters
+    for i in range(len(stats['fitness_max'][:-1])):
+        assert stats['fitness_max'][i] <= stats['fitness_max'][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+    no_increase_num = 15
+    optimizer = SaDE2005(fitness_function,
+                         iters=iters,
+                         pop_size=pop_size,
+                         left=left,
+                         right=right,
+                         optimal_value=None,
+                         termination_error_value=0,
+                         no_increase_num=no_increase_num,
+                         minimization=False,
+                         show_progress_each=1,
+                         keep_history=True)
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = SaDE2005(fitness_function,
+                         iters=iters,
+                         pop_size=pop_size,
+                         left=left,
+                         right=right,
+                         optimal_value=1,
+                         termination_error_value=0,
+                         no_increase_num=None,
+                         minimization=False,
+                         show_progress_each=1,
+                         keep_history=True)
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_SaDE2005_set_strategy():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1)
+
+    iters = 100
+    pop_size = 100
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    optimizer = SaDE2005(fitness_function,
+                         iters=iters,
+                         pop_size=pop_size,
+                         left=left,
+                         right=right,
+                         optimal_value=None,
+                         termination_error_value=0,
+                         no_increase_num=None,
+                         minimization=True,
+                         show_progress_each=1,
+                         keep_history=True)
+
+    initial_population = float_population(pop_size=pop_size, left=left, right=right)
+
+    optimizer.set_strategy(m_learning_period_param=15,
+                           CR_update_timer_param=5,
+                           CR_m_learning_period_param=25,
+                           threshold_params=0.11,
+                           Fm_param=0.55,
+                           F_sigma_param=0.33,
+                           CR_sigma_param=0.12,
+                           elitism_param=False,
+                           initial_population=initial_population)
+
+    assert optimizer._m_learning_period == 15
+    assert optimizer._CR_update_timer == 5
+    assert optimizer._CR_m_learning_period == 25
+    assert optimizer._threshold == 0.11
+    assert optimizer._Fm == 0.55
+    assert optimizer._F_sigma == 0.33
+    assert optimizer._CR_sigma == 0.12
+    assert optimizer._elitism is False
+
+    optimizer.set_strategy(m_learning_period_param=16,
+                           CR_update_timer_param=6,
+                           CR_m_learning_period_param=26,
+                           threshold_params=0.111,
+                           Fm_param=0.555,
+                           F_sigma_param=0.333,
+                           CR_sigma_param=0.122,
+                           elitism_param=True,
+                           initial_population=initial_population)
+
+    assert optimizer._m_learning_period == 16
+    assert optimizer._CR_update_timer == 6
+    assert optimizer._CR_m_learning_period == 26
+    assert optimizer._threshold == 0.111
+    assert optimizer._Fm == 0.555
+    assert optimizer._F_sigma == 0.333
+    assert optimizer._CR_sigma == 0.122
+    assert optimizer._elitism is True
+    optimizer.fit()
+
+    stats = optimizer.get_stats()
+
+    assert np.all(stats['population_g'][0] == initial_population)
+
+
+def test_SelfCGA_start_settings():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1)
+
+    iters = 100
+    pop_size = 50
+    str_len = 200
+
+    # simple start
+    optimizer = SelfCGA(fitness_function,
+                        iters=iters,
+                        pop_size=pop_size,
+                        str_len=str_len,
+                        optimal_value=None,
+                        termination_error_value=0,
+                        no_increase_num=None,
+                        minimization=True,
+                        show_progress_each=1,
+                        keep_history=True)
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, TheFittest)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats['fitness_max']) == iters
+    for i in range(len(stats['fitness_max'][:-1])):
+        assert stats['fitness_max'][i] <= stats['fitness_max'][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.int64)
+    no_increase_num = 15
+    optimizer = SelfCGA(fitness_function,
+                        iters=iters,
+                        pop_size=pop_size,
+                        str_len=str_len,
+                        optimal_value=None,
+                        termination_error_value=0,
+                        no_increase_num=no_increase_num,
+                        minimization=False,
+                        show_progress_each=1,
+                        keep_history=True)
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = SelfCGA(fitness_function,
+                        iters=iters,
+                        pop_size=pop_size,
+                        str_len=str_len,
+                        optimal_value=1,
+                        termination_error_value=0,
+                        no_increase_num=None,
+                        minimization=False,
+                        show_progress_each=1,
+                        keep_history=True)
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_SelfCGA_set_strategy():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1)
+
+    iters = 10
+    pop_size = 10
+    str_len = 5
+
+    optimizer = SelfCGA(fitness_function,
+                        iters=iters,
+                        pop_size=pop_size,
+                        str_len=str_len,
+                        optimal_value=None,
+                        termination_error_value=0,
+                        no_increase_num=None,
+                        minimization=False,
+                        show_progress_each=None,
+                        keep_history=True)
+
+    initial_population = binary_string_population(pop_size=pop_size,
+                                                  str_len=str_len)
+    optimizer.set_strategy(selection_opers=('proportional', 'tournament_3'),
+                           crossover_opers=('uniform2', 'one_point'),
+                           mutation_opers=('weak', 'average'),
+                           tour_size_param=6,
+                           initial_population=initial_population,
+                           elitism_param=False,
+                           parents_num_param=7,
+                           mutation_rate_param=0.1,
+                           K_param=0.2,
+                           threshold_param=0.001)
+
+    selection_set = {'proportional': (proportional_selection, 0),
+                     'tournament_3': (tournament_selection, 3)}
+    crossover_set = {'uniform2': (uniform_crossover, 2),
+                     'one_point': (one_point_crossover, 2)}
+    mutation_set = {'weak': (flip_mutation, 1 / (3 * str_len)),
+                    'average': (flip_mutation, 1 / (str_len))}
+    assert optimizer._selection_set == selection_set
+    assert optimizer._crossover_set == crossover_set
+    assert optimizer._mutation_set == mutation_set
+    assert optimizer._tour_size == 6
+    assert optimizer._elitism is False
+    assert optimizer._parents_num == 7
+    assert optimizer._K == 0.2
+    assert optimizer._threshold == 0.001
+
+    optimizer.set_strategy(selection_opers=('rank', 'tournament_k'),
+                           crossover_opers=('uniform7', 'uniformk'),
+                           mutation_opers=('weak', 'custom_rate'),
+                           tour_size_param=4,
+                           initial_population=initial_population,
+                           elitism_param=True,
+                           parents_num_param=5,
+                           mutation_rate_param=0.12,
+                           K_param=0.3,
+                           threshold_param=0.0011)
+
+    selection_set = {'rank': (rank_selection, 0),
+                     'tournament_k': (tournament_selection, 4)}
+    crossover_set = {'uniform7': (uniform_crossover, 7),
+                     'uniformk': (uniform_crossover, 5)}
+    mutation_set = {'weak': (flip_mutation, 1 / (3 * str_len)),
+                    'custom_rate': (flip_mutation, 0.12)}
+    assert optimizer._selection_set == selection_set
+    assert optimizer._crossover_set == crossover_set
+    assert optimizer._mutation_set == mutation_set
+    assert optimizer._tour_size == 4
+    assert optimizer._elitism is True
+    assert optimizer._parents_num == 5
+    assert optimizer._K == 0.3
+    assert optimizer._threshold == 0.0011
 
     optimizer.fit()
 
