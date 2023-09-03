@@ -5,6 +5,8 @@ from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 # from ..optimizers import GeneticProgramming
 from ..optimizers import JADE
+from ..optimizers import SHADE
+from ..optimizers import SHAGA
 from ..optimizers import SaDE2005
 from ..optimizers import SelfCGA
 from ..optimizers import jDE
@@ -24,7 +26,7 @@ from ..tools.random import float_population
 def test_GeneticAlgorithm_start_settings():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 100
     pop_size = 50
@@ -57,7 +59,7 @@ def test_GeneticAlgorithm_start_settings():
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.int64)
+        return np.ones(len(x), dtype=np.float64)
     no_increase_num = 15
     optimizer = GeneticAlgorithm(fitness_function,
                                  iters=iters,
@@ -94,7 +96,7 @@ def test_GeneticAlgorithm_start_settings():
 def test_GeneticAlgorithm_set_strategy():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 10
     pop_size = 10
@@ -152,7 +154,7 @@ def test_GeneticAlgorithm_set_strategy():
 def test_DifferentialEvolution_start_settings():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 100
     pop_size = 50
@@ -227,7 +229,7 @@ def test_DifferentialEvolution_start_settings():
 def test_DifferentialEvolution_set_strategy():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 10
     pop_size = 10
@@ -281,7 +283,7 @@ def test_DifferentialEvolution_set_strategy():
 def test_JADE_start_settings():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 100
     pop_size = 50
@@ -356,7 +358,7 @@ def test_JADE_start_settings():
 def test_JADE_set_strategy():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 10
     pop_size = 10
@@ -406,7 +408,7 @@ def test_JADE_set_strategy():
 def test_jDE_start_settings():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 100
     pop_size = 50
@@ -443,6 +445,7 @@ def test_jDE_start_settings():
     # start with the no_increase_num is equal 15
     def fitness_function(x):
         return np.ones(len(x), dtype=np.float64)
+
     no_increase_num = 15
     optimizer = jDE(fitness_function,
                     iters=iters,
@@ -481,7 +484,7 @@ def test_jDE_start_settings():
 def test_jDE_set_strategy():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 10
     pop_size = 10
@@ -543,7 +546,7 @@ def test_jDE_set_strategy():
 def test_SaDE2005_start_settings():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 100
     pop_size = 50
@@ -580,6 +583,7 @@ def test_SaDE2005_start_settings():
     # start with the no_increase_num is equal 15
     def fitness_function(x):
         return np.ones(len(x), dtype=np.float64)
+
     no_increase_num = 15
     optimizer = SaDE2005(fitness_function,
                          iters=iters,
@@ -618,7 +622,7 @@ def test_SaDE2005_start_settings():
 def test_SaDE2005_set_strategy():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 100
     pop_size = 100
@@ -687,7 +691,7 @@ def test_SaDE2005_set_strategy():
 def test_SelfCGA_start_settings():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 100
     pop_size = 50
@@ -720,7 +724,8 @@ def test_SelfCGA_start_settings():
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.int64)
+        return np.ones(len(x), dtype=np.float64)
+
     no_increase_num = 15
     optimizer = SelfCGA(fitness_function,
                         iters=iters,
@@ -757,7 +762,7 @@ def test_SelfCGA_start_settings():
 def test_SelfCGA_set_strategy():
 
     def fitness_function(x):
-        return np.sum(x, axis=1)
+        return np.sum(x, axis=1, dtype=np.float64)
 
     iters = 10
     pop_size = 10
@@ -827,6 +832,234 @@ def test_SelfCGA_set_strategy():
     assert optimizer._parents_num == 5
     assert optimizer._K == 0.3
     assert optimizer._threshold == 0.0011
+
+    optimizer.fit()
+
+    stats = optimizer.get_stats()
+
+    assert np.all(stats['population_g'][0] == initial_population)
+
+
+def test_SHADE_start_settings():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    iters = 100
+    pop_size = 50
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    # simple start
+    optimizer = SHADE(fitness_function,
+                      iters=iters,
+                      pop_size=pop_size,
+                      left=left,
+                      right=right,
+                      optimal_value=None,
+                      termination_error_value=0,
+                      no_increase_num=None,
+                      minimization=True,
+                      show_progress_each=1,
+                      keep_history=True)
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, TheFittest)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats['fitness_max']) == iters
+    for i in range(len(stats['fitness_max'][:-1])):
+        assert stats['fitness_max'][i] <= stats['fitness_max'][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+
+    no_increase_num = 15
+    optimizer = SHADE(fitness_function,
+                      iters=iters,
+                      pop_size=pop_size,
+                      left=left,
+                      right=right,
+                      optimal_value=None,
+                      termination_error_value=0,
+                      no_increase_num=no_increase_num,
+                      minimization=False,
+                      show_progress_each=1,
+                      keep_history=True)
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = SHADE(fitness_function,
+                      iters=iters,
+                      pop_size=pop_size,
+                      left=left,
+                      right=right,
+                      optimal_value=1,
+                      termination_error_value=0,
+                      no_increase_num=None,
+                      minimization=False,
+                      show_progress_each=1,
+                      keep_history=True)
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_SHADE_set_strategy():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    iters = 10
+    pop_size = 10
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    optimizer = SHADE(fitness_function,
+                      iters=iters,
+                      pop_size=pop_size,
+                      left=left,
+                      right=right,
+                      optimal_value=None,
+                      termination_error_value=0,
+                      no_increase_num=None,
+                      minimization=True,
+                      show_progress_each=1,
+                      keep_history=True)
+
+    initial_population = float_population(pop_size=pop_size, left=left, right=right)
+
+    optimizer.set_strategy(elitism_param=False,
+                           initial_population=initial_population)
+
+    assert optimizer._elitism is False
+
+    optimizer.set_strategy(elitism_param=True,
+                           initial_population=initial_population)
+
+    assert optimizer._elitism is True
+
+    optimizer.fit()
+
+    stats = optimizer.get_stats()
+
+    assert np.all(stats['population_g'][0] == initial_population)
+
+
+def test_SHAGA_start_settings():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    iters = 100
+    pop_size = 50
+    str_len = 200
+
+    # simple start
+    optimizer = SHAGA(fitness_function,
+                      iters=iters,
+                      pop_size=pop_size,
+                      str_len=str_len,
+                      optimal_value=None,
+                      termination_error_value=0,
+                      no_increase_num=None,
+                      minimization=True,
+                      show_progress_each=1,
+                      keep_history=True)
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, TheFittest)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats['fitness_max']) == iters
+    for i in range(len(stats['fitness_max'][:-1])):
+        assert stats['fitness_max'][i] <= stats['fitness_max'][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+
+    no_increase_num = 15
+    optimizer = SHAGA(fitness_function,
+                      iters=iters,
+                      pop_size=pop_size,
+                      str_len=str_len,
+                      optimal_value=None,
+                      termination_error_value=0,
+                      no_increase_num=no_increase_num,
+                      minimization=False,
+                      show_progress_each=1,
+                      keep_history=True)
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = SHAGA(fitness_function,
+                      iters=iters,
+                      pop_size=pop_size,
+                      str_len=str_len,
+                      optimal_value=1,
+                      termination_error_value=0,
+                      no_increase_num=None,
+                      minimization=False,
+                      show_progress_each=1,
+                      keep_history=True)
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_SHAGA_set_strategy():
+
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    iters = 10
+    pop_size = 10
+    str_len = 5
+
+    optimizer = SHAGA(fitness_function,
+                      iters=iters,
+                      pop_size=pop_size,
+                      str_len=str_len,
+                      optimal_value=None,
+                      termination_error_value=0,
+                      no_increase_num=None,
+                      minimization=False,
+                      show_progress_each=None,
+                      keep_history=True)
+
+    initial_population = binary_string_population(pop_size=pop_size,
+                                                  str_len=str_len)
+    optimizer.set_strategy(initial_population=initial_population,
+                           elitism_param=False)
+
+    assert optimizer._elitism is False
+
+    optimizer.set_strategy(initial_population=initial_population,
+                           elitism_param=True)
+
+    assert optimizer._elitism is True
 
     optimizer.fit()
 

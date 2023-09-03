@@ -2,16 +2,19 @@ from functools import partial
 from typing import Callable
 from typing import Optional
 from typing import Tuple
+
 import numpy as np
+
 from ._jade import JADE
+from ..tools import donothing
+from ..tools import find_pbest_id
+from ..tools.operators import binomial
+from ..tools.operators import current_to_pbest_1_archive_p_min
+from ..tools.random import float_population
 from ..tools.random import randc01
 from ..tools.random import randn01
-from ..tools.random import float_population
-from ..tools.transformations import lehmer_mean
-from ..tools.operators import current_to_pbest_1_archive_p_min
-from ..tools.operators import binomial
-from ..tools import find_pbest_id
 from ..tools.transformations import bounds_control_mean
+from ..tools.transformations import lehmer_mean
 
 
 class SHADE(JADE):
@@ -21,11 +24,11 @@ class SHADE(JADE):
 
     def __init__(self,
                  fitness_function: Callable,
-                 genotype_to_phenotype: Callable,
                  iters: int,
                  pop_size: int,
                  left: np.ndarray,
                  right: np.ndarray,
+                 genotype_to_phenotype: Callable = donothing,
                  optimal_value: Optional[float] = None,
                  termination_error_value: float = 0.,
                  no_increase_num: Optional[int] = None,
@@ -35,11 +38,11 @@ class SHADE(JADE):
         JADE.__init__(
             self,
             fitness_function=fitness_function,
-            genotype_to_phenotype=genotype_to_phenotype,
             iters=iters,
             pop_size=pop_size,
             left=left,
             right=right,
+            genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
             no_increase_num=no_increase_num,
@@ -75,7 +78,7 @@ class SHADE(JADE):
         offspring_fit = fitness.copy()
 
         mutant_cr_ph = self._get_phenotype(mutant_cr_g)
-        mutant_cr_fit = self._evaluate(mutant_cr_ph)
+        mutant_cr_fit = self._get_fitness(mutant_cr_ph)
         mask_more_equal = mutant_cr_fit >= fitness
         offspring_g[mask_more_equal] = mutant_cr_g[mask_more_equal]
         offspring_ph[mask_more_equal] = mutant_cr_ph[mask_more_equal]
@@ -111,8 +114,8 @@ class SHADE(JADE):
         if len(S_CR):
             sum_ = np.sum(df)
             if sum_ > 0:
-                weight_i = df/sum_
-                return np.sum(weight_i*S_CR)
+                weight_i = df / sum_
+                return np.sum(weight_i * S_CR)
         return u_CR
 
     def set_strategy(self,
@@ -128,7 +131,7 @@ class SHADE(JADE):
             population_g = float_population(
                 self._pop_size, self._left, self._right)
         else:
-            population_g = self._initial_population
+            population_g = self._initial_population.copy()
 
         H_F = np.full(self._H_size, 0.5)
         H_CR = np.full(self._H_size, 0.5)
@@ -138,15 +141,15 @@ class SHADE(JADE):
         external_archive = np.zeros(shape=(0, len(self._left)))
 
         population_ph = self._get_phenotype(population_g)
-        fitness = self._evaluate(population_ph)
+        fitness = self._get_fitness(population_ph)
         pbest_id = find_pbest_id(fitness, np.float64(self._p))
+        self._update_fittest(population_g, population_ph, fitness)
+        self._update_stats(population_g=population_g,
+                           fitness_max=self._thefittest._fitness,
+                           H_F=H_F,
+                           H_CR=H_CR)
+        for i in range(self._iters - 1):
 
-        for i in range(self._iters-1):
-            self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats({'population_g': population_g.copy(),
-                                'fitness_max': self._thefittest._fitness,
-                                'H_F': H_F.copy(),
-                                'H_CR': H_CR.copy()})
             self._show_progress(i)
             if self._termitation_check():
                 break
@@ -180,7 +183,8 @@ class SHADE(JADE):
                 df = np.abs(will_be_replaced_fit - fitness[succeses])
 
                 if self._elitism:
-                    population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+                    population_g[-1], population_ph[-1], fitness[-1] =\
+                        self._thefittest.get().values()
                 pbest_id = find_pbest_id(fitness, np.float64(self._p))
 
                 if next_k == self._H_size:
@@ -195,5 +199,11 @@ class SHADE(JADE):
                 else:
                     k += 1
                     next_k += 1
+
+                self._update_fittest(population_g, population_ph, fitness)
+                self._update_stats(population_g=population_g,
+                                   fitness_max=self._thefittest._fitness,
+                                   H_F=H_F,
+                                   H_CR=H_CR)
 
         return self
