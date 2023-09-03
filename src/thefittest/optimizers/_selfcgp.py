@@ -1,16 +1,19 @@
 from functools import partial
 from typing import Callable
+from typing import Dict
 from typing import Optional
 from typing import Tuple
-from typing import Dict
+
 import numpy as np
-from ..tools.transformations import scale_data
-from ..tools.transformations import rank_data
+
+from ._geneticprogramming import GeneticProgramming
 from ..base import Tree
 from ..base import UniversalSet
-from ..tools.transformations import numpy_group_by
-from ._geneticprogramming import GeneticProgramming
+from ..tools import donothing
 from ..tools.random import half_and_half
+from ..tools.transformations import numpy_group_by
+from ..tools.transformations import rank_data
+from ..tools.transformations import scale_data
 
 
 class SelfCGP(GeneticProgramming):
@@ -19,10 +22,10 @@ class SelfCGP(GeneticProgramming):
 
     def __init__(self,
                  fitness_function: Callable,
-                 genotype_to_phenotype: Callable,
                  uniset: UniversalSet,
                  iters: int,
                  pop_size: int,
+                 genotype_to_phenotype: Callable = donothing,
                  optimal_value: Optional[float] = None,
                  termination_error_value: float = 0.,
                  no_increase_num: Optional[int] = None,
@@ -32,10 +35,10 @@ class SelfCGP(GeneticProgramming):
         GeneticProgramming.__init__(
             self,
             fitness_function=fitness_function,
-            genotype_to_phenotype=genotype_to_phenotype,
             uniset=uniset,
             iters=iters,
             pop_size=pop_size,
+            genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
             no_increase_num=no_increase_num,
@@ -61,11 +64,11 @@ class SelfCGP(GeneticProgramming):
     def _update_proba(self,
                       proba_dict: Dict,
                       operator: str) -> Dict:
-        proba_dict[operator] += self._K/self._iters
+        proba_dict[operator] += self._K / self._iters
         proba_value = np.array(list(proba_dict.values()))
-        proba_value -= self._K/(len(proba_dict)*self._iters)
+        proba_value -= self._K / (len(proba_dict) * self._iters)
         proba_value = proba_value.clip(self._threshold, 1)
-        proba_value = proba_value/proba_value.sum()
+        proba_value = proba_value / proba_value.sum()
         new_proba_dict = dict(zip(proba_dict.keys(), proba_value))
         return new_proba_dict
 
@@ -97,18 +100,18 @@ class SelfCGP(GeneticProgramming):
                                               fitness_rank[selected_id],
                                               self._max_level)
 
-        proba = proba_up/len(offspring_no_mutated) if scale else proba_up
+        proba = proba_up / len(offspring_no_mutated) if scale else proba_up
 
         offspring = mutation_func(offspring_no_mutated, self._uniset,
                                   proba, self._max_level)
         return offspring
 
     def set_strategy(self,
-                     select_opers: Tuple = ('proportional',
-                                            'rank',
-                                            'tournament_3',
-                                            'tournament_5',
-                                            'tournament_7'),
+                     selection_opers: Tuple = ('proportional',
+                                               'rank',
+                                               'tournament_3',
+                                               'tournament_5',
+                                               'tournament_7'),
                      crossover_opers: Tuple = ('standart',
                                                'one_point',
                                                'uniform_rank2'),
@@ -118,7 +121,7 @@ class SelfCGP(GeneticProgramming):
                                               'weak_grow',
                                               'average_grow',
                                               'strong_grow'),
-                     tour_size_param:  int = 2,
+                     tour_size_param: int = 2,
                      initial_population: Optional[np.ndarray] = None,
                      elitism_param: bool = True,
                      parents_num_param: int = 7,
@@ -153,7 +156,7 @@ class SelfCGP(GeneticProgramming):
         self._update_pool()
 
         selection_set = {}
-        for operator_name in select_opers:
+        for operator_name in selection_opers:
             value = self._selection_pool[operator_name]
             selection_set[operator_name] = value
         self._selection_set = dict(sorted(selection_set.items()))
@@ -177,35 +180,36 @@ class SelfCGP(GeneticProgramming):
         z_mutation = len(self._mutation_set)
 
         s_proba = dict(zip(list(self._selection_set.keys()),
-                           np.full(z_selection, 1/z_selection)))
+                           np.full(z_selection, 1 / z_selection)))
         if 'empty' in self._crossover_set.keys():
             c_proba = dict(zip(list(self._crossover_set.keys()),
-                           np.full(z_crossover, 0.9/(z_crossover-1))))
+                           np.full(z_crossover, 0.9 / (z_crossover - 1))))
             c_proba['empty'] = 0.1
         else:
             c_proba = dict(zip(list(self._crossover_set.keys()),
-                               np.full(z_crossover, 1/z_crossover)))
+                               np.full(z_crossover, 1 / z_crossover)))
         m_proba = dict(zip(list(self._mutation_set.keys()),
-                       np.full(z_mutation, 1/z_mutation)))
+                       np.full(z_mutation, 1 / z_mutation)))
 
         if self._initial_population is None:
             population_g = half_and_half(
                 self._pop_size, self._uniset, self._init_level)
         else:
-            population_g = self._initial_population
+            population_g = self._initial_population.copy()
 
         for i in range(self._iters):
             population_ph = self._get_phenotype(population_g)
-            fitness = self._evaluate(population_ph)
+            fitness = self._get_fitness(population_ph)
 
             self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats({'individ_max': self._thefittest._genotype.copy(),
-                                'fitness_max': self._thefittest._fitness,
-                                's_proba': s_proba.copy(),
-                                'c_proba': c_proba.copy(),
-                                'm_proba': m_proba.copy()})
+            self._update_stats(population_g=population_g,
+                               fitness_max=self._thefittest._fitness,
+                               s_proba=s_proba,
+                               c_proba=c_proba,
+                               m_proba=m_proba)
             if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+                population_g[-1], population_ph[-1], fitness[-1] =\
+                    self._thefittest.get().values()
             fitness_scale = scale_data(fitness)
 
             if i > 0:

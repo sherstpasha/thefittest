@@ -183,9 +183,9 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             population_g = half_and_half(
                 self._pop_size, self._uniset, self._init_level)
         else:
-            population_g = self._initial_population
+            population_g = self._initial_population.copy()
 
-        for i in range(self._iters - 1):
+        for i in range(self._iters):
             population_ph = self._get_phenotype(population_g)
             fitness = self._get_fitness(population_ph)
 
@@ -193,7 +193,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             self._update_stats(population_g=population_g,
                                fitness_max=self._thefittest._fitness)
             if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get().values()
+                population_g[-1], population_ph[-1], fitness[-1] =\
+                    self._thefittest.get().values()
 
             self._show_progress(i)
             if self._termitation_check():

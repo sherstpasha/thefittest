@@ -1,21 +1,21 @@
+import random
 from functools import partial
 from typing import Callable
+from typing import Dict
 from typing import Optional
 from typing import Tuple
-from typing import Dict
-from typing import Union
-import random
+
 import numpy as np
 from numpy.typing import NDArray
+
 from ._geneticalgorithm import GeneticAlgorithm
-from ..tools.transformations import scale_data
-from ..tools.transformations import rank_data
-from ..tools.transformations import numpy_group_by
-from ..tools.random import binary_string_population
 from ..tools.operators import flip_mutation
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
 from ..tools.operators import tournament_selection
+from ..tools.random import binary_string_population
+from ..tools.transformations import rank_data
+from ..tools.transformations import scale_data
 
 
 class SelfAGA(GeneticAlgorithm):
@@ -52,8 +52,8 @@ class SelfAGA(GeneticAlgorithm):
         self._p_operator_param: float
         self._p_mutate_param: float
 
-        self._min_mutation_rate = 1/self._str_len
-        self._max_mutation_rate = min(1, 3/self._str_len)
+        self._min_mutation_rate = 1 / self._str_len
+        self._max_mutation_rate = min(1, 3 / self._str_len)
 
     def _get_new_individ_g(self,
                            population_g: np.ndarray,
@@ -77,22 +77,23 @@ class SelfAGA(GeneticAlgorithm):
                                 oper_sets: Dict):
         to_return = []
         operators_count = len(oper_sets.keys())
-        quantity_operators = int(self._pop_size/operators_count)
+        quantity_operators = int(self._pop_size / operators_count)
 
         for operator in oper_sets.keys():
-            to_return.extend([operator]*quantity_operators)
+            to_return.extend([operator] * quantity_operators)
 
         quantity_remain = self._pop_size - len(to_return)
         if quantity_remain > 0:
-            to_return.extend(random.choices(list(oper_sets.keys()), k = quantity_remain))
+            to_return.extend(random.choices(list(oper_sets.keys()), k=quantity_remain))
 
         random.shuffle(to_return)
-        
+
         return np.array(to_return)
 
-    def _init_parameter_uniform_float(self, low: np.float64, high: np.float64) -> NDArray[np.float64]:
-        return np.linspace(low, high, self._pop_size)
-        # return np.random.uniform(low=low, high=high, size=self._pop_size)
+    def _init_parameter_uniform_float(self,
+                                      low: np.float64,
+                                      high: np.float64) -> NDArray[np.float64]:
+        return np.random.uniform(low=low, high=high, size=self._pop_size)
 
     def _update_pool(self):
         GeneticAlgorithm._update_pool(self)
@@ -144,12 +145,12 @@ class SelfAGA(GeneticAlgorithm):
         self._parents_num = parents_num_param
 
         if p_operator_param is None:
-           self._p_operator_param = 1/self._pop_size
+            self._p_operator_param = 1 / self._pop_size
         else:
             self._p_operator_param = p_operator_param
-        
+
         if p_mutate_param is None:
-           self._p_mutate_param = 1/self._pop_size
+            self._p_mutate_param = 1 / self._pop_size
         else:
             self._p_mutate_param = p_mutate_param
 
@@ -207,24 +208,24 @@ class SelfAGA(GeneticAlgorithm):
             population_g = binary_string_population(
                 self._pop_size, self._str_len)
         else:
-            population_g = self._initial_population
+            population_g = self._initial_population.copy()
 
         for i in range(self._iters):
             population_ph = self._get_phenotype(population_g)
-            fitness = self._evaluate(population_ph)
+            fitness = self._get_fitness(population_ph)
 
             self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats({'population_g': population_g.copy(),
-                                'fitness_max': self._thefittest._fitness,
-                                's_opers': s_operators.copy(),
-                                'c_opers': c_operators.copy(),
-                                'm_proba': mutation_rate.copy()})
+            self._update_stats(population_g=population_g,
+                               fitness_max=self._thefittest._fitness,
+                               s_opers=s_operators,
+                               c_opers=c_operators,
+                               m_proba=mutation_rate)
             if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get()
+                population_g[-1], population_ph[-1], fitness[-1] =\
+                    self._thefittest.get().values()
             fitness_scale = scale_data(fitness)
             fitness_rank = rank_data(fitness)
             if i > 0:
-                pass
                 s_operators = self._choice_operators_params(
                     s_operators, fitness_scale, fitness_rank)
                 c_operators = self._choice_operators_params(
