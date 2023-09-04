@@ -3,6 +3,7 @@ import numpy as np
 from ..base._ea import Statistics
 from ..base._ea import TheFittest
 from ..base._net import Net
+from ..base._net import HiddenBlock
 from ..base._tree import EphemeralConstantNode
 from ..base._tree import EphemeralNode
 from ..base._tree import FunctionalNode
@@ -260,3 +261,29 @@ def test_net():
 
     assert np.all(fixed._connects == np.array([[1, 4], [2, 4]], dtype=np.int64))
     assert fixed._inputs == {1, 2}
+
+    net16 = Net(inputs={0, 1},
+                hidden_layers=[{2, 3}, {4}],
+                outputs={5},
+                connects=np.array([[0, 2],
+                                   [1, 3],
+                                   [2, 4],
+                                   [3, 4],
+                                   [4, 5]], dtype=np.int64),
+                weights=np.array([0.1, 0.2, 0.4, 0.5, 1.5], dtype=np.float64),
+                activs={2: 1, 3: 1, 4: 1, 5: 1})
+
+    X = np.array([[1, 2]], dtype=np.float64)
+    out = net16.forward(X)
+
+    print(out)
+
+    graph = net16.get_graph()
+
+    assert out[0][0][0] == 0.36000000000000004
+    assert isinstance(graph, dict)
+
+    hb = HiddenBlock(max_size=10)
+
+    assert hb._activ in [0, 1, 2, 3]
+    assert hb._size <= 10

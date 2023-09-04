@@ -45,7 +45,7 @@ def best_1(current: NDArray[np.float64],
     size = np.int64(len(population))
     r1, r2 = random_sample(
         range_size=size, quantity=np.int64(2), replace=False)
-    return best + F*(population[r1] - population[r2])
+    return best + F * (population[r1] - population[r2])
 
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
@@ -56,7 +56,7 @@ def rand_1(current: NDArray[np.float64],
     size = np.int64(len(population))
     r1, r2, r3 = random_sample(
         range_size=size, quantity=np.int64(3), replace=False)
-    return population[r3] + F*(population[r1] - population[r2])
+    return population[r3] + F * (population[r1] - population[r2])
 
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
@@ -67,8 +67,8 @@ def rand_to_best1(current: NDArray[np.float64],
     size = np.int64(len(population))
     r1, r2, r3 = random_sample(
         range_size=size, quantity=np.int64(3), replace=False)
-    return population[r1] + F*(
-        population[r1]) + F*(population[r2] - population[r3])
+    return population[r1] + F * (
+        population[r1]) + F * (population[r2] - population[r3])
 
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
@@ -79,7 +79,7 @@ def current_to_best_1(current: NDArray[np.float64],
     size = np.int64(len(population))
     r1, r2 = random_sample(
         range_size=size, quantity=np.int64(2), replace=False)
-    return current + F*(best - current) + F*(population[r1] - population[r2])
+    return current + F * (best - current) + F * (population[r1] - population[r2])
 
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
@@ -90,8 +90,8 @@ def best_2(current: NDArray[np.float64],
     size = np.int64(len(population))
     r1, r2, r3, r4 = random_sample(
         range_size=size, quantity=np.int64(4), replace=False)
-    return best + F*(population[r1] - population[r2]) +\
-        F*(population[r3] - population[r4])
+    return best + F * (population[r1] - population[r2]) +\
+        F * (population[r3] - population[r4])
 
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
@@ -102,8 +102,8 @@ def rand_2(current: NDArray[np.float64],
     size = np.int64(len(population))
     r1, r2, r3, r4, r5 = random_sample(
         range_size=size, quantity=np.int64(5), replace=False)
-    return population[r5] + F*(population[r1] - population[r2]) +\
-        F*(population[r3] - population[r4])
+    return population[r5] + F * (population[r1] - population[r2]) +\
+        F * (population[r3] - population[r4])
 
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
@@ -114,8 +114,8 @@ def current_to_rand_1_(current: NDArray[np.float64],
     size = np.int64(len(population))
     r1, r2, r3 = random_sample(
         range_size=size, quantity=np.int64(3), replace=False)
-    return population[r1] + F*(population[r3] - current) +\
-        F*(population[r1] - population[r2])
+    return population[r1] + F * (population[r3] - current) +\
+        F * (population[r1] - population[r2])
 
 
 @njit(float64[:](float64[:], float64[:, :], int64[:], float64, float64[:, :]))
@@ -131,7 +131,7 @@ def current_to_pbest_1_archive(
                        quantity=np.int64(1), replace=True)[0]
     r2 = random_sample(range_size=len(pop_archive),
                        quantity=np.int64(1), replace=True)[0]
-    return current + F*(best - current) + F*(
+    return current + F * (best - current) + F * (
         population[r1] - pop_archive[r2])
 
 
@@ -143,9 +143,9 @@ def current_to_pbest_1_archive_p_min(
         F: np.float64,
         pop_archive: NDArray[np.float64]) -> NDArray[np.float64]:
     size = len(population)
-    p_min = 2/size
+    p_min = 2 / size
     p_i = np.random.uniform(p_min, 0.2)
-    value = np.int64(p_i*size)
+    value = np.int64(p_i * size)
     pbest_cut = pbest[:value]
 
     p_best_ind = random.randrange(len(pbest_cut))
@@ -154,7 +154,7 @@ def current_to_pbest_1_archive_p_min(
                        quantity=np.int64(1), replace=True)[0]
     r2 = random_sample(range_size=len(pop_archive),
                        quantity=np.int64(1), replace=True)[0]
-    return current + F*(best - current) + F*(
+    return current + F * (best - current) + F * (
         population[r1] - pop_archive[r2])
 
 
@@ -182,7 +182,7 @@ def growing_mutation(tree: Tree,
     to_return = tree.copy()
     if random.random() < proba:
         i = random.randrange(len(to_return))
-        grown_tree = growing_method(uniset,  max(to_return.get_levels(i)))
+        grown_tree = growing_method(uniset, max(to_return.get_levels(i)))
         to_return = to_return.concat(i, grown_tree)
     return to_return
 
@@ -333,7 +333,7 @@ def uniform_tour_crossover(individs: np.ndarray,
     range_ = np.arange(len(individs))
     diag = np.arange(len(individs[0]))
 
-    tournament = np.random.choice(range_, 2*len(individs[0]))
+    tournament = np.random.choice(range_, 2 * len(individs[0]))
     tournament = tournament.reshape(-1, 2)
     choosen = np.argmax(fitness[tournament], axis=1)
     offspring = individs[choosen, diag].copy()
@@ -671,7 +671,7 @@ class Div(Operator):
             if y == 0:
                 result = 0
             else:
-                result = x/y
+                result = x / y
         result = np.clip(result, min_value, max_value)
         return result
 
@@ -692,7 +692,7 @@ class Inv(Operator):
             if y == 0:
                 result = 1
             else:
-                result = 1/y
+                result = 1 / y
         result = np.clip(result, min_value, max_value)
         return result
 
@@ -779,7 +779,7 @@ def softmax_numba(X: NDArray[np.float64]) -> NDArray[np.float64]:
     for j in range(sum_.shape[0]):
         if sum_[j] == 0:
             sum_[j] = 1
-    result = ((exps).T/sum_).T
+    result = ((exps).T / sum_).T
     return result
 
 
@@ -787,9 +787,9 @@ def softmax_numba(X: NDArray[np.float64]) -> NDArray[np.float64]:
 def multiactivation2d(X: NDArray[np.float64],
                       activ_id: np.int64) -> NDArray[np.float64]:
     if activ_id == 0:
-        result = 1/(1+np.exp(-X))
+        result = 1 / (1 + np.exp(-X))
     elif activ_id == 1:
-        result = X*(X > 0)
+        result = X * (X > 0)
     elif activ_id == 2:
         result = np.exp(-(X**2))
     elif activ_id == 3:
@@ -822,7 +822,7 @@ def forward(X: NDArray[np.float64],
                                                                activs_code,
                                                                activs_nodes):
         weights_i = mask2d(weights, weights_id_i)
-        out = nodes[from_i].T@weights_i.T
+        out = nodes[from_i].T @ weights_i.T
         nodes[to_i] = out.T
 
         for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
