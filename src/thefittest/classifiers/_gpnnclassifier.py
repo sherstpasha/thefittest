@@ -1,28 +1,30 @@
-from ..base._model import Model
 from typing import Optional
 from typing import Union
-from ..optimizers import SelfCGP
+
+import numpy as np
+from numpy.typing import NDArray
+
+from ..base import EphemeralNode
 from ..base import FunctionalNode
 from ..base import TerminalNode
-from ..base import EphemeralNode
-from ..base import UniversalSet
 from ..base import Tree
-from ..tools import donothing
-from numpy.typing import NDArray
-import numpy as np
-from ..tools.operators import Add
-from ..tools.operators import More
+from ..base import UniversalSet
+from ..base._model import Model
+from ..base._net import ACTIV_NAME_INV
 from ..base._net import HiddenBlock
 from ..base._net import Net
-from ..tools.metrics import categorical_crossentropy3d
 from ..optimizers import OptimizerAnyType
-from ..optimizers import optimizer_binary_coded
 from ..optimizers import OptimizerTreeType
 from ..optimizers import SHADE
-from ..tools.random import train_test_split_stratified
+from ..optimizers import SelfCGP
+from ..optimizers import optimizer_binary_coded
+from ..tools import donothing
+from ..tools.metrics import categorical_crossentropy3d
+from ..tools.operators import Add
+from ..tools.operators import More
 from ..tools.random import float_population
+from ..tools.random import train_test_split_stratified
 from ..tools.transformations import GrayCode
-from ..base._net import ACTIV_NAME_INV
 
 
 class GeneticProgrammingNeuralNetClassifier(Model):
@@ -51,7 +53,6 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         self._output_activation = output_activation
         self._test_sample_ratio = test_sample_ratio
         self._optimizer = optimizer(fitness_function=donothing,
-                                    genotype_to_phenotype=donothing,
                                     uniset=UniversalSet,
                                     iters=iters,
                                     pop_size=pop_size,
@@ -65,7 +66,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         self._optimizer_weights_eval_num = optimizer_weights_eval_num
         self._optimizer_weights_n_bit = optimizer_weights_n_bit
         self._cache_condition = cache
-        self._cache = dict()
+        self._cache = {}
         self._train_func: Union[self._train_net, self._train_net_bit]
 
         Model.__init__(self)
@@ -89,14 +90,14 @@ class GeneticProgrammingNeuralNetClassifier(Model):
                     end = n + node._value._size
                     hidden_id = set(range(n, end))
                     activs = dict(
-                        zip(hidden_id, [node._value._activ]*len(hidden_id)))
+                        zip(hidden_id, [node._value._activ] * len(hidden_id)))
                     n = end
                     unit = Net(hidden_layers=[hidden_id], activs=activs)
                 pack.append(unit)
         end = n + n_outputs
         output_id = set(range(n, end))
         activs = dict(
-            zip(output_id, [ACTIV_NAME_INV[self._output_activation]]*len(output_id)))
+            zip(output_id, [ACTIV_NAME_INV[self._output_activation]] * len(output_id)))
         to_return = pack[0] > Net(outputs=output_id, activs=activs)
         to_return = to_return._fix(set(range(n_variables)))
         return to_return
@@ -113,8 +114,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
     def _train_net(self, net, X_train, proba_train):
 
-        def fitness_function(population): return self._evaluate_nets(
-            population, net, X_train, proba_train)
+        def fitness_function(population):
+            return self._evaluate_nets(population, net, X_train, proba_train)
 
         left = np.full(shape=len(net._weights),
                        fill_value=self._optimizer_weights_bounds[0],
@@ -123,10 +124,9 @@ class GeneticProgrammingNeuralNetClassifier(Model):
                         fill_value=self._optimizer_weights_bounds[1],
                         dtype=np.float64)
         iters = int(np.sqrt(self._optimizer_weights_eval_num))
-        pop_size = int(self._optimizer_weights_eval_num/iters)
+        pop_size = int(self._optimizer_weights_eval_num / iters)
 
         optimizer_weights = self._optimizer_weights(fitness_function=fitness_function,
-                                                    genotype_to_phenotype=donothing,
                                                     iters=iters,
                                                     pop_size=pop_size,
                                                     left=left,
@@ -144,8 +144,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
     def _train_net_bit(self, net, X_train, proba_train):
 
-        def fitness_function(population): return self._evaluate_nets(
-            population, net, X_train, proba_train)
+        def fitness_function(population):
+            return self._evaluate_nets(population, net, X_train, proba_train)
 
         left = np.full(shape=len(net._weights),
                        fill_value=self._optimizer_weights_bounds[0],
@@ -161,7 +161,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
             fit_by='parts').fit(left, right, parts)
 
         iters = int(np.sqrt(self._optimizer_weights_eval_num))
-        pop_size = int(self._optimizer_weights_eval_num/iters)
+        pop_size = int(self._optimizer_weights_eval_num / iters)
         str_len = np.sum(parts)
 
         optimizer_weights = self._optimizer_weights(
@@ -213,7 +213,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
         trained_weights = list(map(
             lambda net: self._train_func(net, X_train, proba_train), neet_to_train_list))
-        
+
         for net, weight in zip(neet_to_train_list, trained_weights):
             net._weights = weight
         population_ph[need_to_train_cond] = neet_to_train_list
@@ -238,13 +238,14 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         functional_set = (FunctionalNode(Add()),
                           FunctionalNode(More()))
 
-        def random_hidden_block(): return HiddenBlock(self._max_hidden_block_size)
+        def random_hidden_block():
+            return HiddenBlock(self._max_hidden_block_size)
 
         terminal_set = [TerminalNode(set(variables), 'in{}'.format(i))
                         for i, variables in enumerate(variables_pool)]
         if self._offset:
-            terminal_set.append(TerminalNode(set([n_dimension]),
-                                             'in{}'.format(len(variables_pool))))
+            terminal_set.append(TerminalNode({[n_dimension], }),
+                                'in{}'.format(len(variables_pool)))
         terminal_set.append(EphemeralNode(random_hidden_block))
 
         uniset = UniversalSet(functional_set, terminal_set)
