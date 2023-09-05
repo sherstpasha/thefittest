@@ -822,7 +822,7 @@ def forward(X: NDArray[np.float64],
                                                                activs_code,
                                                                activs_nodes):
         weights_i = mask2d(weights, weights_id_i)
-        out = nodes[from_i].T @ weights_i.T
+        out = np.dot(nodes[from_i].T, weights_i.T)
         nodes[to_i] = out.T
 
         for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
