@@ -13,7 +13,7 @@ pip install thefittest
 ## Dependencies
 thefittest requires:
 *   python (>=3.7,<3.11);
-*   numpy (>=1.21.6,<=1.23);
+*   numpy (>=1.21.6,<1.24);
 *   numba (>=0.56.4);
 *   scipy (>0.16).
 
