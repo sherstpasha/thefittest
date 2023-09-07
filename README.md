@@ -4,6 +4,7 @@
 [![Downloads](https://static.pepy.tech/badge/thefittest)](https://pepy.tech/project/thefittest)
 ![codecov.io](https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4c47b6de61c4422180529bbc360262c4)](https://app.codacy.com/gh/sherstpasha/thefittest/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Installation
 ```bash
