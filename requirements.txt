@@ -12,3 +12,4 @@ flake8-eradicate
 flake8-import-order
 mypy
 typing-extensions<=4.6.3
+networkx

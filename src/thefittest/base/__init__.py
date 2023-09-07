@@ -5,4 +5,8 @@ from ._tree import Tree
 from ._tree import UniversalSet
 
 
-__all__ = ['Tree', 'FunctionalNode', 'TerminalNode', 'EphemeralNode', 'UniversalSet']
+__all__ = ['Tree',
+           'FunctionalNode',
+           'TerminalNode',
+           'EphemeralNode',
+           'UniversalSet']

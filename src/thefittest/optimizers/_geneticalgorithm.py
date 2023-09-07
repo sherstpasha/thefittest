@@ -87,9 +87,9 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
                                 'uniform_tour7': (uniform_tour_crossover, 7),
                                 'uniform_tourk': (uniform_tour_crossover, self._parents_num)}
 
-        self._mutation_pool = {'weak': (flip_mutation, 1 / (3 * self._str_len)),
-                               'average': (flip_mutation, 1 / (self._str_len)),
-                               'strong': (flip_mutation, min(1, 3 / self._str_len)),
+        self._mutation_pool = {'weak': (flip_mutation, lambda: 1 / (3 * self._str_len)),
+                               'average': (flip_mutation, lambda: 1 / (self._str_len)),
+                               'strong': (flip_mutation, lambda: min(1, 3 / self._str_len)),
                                'custom_rate': (flip_mutation, self._mutation_rate)}
 
     def _get_new_individ_g(self,
@@ -100,13 +100,17 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         selection_func, tour_size = self._specified_selection
         crossover_func, quantity = self._specified_crossover
         mutation_func, proba = self._specified_mutation
+        if callable(proba):
+            proba = proba()
 
         selected_id = selection_func(fitness_scale, fitness_rank,
                                      np.int64(tour_size),
                                      np.int64(quantity))
+
         offspring_no_mutated = crossover_func(population_g[selected_id],
                                               fitness_scale[selected_id],
                                               fitness_rank[selected_id])
+        
         offspring = mutation_func(offspring_no_mutated, np.float64(proba))
         return offspring
 

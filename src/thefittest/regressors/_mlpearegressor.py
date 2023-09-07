@@ -62,7 +62,7 @@ class MLPRegressorrEA(MLPClassifierEA):
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        if self._optimizer_weights in optimizer_binary_coded:
+        if self.optimizer_weights in optimizer_binary_coded:
             self._train_func = self._train_net_bit
         else:
             self._train_func = self._train_net

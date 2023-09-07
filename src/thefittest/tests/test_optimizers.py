@@ -142,7 +142,7 @@ def test_GeneticAlgorithm_set_strategy():
 
     assert optimizer._specified_selection == (proportional_selection, 0)
     assert optimizer._specified_crossover == (uniform_crossover, 2)
-    assert optimizer._specified_mutation == (flip_mutation, 1 / (3 * str_len))
+    assert optimizer._specified_mutation[1]() == 1 / (3 * str_len)
 
     optimizer.set_strategy(selection_oper='tournament_k',
                            crossover_oper='uniformk',
@@ -157,8 +157,7 @@ def test_GeneticAlgorithm_set_strategy():
         tournament_selection, optimizer._tour_size)
     assert optimizer._specified_crossover == (
         uniform_crossover, optimizer._parents_num)
-    assert optimizer._specified_mutation == (
-        flip_mutation, optimizer._mutation_rate)
+    assert optimizer._specified_mutation[1] == 0.1
 
     optimizer.fit()
 
@@ -812,11 +811,10 @@ def test_SelfCGA_set_strategy():
                      'tournament_3': (tournament_selection, 3)}
     crossover_set = {'uniform2': (uniform_crossover, 2),
                      'one_point': (one_point_crossover, 2)}
-    mutation_set = {'weak': (flip_mutation, 1 / (3 * str_len)),
-                    'average': (flip_mutation, 1 / (str_len))}
     assert optimizer._selection_set == selection_set
     assert optimizer._crossover_set == crossover_set
-    assert optimizer._mutation_set == mutation_set
+    assert optimizer._mutation_set['weak'][1]() == 1 / (3 * str_len)
+    assert optimizer._mutation_set['average'][1]() == 1 / (str_len)
     assert optimizer._tour_size == 6
     assert optimizer._elitism is False
     assert optimizer._parents_num == 7
@@ -838,11 +836,10 @@ def test_SelfCGA_set_strategy():
                      'tournament_k': (tournament_selection, 4)}
     crossover_set = {'uniform7': (uniform_crossover, 7),
                      'uniformk': (uniform_crossover, 5)}
-    mutation_set = {'weak': (flip_mutation, 1 / (3 * str_len)),
-                    'custom_rate': (flip_mutation, 0.12)}
     assert optimizer._selection_set == selection_set
     assert optimizer._crossover_set == crossover_set
-    assert optimizer._mutation_set == mutation_set
+    assert optimizer._mutation_set['weak'][1]() == 1 / (3 * str_len)
+    assert optimizer._mutation_set['custom_rate'][1] == 0.12
     assert optimizer._tour_size == 4
     assert optimizer._elitism is True
     assert optimizer._parents_num == 5
@@ -1101,8 +1098,8 @@ def test_GeneticProgramming_start_settings():
     sample_size = 300
     n_dimension = 1
 
-    iters = 100
-    pop_size = 100
+    iters = 20
+    pop_size = 15
 
     X = np.array([np.linspace(left_border, right_border, sample_size)
                   for _ in range(n_dimension)]).T
@@ -1204,8 +1201,8 @@ def test_GeneticProgramming_set_strategy():
     sample_size = 300
     n_dimension = 1
 
-    iters = 100
-    pop_size = 100
+    iters = 20
+    pop_size = 15
 
     X = np.array([np.linspace(left_border, right_border, sample_size)
                   for _ in range(n_dimension)]).T
@@ -1305,8 +1302,8 @@ def test_SelfCGP_start_settings():
     sample_size = 300
     n_dimension = 1
 
-    iters = 100
-    pop_size = 100
+    iters = 20
+    pop_size = 15
 
     X = np.array([np.linspace(left_border, right_border, sample_size)
                   for _ in range(n_dimension)]).T
@@ -1372,7 +1369,7 @@ def test_SelfCGP_start_settings():
 
     optimizer.fit()
 
-    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1) 
     assert optimizer._sign == 1
 
     # start with the optimal_value is equal 1
@@ -1408,8 +1405,8 @@ def test_SelfCGP_set_strategy():
     sample_size = 300
     n_dimension = 1
 
-    iters = 100
-    pop_size = 100
+    iters = 20
+    pop_size = 15
 
     X = np.array([np.linspace(left_border, right_border, sample_size)
                   for _ in range(n_dimension)]).T

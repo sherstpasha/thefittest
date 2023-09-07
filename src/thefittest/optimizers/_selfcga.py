@@ -59,6 +59,8 @@ class SelfCGA(GeneticAlgorithm):
         selection_func, tour_size = self._selection_set[selection]
         crossover_func, quantity = self._crossover_set[crossover]
         mutation_func, proba = self._mutation_set[mutation]
+        if callable(proba):
+            proba = proba()
 
         selected_id = selection_func(fitness_scale, fitness_rank,
                                      np.int64(tour_size), np.int64(quantity))

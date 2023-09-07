@@ -29,7 +29,7 @@ class SymbolicRegressionGP(Model):
                  optimizer: OptimizerTreeType = SelfCGP) -> None:
         
         Model.__init__(self)
-        self._optimizer = optimizer(fitness_function=donothing,
+        self.optimizer = optimizer(fitness_function=donothing,
                                     genotype_to_phenotype=donothing,
                                     uniset=UniversalSet,
                                     iters=iters,
@@ -82,16 +82,16 @@ class SymbolicRegressionGP(Model):
     def _fit(self,
              X: np.ndarray,
              y: np.ndarray):
-        self._optimizer._fitness_function = lambda trees: self._fitness_function(
+        self.optimizer._fitness_function = lambda trees: self._fitness_function(
             trees, y)
-        self._optimizer._uniset = self._define_uniset(X)
-        self._optimizer.fit()
+        self.optimizer._uniset = self._define_uniset(X)
+        self.optimizer.fit()
         return self
 
     def _predict(self,
                  X: np.ndarray) -> np.ndarray:
         n_dimension = X.shape[1]
-        solution = self._optimizer.get_fittest()
+        solution = self.optimizer.get_fittest()
         genotype, *_ = solution.get()
         genotype_for_pred = genotype.set_terminals(
             {f'x{i}': X[:, i] for i in range(n_dimension)})

@@ -139,3 +139,8 @@ class EvolutionaryAlgorithm:
 
     def get_stats(self) -> Statistics:
         return self._stats
+
+    def clear(self):
+        self._calls = 0
+        self._thefittest = TheFittest()
+        self._stats = Statistics()

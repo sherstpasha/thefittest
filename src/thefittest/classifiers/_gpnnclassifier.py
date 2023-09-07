@@ -1,5 +1,4 @@
 from typing import Optional
-from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -13,7 +12,7 @@ from ..base._model import Model
 from ..base._net import ACTIV_NAME_INV
 from ..base._net import HiddenBlock
 from ..base._net import Net
-from ..optimizers import OptimizerAnyType
+from ..optimizers import OptimizerStringType
 from ..optimizers import OptimizerTreeType
 from ..optimizers import SHADE
 from ..optimizers import SelfCGP
@@ -40,7 +39,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
                  show_progress_each: Optional[int] = None,
                  keep_history: bool = False,
                  optimizer: OptimizerTreeType = SelfCGP,
-                 optimizer_weights: OptimizerAnyType = SHADE,
+                 optimizer_weights: OptimizerStringType = SHADE,
                  optimizer_weights_bounds: tuple = (-10, 10),
                  optimizer_weights_eval_num: int = 10000,
                  optimizer_weights_n_bit: int = 16,
@@ -52,24 +51,91 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         self._offset = offset
         self._output_activation = output_activation
         self._test_sample_ratio = test_sample_ratio
-        self._optimizer = optimizer(fitness_function=donothing,
-                                    uniset=UniversalSet,
-                                    iters=iters,
-                                    pop_size=pop_size,
-                                    optimal_value=None,
-                                    no_increase_num=no_increase_num,
-                                    show_progress_each=show_progress_each,
-                                    keep_history=keep_history,
-                                    minimization=True)
-        self._optimizer_weights = optimizer_weights
+        self.optimizer = optimizer(fitness_function=donothing,
+                                   uniset=UniversalSet,
+                                   iters=iters,
+                                   pop_size=pop_size,
+                                   optimal_value=None,
+                                   no_increase_num=no_increase_num,
+                                   show_progress_each=show_progress_each,
+                                   keep_history=keep_history,
+                                   minimization=True)
+        self._optimizer_weights_type = optimizer_weights
+        self.optimizer_weights = self._init_optimizer_weights(optimizer_weights,
+                                                              optimizer_weights_eval_num)
         self._optimizer_weights_bounds = optimizer_weights_bounds
         self._optimizer_weights_eval_num = optimizer_weights_eval_num
         self._optimizer_weights_n_bit = optimizer_weights_n_bit
         self._cache_condition = cache
         self._cache = {}
-        self._train_func: Union[self._train_net, self._train_net_bit]
 
         Model.__init__(self)
+
+    def _init_optimizer_weights(self,
+                                optimizer_weights_type: OptimizerStringType,
+                                optimizer_weights_eval_num: int) -> OptimizerStringType:
+        iters = int(np.sqrt(optimizer_weights_eval_num))
+        pop_size = int(optimizer_weights_eval_num / iters)
+
+        if optimizer_weights_type in optimizer_binary_coded:
+            optimizer = optimizer_weights_type(fitness_function=donothing,
+                                               iters=iters,
+                                               pop_size=pop_size,
+                                               str_len=1,
+                                               minimization=True)
+
+        else:
+            optimizer = optimizer_weights_type(fitness_function=donothing,
+                                               iters=iters,
+                                               pop_size=pop_size,
+                                               left=np.empty(shape=(1), dtype=np.float64),
+                                               right=np.empty(shape=(1), dtype=np.float64),
+                                               minimization=True)
+        return optimizer
+
+    def _train_net(self, net, X_train, proba_train):
+
+        self.optimizer_weights.clear()
+
+        def fitness_function(population):
+            return self._evaluate_nets(population, net, X_train, proba_train)
+
+        left = np.full(shape=len(net._weights),
+                       fill_value=self._optimizer_weights_bounds[0],
+                       dtype=np.float64)
+        right = np.full(shape=len(net._weights),
+                        fill_value=self._optimizer_weights_bounds[1],
+                        dtype=np.float64)
+
+        initial_population = float_population(
+            self.optimizer_weights._pop_size, left, right)
+        initial_population[0] = net._weights.copy()
+
+        if self._optimizer_weights_type in optimizer_binary_coded:
+            parts = np.full(shape=len(net._weights),
+                            fill_value=self._optimizer_weights_n_bit,
+                            dtype=np.int64)
+
+            genotype_to_phenotype = GrayCode(
+                fit_by='parts').fit(left, right, parts)
+
+            self.optimizer_weights._genotype_to_phenotype = genotype_to_phenotype.transform
+            self.optimizer_weights._str_len = np.sum(parts)
+            self.optimizer_weights._update_pool()
+
+            initial_population = genotype_to_phenotype.inverse_transform(
+                initial_population)
+        else:
+            self.optimizer_weights._left = left
+            self.optimizer_weights._right = right
+
+        self.optimizer_weights._fitness_function = fitness_function
+        self.optimizer_weights.set_strategy(initial_population=initial_population)
+        self.optimizer_weights.fit()
+
+        fittest = self.optimizer_weights.get_fittest()
+        genotype, phenotype, fitness = fittest.get().values()
+        return phenotype
 
     def _genotype_to_phenotype_tree(self,
                                     n_variables: int,
@@ -112,79 +178,6 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         error = categorical_crossentropy3d(targets, output3d)
         return error
 
-    def _train_net(self, net, X_train, proba_train):
-
-        def fitness_function(population):
-            return self._evaluate_nets(population, net, X_train, proba_train)
-
-        left = np.full(shape=len(net._weights),
-                       fill_value=self._optimizer_weights_bounds[0],
-                       dtype=np.float64)
-        right = np.full(shape=len(net._weights),
-                        fill_value=self._optimizer_weights_bounds[1],
-                        dtype=np.float64)
-        iters = int(np.sqrt(self._optimizer_weights_eval_num))
-        pop_size = int(self._optimizer_weights_eval_num / iters)
-
-        optimizer_weights = self._optimizer_weights(fitness_function=fitness_function,
-                                                    iters=iters,
-                                                    pop_size=pop_size,
-                                                    left=left,
-                                                    right=right,
-                                                    minimization=True)
-
-        initial_population = float_population(pop_size, left, right)
-        initial_population[0] = net._weights.copy()
-
-        optimizer_weights.set_strategy(initial_population=initial_population)
-        optimizer_weights.fit()
-        fittest = optimizer_weights.get_fittest()
-        genotype, phenotype, fitness = fittest.get()
-        return phenotype
-
-    def _train_net_bit(self, net, X_train, proba_train):
-
-        def fitness_function(population):
-            return self._evaluate_nets(population, net, X_train, proba_train)
-
-        left = np.full(shape=len(net._weights),
-                       fill_value=self._optimizer_weights_bounds[0],
-                       dtype=np.float64)
-        right = np.full(shape=len(net._weights),
-                        fill_value=self._optimizer_weights_bounds[1],
-                        dtype=np.float64)
-        parts = np.full(shape=len(net._weights),
-                        fill_value=self._optimizer_weights_n_bit,
-                        dtype=np.int64)
-
-        genotype_to_phenotype = GrayCode(
-            fit_by='parts').fit(left, right, parts)
-
-        iters = int(np.sqrt(self._optimizer_weights_eval_num))
-        pop_size = int(self._optimizer_weights_eval_num / iters)
-        str_len = np.sum(parts)
-
-        optimizer_weights = self._optimizer_weights(
-            fitness_function=fitness_function,
-            genotype_to_phenotype=genotype_to_phenotype.transform,
-            iters=iters,
-            pop_size=pop_size,
-            str_len=str_len,
-            minimization=True)
-
-        initial_population = float_population(pop_size, left, right)
-        initial_population[0] = net._weights.copy()
-
-        initial_population_bit = genotype_to_phenotype.inverse_transform(
-            initial_population)
-        optimizer_weights.set_strategy(
-            initial_population=initial_population_bit)
-        optimizer_weights.fit()
-        fittest = optimizer_weights.get_fittest()
-        genotype, phenotype, fitness = fittest.get()
-
-        return phenotype
-
     def _genotype_to_phenotype(self,
                                X_train: NDArray[np.float64],
                                proba_train: NDArray[np.float64],
@@ -196,8 +189,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         need_to_train_cond = np.full_like(
             population_ph, fill_value=False, dtype=bool)
 
-        neet_to_train_list = []
-        neet_to_train_list_str = []
+        need_to_train_list = []
+        need_to_train_list_str = []
 
         for i, individ_g in enumerate(population_g):
             str_tree = str(individ_g)
@@ -207,18 +200,18 @@ class GeneticProgrammingNeuralNetClassifier(Model):
                 net = self._genotype_to_phenotype_tree(
                     n_variables, n_outputs, individ_g)
 
-                neet_to_train_list.append(net)
-                neet_to_train_list_str.append(str_tree)
+                need_to_train_list.append(net)
+                need_to_train_list_str.append(str_tree)
                 need_to_train_cond[i] = True
 
         trained_weights = list(map(
-            lambda net: self._train_func(net, X_train, proba_train), neet_to_train_list))
+            lambda net: self._train_net(net, X_train, proba_train), need_to_train_list))
 
-        for net, weight in zip(neet_to_train_list, trained_weights):
+        for net, weight in zip(need_to_train_list, trained_weights):
             net._weights = weight
-        population_ph[need_to_train_cond] = neet_to_train_list
+        population_ph[need_to_train_cond] = need_to_train_list
 
-        new_cache = dict(zip(neet_to_train_list_str, neet_to_train_list))
+        new_cache = dict(zip(need_to_train_list_str, need_to_train_list))
         self._cache = dict(list(self._cache.items()) + list(new_cache.items()))
 
         return population_ph
@@ -244,8 +237,9 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         terminal_set = [TerminalNode(set(variables), 'in{}'.format(i))
                         for i, variables in enumerate(variables_pool)]
         if self._offset:
-            terminal_set.append(TerminalNode({[n_dimension], }),
-                                'in{}'.format(len(variables_pool)))
+
+            terminal_set.append(TerminalNode(value=set([n_dimension]),
+                                             name='in{}'.format(len(variables_pool))))
         terminal_set.append(EphemeralNode(random_hidden_block))
 
         uniset = UniversalSet(functional_set, terminal_set)
@@ -264,11 +258,6 @@ class GeneticProgrammingNeuralNetClassifier(Model):
              X: np.ndarray,
              y: np.ndarray):
 
-        if self._optimizer_weights in optimizer_binary_coded:
-            self._train_func = self._train_net_bit
-        else:
-            self._train_func = self._train_net
-
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
@@ -280,16 +269,16 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         proba_test = eye[y_test]
         proba_train = eye[y_train]
 
-        self._optimizer._fitness_function = \
+        self.optimizer._fitness_function = \
             lambda population: self._fitness_function(
                 population, X_test, proba_test)
 
-        self._optimizer._genotype_to_phenotype =\
+        self.optimizer._genotype_to_phenotype =\
             lambda trees: self._genotype_to_phenotype(
                 X_train, proba_train, trees, n_outputs)
 
-        self._optimizer._uniset = self._define_uniset(X)
-        self._optimizer.fit()
+        self.optimizer._uniset = self._define_uniset(X)
+        self.optimizer.fit()
 
         return self
 
@@ -297,8 +286,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        fittest = self._optimizer.get_fittest()
-        genotype, phenotype, fitness = fittest.get()
+        fittest = self.optimizer.get_fittest()
+        genotype, phenotype, fitness = fittest.get().values()
 
         output = phenotype.forward(X)[0]
         y_pred = np.argmax(output, axis=1)
