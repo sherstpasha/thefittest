@@ -1,22 +1,25 @@
 from typing import Optional
+from typing import Tuple
+
 import numpy as np
-from ..tools.metrics import coefficient_determination
-from ..optimizers import SelfCGP
+
+from ..base import EphemeralNode
 from ..base import FunctionalNode
 from ..base import TerminalNode
-from ..base import EphemeralNode
-from ..base import UniversalSet
 from ..base import Tree
-from ..tools.operators import Add
-from ..tools.operators import Mul
-from ..tools.operators import Neg
-from ..tools.operators import Inv
-from ..tools.operators import Pow2
-from ..tools.operators import Cos
-from ..tools.operators import Sin
-from ..tools import donothing
+from ..base import UniversalSet
 from ..base._model import Model
 from ..optimizers import OptimizerTreeType
+from ..optimizers import SelfCGP
+from ..tools import donothing
+from ..tools.metrics import coefficient_determination
+from ..tools.operators import Add
+from ..tools.operators import Cos
+from ..tools.operators import Inv
+from ..tools.operators import Mul
+from ..tools.operators import Neg
+from ..tools.operators import Pow2
+from ..tools.operators import Sin
 
 
 class SymbolicRegressionGP(Model):
@@ -26,24 +29,26 @@ class SymbolicRegressionGP(Model):
                  no_increase_num: Optional[int] = None,
                  show_progress_each: Optional[int] = None,
                  keep_history: bool = False,
-                 optimizer: OptimizerTreeType = SelfCGP) -> None:
-        
+                 optimizer: OptimizerTreeType = SelfCGP,
+                 functional_set: Optional[Tuple[FunctionalNode]] = None) -> None:
+
         Model.__init__(self)
+        self._functional_set = functional_set
         self.optimizer = optimizer(fitness_function=donothing,
-                                    genotype_to_phenotype=donothing,
-                                    uniset=UniversalSet,
-                                    iters=iters,
-                                    pop_size=pop_size,
-                                    optimal_value=1.,
-                                    no_increase_num=no_increase_num,
-                                    show_progress_each=show_progress_each,
-                                    keep_history=keep_history)
+                                   genotype_to_phenotype=donothing,
+                                   uniset=UniversalSet,
+                                   iters=iters,
+                                   pop_size=pop_size,
+                                   optimal_value=1.,
+                                   no_increase_num=no_increase_num,
+                                   show_progress_each=show_progress_each,
+                                   keep_history=keep_history)
         Model.__init__(self)
 
     def _evaluate_tree(self,
                        tree: Tree,
                        y: np.ndarray) -> float:
-        y_pred = tree()*np.ones(len(y))
+        y_pred = tree() * np.ones(len(y))
         fitness = coefficient_determination(y, y_pred)
         return fitness
 
@@ -64,13 +69,16 @@ class SymbolicRegressionGP(Model):
     def _define_uniset(self,
                        X: np.ndarray) -> UniversalSet:
         n_dimension = X.shape[1]
-        functional_set = (FunctionalNode(Add()),
-                          FunctionalNode(Mul()),
-                          FunctionalNode(Neg()),
-                          FunctionalNode(Inv()),
-                          FunctionalNode(Pow2()),
-                          FunctionalNode(Cos()),
-                          FunctionalNode(Sin()))
+        if self._functional_set is None:
+            functional_set = (FunctionalNode(Add()),
+                              FunctionalNode(Mul()),
+                              FunctionalNode(Neg()),
+                              FunctionalNode(Inv()),
+                              FunctionalNode(Pow2()),
+                              FunctionalNode(Cos()),
+                              FunctionalNode(Sin()))
+        else:
+            functional_set = self._functional_set
 
         terminal_set = [TerminalNode(X[:, i], f'x{i}')
                         for i in range(n_dimension)]
@@ -92,9 +100,9 @@ class SymbolicRegressionGP(Model):
                  X: np.ndarray) -> np.ndarray:
         n_dimension = X.shape[1]
         solution = self.optimizer.get_fittest()
-        genotype, *_ = solution.get()
+        genotype, *_ = solution.get().values()
         genotype_for_pred = genotype.set_terminals(
-            {f'x{i}': X[:, i] for i in range(n_dimension)})
+            **{f'x{i}': X[:, i] for i in range(n_dimension)})
 
-        y_pred = genotype_for_pred()*np.ones(len(X))
+        y_pred = genotype_for_pred() * np.ones(len(X))
         return y_pred

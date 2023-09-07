@@ -97,9 +97,8 @@ class GeneticProgrammingNeuralNetRegressor(
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        fittest = self.optimizer.get_fittest()
-        genotype, phenotype, fitness = fittest.get().values()
+        fittest = self.optimizer.get_fittest().get()
 
-        output = phenotype.forward(X)[0, :, 0]
+        output = fittest['phenotype'].forward(X)[0, :, 0]
         y_pred = output
         return y_pred

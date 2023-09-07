@@ -1,10 +1,14 @@
 import numpy as np
 
+from ..base import FunctionalNode
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 from ..optimizers import SelfCGP
 from ..regressors import GeneticProgrammingNeuralNetRegressor
 from ..regressors import MLPRegressorrEA
+from ..regressors import SymbolicRegressionGP
+from ..tools.operators import Add
+from ..tools.operators import Cos
 from ..tools.transformations import scale_data
 
 
@@ -205,3 +209,61 @@ def test_MLPRegressorrEA():
     predict = model.predict(X_scaled)
 
     assert len(predict) == len(X_scaled)
+
+
+def test_SymbolicRegressionGP():
+
+    def problem(x):
+        return 3 * x[:, 0]**2 + 2 * x[:, 0] + 5
+
+    function = problem
+    left_border = -4.5
+    right_border = 4.5
+    sample_size = 300
+    n_dimension = 1
+
+    X = np.array([np.linspace(left_border, right_border, sample_size)
+                  for _ in range(n_dimension)]).T
+    y = function(X)
+
+    X_scaled = scale_data(X)
+
+    iters = 25
+    pop_size = 25
+
+    show_progress_each = 1
+    no_increase_num = 30
+    keep_history = True
+    optimizer = SelfCGP
+    functional_set = (FunctionalNode(value=Add()),
+                      FunctionalNode(value=Cos()))
+
+    model = SymbolicRegressionGP(iters=iters,
+                                 pop_size=pop_size,
+                                 no_increase_num=no_increase_num,
+                                 show_progress_each=show_progress_each,
+                                 keep_history=keep_history,
+                                 optimizer=optimizer,
+                                 functional_set=functional_set)
+
+    model.optimizer.set_strategy(K_param=1.77)
+    assert model.optimizer._K == 1.77
+
+    model.fit(X_scaled, y)
+
+    predict = model.predict(X_scaled)
+
+    assert len(predict) == len(X_scaled)
+    assert len(model.optimizer._uniset._functional_set[2]) == 1
+    assert len(model.optimizer._uniset._functional_set[1]) == 1
+
+    model = SymbolicRegressionGP(iters=iters,
+                                 pop_size=pop_size,
+                                 no_increase_num=no_increase_num,
+                                 show_progress_each=show_progress_each,
+                                 keep_history=keep_history,
+                                 optimizer=optimizer)
+
+    model.fit(X_scaled, y)
+    assert len(model.optimizer._uniset._functional_set[2]) == 2
+    assert len(model.optimizer._uniset._functional_set[1]) == 5
