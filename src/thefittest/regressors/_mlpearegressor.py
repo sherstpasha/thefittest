@@ -1,11 +1,12 @@
-from typing import Tuple
 from typing import Optional
+from typing import Tuple
+
 import numpy as np
-from ..optimizers import SHADE
-from ..optimizers import OptimizerAnyType
-from ..optimizers import optimizer_binary_coded
-from ..tools.metrics import root_mean_square_error2d
+
 from ..classifiers import MLPClassifierEA
+from ..optimizers import OptimizerStringType
+from ..optimizers import SHADE
+from ..tools.metrics import root_mean_square_error2d
 
 
 class MLPRegressorrEA(MLPClassifierEA):
@@ -20,7 +21,7 @@ class MLPRegressorrEA(MLPClassifierEA):
             no_increase_num: Optional[int] = None,
             show_progress_each: Optional[int] = None,
             keep_history: bool = False,
-            optimizer_weights: OptimizerAnyType = SHADE,
+            optimizer_weights: OptimizerStringType = SHADE,
             optimizer_weights_bounds: tuple = (-10, 10),
             optimizer_weights_n_bit: int = 16):
 
@@ -62,17 +63,12 @@ class MLPRegressorrEA(MLPClassifierEA):
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        if self.optimizer_weights in optimizer_binary_coded:
-            self._train_func = self._train_net_bit
-        else:
-            self._train_func = self._train_net
-
         n_inputs = X.shape[1]
         n_outputs = len(set(y))
 
         self._defitne_net(n_inputs, n_outputs)
 
-        self._net._weights = self._train_func(self._net, X, y)
+        self._net._weights = self._train_net(self._net, X, y)
         return self
 
     def _predict(self, X):

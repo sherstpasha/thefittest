@@ -1,19 +1,20 @@
+import os
+from typing import Dict
+from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
-from typing import Union
-from typing import Dict
-import os
 
 
 path = os.path.dirname(__file__) + '/_data/'
 
-iris_data = np.loadtxt(path+'iris_data.txt', delimiter=',')
-wine_data = np.loadtxt(path+'wine_data.txt', delimiter=',')
-breast_data = np.loadtxt(path+'breast_cancer_data.txt', delimiter=',')
-digits_data = np.loadtxt(path+'handwritten_digits_data.txt', delimiter=',')
-credit_data = np.loadtxt(path+'credit_risk_data.txt', delimiter=',')
-know_data = np.loadtxt(path+'user_knowledge_data.txt', delimiter=',')
-banknote_data = np.loadtxt(path+'banknote_dataset.txt', delimiter=',')
+iris_data = np.loadtxt(path + 'iris_data.txt', delimiter=',')
+wine_data = np.loadtxt(path + 'wine_data.txt', delimiter=',')
+breast_data = np.loadtxt(path + 'breast_cancer_data.txt', delimiter=',')
+digits_data = np.loadtxt(path + 'handwritten_digits_data.txt', delimiter=',')
+credit_data = np.loadtxt(path + 'credit_risk_data.txt', delimiter=',')
+know_data = np.loadtxt(path + 'user_knowledge_data.txt', delimiter=',')
+banknote_data = np.loadtxt(path + 'banknote_dataset.txt', delimiter=',')
 
 
 class Dataset:
@@ -55,7 +56,7 @@ class IrisDataset(Dataset):
 
 
 class WineDataset(Dataset):
-    ''' Aeberhard,Stefan and Forina,M.. (1991). Wine. UCI Machine 
+    ''' Aeberhard,Stefan and Forina,M.. (1991). Wine. UCI Machine
     Learning Repository. https://doi.org/10.24432/C5PC7J.'''
 
     def __init__(self):
@@ -80,9 +81,10 @@ class WineDataset(Dataset):
 
 
 class BreastCancerDataset(Dataset):
-    ''' 
-    Wolberg,William, Mangasarian,Olvi, Street,Nick, and Street,W.. (1995). 
-    Breast Cancer Wisconsin (Diagnostic). UCI Machine Learning Repository. https://doi.org/10.24432/C5DW2B.'''
+    '''
+    Wolberg,William, Mangasarian,Olvi, Street,Nick, and Street,W.. (1995).
+    Breast Cancer Wisconsin (Diagnostic). UCI Machine Learning Repository.
+    https://doi.org/10.24432/C5DW2B.'''
 
     def __init__(self):
         Dataset.__init__(
@@ -123,7 +125,7 @@ class BreastCancerDataset(Dataset):
 
 
 class DigitsDataset(Dataset):
-    ''' Alpaydin,E. and Kaynak,C.. (1998). Optical Recognition of Handwritten Digits. 
+    ''' Alpaydin,E. and Kaynak,C.. (1998). Optical Recognition of Handwritten Digits.
     UCI Machine Learning Repository. https://doi.org/10.24432/C50P49.'''
 
     def __init__(self):
@@ -156,11 +158,12 @@ class UserKnowladgeDataset(Dataset):
             self,
             X=know_data[:, :-1].astype(np.float64),
             y=know_data[:, -1].astype(np.int64),
-            X_names={0: 'STG (The degree of study time for goal object materails)',
-                     1: 'SCG (The degree of repetition number of user for goal object materails) ',
-                     2: 'STR (The degree of study time of user for related objects with goal object)',
-                     3: 'LPR (The exam performance of user for related objects with goal object)',
-                     4: 'PEG (The exam performance of user for goal objects)'},
+            X_names={
+                0: 'STG (The degree of study time for goal object materails)',
+                1: 'SCG (The degree of repetition number of user for goal object materails) ',
+                2: 'STR (The degree of study time of user for related objects with goal object)',
+                3: 'LPR (The exam performance of user for related objects with goal object)',
+                4: 'PEG (The exam performance of user for goal objects)'},
             y_names={0: 'Very Low',
                      1: 'Low',
                      2: 'Middle',
@@ -168,8 +171,8 @@ class UserKnowladgeDataset(Dataset):
 
 
 class BanknoteDataset(Dataset):
-    ''' 
-    Lohweg,Volker. (2013). banknote authentication. 
+    '''
+    Lohweg,Volker. (2013). banknote authentication.
     UCI Machine Learning Repository. https://doi.org/10.24432/C55P57.'''
 
     def __init__(self):
