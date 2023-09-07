@@ -110,7 +110,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         offspring_no_mutated = crossover_func(population_g[selected_id],
                                               fitness_scale[selected_id],
                                               fitness_rank[selected_id])
-        
+
         offspring = mutation_func(offspring_no_mutated, np.float64(proba))
         return offspring
 
