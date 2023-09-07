@@ -100,7 +100,7 @@ def test_UserKnowladgeDataset():
     y_names = data.get_y_names()
 
     assert len(X_names) == 5
-    assert len(y_names) == 5
+    assert len(y_names) == 4
 
 
 def test_BanknoteDataset():
@@ -109,11 +109,11 @@ def test_BanknoteDataset():
     X = data.get_X()
     y = data.get_y()
 
-    assert X.shape == (403, 5)
-    assert y.shape == (403,)
+    assert X.shape == (1372, 4)
+    assert y.shape == (1372,)
 
     X_names = data.get_X_names()
     y_names = data.get_y_names()
 
-    assert len(X_names) == 5
-    assert len(y_names) == 4
+    assert len(X_names) == 4
+    assert len(y_names) == 2
