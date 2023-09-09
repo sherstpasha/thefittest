@@ -151,7 +151,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
             if node.is_functional():
                 pack.append(node._value(*args))
             else:
-                if isinstance(node, TerminalNode):
+                if type(node) is TerminalNode:
                     unit = Net(inputs=node._value)
                 else:
                     end = n + node._value._size
