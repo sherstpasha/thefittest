@@ -38,7 +38,7 @@ def common_region(trees: List) -> Tuple:
 
         for j in range(len(indexes)):
             _, right = trees[j].subtree(common_indexes[j][-1])
-            delete_to = indexes[j].index(right-1) + 1
+            delete_to = indexes[j].index(right - 1) + 1
             indexes[j] = indexes[j][delete_to:]
 
             if len(indexes[j]) < 1:
@@ -48,8 +48,7 @@ def common_region(trees: List) -> Tuple:
     return common_indexes, border_indexes
 
 
-def common_region_two_trees(n_args_array_1: np.ndarray,
-                            n_args_array_2: np.ndarray) -> Tuple:
+def common_region_two_trees(n_args_array_1: np.ndarray, n_args_array_2: np.ndarray) -> Tuple:
     index_list_1 = range(len(n_args_array_1))
     index_list_2 = range(len(n_args_array_2))
     index_1 = np.int64(0)
@@ -64,14 +63,13 @@ def common_region_two_trees(n_args_array_1: np.ndarray,
         if index_1 < len(n_args_array_1) and index_2 < len(n_args_array_2):
             id_1 = index_1
             id_2 = index_2
-            end = find_first_difference_between_two(n_args_array_1[id_1:],
-                                                    n_args_array_2[id_2:])
+            end = find_first_difference_between_two(n_args_array_1[id_1:], n_args_array_2[id_2:])
             index_1 = index_1 + end
             index_2 = index_2 + end
-            common_1.extend(index_list_1[id_1:index_1+1])
-            common_2.extend(index_list_2[id_2:index_2+1])
+            common_1.extend(index_list_1[id_1 : index_1 + 1])
+            common_2.extend(index_list_2[id_2 : index_2 + 1])
 
-        if len(n_args_array_1)-1 > index_1 or len(n_args_array_2)-1 > index_2:
+        if len(n_args_array_1) - 1 > index_1 or len(n_args_array_2) - 1 > index_2:
             border_1.append(index_1)
             border_2.append(index_2)
             index_1 = find_end_subtree_from_i(index_1, n_args_array_1)
@@ -91,9 +89,7 @@ def common_region_(trees: List) -> Tuple:
     return to_return
 
 
-def numpy_group_by(group: np.ndarray,
-                   by: np.ndarray) -> Tuple:
-
+def numpy_group_by(group: np.ndarray, by: np.ndarray) -> Tuple:
     argsort = np.argsort(by)
     group = group[argsort]
     by = by[argsort]
@@ -103,14 +99,12 @@ def numpy_group_by(group: np.ndarray,
     return keys, groups
 
 
-def lehmer_mean(x: np.ndarray,
-                power: int = 2,
-                weight: Optional[np.ndarray] = None) -> float:
+def lehmer_mean(x: np.ndarray, power: int = 2, weight: Optional[np.ndarray] = None) -> float:
     if weight is None:
         weight = 1
-    x_up = weight*np.power(x, power)
-    x_down = weight*np.power(x, power-1)
-    return np.sum(x_up)/np.sum(x_down)
+    x_up = weight * np.power(x, power)
+    x_down = weight * np.power(x, power - 1)
+    return np.sum(x_up) / np.sum(x_down)
 
 
 def rank_data(arr: np.ndarray) -> np.ndarray:
@@ -121,7 +115,7 @@ def rank_data(arr: np.ndarray) -> np.ndarray:
 
     cond = np.r_[True, arr_sorted[1:] != arr_sorted[:-1]]
     raw_ranks = np.r_[arange[cond == True], len(arange)]
-    ranks = (raw_ranks[1:] + raw_ranks[:-1] + 1)/2
+    ranks = (raw_ranks[1:] + raw_ranks[:-1] + 1) / 2
     count = raw_ranks[1:] - raw_ranks[:-1]
 
     results = np.empty_like(arr, dtype=np.float64)
@@ -135,9 +129,9 @@ def protect_norm(x: np.ndarray) -> np.ndarray:
     sum_ = np.sum(x, dtype=np.float64)
     if sum_ > 0:
         for i in range(result.size):
-            result[i] = x[i]/sum_
+            result[i] = x[i] / sum_
     else:
-        value = 1/len(x)
+        value = 1 / len(x)
         for i in range(result.size):
             result[i] = value
     return result
@@ -150,49 +144,44 @@ def scale_data(arr: np.ndarray) -> np.ndarray:
     if max_ == min_:
         to_return = np.ones_like(arr, dtype=np.float64)
     else:
-        to_return = ((arr - min_)/(max_ - min_)).astype(np.float64)
+        to_return = ((arr - min_) / (max_ - min_)).astype(np.float64)
     return to_return
 
 
-def numpy_bit_to_int(bit_array: np.ndarray,
-                     powers: np.ndarray = None) -> np.ndarray:
+def numpy_bit_to_int(bit_array: np.ndarray, powers: np.ndarray = None) -> np.ndarray:
     if powers is None:
-        powers = 2**np.arange(bit_array.shape[1], dtype=np.int8)
-    arange_ = powers[:bit_array.shape[1]][::-1]
-    int_array = np.sum(bit_array*arange_, axis=1)
+        powers = 2 ** np.arange(bit_array.shape[1], dtype=np.int8)
+    arange_ = powers[: bit_array.shape[1]][::-1]
+    int_array = np.sum(bit_array * arange_, axis=1)
     return int_array
 
 
 def numpy_int_to_bit(int_array: np.ndarray) -> np.ndarray:
     result = []
     bit = int_array % 2
-    remains = int_array//2
+    remains = int_array // 2
     result.append(bit)
     while np.sum(remains) > 0:
         bit = remains % 2
-        remains = remains//2
+        remains = remains // 2
         result.append(bit)
     bit_array = np.array(result, dtype=np.int8)[::-1].T
     return bit_array
 
 
 def numpy_gray_to_bit(gray_array: np.ndarray) -> np.ndarray:
-    bit_array = np.logical_xor.accumulate(
-        gray_array, axis=-1).astype(np.byte)
+    bit_array = np.logical_xor.accumulate(gray_array, axis=-1).astype(np.byte)
     return bit_array
 
 
 def numpy_bit_to_gray(bit_array: np.ndarray) -> np.ndarray:
-    cut_gray = np.logical_xor(bit_array[:, :-1],
-                              bit_array[:, 1:])
-    gray_array = np.hstack(
-        [bit_array[:, 0].reshape(-1, 1), cut_gray])
+    cut_gray = np.logical_xor(bit_array[:, :-1], bit_array[:, 1:])
+    gray_array = np.hstack([bit_array[:, 0].reshape(-1, 1), cut_gray])
     return gray_array
 
 
 class SamplingGrid:
-    def __init__(self,
-                 fit_by: str = 'h') -> None:
+    def __init__(self, fit_by: str = "h") -> None:
         self._fit_by = fit_by
         self.left: np.ndarray
         self.right: np.ndarray
@@ -200,36 +189,27 @@ class SamplingGrid:
         self.h: np.ndarray
         self._power_arange: np.ndarray
 
-    def _culc_h_from_parts(self,
-                           left: np.ndarray,
-                           right: np.ndarray,
-                           parts: np.ndarray) -> np.ndarray:
-        h = (right - left)/(2.0**parts - 1)
+    def _culc_h_from_parts(
+        self, left: np.ndarray, right: np.ndarray, parts: np.ndarray
+    ) -> np.ndarray:
+        h = (right - left) / (2.0**parts - 1)
         return h
 
-    def _culc_parts_from_h(self,
-                           left: np.ndarray,
-                           right: np.ndarray,
-                           h: np.ndarray) -> np.ndarray:
-        parts = np.ceil(np.log2((right - left)/h + 1)).astype(int)
+    def _culc_parts_from_h(self, left: np.ndarray, right: np.ndarray, h: np.ndarray) -> np.ndarray:
+        parts = np.ceil(np.log2((right - left) / h + 1)).astype(int)
         return parts
 
-    def _decode(self,
-                bit_array_i: np.ndarray) -> np.ndarray:
+    def _decode(self, bit_array_i: np.ndarray) -> np.ndarray:
         int_convert = numpy_bit_to_int(bit_array_i, self._power_arange)
         return int_convert
 
-    def fit(self,
-            left: np.ndarray,
-            right: np.ndarray,
-            arg: np.ndarray):
+    def fit(self, left: np.ndarray, right: np.ndarray, arg: np.ndarray):
         self.left = left
         self.right = right
 
-        assert self._fit_by in [
-            'h', 'parts'], f"incorrect option {self._fit_by} for fit_by."
+        assert self._fit_by in ["h", "parts"], f"incorrect option {self._fit_by} for fit_by."
         "The available ones are 'h' and 'parts'"
-        if self._fit_by == 'h':
+        if self._fit_by == "h":
             min_h = arg
             self.parts = self._culc_parts_from_h(left, right, min_h)
             self.h = self._culc_h_from_parts(left, right, self.parts)
@@ -237,52 +217,40 @@ class SamplingGrid:
             self.parts = arg
             self.h = self._culc_h_from_parts(left, right, self.parts)
 
-        self._power_arange = 2**np.arange(self.parts.max(), dtype=np.int64)
+        self._power_arange = 2 ** np.arange(self.parts.max(), dtype=np.int64)
         return self
 
-    def transform(self,
-                  population: np.ndarray) -> np.ndarray:
+    def transform(self, population: np.ndarray) -> np.ndarray:
         splits = np.add.accumulate(self.parts)
         p_parts = np.split(population, splits[:-1], axis=1)
 
         int_array = np.array(list(map(self._decode, p_parts))).T
-        float_array = self.left[np.newaxis, :] +\
-            self.h[np.newaxis, :]*int_array
+        float_array = self.left[np.newaxis, :] + self.h[np.newaxis, :] * int_array
         return float_array
 
-    def _float_to_bit(self,
-                      float_array: np.ndarray,
-                      left: np.ndarray,
-                      h: np.ndarray) -> np.ndarray:
-        grid_number = (float_array - left)/h
+    def _float_to_bit(self, float_array: np.ndarray, left: np.ndarray, h: np.ndarray) -> np.ndarray:
+        grid_number = (float_array - left) / h
         int_array = np.rint(grid_number)
         bit_array = numpy_int_to_bit(int_array)
         return bit_array
 
-    def inverse_transform(self,
-                          population: np.ndarray) -> np.ndarray:
+    def inverse_transform(self, population: np.ndarray) -> np.ndarray:
         map_ = map(self._float_to_bit, population.T, self.left, self.h)
         bit_array = np.hstack(list(map_))
         return bit_array
 
 
 class GrayCode(SamplingGrid):
-
-    def __init__(self,
-                 fit_by: str = 'h') -> None:
+    def __init__(self, fit_by: str = "h") -> None:
         SamplingGrid.__init__(self, fit_by)
 
-    def _decode(self,
-                gray_array_i: np.ndarray) -> np.ndarray:
+    def _decode(self, gray_array_i: np.ndarray) -> np.ndarray:
         bit_array_i = numpy_gray_to_bit(gray_array_i)
         int_convert = numpy_bit_to_int(bit_array_i, self._power_arange)
         return int_convert
 
-    def _float_to_bit(self,
-                      float_array: np.ndarray,
-                      left: np.ndarray,
-                      h: np.ndarray) -> np.ndarray:
-        grid_number = (float_array - left)/h
+    def _float_to_bit(self, float_array: np.ndarray, left: np.ndarray, h: np.ndarray) -> np.ndarray:
+        grid_number = (float_array - left) / h
         int_array = np.rint(grid_number)
         bit_array = numpy_int_to_bit(int_array)
         gray_array = numpy_bit_to_gray(bit_array)
@@ -290,9 +258,9 @@ class GrayCode(SamplingGrid):
 
 
 @njit(float64[:](float64[:], float64[:], float64[:]))
-def bounds_control(array: NDArray[np.float64],
-                   left: NDArray[np.float64],
-                   right: NDArray[np.float64]) -> NDArray[np.float64]:
+def bounds_control(
+    array: NDArray[np.float64], left: NDArray[np.float64], right: NDArray[np.float64]
+) -> NDArray[np.float64]:
     to_return = array.copy()
 
     size = len(array)
@@ -305,14 +273,14 @@ def bounds_control(array: NDArray[np.float64],
 
 
 @njit(float64[:](float64[:], float64[:], float64[:]))
-def bounds_control_mean(array: NDArray[np.float64],
-                        left: NDArray[np.float64],
-                        right: NDArray[np.float64]) -> NDArray[np.float64]:
+def bounds_control_mean(
+    array: NDArray[np.float64], left: NDArray[np.float64], right: NDArray[np.float64]
+) -> NDArray[np.float64]:
     to_return = array.copy()
     size = len(array)
     for i in range(size):
         if array[i] < left[i]:
-            to_return[i] = (left[i] + array[i])/2
+            to_return[i] = (left[i] + array[i]) / 2
         elif array[i] > right[i]:
-            to_return[i] = (right[i] + array[i])/2
+            to_return[i] = (right[i] + array[i]) / 2
     return to_return

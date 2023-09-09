@@ -1,16 +1,35 @@
-from ..benchmarks import BanknoteDataset
-from ..benchmarks import BreastCancerDataset
 import numpy as np
 
+from ..benchmarks import BanknoteDataset
+from ..benchmarks import BreastCancerDataset
 from ..benchmarks import CreditRiskDataset
 from ..benchmarks import DigitsDataset
 from ..benchmarks import IrisDataset
 from ..benchmarks import UserKnowladgeDataset
 from ..benchmarks import WineDataset
-from ..benchmarks.symbolicregression17 import (F1, F2, F3, F4,
-                                               F5, F6, F7, F8,
-                                               F9, F10, F11, F12,
-                                               F13, F14, F15, F16, F17)
+from ..benchmarks.symbolicregression17 import (
+    F1,
+    F2,
+    F3,
+    F4,
+    F5,
+    F6,
+    F7,
+    F8,
+    F9,
+    F10,
+    F11,
+    F12,
+    F13,
+    F14,
+    F15,
+    F16,
+    F17,
+)
+
+from ..benchmarks.CEC2005 import problems_dict
+from ..optimizers import DifferentialEvolution
+from ..tools.random import float_population
 
 
 def test_IrisDataset():
@@ -131,8 +150,10 @@ def test_symbolicregression17():
     sample_size = 30
     n_dimension = 1
 
-    X = np.array([np.linspace(left_border, right_border, sample_size)
-                  for _ in range(n_dimension)], dtype=np.float64).T
+    X = np.array(
+        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)],
+        dtype=np.float64,
+    ).T
 
     F1(X)
     F2(X)
@@ -141,9 +162,11 @@ def test_symbolicregression17():
 
     n_dimension = 2
 
-    X = np.array([np.linspace(left_border, right_border, sample_size)
-                  for _ in range(n_dimension)], dtype=np.float64).T
-    
+    X = np.array(
+        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)],
+        dtype=np.float64,
+    ).T
+
     F3(X)
     F4(X)
     F5(X)
@@ -157,3 +180,42 @@ def test_symbolicregression17():
     F13(X)
     F14(X)
     F15(X)
+
+
+def test_CEC2005():
+    iters = 10
+    pop_size = 10
+
+    for problem in problems_dict.values():
+        function = problem["function"]
+
+        for dim in problem["dimentions"]:
+            print(problem, dim)
+            left_scalar = problem["bounds"][0]
+            right_scalar = problem["bounds"][1]
+
+            left = np.full(shape=dim, fill_value=left_scalar, dtype=np.float64)
+            right = np.full(shape=dim, fill_value=right_scalar, dtype=np.float64)
+
+            model = DifferentialEvolution(
+                fitness_function=function(),
+                iters=iters,
+                pop_size=pop_size,
+                left=left,
+                right=right,
+                minimization=True,
+            )
+
+            if "init_bounds" in problem.keys():
+                init_left_scalar = problem["init_bounds"][1]
+                init_left = np.full(shape=dim, fill_value=init_left_scalar, dtype=np.float64)
+                init_right_scalar = problem["init_bounds"][1]
+                init_right = np.full(shape=dim, fill_value=init_right_scalar, dtype=np.float64)
+
+                initial_population = float_population(
+                    pop_size=pop_size, left=init_left, right=init_right
+                )
+
+                model.set_strategy(initial_population=initial_population)
+
+            model.fit()

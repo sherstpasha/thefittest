@@ -16,22 +16,24 @@ from ..tools.transformations import lehmer_mean
 
 
 class SHAGA(EvolutionaryAlgorithm):
-    '''Stanovov, Vladimir & Akhmedova, Shakhnaz & Semenkin, Eugene. (2019).
+    """Stanovov, Vladimir & Akhmedova, Shakhnaz & Semenkin, Eugene. (2019).
     Genetic Algorithm with Success History based Parameter Adaptation. 180-187.
-    10.5220/0008071201800187. '''
+    10.5220/0008071201800187."""
 
-    def __init__(self,
-                 fitness_function: Callable,
-                 iters: int,
-                 pop_size: int,
-                 str_len: int,
-                 genotype_to_phenotype: Callable = donothing,
-                 optimal_value: Optional[float] = None,
-                 termination_error_value: float = 0.,
-                 no_increase_num: Optional[int] = None,
-                 minimization: bool = False,
-                 show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+    def __init__(
+        self,
+        fitness_function: Callable,
+        iters: int,
+        pop_size: int,
+        str_len: int,
+        genotype_to_phenotype: Callable = donothing,
+        optimal_value: Optional[float] = None,
+        termination_error_value: float = 0.0,
+        no_increase_num: Optional[int] = None,
+        minimization: bool = False,
+        show_progress_each: Optional[int] = None,
+        keep_history: bool = False,
+    ):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -43,7 +45,8 @@ class SHAGA(EvolutionaryAlgorithm):
             no_increase_num=no_increase_num,
             minimization=minimization,
             show_progress_each=show_progress_each,
-            keep_history=keep_history)
+            keep_history=keep_history,
+        )
 
         self._str_len = str_len
         self._H_size = pop_size
@@ -51,23 +54,22 @@ class SHAGA(EvolutionaryAlgorithm):
         self._initial_population: np.ndarray
         self.set_strategy()
 
-    def _selection_crossover_mutation(self,
-                                      population_g: np.ndarray,
-                                      fitness: np.ndarray,
-                                      current: np.ndarray,
-                                      MR,
-                                      CR) -> np.ndarray:
+    def _selection_crossover_mutation(
+        self, population_g: np.ndarray, fitness: np.ndarray, current: np.ndarray, MR, CR
+    ) -> np.ndarray:
         second_parent_id = tournament_selection(fitness, fitness, 2, 1)[0]
         second_parent = population_g[second_parent_id].copy()
         offspring = binomialGA(current, second_parent, CR)
         mutant = flip_mutation(offspring, MR)
         return mutant
 
-    def _evaluate_replace(self,
-                          mutant_cr_g: np.ndarray,
-                          population_g: np.ndarray,
-                          population_ph: np.ndarray,
-                          fitness: np.ndarray) -> Tuple:
+    def _evaluate_replace(
+        self,
+        mutant_cr_g: np.ndarray,
+        population_g: np.ndarray,
+        population_ph: np.ndarray,
+        fitness: np.ndarray,
+    ) -> Tuple:
         offspring_g = population_g.copy()
         offspring_ph = population_ph.copy()
         offspring_fit = fitness.copy()
@@ -114,9 +116,9 @@ class SHAGA(EvolutionaryAlgorithm):
                 return lehmer_mean(x=S, weight=weight_i)
         return u
 
-    def set_strategy(self,
-                     elitism_param: bool = True,
-                     initial_population: Optional[np.ndarray] = None) -> None:
+    def set_strategy(
+        self, elitism_param: bool = True, initial_population: Optional[np.ndarray] = None
+    ) -> None:
         self._elitism = elitism_param
         self._initial_population = initial_population
 
@@ -127,38 +129,33 @@ class SHAGA(EvolutionaryAlgorithm):
         next_k = 1
 
         if self._initial_population is None:
-            population_g = binary_string_population(
-                self._pop_size, self._str_len)
+            population_g = binary_string_population(self._pop_size, self._str_len)
         else:
             population_g = self._initial_population.copy()
 
         population_ph = self._get_phenotype(population_g)
         fitness = self._get_fitness(population_ph)
         self._update_fittest(population_g, population_ph, fitness)
-        self._update_stats(population_g=population_g,
-                           fitness_max=self._thefittest._fitness,
-                           H_MR=H_MR,
-                           H_CR=H_CR)
+        self._update_stats(
+            population_g=population_g, fitness_max=self._thefittest._fitness, H_MR=H_MR, H_CR=H_CR
+        )
 
         for i in range(self._iters - 1):
-
             self._show_progress(i)
             if self._termitation_check():
                 break
             else:
                 MR_i, CR_i = self._generate_MR_CR(H_MR, H_CR, self._pop_size)
 
-                partial_operators = partial(self._selection_crossover_mutation,
-                                            population_g, fitness)
+                partial_operators = partial(
+                    self._selection_crossover_mutation, population_g, fitness
+                )
 
-                mutant_cr_g = np.array(list(map(partial_operators,
-                                                population_g,
-                                                MR_i, CR_i)))
+                mutant_cr_g = np.array(list(map(partial_operators, population_g, MR_i, CR_i)))
 
-                stack = self._evaluate_replace(mutant_cr_g.copy(),
-                                               population_g.copy(),
-                                               population_ph.copy(),
-                                               fitness.copy())
+                stack = self._evaluate_replace(
+                    mutant_cr_g.copy(), population_g.copy(), population_ph.copy(), fitness.copy()
+                )
 
                 succeses = stack[3]
                 will_be_replaced_fit = fitness[succeses].copy()
@@ -172,8 +169,11 @@ class SHAGA(EvolutionaryAlgorithm):
                 df = np.abs(will_be_replaced_fit - fitness[succeses])
 
                 if self._elitism:
-                    population_g[-1], population_ph[-1], fitness[-1] =\
-                        self._thefittest.get().values()
+                    (
+                        population_g[-1],
+                        population_ph[-1],
+                        fitness[-1],
+                    ) = self._thefittest.get().values()
 
                 if next_k == self._H_size:
                     next_k = 0
@@ -189,9 +189,11 @@ class SHAGA(EvolutionaryAlgorithm):
                     next_k += 1
 
                 self._update_fittest(population_g, population_ph, fitness)
-                self._update_stats(population_g=population_g,
-                                   fitness_max=self._thefittest._fitness,
-                                   H_MR=H_MR,
-                                   H_CR=H_CR)
+                self._update_stats(
+                    population_g=population_g,
+                    fitness_max=self._thefittest._fitness,
+                    H_MR=H_MR,
+                    H_CR=H_CR,
+                )
 
         return self

@@ -16,19 +16,21 @@ from ._optproblems import Sphere
 from ._optproblems import Weierstrass
 
 
-__all__ = ['BanknoteDataset',
-           'BreastCancerDataset',
-           'CreditRiskDataset',
-           'DigitsDataset',
-           'IrisDataset',
-           'UserKnowladgeDataset',
-           'WineDataset',
-           'Ackley',
-           'Griewank',
-           'HighConditionedElliptic',
-           'OneMax',
-           'Rastrigin',
-           'Rosenbrock',
-           'Schwefe1_2',
-           'Sphere',
-           'Weierstrass']
+__all__ = [
+    "BanknoteDataset",
+    "BreastCancerDataset",
+    "CreditRiskDataset",
+    "DigitsDataset",
+    "IrisDataset",
+    "UserKnowladgeDataset",
+    "WineDataset",
+    "Ackley",
+    "Griewank",
+    "HighConditionedElliptic",
+    "OneMax",
+    "Rastrigin",
+    "Rosenbrock",
+    "Schwefe1_2",
+    "Sphere",
+    "Weierstrass",
+]

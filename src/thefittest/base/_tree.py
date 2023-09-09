@@ -22,11 +22,7 @@ TERMINAL_COLOR_CODE = (0.21, 0.76, 0.56, 1)
 
 
 class Node:
-    def __init__(self,
-                 value: Union[Any, Callable],
-                 name: str,
-                 sign: str,
-                 n_args: int) -> None:
+    def __init__(self, value: Union[Any, Callable], name: str, sign: str, n_args: int) -> None:
         self._value = value
         self._name = name
         self._sign = sign
@@ -49,45 +45,36 @@ class Node:
 
 
 class FunctionalNode(Node):
-    def __init__(self,
-                 value,
-                 sign: Optional[str] = None) -> None:
-        Node.__init__(self,
-                      value=value,
-                      name=value.__name__,
-                      sign=sign or value._sign,
-                      n_args=len(signature(value.__call__).parameters))
+    def __init__(self, value, sign: Optional[str] = None) -> None:
+        Node.__init__(
+            self,
+            value=value,
+            name=value.__name__,
+            sign=sign or value._sign,
+            n_args=len(signature(value.__call__).parameters),
+        )
 
 
 class TerminalNode(Node):
-    def __init__(self,
-                 value: Any,
-                 name: str) -> None:
-        Node.__init__(self,
-                      value=value,
-                      name=name,
-                      sign=name,
-                      n_args=0)
+    def __init__(self, value: Any, name: str) -> None:
+        Node.__init__(self, value=value, name=name, sign=name, n_args=0)
 
 
 class EphemeralConstantNode(TerminalNode):
-    def __init__(self,
-                 value: Any,
-                 name: str) -> None:
-        TerminalNode.__init__(self,
-                              value=value,
-                              name=name)
+    def __init__(self, value: Any, name: str) -> None:
+        TerminalNode.__init__(self, value=value, name=name)
 
 
 class EphemeralNode(Node):
-    def __init__(self,
-                 generator: Callable) -> None:
+    def __init__(self, generator: Callable) -> None:
         self._generator = generator
-        Node.__init__(self,
-                      value=self._generator,
-                      name=str(self._generator.__name__),
-                      sign=str(self._generator.__name__),
-                      n_args=0)
+        Node.__init__(
+            self,
+            value=self._generator,
+            name=str(self._generator.__name__),
+            sign=str(self._generator.__name__),
+            n_args=0,
+        )
 
     def __call__(self) -> EphemeralConstantNode:
         value = self._generator()
@@ -96,40 +83,41 @@ class EphemeralNode(Node):
 
 
 class UniversalSet:
-    def __init__(self,
-                 functional_set: Tuple[FunctionalNode],
-                 terminal_set: Tuple[Union[TerminalNode, EphemeralNode]]) -> None:
+    def __init__(
+        self,
+        functional_set: Tuple[FunctionalNode],
+        terminal_set: Tuple[Union[TerminalNode, EphemeralNode]],
+    ) -> None:
         self._functional_set = self._define_functional_set(functional_set)
         self._terminal_set = tuple(terminal_set)
 
-    def _define_functional_set(self,
-                               functional_set: Tuple[FunctionalNode]) -> defaultdict:
-        _functional_set = defaultdict(list, {'any': functional_set})
+    def _define_functional_set(self, functional_set: Tuple[FunctionalNode]) -> defaultdict:
+        _functional_set = defaultdict(list, {"any": functional_set})
         for unit in functional_set:
             _functional_set[unit._n_args].append(unit)
         for key, value in _functional_set.items():
             _functional_set[key] = tuple(value)
         return _functional_set
 
-    def _random_terminal_or_ephemeral(
-            self) -> Union[EphemeralConstantNode, TerminalNode]:
+    def _random_terminal_or_ephemeral(self) -> Union[EphemeralConstantNode, TerminalNode]:
         choosen = random.choice(self._terminal_set)
         if isinstance(choosen, EphemeralNode):
             return choosen()
         else:
             return choosen
 
-    def _random_functional(self,
-                           n_args: Union[str, int] = 'any') -> FunctionalNode:
+    def _random_functional(self, n_args: Union[str, int] = "any") -> FunctionalNode:
         n_args_functionals = self._functional_set[n_args]
         node = random.choice(n_args_functionals)
         return node
 
 
 class Tree:
-    def __init__(self,
-                 nodes: List[Union[FunctionalNode, TerminalNode, EphemeralNode]],
-                 n_args: Optional[List[int]] = None) -> None:
+    def __init__(
+        self,
+        nodes: List[Union[FunctionalNode, TerminalNode, EphemeralNode]],
+        n_args: Optional[List[int]] = None,
+    ) -> None:
         self._nodes = nodes
         if n_args is None:
             self._n_args = self._init_n_args()
@@ -181,52 +169,42 @@ class Tree:
     def copy(self):
         return Tree(self._nodes.copy(), self._n_args.copy())
 
-    def set_terminals(self,
-                      **kwargs):
+    def set_terminals(self, **kwargs):
         tree_copy = self.copy()
         for i, node in enumerate(tree_copy._nodes):
             if node.is_terminal():
                 for name, value in kwargs.items():
                     if node._name == name:
-                        tree_copy._nodes[i] = TerminalNode(value=value,
-                                                           name=node._name)
+                        tree_copy._nodes[i] = TerminalNode(value=value, name=node._name)
         return tree_copy
 
-    def subtree(self,
-                index: int,
-                return_class: bool = False) -> Tuple:
+    def subtree(self, index: int, return_class: bool = False) -> Tuple:
         n_index = find_end_subtree_from_i(np.int64(index), self._n_args)
         if return_class:
-            new_tree = Tree(self._nodes[index:n_index].copy(),
-                            self._n_args[index:n_index].copy())
+            new_tree = Tree(self._nodes[index:n_index].copy(), self._n_args[index:n_index].copy())
             return new_tree
         return index, n_index
 
-    def concat(self,
-               index: int,
-               other_tree):
+    def concat(self, index: int, other_tree):
         to_return = self.copy()
         left, right = self.subtree(index)
         to_return._nodes[left:right] = other_tree._nodes.copy()
-        to_return._n_args = np.r_[to_return._n_args[:left],
-                                  other_tree._n_args.copy(),
-                                  to_return._n_args[right:]]
+        to_return._n_args = np.r_[
+            to_return._n_args[:left], other_tree._n_args.copy(), to_return._n_args[right:]
+        ]
         return to_return
 
-    def get_args_id(self,
-                    index: int) -> NDArray[np.int64]:
+    def get_args_id(self, index: int) -> NDArray[np.int64]:
         args_id = find_id_args_from_i(np.int64(index), self._n_args)
         return args_id
 
-    def get_levels(self,
-                   index: int) -> NDArray[np.int64]:
+    def get_levels(self, index: int) -> NDArray[np.int64]:
         return get_levels_tree_from_i(np.int64(index), self._n_args)
 
     def get_max_level(self) -> np.int64:
         return max(self.get_levels(0))
 
-    def get_graph(self,
-                  keep_id: bool = False) -> Dict:
+    def get_graph(self, keep_id: bool = False) -> Dict:
         pack = []
         edges = []
         nodes = []
@@ -234,7 +212,7 @@ class Tree:
         for i, node in enumerate(reversed(self._nodes)):
             index = len(self) - i - 1
             if keep_id:
-                labels[index] = str(index) + '. ' + node._sign[:60]
+                labels[index] = str(index) + ". " + node._sign[:60]
             else:
                 labels[index] = node._sign[:60]
 
@@ -267,9 +245,5 @@ class Tree:
             else:
                 colors[i] = TERMINAL_COLOR_CODE
 
-        to_return = {'edges': edges,
-                     'labels': labels,
-                     'nodes': nodes,
-                     'pos': pos,
-                     'colors': colors}
+        to_return = {"edges": edges, "labels": labels, "nodes": nodes, "pos": pos, "colors": colors}
         return to_return

@@ -6,18 +6,24 @@ from numpy.typing import NDArray
 
 
 class Model:
-    def _fit(self, X: NDArray[Union[np.float64, np.int64]],
-             y: NDArray[Union[np.float64, np.int64]]) -> Any:
+    def _fit(
+        self,
+        X: NDArray[Union[np.float64, np.int64]],
+        y: NDArray[Union[np.float64, np.int64]],
+    ) -> Any:
         pass
 
-    def _predict(self,
-                 X: NDArray[Union[np.float64, np.int64]]) -> Any:
+    def _predict(self, X: NDArray[Union[np.float64, np.int64]]) -> Any:
         pass
 
-    def fit(self, X: NDArray[Union[np.float64, np.int64]],
-            y: NDArray[Union[np.float64, np.int64]]) -> Any:
+    def fit(
+        self,
+        X: NDArray[Union[np.float64, np.int64]],
+        y: NDArray[Union[np.float64, np.int64]],
+    ) -> Any:
         return self._fit(X, y)
 
-    def predict(self,
-                X: NDArray[Union[np.float64, np.int64]]) -> NDArray[Union[np.float64, np.int64]]:
+    def predict(
+        self, X: NDArray[Union[np.float64, np.int64]]
+    ) -> NDArray[Union[np.float64, np.int64]]:
         return self._predict(X)

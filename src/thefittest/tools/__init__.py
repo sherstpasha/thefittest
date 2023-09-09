@@ -14,11 +14,13 @@ def donothing(x: Any) -> Any:
     return x
 
 
-__all__ = ['find_end_subtree_from_i',
-           'find_id_args_from_i',
-           'get_levels_tree_from_i',
-           'find_first_difference_between_two',
-           'binary_search_interval',
-           'check_for_value',
-           'argsort_k',
-           'find_pbest_id']
+__all__ = [
+    "find_end_subtree_from_i",
+    "find_id_args_from_i",
+    "get_levels_tree_from_i",
+    "find_first_difference_between_two",
+    "binary_search_interval",
+    "check_for_value",
+    "argsort_k",
+    "find_pbest_id",
+]

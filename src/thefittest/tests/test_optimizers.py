@@ -22,7 +22,6 @@ from ..tools.operators import Mul
 from ..tools.operators import Neg
 from ..tools.operators import best_1
 from ..tools.operators import current_to_best_1
-from ..tools.operators import flip_mutation
 from ..tools.operators import growing_mutation
 from ..tools.operators import one_point_crossover
 from ..tools.operators import one_point_crossoverGP
@@ -1369,7 +1368,7 @@ def test_SelfCGP_start_settings():
 
     optimizer.fit()
 
-    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1) 
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
     assert optimizer._sign == 1
 
     # start with the optimal_value is equal 1

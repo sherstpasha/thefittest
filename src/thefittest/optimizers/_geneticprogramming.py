@@ -28,21 +28,23 @@ from ..tools.transformations import scale_data
 
 
 class GeneticProgramming(EvolutionaryAlgorithm):
-    '''Koza, John R.. “Genetic programming - on the programming of computers by means
-    of natural selection.” Complex Adaptive Systems (1993)'''
+    """Koza, John R.. “Genetic programming - on the programming of computers by means
+    of natural selection.” Complex Adaptive Systems (1993)"""
 
-    def __init__(self,
-                 fitness_function: Callable,
-                 uniset: UniversalSet,
-                 iters: int,
-                 pop_size: int,
-                 genotype_to_phenotype: Callable = donothing,
-                 optimal_value: Optional[float] = None,
-                 termination_error_value: float = 0.,
-                 no_increase_num: Optional[int] = None,
-                 minimization: bool = False,
-                 show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+    def __init__(
+        self,
+        fitness_function: Callable,
+        uniset: UniversalSet,
+        iters: int,
+        pop_size: int,
+        genotype_to_phenotype: Callable = donothing,
+        optimal_value: Optional[float] = None,
+        termination_error_value: float = 0.0,
+        no_increase_num: Optional[int] = None,
+        minimization: bool = False,
+        show_progress_each: Optional[int] = None,
+        keep_history: bool = False,
+    ):
         EvolutionaryAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -54,7 +56,8 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             no_increase_num=no_increase_num,
             minimization=minimization,
             show_progress_each=show_progress_each,
-            keep_history=keep_history)
+            keep_history=keep_history,
+        )
 
         self._uniset = uniset
         self._selection_pool: dict
@@ -72,85 +75,88 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
     def _update_pool(self):
         self._selection_pool = {
-            'proportional': (proportional_selection, 0),
-            'rank': (rank_selection, 0),
-            'tournament_k': (tournament_selection, self._tour_size),
-            'tournament_3': (tournament_selection, 3),
-            'tournament_5': (tournament_selection, 5),
-            'tournament_7': (tournament_selection, 7)}
+            "proportional": (proportional_selection, 0),
+            "rank": (rank_selection, 0),
+            "tournament_k": (tournament_selection, self._tour_size),
+            "tournament_3": (tournament_selection, 3),
+            "tournament_5": (tournament_selection, 5),
+            "tournament_7": (tournament_selection, 7),
+        }
 
         self._crossover_pool = {
-            'empty': (empty_crossover, 1),
-            'standart': (standart_crossover, 2),
-            'one_point': (one_point_crossoverGP, 2),
-            'uniform2': (uniform_crossoverGP, 2),
-            'uniform7': (uniform_crossoverGP, 7),
-            'uniformk': (uniform_crossoverGP, self._parents_num),
-            'uniform_prop2': (uniform_crossoverGP_prop, 2),
-            'uniform_prop7': (uniform_crossoverGP_prop, 7),
-            'uniform_propk': (uniform_crossoverGP_prop, self._parents_num),
-            'uniform_rank2': (uniform_crossoverGP_rank, 2),
-            'uniform_rank7': (uniform_crossoverGP_rank, 7),
-            'uniform_rankk': (uniform_crossoverGP_rank, self._parents_num),
-            'uniform_tour3': (uniform_crossoverGP_tour, 3),
-            'uniform_tour7': (uniform_crossoverGP_tour, 7),
-            'uniform_tourk': (uniform_crossoverGP_tour, self._parents_num)}
+            "empty": (empty_crossover, 1),
+            "standart": (standart_crossover, 2),
+            "one_point": (one_point_crossoverGP, 2),
+            "uniform2": (uniform_crossoverGP, 2),
+            "uniform7": (uniform_crossoverGP, 7),
+            "uniformk": (uniform_crossoverGP, self._parents_num),
+            "uniform_prop2": (uniform_crossoverGP_prop, 2),
+            "uniform_prop7": (uniform_crossoverGP_prop, 7),
+            "uniform_propk": (uniform_crossoverGP_prop, self._parents_num),
+            "uniform_rank2": (uniform_crossoverGP_rank, 2),
+            "uniform_rank7": (uniform_crossoverGP_rank, 7),
+            "uniform_rankk": (uniform_crossoverGP_rank, self._parents_num),
+            "uniform_tour3": (uniform_crossoverGP_tour, 3),
+            "uniform_tour7": (uniform_crossoverGP_tour, 7),
+            "uniform_tourk": (uniform_crossoverGP_tour, self._parents_num),
+        }
 
         self._mutation_pool = {
-            'weak_point': (point_mutation, 0.25, True),
-            'average_point': (point_mutation, 1, True),
-            'strong_point': (point_mutation, 4, True),
-            'custom_rate_point': (point_mutation, self._mutation_rate, False),
-            'weak_grow': (growing_mutation, 0.25, True),
-            'average_grow': (growing_mutation, 1, True),
-            'strong_grow': (growing_mutation, 4, True),
-            'custom_rate_grow': (growing_mutation, self._mutation_rate, False),
-            'weak_swap': (swap_mutation, 0.25, True),
-            'average_swap': (swap_mutation, 1, True),
-            'strong_swap': (swap_mutation, 4, True),
-            'custom_rate_swap': (swap_mutation, self._mutation_rate, False),
-            'weak_shrink': (shrink_mutation, 0.25, True),
-            'average_shrink': (shrink_mutation, 1, True),
-            'strong_shrink': (shrink_mutation, 4, True),
-            'custom_rate_shrink': (shrink_mutation, self._mutation_rate, False)}
+            "weak_point": (point_mutation, 0.25, True),
+            "average_point": (point_mutation, 1, True),
+            "strong_point": (point_mutation, 4, True),
+            "custom_rate_point": (point_mutation, self._mutation_rate, False),
+            "weak_grow": (growing_mutation, 0.25, True),
+            "average_grow": (growing_mutation, 1, True),
+            "strong_grow": (growing_mutation, 4, True),
+            "custom_rate_grow": (growing_mutation, self._mutation_rate, False),
+            "weak_swap": (swap_mutation, 0.25, True),
+            "average_swap": (swap_mutation, 1, True),
+            "strong_swap": (swap_mutation, 4, True),
+            "custom_rate_swap": (swap_mutation, self._mutation_rate, False),
+            "weak_shrink": (shrink_mutation, 0.25, True),
+            "average_shrink": (shrink_mutation, 1, True),
+            "strong_shrink": (shrink_mutation, 4, True),
+            "custom_rate_shrink": (shrink_mutation, self._mutation_rate, False),
+        }
 
-    def _get_new_individ_g(self,
-                           population_g: np.ndarray,
-                           fitness_scale: np.ndarray,
-                           fitness_rank: np.ndarray,
-                           *args) -> Tree:
+    def _get_new_individ_g(
+        self, population_g: np.ndarray, fitness_scale: np.ndarray, fitness_rank: np.ndarray, *args
+    ) -> Tree:
         selection_func, tour_size = self._specified_selection
         crossover_func, quantity = self._specified_crossover
         mutation_func, proba_up, scale = self._specified_mutation
 
-        selected_id = selection_func(fitness_scale,
-                                     fitness_rank,
-                                     np.int64(tour_size),
-                                     np.int64(quantity))
+        selected_id = selection_func(
+            fitness_scale, fitness_rank, np.int64(tour_size), np.int64(quantity)
+        )
 
-        offspring_no_mutated = crossover_func(population_g[selected_id],
-                                              fitness_scale[selected_id],
-                                              fitness_rank[selected_id],
-                                              self._max_level)
+        offspring_no_mutated = crossover_func(
+            population_g[selected_id],
+            fitness_scale[selected_id],
+            fitness_rank[selected_id],
+            self._max_level,
+        )
 
         proba = proba_up / len(offspring_no_mutated) if scale else proba_up
 
-        offspring = mutation_func(offspring_no_mutated, self._uniset,
-                                  proba, self._max_level)
+        offspring = mutation_func(offspring_no_mutated, self._uniset, proba, self._max_level)
         return offspring
 
-    def set_strategy(self,
-                     selection_oper: str = 'rank',
-                     crossover_oper: str = 'standart',
-                     mutation_oper: str = 'weak_grow',
-                     tour_size_param: int = 2,
-                     initial_population: Optional[np.ndarray] = None,
-                     max_level_param: int = 16,
-                     init_level_param: int = 5,
-                     elitism_param: bool = True,
-                     parents_num_param: int = 7,
-                     mutation_rate_param: float = 0.05) -> None:
-        '''
+    def set_strategy(
+        self,
+        selection_oper: str = "rank",
+        crossover_oper: str = "standart",
+        mutation_oper: str = "weak_grow",
+        tour_size_param: int = 2,
+        initial_population: Optional[np.ndarray] = None,
+        max_level_param: int = 16,
+        init_level_param: int = 5,
+        elitism_param: bool = True,
+        parents_num_param: int = 7,
+        mutation_rate_param: float = 0.05,
+    ) -> None:
+        """
         - selection_oper: should be one of:
             'proportional', 'rank', 'tournament_k', 'tournament_3', 'tournament_5', 'tournament_7'
         - crossover oper: should be one of:
@@ -162,7 +168,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             'weak_grow', 'average_grow', 'strong_grow', 'custom_rate_grow',
             'weak_swap', 'average_swap', 'strong_swap', 'custom_rate_swap',
             'weak_shrink', 'average_shrink', 'strong_shrink', 'custom_rate_shrink',
-        '''
+        """
 
         self._tour_size = tour_size_param
         self._initial_population = initial_population
@@ -180,8 +186,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
     def fit(self):
         if self._initial_population is None:
-            population_g = half_and_half(
-                self._pop_size, self._uniset, self._init_level)
+            population_g = half_and_half(self._pop_size, self._uniset, self._init_level)
         else:
             population_g = self._initial_population.copy()
 
@@ -190,20 +195,17 @@ class GeneticProgramming(EvolutionaryAlgorithm):
             fitness = self._get_fitness(population_ph)
 
             self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats(population_g=population_g,
-                               fitness_max=self._thefittest._fitness)
+            self._update_stats(population_g=population_g, fitness_max=self._thefittest._fitness)
             if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] =\
-                    self._thefittest.get().values()
+                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get().values()
 
             self._show_progress(i)
             if self._termitation_check():
                 break
             else:
-                get_new_individ_g = partial(self._get_new_individ_g,
-                                            population_g,
-                                            scale_data(fitness),
-                                            rank_data(fitness))
+                get_new_individ_g = partial(
+                    self._get_new_individ_g, population_g, scale_data(fitness), rank_data(fitness)
+                )
                 map_ = map(get_new_individ_g, range(self._pop_size))
                 population_g = np.array(list(map_), dtype=object)
 

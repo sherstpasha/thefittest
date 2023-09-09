@@ -347,10 +347,15 @@ class F8F2(TestFunction):
         self.griewank_f = Griewank()
 
     def f(self, x):
-        indexes = np.kron(
-            np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
-        indexes = np.insert(indexes, [0], [0])
-        indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
+        if x.shape[1] == 2:
+            indexes = np.array([0, 1, 1, 0], dtype=np.int64)
+        else:
+            indexes = np.kron(
+                np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
+
+            indexes = np.insert(indexes, [0], [0])
+
+            indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
 
         x_indexes = x[:, indexes]
 
@@ -369,10 +374,15 @@ class ExpandedScaffers_F6(TestFunction):
         return 0.5 + up / down
 
     def f(self, x):
-        indexes = np.kron(
-            np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
-        indexes = np.insert(indexes, [0], [0])
-        indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
+        if x.shape[1] == 2:
+            indexes = np.array([0, 1, 1, 0], dtype=np.int64)
+        else:
+            indexes = np.kron(
+                np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
+
+            indexes = np.insert(indexes, [0], [0])
+
+            indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
         x_indexes = x[:, indexes]
 
         vertical_X = x_indexes.reshape(-1, 2)
@@ -591,10 +601,15 @@ class ShiftedExpandedGriewankRosenbrock(TestShiftedFunction):
         return x - self.x_shift[:shape[-1]].reshape(axis) + 1
 
     def f(self, x):
-        indexes = np.kron(
-            np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
-        indexes = np.insert(indexes, [0], [0])
-        indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
+        if x.shape[1] == 2:
+            indexes = np.array([0, 1, 1, 0], dtype=np.int64)
+        else:
+            indexes = np.kron(
+                np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
+
+            indexes = np.insert(indexes, [0], [0])
+
+            indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
 
         x_indexes = x[:, indexes]
 
@@ -624,10 +639,16 @@ class ShiftedRotatedExpandedScaffes_F6(TestShiftedRotatedFunction):
         return 0.5 + up / down
 
     def f(self, x):
-        indexes = np.kron(
-            np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
-        indexes = np.insert(indexes, [0], [0])
-        indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
+        if x.shape[1] == 2:
+            indexes = np.array([0, 1, 1, 0], dtype=np.int64)
+        else:
+            indexes = np.kron(
+                np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
+
+            indexes = np.insert(indexes, [0], [0])
+
+            indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
+
         x_indexes = x[:, indexes]
 
         vertical_X = x_indexes.reshape(-1, 2)

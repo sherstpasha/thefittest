@@ -15,18 +15,20 @@ from ..tools.transformations import scale_data
 
 
 class SelfCGA(GeneticAlgorithm):
-    def __init__(self,
-                 fitness_function: Callable,
-                 iters: int,
-                 pop_size: int,
-                 str_len: int,
-                 genotype_to_phenotype: Callable = donothing,
-                 optimal_value: Optional[float] = None,
-                 termination_error_value: float = 0.,
-                 no_increase_num: Optional[int] = None,
-                 minimization: bool = False,
-                 show_progress_each: Optional[int] = None,
-                 keep_history: bool = False):
+    def __init__(
+        self,
+        fitness_function: Callable,
+        iters: int,
+        pop_size: int,
+        str_len: int,
+        genotype_to_phenotype: Callable = donothing,
+        optimal_value: Optional[float] = None,
+        termination_error_value: float = 0.0,
+        no_increase_num: Optional[int] = None,
+        minimization: bool = False,
+        show_progress_each: Optional[int] = None,
+        keep_history: bool = False,
+    ):
         GeneticAlgorithm.__init__(
             self,
             fitness_function=fitness_function,
@@ -39,7 +41,8 @@ class SelfCGA(GeneticAlgorithm):
             no_increase_num=no_increase_num,
             minimization=minimization,
             show_progress_each=show_progress_each,
-            keep_history=keep_history)
+            keep_history=keep_history,
+        )
 
         self._selection_set: dict
         self._crossover_set: dict
@@ -49,37 +52,37 @@ class SelfCGA(GeneticAlgorithm):
 
         self.set_strategy()
 
-    def _get_new_individ_g(self,
-                           population_g: np.ndarray,
-                           fitness_scale: np.ndarray,
-                           fitness_rank: np.ndarray,
-                           selection: str,
-                           crossover: str,
-                           mutation: str) -> np.ndarray:
+    def _get_new_individ_g(
+        self,
+        population_g: np.ndarray,
+        fitness_scale: np.ndarray,
+        fitness_rank: np.ndarray,
+        selection: str,
+        crossover: str,
+        mutation: str,
+    ) -> np.ndarray:
         selection_func, tour_size = self._selection_set[selection]
         crossover_func, quantity = self._crossover_set[crossover]
         mutation_func, proba = self._mutation_set[mutation]
         if callable(proba):
             proba = proba()
 
-        selected_id = selection_func(fitness_scale, fitness_rank,
-                                     np.int64(tour_size), np.int64(quantity))
-        offspring_no_mutated = crossover_func(population_g[selected_id],
-                                              fitness_scale[selected_id],
-                                              fitness_rank[selected_id])
+        selected_id = selection_func(
+            fitness_scale, fitness_rank, np.int64(tour_size), np.int64(quantity)
+        )
+        offspring_no_mutated = crossover_func(
+            population_g[selected_id], fitness_scale[selected_id], fitness_rank[selected_id]
+        )
         offspring = mutation_func(offspring_no_mutated, np.float64(proba))
         return offspring
 
-    def _choice_operators(self,
-                          proba_dict: Dict) -> np.ndarray:
+    def _choice_operators(self, proba_dict: Dict) -> np.ndarray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
         chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
         return chosen_operator
 
-    def _update_proba(self,
-                      proba_dict: Dict,
-                      operator: str) -> Dict:
+    def _update_proba(self, proba_dict: Dict, operator: str) -> Dict:
         proba_dict[operator] += self._K / self._iters
         proba_value = np.array(list(proba_dict.values()))
         proba_value -= self._K / (len(proba_dict) * self._iters)
@@ -88,42 +91,44 @@ class SelfCGA(GeneticAlgorithm):
         new_proba_dict = dict(zip(proba_dict.keys(), proba_value))
         return new_proba_dict
 
-    def _find_fittest_operator(self,
-                               operators: np.ndarray,
-                               fitness: np.ndarray) -> str:
+    def _find_fittest_operator(self, operators: np.ndarray, fitness: np.ndarray) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
         fittest_operator = keys[np.argmax(mean_fit)]
         return fittest_operator
 
-    def set_strategy(self,
-                     selection_opers: Tuple = ('proportional',
-                                               'rank',
-                                               'tournament_3',
-                                               'tournament_5',
-                                               'tournament_7'),
-                     crossover_opers: Tuple = ('empty',
-                                               'one_point',
-                                               'two_point',
-                                               'uniform2',
-                                               'uniform7',
-                                               'uniform_prop2',
-                                               'uniform_prop7',
-                                               'uniform_rank2',
-                                               'uniform_rank7',
-                                               'uniform_tour3',
-                                               'uniform_tour7'),
-                     mutation_opers: Tuple = ('weak',
-                                              'average',
-                                              'strong'),
-                     tour_size_param: int = 2,
-                     initial_population: Optional[np.ndarray] = None,
-                     elitism_param: bool = True,
-                     parents_num_param: int = 7,
-                     mutation_rate_param: float = 0.05,
-                     K_param: float = 2,
-                     threshold_param: float = 0.05) -> None:
-        '''
+    def set_strategy(
+        self,
+        selection_opers: Tuple = (
+            "proportional",
+            "rank",
+            "tournament_3",
+            "tournament_5",
+            "tournament_7",
+        ),
+        crossover_opers: Tuple = (
+            "empty",
+            "one_point",
+            "two_point",
+            "uniform2",
+            "uniform7",
+            "uniform_prop2",
+            "uniform_prop7",
+            "uniform_rank2",
+            "uniform_rank7",
+            "uniform_tour3",
+            "uniform_tour7",
+        ),
+        mutation_opers: Tuple = ("weak", "average", "strong"),
+        tour_size_param: int = 2,
+        initial_population: Optional[np.ndarray] = None,
+        elitism_param: bool = True,
+        parents_num_param: int = 7,
+        mutation_rate_param: float = 0.05,
+        K_param: float = 2,
+        threshold_param: float = 0.05,
+    ) -> None:
+        """
         - selection_oper: must be a Tuple of:
             'proportional', 'rank', 'tournament_k', 'tournament_3', 'tournament_5', 'tournament_7'
         - crossover oper: must be a Tuple of:
@@ -132,7 +137,7 @@ class SelfCGA(GeneticAlgorithm):
             'uniform_tour3', 'uniform_tour7', 'uniform_tourk'
         - mutation oper: must be a Tuple of:
             'weak', 'average', 'strong', 'custom_rate'
-        '''
+        """
         self._tour_size = tour_size_param
         self._initial_population = initial_population
         self._elitism = elitism_param
@@ -162,26 +167,24 @@ class SelfCGA(GeneticAlgorithm):
         self._mutation_set = dict(sorted(mutation_set.items()))
 
     def fit(self):
-
         z_selection = len(self._selection_set)
         z_crossover = len(self._crossover_set)
         z_mutation = len(self._mutation_set)
 
-        s_proba = dict(zip(list(self._selection_set.keys()),
-                           np.full(z_selection, 1 / z_selection)))
-        if 'empty' in self._crossover_set.keys():
-            c_proba = dict(zip(list(self._crossover_set.keys()),
-                           np.full(z_crossover, 0.9 / (z_crossover - 1))))
-            c_proba['empty'] = 0.1
+        s_proba = dict(zip(list(self._selection_set.keys()), np.full(z_selection, 1 / z_selection)))
+        if "empty" in self._crossover_set.keys():
+            c_proba = dict(
+                zip(list(self._crossover_set.keys()), np.full(z_crossover, 0.9 / (z_crossover - 1)))
+            )
+            c_proba["empty"] = 0.1
         else:
-            c_proba = dict(zip(list(self._crossover_set.keys()),
-                               np.full(z_crossover, 1 / z_crossover)))
-        m_proba = dict(zip(list(self._mutation_set.keys()),
-                       np.full(z_mutation, 1 / z_mutation)))
+            c_proba = dict(
+                zip(list(self._crossover_set.keys()), np.full(z_crossover, 1 / z_crossover))
+            )
+        m_proba = dict(zip(list(self._mutation_set.keys()), np.full(z_mutation, 1 / z_mutation)))
 
         if self._initial_population is None:
-            population_g = binary_string_population(
-                self._pop_size, self._str_len)
+            population_g = binary_string_population(self._pop_size, self._str_len)
         else:
             population_g = self._initial_population.copy()
 
@@ -190,27 +193,25 @@ class SelfCGA(GeneticAlgorithm):
             fitness = self._get_fitness(population_ph)
 
             self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats(population_g=population_g,
-                               fitness_max=self._thefittest._fitness,
-                               s_proba=s_proba,
-                               c_proba=c_proba,
-                               m_proba=m_proba)
+            self._update_stats(
+                population_g=population_g,
+                fitness_max=self._thefittest._fitness,
+                s_proba=s_proba,
+                c_proba=c_proba,
+                m_proba=m_proba,
+            )
             if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] =\
-                    self._thefittest.get().values()
+                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get().values()
             fitness_scale = scale_data(fitness)
 
             if i > 0:
-                s_fittest_oper = self._find_fittest_operator(
-                    s_operators, fitness_scale)
+                s_fittest_oper = self._find_fittest_operator(s_operators, fitness_scale)
                 s_proba = self._update_proba(s_proba, s_fittest_oper)
 
-                c_fittest_oper = self._find_fittest_operator(
-                    c_operators, fitness_scale)
+                c_fittest_oper = self._find_fittest_operator(c_operators, fitness_scale)
                 c_proba = self._update_proba(c_proba, c_fittest_oper)
 
-                m_fittest_oper = self._find_fittest_operator(
-                    m_operators, fitness_scale)
+                m_fittest_oper = self._find_fittest_operator(m_operators, fitness_scale)
                 m_proba = self._update_proba(m_proba, m_fittest_oper)
 
             self._show_progress(i)
@@ -221,12 +222,10 @@ class SelfCGA(GeneticAlgorithm):
                 c_operators = self._choice_operators(c_proba)
                 m_operators = self._choice_operators(m_proba)
 
-                get_new_individ_g = partial(self._get_new_individ_g,
-                                            population_g,
-                                            fitness_scale,
-                                            rank_data(fitness))
-                map_ = map(get_new_individ_g,
-                           s_operators, c_operators, m_operators)
+                get_new_individ_g = partial(
+                    self._get_new_individ_g, population_g, fitness_scale, rank_data(fitness)
+                )
+                map_ = map(get_new_individ_g, s_operators, c_operators, m_operators)
                 population_g = np.array(list(map_), dtype=np.byte)
 
         return self

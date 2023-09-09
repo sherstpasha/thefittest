@@ -2,9 +2,9 @@ import numpy as np
 
 
 def z(x):
-    first = - 1 / ((x - 1)**2 + 0.2)
-    left = - 1 / (2 * (x - 2)**2 + 0.15)
-    right = - 1 / (3 * (x - 3)**2 + 0.3)
+    first = -1 / ((x - 1) ** 2 + 0.2)
+    left = -1 / (2 * (x - 2) ** 2 + 0.15)
+    right = -1 / (3 * (x - 3) ** 2 + 0.3)
     return first + left + right
 
 
@@ -12,8 +12,8 @@ def F1(x):
     x_1 = x[:, 0]
     firts = 0.05 * (x_1 - 1) * (x_1 - 1)
     exp_x_power_2 = np.exp(-2.77257 * x_1 * x_1)
-    left = (3 - 2.9 * exp_x_power_2)
-    right = (1 - np.cos(x_1 * (4 - 50 * exp_x_power_2)))
+    left = 3 - 2.9 * exp_x_power_2
+    right = 1 - np.cos(x_1 * (4 - 50 * exp_x_power_2))
     return firts + left * right
 
 
@@ -28,14 +28,14 @@ def F3(x):
     x_1 = x[:, 0]
     x_2 = x[:, 1]
     left = 0.1 * x_1**2 + 0.1 * x_2**2
-    right = - 4 * np.cos(0.8 * x_1) - 4 * np.cos(0.8 * x_2) + 8
+    right = -4 * np.cos(0.8 * x_1) - 4 * np.cos(0.8 * x_2) + 8
     return left + right
 
 
 def F4(x):
     x_1 = x[:, 0]
     x_2 = x[:, 1]
-    left = (0.1 * 1.5 * x_2)**2 + (0.1 * 0.8 * x_1)**2
+    left = (0.1 * 1.5 * x_2) ** 2 + (0.1 * 0.8 * x_1) ** 2
     right = -4 * np.cos(0.8 * 1.5 * x_2) - 4 * np.cos(0.8 * 0.8 * x_1) + 8
     return left + right
 
@@ -43,7 +43,7 @@ def F4(x):
 def F5(x):
     x_1 = x[:, 0]
     x_2 = x[:, 1]
-    return 100 * ((x_2 - x_1**2))**2 + (1 - x_1)**2
+    return 100 * ((x_2 - x_1**2)) ** 2 + (1 - x_1) ** 2
 
 
 def F6(x):
@@ -57,7 +57,7 @@ def F6(x):
 def F7(x):
     x_1 = x[:, 0]
     x_2 = x[:, 1]
-    down = 100 * (x_1**2 - x_2) + (1 - x_1)**2 + 1
+    down = 100 * (x_1**2 - x_2) + (1 - x_1) ** 2 + 1
     return -100 / down + 100
 
 
@@ -65,7 +65,7 @@ def F8(x):
     x_1 = x[:, 0]
     x_2 = x[:, 1]
     power_x_y = x_1**2 + x_2**2
-    up = 1 - np.sin(np.sqrt(power_x_y))**2
+    up = 1 - np.sin(np.sqrt(power_x_y)) ** 2
     down = 1 + 0.001 * (power_x_y)
     return up / down
 
@@ -101,10 +101,8 @@ def F12(x):
     x_1 = x[:, 0]
     x_2 = x[:, 1]
     first = 0.5 * (x_1**2 + x_1 * x_2 + x_2**2)
-    left = 1 + 0.5 * np.cos(1.5 * x_1) * np.cos(
-        3.2 * x_1 * x_2) * np.cos(3.14 * x_2)
-    right = 0.5 * np.cos(2.2 * x_2) * np.cos(
-        4.8 * x_1 * x_2) * np.cos(3.5 * x_2)
+    left = 1 + 0.5 * np.cos(1.5 * x_1) * np.cos(3.2 * x_1 * x_2) * np.cos(3.14 * x_2)
+    right = 0.5 * np.cos(2.2 * x_2) * np.cos(4.8 * x_1 * x_2) * np.cos(3.5 * x_2)
     return first * (left + right)
 
 
@@ -127,7 +125,7 @@ def F14(x):
 def F15(x):
     x_1 = x[:, 0]
     x_2 = x[:, 1]
-    return (x_1 - 2)**2 + (x_2 - 1)**2
+    return (x_1 - 2) ** 2 + (x_2 - 1) ** 2
 
 
 def F16(x):
@@ -140,20 +138,22 @@ def F17(x):
     return np.sin(x_1) + x_1
 
 
-problems_dict = {'F1': {'function': F1, 'bounds': (-1, 1), 'n_vars': 1},
-                 'F2': {'function': F2, 'bounds': (-1, 1), 'n_vars': 1},
-                 'F3': {'function': F3, 'bounds': (-16, 16), 'n_vars': 2},
-                 'F4': {'function': F4, 'bounds': (-16, 16), 'n_vars': 2},
-                 'F5': {'function': F5, 'bounds': (-2, 2), 'n_vars': 2},
-                 'F6': {'function': F6, 'bounds': (-16, 16), 'n_vars': 2},
-                 'F7': {'function': F7, 'bounds': (-5, 5), 'n_vars': 2},
-                 'F8': {'function': F8, 'bounds': (-10, 10), 'n_vars': 2},
-                 'F9': {'function': F9, 'bounds': (-2.5, 2.5), 'n_vars': 2},
-                 'F10': {'function': F10, 'bounds': (-5, 5), 'n_vars': 2},
-                 'F11': {'function': F11, 'bounds': (-4, 4), 'n_vars': 2},
-                 'F12': {'function': F12, 'bounds': (0, 4), 'n_vars': 2},
-                 'F13': {'function': F13, 'bounds': (0, 4), 'n_vars': 2},
-                 'F14': {'function': F14, 'bounds': (0, 4), 'n_vars': 2},
-                 'F15': {'function': F15, 'bounds': (-5, 5), 'n_vars': 2},
-                 'F16': {'function': F16, 'bounds': (-5, 5), 'n_vars': 1},
-                 'F17': {'function': F17, 'bounds': (-5, 5), 'n_vars': 1}}
+problems_dict = {
+    "F1": {"function": F1, "bounds": (-1, 1), "n_vars": 1},
+    "F2": {"function": F2, "bounds": (-1, 1), "n_vars": 1},
+    "F3": {"function": F3, "bounds": (-16, 16), "n_vars": 2},
+    "F4": {"function": F4, "bounds": (-16, 16), "n_vars": 2},
+    "F5": {"function": F5, "bounds": (-2, 2), "n_vars": 2},
+    "F6": {"function": F6, "bounds": (-16, 16), "n_vars": 2},
+    "F7": {"function": F7, "bounds": (-5, 5), "n_vars": 2},
+    "F8": {"function": F8, "bounds": (-10, 10), "n_vars": 2},
+    "F9": {"function": F9, "bounds": (-2.5, 2.5), "n_vars": 2},
+    "F10": {"function": F10, "bounds": (-5, 5), "n_vars": 2},
+    "F11": {"function": F11, "bounds": (-4, 4), "n_vars": 2},
+    "F12": {"function": F12, "bounds": (0, 4), "n_vars": 2},
+    "F13": {"function": F13, "bounds": (0, 4), "n_vars": 2},
+    "F14": {"function": F14, "bounds": (0, 4), "n_vars": 2},
+    "F15": {"function": F15, "bounds": (-5, 5), "n_vars": 2},
+    "F16": {"function": F16, "bounds": (-5, 5), "n_vars": 1},
+    "F17": {"function": F17, "bounds": (-5, 5), "n_vars": 1},
+}

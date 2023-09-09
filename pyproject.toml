@@ -11,6 +11,9 @@ where = ["src"]
 [tool.setuptools.package-data]
 "*" = ["*.txt"]
 
+[tool.black]
+line-length = 100
+target-version = ['py37']
 
 [project]
 name = "thefittest"

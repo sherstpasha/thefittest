@@ -13,24 +13,14 @@ from ._shade import SHADE
 from ._shaga import SHAGA
 
 
-_optimizer_tree_type = [GeneticProgramming,
-                        SelfCGP]
+_optimizer_tree_type = [GeneticProgramming, SelfCGP]
 
-OptimizerTreeType = Union[GeneticProgramming,
-                          SelfCGP]
+OptimizerTreeType = Union[GeneticProgramming, SelfCGP]
 
 
-optimizer_real_coded = [DifferentialEvolution,
-                        JADE,
-                        SHADE,
-                        jDE,
-                        SaDE2005]
+optimizer_real_coded = [DifferentialEvolution, JADE, SHADE, jDE, SaDE2005]
 
-OptimizerRealCoded = Union[DifferentialEvolution,
-                           JADE,
-                           SHADE,
-                           jDE,
-                           SaDE2005]
+OptimizerRealCoded = Union[DifferentialEvolution, JADE, SHADE, jDE, SaDE2005]
 
 optimizer_binary_coded = [GeneticAlgorithm, SelfCGA, SHAGA, SelfAGA]
 
@@ -44,14 +34,16 @@ OptimizerAnyType = Union[OptimizerTreeType, OptimizerStringType]
 
 optimizer_any_type = _optimizer_tree_type + optimizer_string_type
 
-__all__ = ['DifferentialEvolution',
-           'GeneticAlgorithm',
-           'GeneticProgramming',
-           'JADE',
-           'jDE',
-           'SaDE2005',
-           'SelfAGA',
-           'SelfCGA',
-           'SelfCGP',
-           'SHADE',
-           'SHAGA']
+__all__ = [
+    "DifferentialEvolution",
+    "GeneticAlgorithm",
+    "GeneticProgramming",
+    "JADE",
+    "jDE",
+    "SaDE2005",
+    "SelfAGA",
+    "SelfCGA",
+    "SelfCGP",
+    "SHADE",
+    "SHAGA",
+]
