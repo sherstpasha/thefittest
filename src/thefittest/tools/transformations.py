@@ -114,7 +114,7 @@ def rank_data(arr: np.ndarray) -> np.ndarray:
     arr_sorted = arr.copy()[argsort]
 
     cond = np.r_[True, arr_sorted[1:] != arr_sorted[:-1]]
-    raw_ranks = np.r_[arange[cond == True], len(arange)]
+    raw_ranks = np.r_[arange[cond is True], len(arange)]
     ranks = (raw_ranks[1:] + raw_ranks[:-1] + 1) / 2
     count = raw_ranks[1:] - raw_ranks[:-1]
 

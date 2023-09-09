@@ -32,7 +32,7 @@ def get_levels_tree_from_i(origin: np.int64, n_args_array: NDArray[np.int64]) ->
     s = [1]
     d = [-1]
     result_list = []
-    for i, n_arg in enumerate(n_args_array[origin:]):
+    for n_arg in n_args_array[origin:]:
         s[-1] = s[-1] - 1
         if s[-1] == 0:
             s.pop()

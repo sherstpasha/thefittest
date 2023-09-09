@@ -147,9 +147,8 @@ class MLPClassifierEA(Model):
         self.optimizer_weights.set_strategy(initial_population=initial_population)
         self.optimizer_weights.fit()
 
-        fittest = self.optimizer_weights.get_fittest()
-        genotype, phenotype, fitness = fittest.get().values()
-        return phenotype
+        fittest = self.optimizer_weights.get_fittest().get()
+        return fittest["phenotype"]
 
     def _fit(self, X, y):
         if self._offset:

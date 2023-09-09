@@ -599,7 +599,7 @@ class Inv(Operator):
         Operator.__init__(self, formula="(1/{})", name="Inv", sign="1/")
 
     def __call__(self, y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        if type(y) == np.ndarray:
+        if isinstance(y, np.ndarray):
             result = np.divide(1, y, out=np.ones_like(y, dtype=np.float64), where=y != 0)
         else:
             if y == 0:
