@@ -1,10 +1,16 @@
 from ..benchmarks import BanknoteDataset
 from ..benchmarks import BreastCancerDataset
+import numpy as np
+
 from ..benchmarks import CreditRiskDataset
 from ..benchmarks import DigitsDataset
 from ..benchmarks import IrisDataset
 from ..benchmarks import UserKnowladgeDataset
 from ..benchmarks import WineDataset
+from ..benchmarks.symbolicregression17 import (F1, F2, F3, F4,
+                                               F5, F6, F7, F8,
+                                               F9, F10, F11, F12,
+                                               F13, F14, F15, F16, F17)
 
 
 def test_IrisDataset():
@@ -117,3 +123,37 @@ def test_BanknoteDataset():
 
     assert len(X_names) == 4
     assert len(y_names) == 2
+
+
+def test_symbolicregression17():
+    left_border = -4.5
+    right_border = 4.5
+    sample_size = 30
+    n_dimension = 1
+
+    X = np.array([np.linspace(left_border, right_border, sample_size)
+                  for _ in range(n_dimension)], dtype=np.float64).T
+
+    F1(X)
+    F2(X)
+    F16(X)
+    F17(X)
+
+    n_dimension = 2
+
+    X = np.array([np.linspace(left_border, right_border, sample_size)
+                  for _ in range(n_dimension)], dtype=np.float64).T
+    
+    F3(X)
+    F4(X)
+    F5(X)
+    F6(X)
+    F7(X)
+    F8(X)
+    F9(X)
+    F10(X)
+    F11(X)
+    F12(X)
+    F13(X)
+    F14(X)
+    F15(X)

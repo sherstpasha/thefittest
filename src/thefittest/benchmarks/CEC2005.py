@@ -1,24 +1,23 @@
 import numpy as np
-# Unimodal (5)
-from ._optproblems import ShiftedSphere  # 1
+
+from ._optproblems import ShiftedSphere  # 1 Unimodal (5)
 from ._optproblems import ShiftedSchwefe1_2  # 2
 from ._optproblems import ShiftedRotatedHighConditionedElliptic  # 3
 from ._optproblems import ShiftedSchwefe1_2WithNoise  # 4
 from ._optproblems import Schwefel2_6  # 5
-# Multimodal (20)
-# Basic Functions (7)
-from ._optproblems import ShiftedRosenbrock  # 6
+
+from ._optproblems import ShiftedRosenbrock  # 6 Multimodal (20) Basic Functions (7)
 from ._optproblems import ShiftedRotatedGriewank  # 7
 from ._optproblems import ShiftedRotatedAckley  # 8
 from ._optproblems import ShiftedRastrigin  # 9
 from ._optproblems import ShiftedRotatedRastrigin  # 10
 from ._optproblems import ShiftedRotatedWeierstrass  # 11
 from ._optproblems import Schwefel2_13  # 12
-# Expanded Functions (2)
-from ._optproblems import ShiftedExpandedGriewankRosenbrock  # 13
+
+from ._optproblems import ShiftedExpandedGriewankRosenbrock  # 13 Expanded Functions (2)
 from ._optproblems import ShiftedRotatedExpandedScaffes_F6  # 14
-# Hybrid Composition Functions (11)
-from ._optproblems import HybridCompositionFunction1  # 15
+
+from ._optproblems import HybridCompositionFunction1  # 15 Hybrid Composition Functions (11)
 from ._optproblems import RotatedVersionHybridCompositionFunction1  # 16
 from ._optproblems import RotatedVersionHybridCompositionFunction1Noise  # 17
 from ._optproblems import RotatedHybridCompositionFunction  # 18

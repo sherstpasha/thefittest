@@ -5,91 +5,90 @@ import numpy as np
 
 path = os.path.dirname(__file__) + '/_data/'
 
-fbias_data = np.loadtxt(path+'fbias_data.txt')
+fbias_data = np.loadtxt(path + 'fbias_data.txt')
 # 1
-sphere_func_data = np.loadtxt(path+'sphere_func_data.txt')
+sphere_func_data = np.loadtxt(path + 'sphere_func_data.txt')
 # 2
-schwefel_102_data = np.loadtxt(path+'schwefel_102_data.txt')
+schwefel_102_data = np.loadtxt(path + 'schwefel_102_data.txt')
 # 3
-high_cond_elliptic_rot_data = np.loadtxt(path
-                                         + 'high_cond_elliptic_rot_data.txt')[:50]
-elliptic_m_d2 = np.loadtxt(path+'elliptic_M_D2.txt')
-elliptic_m_d10 = np.loadtxt(path+'elliptic_M_D10.txt')
-elliptic_m_d30 = np.loadtxt(path+'elliptic_M_D30.txt')
-elliptic_m_d50 = np.loadtxt(path+'elliptic_M_D50.txt')
+high_cond_elliptic_rot_data = np.loadtxt(path + 'high_cond_elliptic_rot_data.txt')[:50]
+elliptic_m_d2 = np.loadtxt(path + 'elliptic_M_D2.txt')
+elliptic_m_d10 = np.loadtxt(path + 'elliptic_M_D10.txt')
+elliptic_m_d30 = np.loadtxt(path + 'elliptic_M_D30.txt')
+elliptic_m_d50 = np.loadtxt(path + 'elliptic_M_D50.txt')
 # 5
-schwefel_206_data = np.loadtxt(path+'schwefel_206_data.txt')
+schwefel_206_data = np.loadtxt(path + 'schwefel_206_data.txt')
 o_206 = schwefel_206_data[0]
 A_206 = schwefel_206_data[1:]
 # 6
-rosenbrock_func_data = np.loadtxt(path+'rosenbrock_func_data.txt')
+rosenbrock_func_data = np.loadtxt(path + 'rosenbrock_func_data.txt')
 # 7
-griewank_func_data = np.loadtxt(path+'griewank_func_data.txt')[:50]
-griewank_m_d2 = np.loadtxt(path+'griewank_M_D2.txt')
-griewank_m_d10 = np.loadtxt(path+'griewank_M_D10.txt')
-griewank_m_d30 = np.loadtxt(path+'griewank_M_D30.txt')
-griewank_m_d50 = np.loadtxt(path+'griewank_M_D50.txt')
+griewank_func_data = np.loadtxt(path + 'griewank_func_data.txt')[:50]
+griewank_m_d2 = np.loadtxt(path + 'griewank_M_D2.txt')
+griewank_m_d10 = np.loadtxt(path + 'griewank_M_D10.txt')
+griewank_m_d30 = np.loadtxt(path + 'griewank_M_D30.txt')
+griewank_m_d50 = np.loadtxt(path + 'griewank_M_D50.txt')
 # 8
-ackley_func_data = np.loadtxt(path+'ackley_func_data.txt')[:50]
-ackley_m_d2 = np.loadtxt(path+'ackley_M_D2.txt')
-ackley_m_d10 = np.loadtxt(path+'ackley_M_D10.txt')
-ackley_m_d30 = np.loadtxt(path+'ackley_M_D30.txt')
-ackley_m_d50 = np.loadtxt(path+'ackley_M_D50.txt')
+ackley_func_data = np.loadtxt(path + 'ackley_func_data.txt')[:50]
+ackley_m_d2 = np.loadtxt(path + 'ackley_M_D2.txt')
+ackley_m_d10 = np.loadtxt(path + 'ackley_M_D10.txt')
+ackley_m_d30 = np.loadtxt(path + 'ackley_M_D30.txt')
+ackley_m_d50 = np.loadtxt(path + 'ackley_M_D50.txt')
 # 9-10
-rastrigin_func_data = np.loadtxt(path+'rastrigin_func_data.txt')[:50]
-rastrigin_m_d2 = np.loadtxt(path+'rastrigin_M_D2.txt')
-rastrigin_m_d10 = np.loadtxt(path+'rastrigin_M_D10.txt')
-rastrigin_m_d30 = np.loadtxt(path+'rastrigin_M_D30.txt')
-rastrigin_m_d50 = np.loadtxt(path+'rastrigin_M_D50.txt')
+rastrigin_func_data = np.loadtxt(path + 'rastrigin_func_data.txt')[:50]
+rastrigin_m_d2 = np.loadtxt(path + 'rastrigin_M_D2.txt')
+rastrigin_m_d10 = np.loadtxt(path + 'rastrigin_M_D10.txt')
+rastrigin_m_d30 = np.loadtxt(path + 'rastrigin_M_D30.txt')
+rastrigin_m_d50 = np.loadtxt(path + 'rastrigin_M_D50.txt')
 # 11
-weierstrass_m_d2 = np.loadtxt(path+'weierstrass_M_D2.txt')
-weierstrass_m_d10 = np.loadtxt(path+'weierstrass_M_D10.txt')
-weierstrass_m_d30 = np.loadtxt(path+'weierstrass_M_D30.txt')
-weierstrass_m_d50 = np.loadtxt(path+'weierstrass_M_D50.txt')
-weierstrass_data = np.loadtxt(path+'weierstrass_data.txt')[:50]
+weierstrass_m_d2 = np.loadtxt(path + 'weierstrass_M_D2.txt')
+weierstrass_m_d10 = np.loadtxt(path + 'weierstrass_M_D10.txt')
+weierstrass_m_d30 = np.loadtxt(path + 'weierstrass_M_D30.txt')
+weierstrass_m_d50 = np.loadtxt(path + 'weierstrass_M_D50.txt')
+weierstrass_data = np.loadtxt(path + 'weierstrass_data.txt')[:50]
 # 12
-schwefel_213_data = np.loadtxt(path+'schwefel_213_data.txt')
+schwefel_213_data = np.loadtxt(path + 'schwefel_213_data.txt')
 # 13
-EF8F2_func_data = np.loadtxt(path+'EF8F2_func_data.txt')
+EF8F2_func_data = np.loadtxt(path + 'EF8F2_func_data.txt')
 a_213 = schwefel_213_data[:100]
 b_213 = schwefel_213_data[100:200]
 alpha_213 = schwefel_213_data[-1]
 # 14
-E_ScafferF6_func_data = np.loadtxt(path+'E_ScafferF6_func_data.txt')[:50]
-E_ScafferF6_m_d2 = np.loadtxt(path+'E_ScafferF6_M_D2.txt')
-E_ScafferF6_m_d10 = np.loadtxt(path+'E_ScafferF6_M_D10.txt')
-E_ScafferF6_m_d30 = np.loadtxt(path+'E_ScafferF6_M_D30.txt')
-E_ScafferF6_m_d50 = np.loadtxt(path+'E_ScafferF6_M_D50.txt')
+E_ScafferF6_func_data = np.loadtxt(path + 'E_ScafferF6_func_data.txt')[:50]
+E_ScafferF6_m_d2 = np.loadtxt(path + 'E_ScafferF6_M_D2.txt')
+E_ScafferF6_m_d10 = np.loadtxt(path + 'E_ScafferF6_M_D10.txt')
+E_ScafferF6_m_d30 = np.loadtxt(path + 'E_ScafferF6_M_D30.txt')
+E_ScafferF6_m_d50 = np.loadtxt(path + 'E_ScafferF6_M_D50.txt')
 # 15
-hybrid_func1_data = np.loadtxt(path+'hybrid_func1_data.txt')
+hybrid_func1_data = np.loadtxt(path + 'hybrid_func1_data.txt')
 # 16
-hybrid_func1_m_d2 = np.loadtxt(path+'hybrid_func1_M_D2.txt')
-hybrid_func1_m_d10 = np.loadtxt(path+'hybrid_func1_M_D10.txt')
-hybrid_func1_m_d30 = np.loadtxt(path+'hybrid_func1_M_D30.txt')
-hybrid_func1_m_d50 = np.loadtxt(path+'hybrid_func1_M_D50.txt')
+hybrid_func1_m_d2 = np.loadtxt(path + 'hybrid_func1_M_D2.txt')
+hybrid_func1_m_d10 = np.loadtxt(path + 'hybrid_func1_M_D10.txt')
+hybrid_func1_m_d30 = np.loadtxt(path + 'hybrid_func1_M_D30.txt')
+hybrid_func1_m_d50 = np.loadtxt(path + 'hybrid_func1_M_D50.txt')
 # 18
-hybrid_func2_data = np.loadtxt(path+'hybrid_func2_data.txt')
-hybrid_func2_m_d2 = np.loadtxt(path+'hybrid_func2_M_D2.txt')
-hybrid_func2_m_d10 = np.loadtxt(path+'hybrid_func2_M_D10.txt')
-hybrid_func2_m_d30 = np.loadtxt(path+'hybrid_func2_M_D30.txt')
-hybrid_func2_m_d50 = np.loadtxt(path+'hybrid_func2_M_D50.txt')
+hybrid_func2_data = np.loadtxt(path + 'hybrid_func2_data.txt')
+hybrid_func2_m_d2 = np.loadtxt(path + 'hybrid_func2_M_D2.txt')
+hybrid_func2_m_d10 = np.loadtxt(path + 'hybrid_func2_M_D10.txt')
+hybrid_func2_m_d30 = np.loadtxt(path + 'hybrid_func2_M_D30.txt')
+hybrid_func2_m_d50 = np.loadtxt(path + 'hybrid_func2_M_D50.txt')
 # 21
-hybrid_func3_data = np.loadtxt(path+'hybrid_func3_data.txt')
-hybrid_func3_m_d2 = np.loadtxt(path+'hybrid_func3_M_D2.txt')
-hybrid_func3_m_d10 = np.loadtxt(path+'hybrid_func3_M_D10.txt')
-hybrid_func3_m_d30 = np.loadtxt(path+'hybrid_func3_M_D30.txt')
-hybrid_func3_m_d50 = np.loadtxt(path+'hybrid_func3_M_D50.txt')
+hybrid_func3_data = np.loadtxt(path + 'hybrid_func3_data.txt')
+hybrid_func3_m_d2 = np.loadtxt(path + 'hybrid_func3_M_D2.txt')
+hybrid_func3_m_d10 = np.loadtxt(path + 'hybrid_func3_M_D10.txt')
+hybrid_func3_m_d30 = np.loadtxt(path + 'hybrid_func3_M_D30.txt')
+hybrid_func3_m_d50 = np.loadtxt(path + 'hybrid_func3_M_D50.txt')
 # 22
-hybrid_func3_hm_d2 = np.loadtxt(path+'hybrid_func3_HM_D2.txt')
-hybrid_func3_hm_d10 = np.loadtxt(path+'hybrid_func3_HM_D10.txt')
-hybrid_func3_hm_d30 = np.loadtxt(path+'hybrid_func3_HM_D30.txt')
-hybrid_func3_hm_d50 = np.loadtxt(path+'hybrid_func3_HM_D50.txt')
+hybrid_func3_hm_d2 = np.loadtxt(path + 'hybrid_func3_HM_D2.txt')
+hybrid_func3_hm_d10 = np.loadtxt(path + 'hybrid_func3_HM_D10.txt')
+hybrid_func3_hm_d30 = np.loadtxt(path + 'hybrid_func3_HM_D30.txt')
+hybrid_func3_hm_d50 = np.loadtxt(path + 'hybrid_func3_HM_D50.txt')
 # 24
-hybrid_func4_data = np.loadtxt(path+'hybrid_func4_data.txt')
-hybrid_func4_m_d2 = np.loadtxt(path+'hybrid_func4_M_D2.txt')
-hybrid_func4_m_d10 = np.loadtxt(path+'hybrid_func4_M_D10.txt')
-hybrid_func4_m_d30 = np.loadtxt(path+'hybrid_func4_M_D30.txt')
-hybrid_func4_m_d50 = np.loadtxt(path+'hybrid_func4_M_D50.txt')
+hybrid_func4_data = np.loadtxt(path + 'hybrid_func4_data.txt')
+hybrid_func4_m_d2 = np.loadtxt(path + 'hybrid_func4_M_D2.txt')
+hybrid_func4_m_d10 = np.loadtxt(path + 'hybrid_func4_M_D10.txt')
+hybrid_func4_m_d30 = np.loadtxt(path + 'hybrid_func4_M_D30.txt')
+hybrid_func4_m_d50 = np.loadtxt(path + 'hybrid_func4_M_D50.txt')
 
 
 class TestFunction:
@@ -113,7 +112,7 @@ class TestShiftedFunction:
 
     def shift(self, x):
         shape = x.shape
-        axis = [1]*(len(shape)-1) + [-1]
+        axis = [1] * (len(shape) - 1) + [-1]
         return x - self.x_shift[:shape[-1]].reshape(axis)
 
     def __call__(self, x):
@@ -142,18 +141,18 @@ class TestShiftedRotatedFunction:
 
     def shift(self, x):
         shape = x.shape
-        axis = [1]*(len(shape)-1) + [-1]
+        axis = [1] * (len(shape) - 1) + [-1]
         return x - self.x_shift[:shape[-1]].reshape(axis)
 
     def rotate(self, x):
         if x.shape[1] == 2:
-            z = x@self.rotate_M_D2
+            z = x @ self.rotate_M_D2
         elif x.shape[1] == 10:
-            z = x@self.rotate_M_D10
+            z = x @ self.rotate_M_D10
         elif x.shape[1] == 30:
-            z = x@self.rotate_M_D30
+            z = x @ self.rotate_M_D30
         elif x.shape[1] == 50:
-            z = x@self.rotate_M_D50
+            z = x @ self.rotate_M_D50
         return z
 
     def __call__(self, x):
@@ -196,18 +195,18 @@ class SampleHybridCompositionFunction():
 
     def shift(self, x, i):
         shape = x.shape
-        axis = [1]*(len(shape)-1) + [-1]
+        axis = [1] * (len(shape) - 1) + [-1]
         return x - self.x_shift[i][:shape[-1]].reshape(axis)
 
     def rotate(self, x, M_D2, M_D10, M_D30, M_D50):
         if x.shape[1] == 2:
-            z = x@M_D2
+            z = x @ M_D2
         elif x.shape[1] == 10:
-            z = x@M_D10
+            z = x @ M_D10
         elif x.shape[1] == 30:
-            z = x@M_D30
+            z = x @ M_D30
         elif x.shape[1] == 50:
-            z = x@M_D50
+            z = x @ M_D50
         return z
 
     def calc_w(self, x, shift_i, sigma_i, i):
@@ -215,9 +214,9 @@ class SampleHybridCompositionFunction():
         shift_x = self.shift(x, i)
 
         up = np.sum(shift_x**2, axis=-1)
-        down = 2*D*(sigma_i*sigma_i)
+        down = 2 * D * (sigma_i * sigma_i)
 
-        w_i = np.exp(-(up/down))
+        w_i = np.exp(-(up / down))
 
         return w_i, shift_x
 
@@ -226,13 +225,13 @@ class SampleHybridCompositionFunction():
         y = np.full(shape=x.shape, fill_value=5)
         w_i, shift_x = self.calc_w(x, shift_i, sigma_i, i)
 
-        arg1 = self.rotate(shift_x/lambda_i,  M_D2i, M_D10i, M_D30i, M_D50i)
+        arg1 = self.rotate(shift_x / lambda_i, M_D2i, M_D10i, M_D30i, M_D50i)
         fit_i = func_i()(arg1)
 
-        arg2 = self.rotate(y/lambda_i,  M_D2i, M_D10i, M_D30i, M_D50i)
+        arg2 = self.rotate(y / lambda_i, M_D2i, M_D10i, M_D30i, M_D50i)
         f_max_i = func_i()(arg2)
 
-        fit_i = self.C*fit_i/f_max_i
+        fit_i = self.C * fit_i / f_max_i
 
         return w_i, fit_i
 
@@ -251,11 +250,11 @@ class SampleHybridCompositionFunction():
 
         for i, w_i_j in enumerate(w_i.T):
             cond = w_i_j != max_w
-            w_i[:, i][cond] = w_i[:, i][cond]*(1.0 - max_w[cond]**10)
+            w_i[:, i][cond] = w_i[:, i][cond] * (1.0 - max_w[cond]**10)
 
-        w_i = w_i/np.sum(w_i, axis=-1)[:, np.newaxis]
+        w_i = w_i / np.sum(w_i, axis=-1)[:, np.newaxis]
 
-        return np.sum(w_i*(fit_i + self.bias), axis=-1) + self.fbias
+        return np.sum(w_i * (fit_i + self.bias), axis=-1) + self.fbias
 
     def test(self):
         y = self(self.x_shift.reshape(1, -1))
@@ -288,38 +287,38 @@ class Schwefe1_2(TestFunction):
 
 class HighConditionedElliptic(TestFunction):
     def f(self, x):
-        i = np.arange(1, x.shape[1]+1)
+        i = np.arange(1, x.shape[1] + 1)
         demension = x.shape[1]
-        return np.sum((1e6**((i - 1)/(demension - 1)))*x**2, axis=-1)
+        return np.sum((1e6**((i - 1) / (demension - 1))) * x**2, axis=-1)
 
 
 class Rosenbrock(TestFunction):
     def f(self, x):
-        value = 100*((x.T[:-1]**2 - x.T[1:])**2) + (x.T[:-1] - 1)**2
+        value = 100 * ((x.T[:-1]**2 - x.T[1:])**2) + (x.T[:-1] - 1)**2
         return np.sum(value.T, axis=-1)
 
 
 class Rastrigin(TestFunction):
     def f(self, x):
-        return np.sum(x**2 - 10*np.cos(2*np.pi*x) + 10, axis=-1)
+        return np.sum(x**2 - 10 * np.cos(2 * np.pi * x) + 10, axis=-1)
 
 
 class Griewank(TestFunction):
     def f(self, x):
-        sqrt_i = np.sqrt(np.arange(1, x.shape[1]+1))
-        sum_ = np.sum((x**2)/4000, axis=-1)
-        prod_ = np.prod(np.cos(x/sqrt_i), axis=-1)
+        sqrt_i = np.sqrt(np.arange(1, x.shape[1] + 1))
+        sum_ = np.sum((x**2) / 4000, axis=-1)
+        prod_ = np.prod(np.cos(x / sqrt_i), axis=-1)
         return sum_ - prod_ + 1
 
 
 class Ackley(TestFunction):
     def f(self, x):
         a = 20
-        c = 2*np.pi
+        c = 2 * np.pi
         b = 0.2
         D = x.shape[1]
-        left = -a*np.exp(-b*np.sqrt(np.sum(x**2, axis=1)/D))
-        right = -np.exp((1/D)*np.sum(np.cos(c*x), axis=1))
+        left = -a * np.exp(-b * np.sqrt(np.sum(x**2, axis=1) / D))
+        right = -np.exp((1 / D) * np.sum(np.cos(c * x), axis=1))
         return left + right + a + np.exp(1)
 
 
@@ -330,16 +329,16 @@ class Weierstrass(TestFunction):
         k_max = np.arange(20, dtype=np.int64)
         D = x.shape[1]
 
-        two_pi_power_b = 2*np.pi*(b**k_max)
+        two_pi_power_b = 2 * np.pi * (b**k_max)
         a_power_k = a**k_max
-        arg1 = two_pi_power_b*(x[:, :, np.newaxis]+0.5)
-        arg2 = two_pi_power_b*0.5
-        left = a_power_k*np.cos(arg1)
-        right = a_power_k*np.cos(arg2)
+        arg1 = two_pi_power_b * (x[:, :, np.newaxis] + 0.5)
+        arg2 = two_pi_power_b * 0.5
+        left = a_power_k * np.cos(arg1)
+        right = a_power_k * np.cos(arg2)
 
         left_sum = np.sum(np.sum(left, axis=-1), axis=-1)
         right_sum = np.sum(right, axis=-1)
-        return left_sum - D*right_sum
+        return left_sum - D * right_sum
 
 
 class F8F2(TestFunction):
@@ -349,9 +348,9 @@ class F8F2(TestFunction):
 
     def f(self, x):
         indexes = np.kron(
-            np.arange(1, x.shape[1]-1, dtype=np.int64), np.array([1, 1]))
+            np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
         indexes = np.insert(indexes, [0], [0])
-        indexes = np.append(indexes, np.array([x.shape[1]-1, x.shape[1]-1, 0]))
+        indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
 
         x_indexes = x[:, indexes]
 
@@ -366,14 +365,14 @@ class ExpandedScaffers_F6(TestFunction):
     def Scaffes_F6(self, x):
         sum_of_power = x[:, 0]**2 + x[:, 1]**2
         up = np.sin(np.sqrt(sum_of_power))**2 - 0.5
-        down = (1 + 0.001*(sum_of_power))**2
-        return 0.5 + up/down
+        down = (1 + 0.001 * (sum_of_power))**2
+        return 0.5 + up / down
 
     def f(self, x):
         indexes = np.kron(
-            np.arange(1, x.shape[1]-1, dtype=np.int64), np.array([1, 1]))
+            np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
         indexes = np.insert(indexes, [0], [0])
-        indexes = np.append(indexes, np.array([x.shape[1]-1, x.shape[1]-1, 0]))
+        indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
         x_indexes = x[:, indexes]
 
         vertical_X = x_indexes.reshape(-1, 2)
@@ -386,22 +385,22 @@ class ExpandedScaffers_F6(TestFunction):
 class NonContinuosRastrigin(Rastrigin):
     def __call__(self, x):
         cond = np.abs(x) >= 0.5
-        x[cond] = (np.round(2*x)/2)[cond]
+        x[cond] = (np.round(2 * x) / 2)[cond]
         return super().__call__(x)
 
 
 class NonContinuosExpandedScaffers_F6(ExpandedScaffers_F6):
     def __call__(self, x):
         cond = np.abs(x) >= 0.5
-        x[cond] = (np.round(2*x)/2)[cond]
+        x[cond] = (np.round(2 * x) / 2)[cond]
         return super().__call__(x)
 
 
 class SphereWithNoise(Sphere):
     def __call__(self, x):
         y = super().__call__(x)
-        noise = 1 + 0.1*np.abs(np.random.normal(size=y.shape))
-        return y*noise
+        noise = 1 + 0.1 * np.abs(np.random.normal(size=y.shape))
+        return y * noise
 
 
 # CEC05 #1
@@ -444,8 +443,8 @@ class ShiftedSchwefe1_2WithNoise(TestShiftedFunction, Schwefe1_2):
     def __call__(self, x):
         z = self.shift(x)
         y = self.f(z)
-        noise = 1 + 0.4*np.abs(np.random.normal(size=y.shape))
-        return y*noise + self.fbias
+        noise = 1 + 0.4 * np.abs(np.random.normal(size=y.shape))
+        return y * noise + self.fbias
 
 
 # CEC05 #5
@@ -457,15 +456,15 @@ class Schwefel2_6(TestShiftedFunction):
 
     def __call__(self, x):
         D = x.shape[1]
-        self.x_shift[np.floor(3*D/4).astype(np.int64)-1:D] = 100
-        self.x_shift[:np.ceil(D/4).astype(np.int64)] = -100
+        self.x_shift[np.floor(3 * D / 4).astype(np.int64) - 1:D] = 100
+        self.x_shift[:np.ceil(D / 4).astype(np.int64)] = -100
         return self.f(x) + self.fbias
 
     def f(self, x):
         o = self.x_shift[:x.shape[1]]
         A = A_206[:x.shape[1], :x.shape[1]]
-        Ax = A@x.T
-        B = A@o
+        Ax = A @ x.T
+        B = A @ o
         fx = np.abs(Ax - B[:, np.newaxis])
         return np.max(fx, axis=0)
 
@@ -479,7 +478,7 @@ class ShiftedRosenbrock(TestShiftedFunction, Rosenbrock):
 
     def shift(self, x):
         shape = x.shape
-        axis = [1]*(len(shape)-1) + [-1]
+        axis = [1] * (len(shape) - 1) + [-1]
         return x - self.x_shift[:shape[-1]].reshape(axis) + 1
 
 
@@ -567,11 +566,10 @@ class Schwefel2_13(TestShiftedFunction):
         b = b_213[:x.shape[1], :x.shape[1]]
         alpha = self.x_shift[:x.shape[1]]
 
-        A = np.sum(a*np.sin(alpha)[np.newaxis:, ]
-                   + b*np.cos(alpha)[np.newaxis:, ], axis=1)
+        A = np.sum(a * np.sin(alpha)[np.newaxis:, ] + b * np.cos(alpha)[np.newaxis:, ], axis=1)
 
-        B1 = a[np.newaxis]*np.sin(x[:, np.newaxis])
-        B2 = b[np.newaxis]*np.cos(x[:, np.newaxis])
+        B1 = a[np.newaxis] * np.sin(x[:, np.newaxis])
+        B2 = b[np.newaxis] * np.cos(x[:, np.newaxis])
         B = np.sum(B1 + B2, axis=-1)
 
         return np.sum((A[np.newaxis:, ] - B)**2, axis=-1)
@@ -589,14 +587,14 @@ class ShiftedExpandedGriewankRosenbrock(TestShiftedFunction):
 
     def shift(self, x):
         shape = x.shape
-        axis = [1]*(len(shape)-1) + [-1]
+        axis = [1] * (len(shape) - 1) + [-1]
         return x - self.x_shift[:shape[-1]].reshape(axis) + 1
 
     def f(self, x):
         indexes = np.kron(
-            np.arange(1, x.shape[1]-1, dtype=np.int64), np.array([1, 1]))
+            np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
         indexes = np.insert(indexes, [0], [0])
-        indexes = np.append(indexes, np.array([x.shape[1]-1, x.shape[1]-1, 0]))
+        indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
 
         x_indexes = x[:, indexes]
 
@@ -622,14 +620,14 @@ class ShiftedRotatedExpandedScaffes_F6(TestShiftedRotatedFunction):
     def Scaffes_F6(self, x):
         sum_of_power = x[:, 0]**2 + x[:, 1]**2
         up = np.sin(np.sqrt(sum_of_power))**2 - 0.5
-        down = (1 + 0.001*(sum_of_power))**2
-        return 0.5 + up/down
+        down = (1 + 0.001 * (sum_of_power))**2
+        return 0.5 + up / down
 
     def f(self, x):
         indexes = np.kron(
-            np.arange(1, x.shape[1]-1, dtype=np.int64), np.array([1, 1]))
+            np.arange(1, x.shape[1] - 1, dtype=np.int64), np.array([1, 1]))
         indexes = np.insert(indexes, [0], [0])
-        indexes = np.append(indexes, np.array([x.shape[1]-1, x.shape[1]-1, 0]))
+        indexes = np.append(indexes, np.array([x.shape[1] - 1, x.shape[1] - 1, 0]))
         x_indexes = x[:, indexes]
 
         vertical_X = x_indexes.reshape(-1, 2)
@@ -655,8 +653,8 @@ class HybridCompositionFunction1(SampleHybridCompositionFunction):
                              Sphere,
                              Sphere),
             sigmas=np.ones(10),
-            lambdas=np.array([1, 1, 10, 10, 5/60, 5/60, 5/32,
-                             5/32, 5/100, 5/100], dtype=np.float64),
+            lambdas=np.array([1, 1, 10, 10, 5 / 60, 5 / 60, 5 / 32,
+                             5 / 32, 5 / 100, 5 / 100], dtype=np.float64),
             fbias=fbias_data[14],
             x_shift=hybrid_func1_data,
             M_D2=np.vstack([np.eye(2) for _ in range(10)]),
@@ -681,8 +679,8 @@ class RotatedVersionHybridCompositionFunction1(SampleHybridCompositionFunction):
                              Sphere,
                              Sphere),
             sigmas=np.ones(10),
-            lambdas=np.array([1, 1, 10, 10, 5/60, 5/60, 5/32,
-                             5/32, 5/100, 5/100], dtype=np.float64),
+            lambdas=np.array([1, 1, 10, 10, 5 / 60, 5 / 60, 5 / 32,
+                             5 / 32, 5 / 100, 5 / 100], dtype=np.float64),
             fbias=fbias_data[15],
             x_shift=hybrid_func1_data,
             M_D2=hybrid_func1_m_d2,
@@ -707,8 +705,8 @@ class RotatedVersionHybridCompositionFunction1Noise(SampleHybridCompositionFunct
                              Sphere,
                              Sphere),
             sigmas=np.ones(10),
-            lambdas=np.array([1, 1, 10, 10, 5/60, 5/60, 5/32,
-                             5/32, 5/100, 5/100], dtype=np.float64),
+            lambdas=np.array([1, 1, 10, 10, 5 / 60, 5 / 60, 5 / 32,
+                             5 / 32, 5 / 100, 5 / 100], dtype=np.float64),
             fbias=fbias_data[16],
             x_shift=hybrid_func1_data,
             M_D2=hybrid_func1_m_d2,
@@ -719,7 +717,7 @@ class RotatedVersionHybridCompositionFunction1Noise(SampleHybridCompositionFunct
     def __call__(self, x):
         G_x = RotatedVersionHybridCompositionFunction1()(x) - fbias_data[15]
         noise = np.abs(np.random.normal(size=G_x.shape))
-        return G_x*(1 + 0.2*noise) + fbias_data[16]
+        return G_x * (1 + 0.2 * noise) + fbias_data[16]
 
 
 # CEC05 #18
@@ -739,8 +737,8 @@ class RotatedHybridCompositionFunction(SampleHybridCompositionFunction):
                              Griewank),
             sigmas=np.array([1, 2, 1.5, 1.5, 1, 1, 1.5,
                             1.5, 2, 2], dtype=np.float64),
-            lambdas=np.array([2*(5/32), 5/32, 2*1, 1, 2*(5/100),
-                             5/100, 2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
+            lambdas=np.array([2 * (5 / 32), 5 / 32, 2 * 1, 1, 2 * (5 / 100),
+                             5 / 100, 2 * 10, 10, 2 * (5 / 60), 5 / 60], dtype=np.float64),
             fbias=fbias_data[17],
             x_shift=hybrid_func2_data,
             M_D2=hybrid_func2_m_d2,
@@ -766,9 +764,8 @@ class RotatedHybridCompositionFunctionNarrowBasin(SampleHybridCompositionFunctio
                                                  sigmas=np.array(
                                                      [0.1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2],
             dtype=np.float64),
-            lambdas=np.array(
-                                                     [0.1*(5/32), 5/32, 2*1, 1, 2*(5/100), 5/100,
-                                                      2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
+            lambdas=np.array([0.1 * (5 / 32), 5 / 32, 2 * 1, 1, 2 * (5 / 100), 5 / 100,
+                              2 * 10, 10, 2 * (5 / 60), 5 / 60], dtype=np.float64),
             fbias=fbias_data[17],
             x_shift=hybrid_func2_data,
             M_D2=hybrid_func2_m_d2,
@@ -794,8 +791,8 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
                                    Griewank),
             sigmas=np.array([1, 2, 1.5, 1.5, 1, 1, 1.5,
                             1.5, 2, 2], dtype=np.float64),
-            lambdas=np.array([2*(5/32), 5/32, 2*1, 1, 2*(5/100),
-                             5/100, 2*10, 10, 2*(5/60), 5/60], dtype=np.float64),
+            lambdas=np.array([2 * (5 / 32), 5 / 32, 2 * 1, 1, 2 * (5 / 100),
+                             5 / 100, 2 * 10, 10, 2 * (5 / 60), 5 / 60], dtype=np.float64),
             fbias=fbias_data[19],
             x_shift=hybrid_func2_data,
             M_D2=hybrid_func2_m_d2,
@@ -806,7 +803,7 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
 
     def __call__(self, x):
         D = x.shape[1]
-        self.x_shift[0][1:int(D/2):2] = 5
+        self.x_shift[0][1:int(D / 2):2] = 5
         return super().__call__(x)
 
 
@@ -827,8 +824,8 @@ class HybridCompositionFunction3(SampleHybridCompositionFunction):
                              Griewank),
             sigmas=np.array([1., 1., 1., 1., 1., 2., 2.,
                             2., 2., 2.], dtype=np.float64),
-            lambdas=np.array([5*5/100, 5/100, 5*1, 1, 5*1, 1,
-                             5*10, 10, 5*5/200, 5/200], dtype=np.float64),
+            lambdas=np.array([5 * 5 / 100, 5 / 100, 5 * 1, 1, 5 * 1, 1,
+                             5 * 10, 10, 5 * 5 / 200, 5 / 200], dtype=np.float64),
             fbias=fbias_data[20],
             x_shift=hybrid_func3_data,
             M_D2=hybrid_func3_m_d2,
@@ -854,8 +851,8 @@ class HybridCompositionFunction3H(SampleHybridCompositionFunction):
                              Griewank),
             sigmas=np.array([1., 1., 1., 1., 1., 2., 2.,
                             2., 2., 2.], dtype=np.float64),
-            lambdas=np.array([5*5/100, 5/100, 5*1, 1, 5*1, 1,
-                             5*10, 10, 5*5/200, 5/200], dtype=np.float64),
+            lambdas=np.array([5 * 5 / 100, 5 / 100, 5 * 1, 1, 5 * 1, 1,
+                             5 * 10, 10, 5 * 5 / 200, 5 / 200], dtype=np.float64),
             fbias=fbias_data[21],
             x_shift=hybrid_func3_data,
             M_D2=hybrid_func3_hm_d2,
@@ -881,8 +878,8 @@ class NonContinuousHybridCompositionFunction3(SampleHybridCompositionFunction):
                              Griewank),
             sigmas=np.array([1., 1., 1., 1., 1., 2., 2.,
                             2., 2., 2.], dtype=np.float64),
-            lambdas=np.array([5*5/100, 5/100, 5*1, 1, 5*1, 1,
-                             5*10, 10, 5*5/200, 5/200], dtype=np.float64),
+            lambdas=np.array([5 * 5 / 100, 5 / 100, 5 * 1, 1, 5 * 1, 1,
+                             5 * 10, 10, 5 * 5 / 200, 5 / 200], dtype=np.float64),
             fbias=fbias_data[22],
             x_shift=hybrid_func3_data,
             M_D2=hybrid_func3_m_d2,
@@ -892,10 +889,10 @@ class NonContinuousHybridCompositionFunction3(SampleHybridCompositionFunction):
 
     def __call__(self, x):
         shape = x.shape
-        axis = [1]*(len(shape)-1) + [-1]
+        axis = [1] * (len(shape) - 1) + [-1]
         o = self.x_shift[0][:shape[-1]].reshape(axis)
         cond = np.abs(x - o) >= 0.5
-        x[cond] = (np.round(2*x)/2)[cond]
+        x[cond] = (np.round(2 * x) / 2)[cond]
         return super().__call__(x)
 
 
@@ -916,8 +913,8 @@ class HybridCompositionFunction4(SampleHybridCompositionFunction):
                              SphereWithNoise),
             sigmas=np.array([2., 2., 2., 2., 2., 2., 2.,
                             2., 2., 2.], dtype=np.float64),
-            lambdas=np.array([10, 5/20, 1, 5/32, 1, 5/100,
-                             5/50, 1, 5/100, 5/100], dtype=np.float64),
+            lambdas=np.array([10, 5 / 20, 1, 5 / 32, 1, 5 / 100,
+                             5 / 50, 1, 5 / 100, 5 / 100], dtype=np.float64),
             fbias=fbias_data[23],
             x_shift=hybrid_func4_data,
             M_D2=hybrid_func4_m_d2,
@@ -943,8 +940,8 @@ class HybridCompositionFunction4withoutbounds(SampleHybridCompositionFunction):
                              SphereWithNoise),
             sigmas=np.array([2., 2., 2., 2., 2., 2., 2.,
                             2., 2., 2.], dtype=np.float64),
-            lambdas=np.array([10, 5/20, 1, 5/32, 1, 5/100,
-                             5/50, 1, 5/100, 5/100], dtype=np.float64),
+            lambdas=np.array([10, 5 / 20, 1, 5 / 32, 1, 5 / 100,
+                             5 / 50, 1, 5 / 100, 5 / 100], dtype=np.float64),
             fbias=fbias_data[24],
             x_shift=hybrid_func4_data,
             M_D2=hybrid_func4_m_d2,
