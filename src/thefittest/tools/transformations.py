@@ -1,12 +1,15 @@
 from typing import List
-from typing import Tuple
 from typing import Optional
+from typing import Tuple
+
+from numba import float64
+from numba import njit
+
 import numpy as np
 from numpy.typing import NDArray
-from numba import njit
-from numba import float64
-from ..tools import find_first_difference_between_two
+
 from ..tools import find_end_subtree_from_i
+from ..tools import find_first_difference_between_two
 
 
 def common_region(trees: List) -> Tuple:
