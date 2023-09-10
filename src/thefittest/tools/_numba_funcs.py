@@ -1,7 +1,8 @@
-from numba import njit
-from numba import int64
-from numba import float64
 from numba import boolean
+from numba import float64
+from numba import int64
+from numba import njit
+
 import numpy as np
 from numpy.typing import NDArray
 

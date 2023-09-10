@@ -5,6 +5,7 @@ from ..benchmarks import BreastCancerDataset
 from ..benchmarks import CreditRiskDataset
 from ..benchmarks import DigitsDataset
 from ..benchmarks import IrisDataset
+from ..benchmarks import OneMax
 from ..benchmarks import UserKnowladgeDataset
 from ..benchmarks import WineDataset
 from ..benchmarks.symbolicregression17 import (
@@ -29,6 +30,7 @@ from ..benchmarks.symbolicregression17 import (
 
 from ..benchmarks.CEC2005 import problems_dict
 from ..optimizers import DifferentialEvolution
+from ..optimizers import GeneticAlgorithm
 from ..tools.random import float_population
 
 
@@ -187,18 +189,29 @@ def test_CEC2005():
     pop_size = 10
 
     for problem in problems_dict.values():
-        function = problem["function"]
+        n_dimension = 2
+        sample_size = 100
+
+        left_scalar = problem["bounds"][0]
+        right_scalar = problem["bounds"][1]
+
+        X = np.array(
+            [np.linspace(left_scalar, right_scalar, sample_size) for _ in range(n_dimension)],
+            dtype=np.float64,
+        ).T
+
+        function = problem["function"]()
+
+        function.build_grid(x=X[:, 0], y=X[:, 1])
 
         for dim in problem["dimentions"]:
             print(problem, dim)
-            left_scalar = problem["bounds"][0]
-            right_scalar = problem["bounds"][1]
 
             left = np.full(shape=dim, fill_value=left_scalar, dtype=np.float64)
             right = np.full(shape=dim, fill_value=right_scalar, dtype=np.float64)
 
             model = DifferentialEvolution(
-                fitness_function=function(),
+                fitness_function=function,
                 iters=iters,
                 pop_size=pop_size,
                 left=left,
@@ -219,3 +232,9 @@ def test_CEC2005():
                 model.set_strategy(initial_population=initial_population)
 
             model.fit()
+
+    problem = OneMax()
+
+    model = GeneticAlgorithm(fitness_function=problem, iters=iters, pop_size=pop_size, str_len=100)
+
+    model.fit()
