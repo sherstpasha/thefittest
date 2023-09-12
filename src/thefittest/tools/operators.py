@@ -17,9 +17,10 @@ from .random import random_sample
 from .random import random_weighted_sample
 from .random import sattolo_shuffle
 from .transformations import common_region
+from ..base import FunctionalNode
 from ..base import Tree
 from ..base import UniversalSet
-
+from ..base._tree import Operator
 
 min_value = np.finfo(np.float64).min
 max_value = np.finfo(np.float64).max
@@ -165,7 +166,7 @@ def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) ->
     to_return = tree.copy()
     if random.random() < proba:
         i = random.randrange(len(to_return))
-        if to_return._nodes[i].is_functional():
+        if isinstance(to_return._nodes[i], FunctionalNode):
             n_args = to_return._nodes[i]._n_args
             new_node = uniset._random_functional(n_args)
         else:
@@ -194,7 +195,7 @@ def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) -> 
             new_arg_id = args_id.copy()
             sattolo_shuffle(new_arg_id)
             for old_j, new_j in zip(args_id, new_arg_id):
-                subtree = tree.subtree(old_j, return_class=True)
+                subtree = tree.subtree(old_j)
                 to_return = to_return.concat(new_j, subtree)
     return to_return
 
@@ -209,7 +210,7 @@ def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) -
                 i = random.choice(indexes)
                 args_id = to_return.get_args_id(i)
                 choosen_id = random.choice(args_id)
-                to_return = to_return.concat(i, tree.subtree(choosen_id, return_class=True))
+                to_return = to_return.concat(i, tree.subtree(choosen_id))
     return to_return
 
 
@@ -335,12 +336,12 @@ def standart_crossover(
     second_point = random.randrange(len(individ_2))
 
     if random.random() < 0.5:
-        first_subtree = individ_1.subtree(first_point, return_class=True)
+        first_subtree = individ_1.subtree(first_point)
         offspring = individ_2.concat(second_point, first_subtree)
         if offspring.get_max_level() > max_level:
             offspring = individ_2
     else:
-        second_subtree = individ_2.subtree(second_point, return_class=True)
+        second_subtree = individ_2.subtree(second_point)
         offspring = individ_1.concat(first_point, second_subtree)
         if offspring.get_max_level() > max_level:
             offspring = individ_1
@@ -358,10 +359,10 @@ def one_point_crossoverGP(
     first_point = common_indexes[0][point]
     second_point = common_indexes[1][point]
     if random.random() < 0.5:
-        first_subtree = individ_1.subtree(first_point, return_class=True)
+        first_subtree = individ_1.subtree(first_point)
         offspring = individ_2.concat(second_point, first_subtree)
     else:
-        second_subtree = individ_2.subtree(second_point, return_class=True)
+        second_subtree = individ_2.subtree(second_point)
         offspring = individ_1.concat(first_point, second_subtree)
     return offspring
 
@@ -379,7 +380,7 @@ def uniform_crossoverGP(
         j = pool[i]
         id_ = common[j][i]
         if common_0_i in border[0]:
-            subtree = individs[j].subtree(id_, return_class=True)
+            subtree = individs[j].subtree(id_)
             to_return._nodes.extend(subtree._nodes)
             new_n_args.extend(subtree._n_args)
         else:
@@ -402,7 +403,7 @@ def uniform_crossoverGP_prop(
         j = pool[i]
         id_ = common[j][i]
         if common_0_i in border[0]:
-            subtree = individs[j].subtree(id_, return_class=True)
+            subtree = individs[j].subtree(id_)
             to_return._nodes.extend(subtree._nodes)
             new_n_args.extend(subtree._n_args)
         else:
@@ -426,7 +427,7 @@ def uniform_crossoverGP_rank(
         j = pool[i]
         id_ = common[j][i]
         if common_0_i in border[0]:
-            subtree = individs[j].subtree(id_, return_class=True)
+            subtree = individs[j].subtree(id_)
             to_return._nodes.extend(subtree._nodes)
             new_n_args.extend(subtree._n_args)
         else:
@@ -450,7 +451,7 @@ def uniform_crossoverGP_tour(
         j = pool[i]
         id_ = common[j][i]
         if common_0_i in border[0]:
-            subtree = individs[j].subtree(id_, return_class=True)
+            subtree = individs[j].subtree(id_)
             to_return._nodes.extend(subtree._nodes)
             new_n_args.extend(subtree._n_args)
         else:
@@ -493,20 +494,6 @@ def tournament_selection(
 
 
 # GP MATH
-class Operator:
-    def __init__(self, formula: str, name: str, sign: str) -> None:
-        self._formula = formula
-        self.__name__ = name
-        self._sign = sign
-
-    def _write(self, *args) -> str:
-        formula = self._formula.format(*args)
-        return formula
-
-    def __call__(self, *args: Any) -> None:
-        pass
-
-
 class Cos(Operator):
     def __init__(self) -> None:
         Operator.__init__(self, formula="cos({})", name="cos", sign="cos")

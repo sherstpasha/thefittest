@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 from functools import partial
+from typing import Any
 from typing import Callable
 from typing import Optional
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..base import Tree
 from ..base import UniversalSet
@@ -33,11 +37,11 @@ class GeneticProgramming(EvolutionaryAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable,
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         uniset: UniversalSet,
         iters: int,
         pop_size: int,
-        genotype_to_phenotype: Callable = donothing,
+        genotype_to_phenotype: Callable[[NDArray[Any]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -66,14 +70,14 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         self._tour_size: int
         self._max_level: int
         self._init_level: int
-        self._initial_population: np.ndarray
+        self._initial_population: Optional[NDArray]
         self._specified_selection: tuple
         self._specified_crossover: tuple
         self._specified_mutation: tuple
 
         self.set_strategy()
 
-    def _update_pool(self):
+    def _update_pool(self) -> None:
         self._selection_pool = {
             "proportional": (proportional_selection, 0),
             "rank": (rank_selection, 0),
@@ -121,7 +125,11 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         }
 
     def _get_new_individ_g(
-        self, population_g: np.ndarray, fitness_scale: np.ndarray, fitness_rank: np.ndarray, *args
+        self,
+        population_g: NDArray,
+        fitness_scale: NDArray[np.float64],
+        fitness_rank: NDArray[np.float64],
+        i: np.int64,
     ) -> Tree:
         selection_func, tour_size = self._specified_selection
         crossover_func, quantity = self._specified_crossover
@@ -149,7 +157,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         crossover_oper: str = "standart",
         mutation_oper: str = "weak_grow",
         tour_size_param: int = 2,
-        initial_population: Optional[np.ndarray] = None,
+        initial_population: Optional[NDArray] = None,
         max_level_param: int = 16,
         init_level_param: int = 5,
         elitism_param: bool = True,
@@ -184,7 +192,7 @@ class GeneticProgramming(EvolutionaryAlgorithm):
         self._specified_crossover = self._crossover_pool[crossover_oper]
         self._specified_mutation = self._mutation_pool[mutation_oper]
 
-    def fit(self):
+    def fit(self) -> GeneticProgramming:
         if self._initial_population is None:
             population_g = half_and_half(self._pop_size, self._uniset, self._init_level)
         else:

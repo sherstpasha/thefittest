@@ -102,9 +102,6 @@ def test_nodes_class():
 
     terminal_node = TerminalNode(value=1, name="1")
     assert str(terminal_node) == "1"
-    assert terminal_node.is_functional() is False
-    assert terminal_node.is_ephemeral() is False
-    assert terminal_node.is_terminal() is True
 
     terminal_node2 = TerminalNode(value=2, name="2")
 
@@ -179,10 +176,10 @@ def test_tree_class():
     tree3._nodes[0] = functional_mul
     assert bool(tree2 == tree3) is False
 
-    index, n_index = tree2.subtree(4)
+    index, n_index = tree2.subtree_id(4)
     assert (index, n_index) == (4, 9)
 
-    tree4 = tree2.subtree(4, return_class=True)
+    tree4 = tree2.subtree(4)
     assert tree4() == 22
     assert str(tree4) == "(z * (y - x))"
     assert len(tree) == 5

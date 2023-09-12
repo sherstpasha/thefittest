@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 from functools import partial
+from typing import Any
 from typing import Callable
 from typing import Optional
 from typing import Tuple
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..base._ea import EvolutionaryAlgorithm
 from ..tools import donothing
@@ -22,11 +26,11 @@ class SHAGA(EvolutionaryAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable,
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         iters: int,
         pop_size: int,
         str_len: int,
-        genotype_to_phenotype: Callable = donothing,
+        genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -51,12 +55,17 @@ class SHAGA(EvolutionaryAlgorithm):
         self._str_len = str_len
         self._H_size = pop_size
         self._elitism: bool
-        self._initial_population: np.ndarray
+        self._initial_population: Optional[NDArray[np.byte]]
         self.set_strategy()
 
     def _selection_crossover_mutation(
-        self, population_g: np.ndarray, fitness: np.ndarray, current: np.ndarray, MR, CR
-    ) -> np.ndarray:
+        self,
+        population_g: NDArray[np.byte],
+        fitness: NDArray[np.float64],
+        current: NDArray[np.byte],
+        MR: float,
+        CR: float,
+    ) -> NDArray[np.byte]:
         second_parent_id = tournament_selection(fitness, fitness, 2, 1)[0]
         second_parent = population_g[second_parent_id].copy()
         offspring = binomialGA(current, second_parent, CR)
@@ -65,10 +74,10 @@ class SHAGA(EvolutionaryAlgorithm):
 
     def _evaluate_replace(
         self,
-        mutant_cr_g: np.ndarray,
-        population_g: np.ndarray,
-        population_ph: np.ndarray,
-        fitness: np.ndarray,
+        mutant_cr_g: NDArray[np.byte],
+        population_g: NDArray[np.byte],
+        population_ph: NDArray,
+        fitness: NDArray[np.float64],
     ) -> Tuple:
         offspring_g = population_g.copy()
         offspring_ph = population_ph.copy()
@@ -83,7 +92,9 @@ class SHAGA(EvolutionaryAlgorithm):
         mask_more = mutant_cr_fit > fitness
         return offspring_g, offspring_ph, offspring_fit, mask_more
 
-    def _generate_MR_CR(self, H_MR_i, H_CR_i, size):
+    def _generate_MR_CR(
+        self, H_MR_i: NDArray[np.float64], H_CR_i: NDArray[np.float64], size: int
+    ) -> Tuple:
         MR_i = np.zeros(size)
         CR_i = np.zeros(size)
         for i in range(size):
@@ -94,13 +105,13 @@ class SHAGA(EvolutionaryAlgorithm):
             CR_i[i] = self._randn(u_CR, 0.1)
         return MR_i, CR_i
 
-    def _randc(self, u, scale):
+    def _randc(self, u: float, scale: float) -> NDArray[np.float64]:
         value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
         while value <= 0 or value > 5 / self._str_len:
             value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
         return value
 
-    def _randn(self, u, scale):
+    def _randn(self, u: float, scale: float) -> float:
         value = np.random.normal(u, scale)
         if value < 0:
             value = 0
@@ -108,7 +119,7 @@ class SHAGA(EvolutionaryAlgorithm):
             value = 1
         return value
 
-    def _update_u(self, u, S, df):
+    def _update_u(self, u: float, S: NDArray[np.float64], df: NDArray[np.float64]) -> float:
         if len(S):
             sum_ = np.sum(df)
             if sum_ > 0:
@@ -117,12 +128,12 @@ class SHAGA(EvolutionaryAlgorithm):
         return u
 
     def set_strategy(
-        self, elitism_param: bool = True, initial_population: Optional[np.ndarray] = None
+        self, elitism_param: bool = True, initial_population: Optional[NDArray[np.byte]] = None
     ) -> None:
         self._elitism = elitism_param
         self._initial_population = initial_population
 
-    def fit(self):
+    def fit(self) -> SHAGA:
         H_MR = np.full(self._H_size, 1 / (self._str_len))
         H_CR = np.full(self._H_size, 0.5)
         k = 0

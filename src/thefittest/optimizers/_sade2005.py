@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 from functools import partial
+from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
 
-
 import numpy as np
+from numpy.typing import NDArray
 
 from ._differentialevolution import DifferentialEvolution
 from ..tools import donothing
@@ -24,12 +27,12 @@ class SaDE2005(DifferentialEvolution):
 
     def __init__(
         self,
-        fitness_function: Callable,
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         iters: int,
         pop_size: int,
-        left: np.ndarray,
-        right: np.ndarray,
-        genotype_to_phenotype: Callable = donothing,
+        left: NDArray[np.float64],
+        right: NDArray[np.float64],
+        genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -56,7 +59,7 @@ class SaDE2005(DifferentialEvolution):
         self._m_learning_period: int
         self._CR_update_timer: int
         self._CR_m_learning_period: int
-        self._threshold: int
+        self._threshold: float
 
         self._Fm: float
         self._F_sigma: float
@@ -64,12 +67,16 @@ class SaDE2005(DifferentialEvolution):
 
         self.set_strategy()
 
-    def _update_pool(self):
+    def _update_pool(self) -> None:
         self._mutation_pool = {"rand_1": rand_1, "current_to_best_1": current_to_best_1}
 
-    def _mutation_and_crossover(
-        self, popuation_g: np.ndarray, individ_g: np.ndarray, mutation: str, CR: float
-    ) -> np.ndarray:
+    def _sade2005_mutation_and_crossover(
+        self,
+        popuation_g: NDArray[np.float64],
+        individ_g: NDArray[np.float64],
+        mutation: str,
+        CR: float,
+    ) -> NDArray[np.float64]:
         F = np.random.normal(self._Fm, self._F_sigma)
         mutant = self._mutation_pool[mutation](
             individ_g, self._thefittest._genotype, popuation_g, np.float64(F)
@@ -79,20 +86,22 @@ class SaDE2005(DifferentialEvolution):
         mutant_cr_g = bounds_control(mutant_cr_g, self._left, self._right)
         return mutant_cr_g
 
-    def _choice_operators(self, proba_dict: Dict) -> np.ndarray:
+    def _choice_operators(self, proba_dict: Dict) -> NDArray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
         chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
         return chosen_operator
 
-    def _succeses_to_ns(self, succeses: np.ndarray) -> int:
+    def _succeses_to_ns(self, succeses: NDArray[np.bool_]) -> int:
         return np.sum(succeses)
 
-    def _succeses_to_nf(self, succeses: np.ndarray) -> int:
+    def _succeses_to_nf(self, succeses: NDArray[np.bool_]) -> int:
         return np.sum(~succeses)
 
-    def _update_ns_nf(self, operators: str, succeses: np.ndarray, ns_i: Dict, nf_i: Dict) -> Tuple:
-        grouped = dict(zip(*numpy_group_by(group=succeses, by=operators)))
+    def _update_ns_nf(
+        self, operators: NDArray, succeses: NDArray[np.bool_], ns_i: Dict, nf_i: Dict
+    ) -> Tuple:
+        grouped: Dict = dict(zip(*numpy_group_by(group=succeses, by=operators)))
 
         for key in self._mutation_pool.keys():
             if key in grouped.keys():
@@ -108,7 +117,7 @@ class SaDE2005(DifferentialEvolution):
         new_m_proba = {"rand_1": p1, "current_to_best_1": 1 - p1}
         return new_m_proba
 
-    def _generate_CR(self, CRm: float) -> np.ndarray:
+    def _generate_CR(self, CRm: float) -> NDArray[np.float64]:
         value = np.random.normal(CRm, self._CR_sigma, self._pop_size)
         value = np.clip(value, 1e-6, 1)
         return value
@@ -126,7 +135,7 @@ class SaDE2005(DifferentialEvolution):
         F_sigma_param: float = 0.3,
         CR_sigma_param: float = 0.1,
         elitism_param: bool = True,
-        initial_population: Optional[np.ndarray] = None,
+        initial_population: Optional[NDArray[np.float64]] = None,
     ) -> None:
         self._update_pool()
         self._m_learning_period = m_learning_period_param
@@ -139,7 +148,7 @@ class SaDE2005(DifferentialEvolution):
         self._elitism = elitism_param
         self._initial_population = initial_population
 
-    def fit(self):
+    def fit(self) -> SaDE2005:
         if self._initial_population is None:
             population_g = float_population(self._pop_size, self._left, self._right)
         else:
@@ -170,7 +179,9 @@ class SaDE2005(DifferentialEvolution):
             else:
                 m_operators = self._choice_operators(m_proba)
 
-                mutation_and_crossover = partial(self._mutation_and_crossover, population_g)
+                mutation_and_crossover = partial(
+                    self._sade2005_mutation_and_crossover, population_g
+                )
                 mutant_cr_g = np.array(
                     list(map(mutation_and_crossover, population_g, m_operators, CR_i))
                 )

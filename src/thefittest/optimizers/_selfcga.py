@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 from functools import partial
+from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ._geneticalgorithm import GeneticAlgorithm
 from ..tools import donothing
@@ -17,11 +21,11 @@ from ..tools.transformations import scale_data
 class SelfCGA(GeneticAlgorithm):
     def __init__(
         self,
-        fitness_function: Callable,
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         iters: int,
         pop_size: int,
         str_len: int,
-        genotype_to_phenotype: Callable = donothing,
+        genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -47,20 +51,20 @@ class SelfCGA(GeneticAlgorithm):
         self._selection_set: dict
         self._crossover_set: dict
         self._mutation_set: dict
-        self._K: int
+        self._K: float
         self._threshold: float
 
         self.set_strategy()
 
-    def _get_new_individ_g(
+    def _selfcga_get_new_individ_g(
         self,
-        population_g: np.ndarray,
-        fitness_scale: np.ndarray,
-        fitness_rank: np.ndarray,
+        population_g: NDArray[np.byte],
+        fitness_scale: NDArray[np.float64],
+        fitness_rank: NDArray[np.float64],
         selection: str,
         crossover: str,
         mutation: str,
-    ) -> np.ndarray:
+    ) -> NDArray[np.byte]:
         selection_func, tour_size = self._selection_set[selection]
         crossover_func, quantity = self._crossover_set[crossover]
         mutation_func, proba = self._mutation_set[mutation]
@@ -76,7 +80,7 @@ class SelfCGA(GeneticAlgorithm):
         offspring = mutation_func(offspring_no_mutated, np.float64(proba))
         return offspring
 
-    def _choice_operators(self, proba_dict: Dict) -> np.ndarray:
+    def _choice_operators(self, proba_dict: Dict) -> NDArray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
         chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
@@ -91,7 +95,7 @@ class SelfCGA(GeneticAlgorithm):
         new_proba_dict = dict(zip(proba_dict.keys(), proba_value))
         return new_proba_dict
 
-    def _find_fittest_operator(self, operators: np.ndarray, fitness: np.ndarray) -> str:
+    def _find_fittest_operator(self, operators: NDArray, fitness: NDArray[np.float64]) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
         fittest_operator = keys[np.argmax(mean_fit)]
@@ -121,7 +125,7 @@ class SelfCGA(GeneticAlgorithm):
         ),
         mutation_opers: Tuple = ("weak", "average", "strong"),
         tour_size_param: int = 2,
-        initial_population: Optional[np.ndarray] = None,
+        initial_population: Optional[NDArray[np.byte]] = None,
         elitism_param: bool = True,
         parents_num_param: int = 7,
         mutation_rate_param: float = 0.05,
@@ -166,7 +170,7 @@ class SelfCGA(GeneticAlgorithm):
             mutation_set[operator_name] = value
         self._mutation_set = dict(sorted(mutation_set.items()))
 
-    def fit(self):
+    def fit(self) -> SelfCGA:
         z_selection = len(self._selection_set)
         z_crossover = len(self._crossover_set)
         z_mutation = len(self._mutation_set)
@@ -189,6 +193,10 @@ class SelfCGA(GeneticAlgorithm):
             population_g = self._initial_population.copy()
 
         for i in range(self._iters):
+            s_operators: NDArray
+            c_operators: NDArray
+            m_operators: NDArray
+
             population_ph = self._get_phenotype(population_g)
             fitness = self._get_fitness(population_ph)
 
@@ -223,7 +231,7 @@ class SelfCGA(GeneticAlgorithm):
                 m_operators = self._choice_operators(m_proba)
 
                 get_new_individ_g = partial(
-                    self._get_new_individ_g, population_g, fitness_scale, rank_data(fitness)
+                    self._selfcga_get_new_individ_g, population_g, fitness_scale, rank_data(fitness)
                 )
                 map_ = map(get_new_individ_g, s_operators, c_operators, m_operators)
                 population_g = np.array(list(map_), dtype=np.byte)

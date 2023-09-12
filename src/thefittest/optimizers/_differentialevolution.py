@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import partial
 from typing import Any
 from typing import Callable
@@ -27,12 +29,12 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable,
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         iters: int,
         pop_size: int,
         left: NDArray[np.float64],
         right: NDArray[np.float64],
-        genotype_to_phenotype: Callable = donothing,
+        genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -56,7 +58,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
         self._left = left
         self._right = right
-        self._initial_population: NDArray[np.float64]
+        self._initial_population: Optional[NDArray[np.float64]]
         self._mutation_pool: dict
         self._specified_mutation: Callable
         self._F: float
@@ -65,7 +67,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
         self.set_strategy()
 
-    def _update_pool(self):
+    def _update_pool(self) -> None:
         self._mutation_pool = {
             "best_1": best_1,
             "rand_1": rand_1,
@@ -124,7 +126,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         self._elitism = elitism_param
         self._initial_population = initial_population
 
-    def fit(self):
+    def fit(self) -> DifferentialEvolution:
         if self._initial_population is None:
             population_g = float_population(self._pop_size, self._left, self._right)
         else:

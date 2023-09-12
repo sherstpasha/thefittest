@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import random
 from collections import defaultdict
 from itertools import product
-from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -33,7 +34,7 @@ class Net:
         outputs: Optional[Set] = None,
         connects: Optional[NDArray[np.int64]] = None,
         weights: Optional[NDArray[np.float64]] = None,
-        activs: Optional[Dict] = None,
+        activs: Optional[Dict[int, int]] = None,
     ):
         self._inputs = inputs or set()
         self._hidden_layers = hidden_layers or []
@@ -70,7 +71,7 @@ class Net:
 
         return to_return
 
-    def copy(self) -> Any:
+    def copy(self) -> Net:
         return Net(
             inputs=self._inputs.copy(),
             hidden_layers=self._hidden_layers.copy(),
@@ -86,18 +87,17 @@ class Net:
         else:
             return set()
 
-    def _merge_layers(self, layers: List) -> Set:
-        return layers[0].union(layers[1])
-
-    def _get_connect(self, left: Set[int], right: Set[int]) -> Tuple:
+    def _get_connect(
+        self, left: Set[int], right: Set[int]
+    ) -> Tuple[NDArray[np.int64], NDArray[np.float64]]:
         if len(left) and len(right):
             connects = np.array(list(product(left, right)), dtype=np.int64)
             weights = np.random.uniform(-2, 2, len(connects)).astype(np.float64)
             return (connects, weights)
         else:
-            return (np.zeros((0, 2), dtype=int), np.zeros((0), dtype=float))
+            return (np.zeros((0, 2), dtype=np.int64), np.zeros((0), dtype=np.float64))
 
-    def __add__(self, other: Any) -> Any:
+    def __add__(self, other: Net) -> Net:
         len_i_1, len_i_2 = len(self._inputs), len(other._inputs)
         len_h_1, len_h_2 = len(self._hidden_layers), len(other._hidden_layers)
 
@@ -106,7 +106,10 @@ class Net:
         elif (len_i_1 == 0 and len_i_2 > 0) and (len_h_1 > 0 and len_h_2 == 0):
             return other > self
 
-        map_res = map(self._merge_layers, zip(self._hidden_layers, other._hidden_layers))
+        map_res = map(
+            lambda layers: layers[0].union(layers[1]),
+            zip(self._hidden_layers, other._hidden_layers),
+        )
 
         if len_h_1 < len_h_2:
             excess = other._hidden_layers[len_h_1:]
@@ -125,7 +128,7 @@ class Net:
             activs={**self._activs, **other._activs},
         )
 
-    def __gt__(self, other: Any) -> Any:
+    def __gt__(self, other: Net) -> Net:
         len_i_1, len_i_2 = len(self._inputs), len(other._inputs)
         len_h_1, len_h_2 = len(self._hidden_layers), len(other._hidden_layers)
 
@@ -154,7 +157,7 @@ class Net:
             activs={**self._activs, **other._activs},
         )
 
-    def _fix(self, inputs: Set[int]) -> Any:
+    def _fix(self, inputs: Set[int]) -> Net:
         hidden_outputs = self._assemble_hiddens().union(self._outputs)
         to_ = hidden_outputs.difference(self._connects[:, 1])
         if len(to_) > 0:
@@ -186,16 +189,17 @@ class Net:
         group_index = np.split(index_sort, cut_index)[1:]
 
         pairs = defaultdict(list)
-        weights_id = defaultdict(list)
+        weights_id_list = defaultdict(list)
+        weights_id_ndarray = {}
 
         for groups_to_i, groups_from_i, group_index_i in zip(groups_to, groups_from, group_index):
             argsort = np.argsort(groups_from_i)
             groups_from_i_sort = tuple(groups_from_i[argsort])
             pairs[groups_from_i_sort].append(groups_to_i)
-            weights_id[groups_from_i_sort].append(group_index_i[argsort])
+            weights_id_list[groups_from_i_sort].append(group_index_i[argsort])
 
-        for key, value in weights_id.items():
-            weights_id[key] = np.array(value, dtype=np.int64)
+        for key, value in weights_id_list.items():
+            weights_id_ndarray[key] = np.array(value, dtype=np.int64)
 
         numba_from = numbaList()
         numba_to = numbaList()
@@ -213,7 +217,7 @@ class Net:
                     calculated = calculated.union(set(to_i))
                     numba_from.append(np.array(from_i, dtype=np.int64))
                     numba_to.append(np.array(to_i, dtype=np.int64))
-                    numba_weight_id.append(weights_id[from_i])
+                    numba_weight_id.append(weights_id_ndarray[from_i])
 
                     nodes_i = defaultdict(list)
                     for to_i_i in to_i:
@@ -229,7 +233,7 @@ class Net:
 
         self._numpy_inputs = np.array(list(self._inputs), dtype=np.int64)
         self._numpy_outputs = np.array(list(self._outputs), dtype=np.int64)
-        self._n_hiddens = len(hidden)
+        self._n_hiddens = np.int64(len(hidden))
         self._numba_from = numba_from
         self._numba_to = numba_to
         self._numba_weights_id = numba_weight_id

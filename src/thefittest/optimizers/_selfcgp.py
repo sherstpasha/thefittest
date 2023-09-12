@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 from functools import partial
+from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ._geneticprogramming import GeneticProgramming
 from ..base import Tree
@@ -52,12 +56,12 @@ class SelfCGP(GeneticProgramming):
         self._selection_set: dict
         self._crossover_set: dict
         self._mutation_set: dict
-        self._K: int
+        self._K: float
         self._threshold: float
 
         self.set_strategy()
 
-    def _choice_operators(self, proba_dict: Dict) -> np.ndarray:
+    def _choice_operators(self, proba_dict: Dict) -> NDArray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
         chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
@@ -72,17 +76,17 @@ class SelfCGP(GeneticProgramming):
         new_proba_dict = dict(zip(proba_dict.keys(), proba_value))
         return new_proba_dict
 
-    def _find_fittest_operator(self, operators: np.ndarray, fitness: np.ndarray) -> str:
+    def _find_fittest_operator(self, operators: NDArray, fitness: NDArray[np.float64]) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
         fittest_operator = keys[np.argmax(mean_fit)]
         return fittest_operator
 
-    def _get_new_individ_g(
+    def _selfgp_get_new_individ_g(
         self,
-        population_g: np.ndarray,
-        fitness_scale: np.ndarray,
-        fitness_rank: np.ndarray,
+        population_g: NDArray[np.byte],
+        fitness_scale: NDArray[np.float64],
+        fitness_rank: NDArray[np.float64],
         selection: str,
         crossover: str,
         mutation: str,
@@ -124,7 +128,7 @@ class SelfCGP(GeneticProgramming):
             "strong_grow",
         ),
         tour_size_param: int = 2,
-        initial_population: Optional[np.ndarray] = None,
+        initial_population: Optional[NDArray] = None,
         elitism_param: bool = True,
         parents_num_param: int = 7,
         mutation_rate_param: float = 0.05,
@@ -176,7 +180,11 @@ class SelfCGP(GeneticProgramming):
             mutation_set[operator_name] = value
         self._mutation_set = dict(sorted(mutation_set.items()))
 
-    def fit(self):
+    def fit(self) -> Any:
+        s_operators: NDArray
+        c_operators: NDArray
+        m_operators: NDArray
+
         z_selection = len(self._selection_set)
         z_crossover = len(self._crossover_set)
         z_mutation = len(self._mutation_set)
@@ -233,7 +241,7 @@ class SelfCGP(GeneticProgramming):
                 m_operators = self._choice_operators(m_proba)
 
                 get_new_individ_g = partial(
-                    self._get_new_individ_g, population_g, fitness_scale, rank_data(fitness)
+                    self._selfgp_get_new_individ_g, population_g, fitness_scale, rank_data(fitness)
                 )
                 map_ = map(get_new_individ_g, s_operators, c_operators, m_operators)
                 population_g = np.array(list(map_), dtype=object)

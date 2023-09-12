@@ -14,7 +14,7 @@ class TheFittest:
     def __init__(self) -> None:
         self._genotype: Any
         self._phenotype: Any
-        self._fitness: Union[float, np.float64] = -np.inf
+        self._fitness: float = -np.inf
         self._no_update_counter: int = 0
 
     def _update(
@@ -35,24 +35,21 @@ class TheFittest:
         else:
             self._no_update_counter += 1
 
-    def _replace(
-        self, new_genotype: Any, new_phenotype: Any, new_fitness: np.float64
-    ) -> None:
+    def _replace(self, new_genotype: Any, new_phenotype: Any, new_fitness: float) -> None:
         self._genotype = new_genotype.copy()
         self._phenotype = new_phenotype.copy()
         self._fitness = new_fitness
 
     def get(self) -> Dict:
-        to_return = {
+        return {
             "genotype": self._genotype.copy(),
             "phenotype": self._phenotype.copy(),
             "fitness": self._fitness,
         }
-        return to_return
 
 
 class Statistics(dict):
-    def _update(self, arg: Dict) -> None:
+    def _update(self, arg: Dict[str, Any]) -> None:
         for key, value in arg.items():
             try:
                 value_to_append = value.copy()
@@ -67,50 +64,50 @@ class Statistics(dict):
 class EvolutionaryAlgorithm:
     def __init__(
         self,
-        fitness_function: Callable,
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         iters: int,
         pop_size: int,
-        genotype_to_phenotype: Callable = donothing,
-        optimal_value: Optional[float] = None,
-        termination_error_value: float = 0.0,
+        genotype_to_phenotype: Callable[[NDArray[Any]], NDArray[Any]] = donothing,
+        optimal_value: Optional[Union[float, int]] = None,
+        termination_error_value: Union[float, int] = 0.0,
         no_increase_num: Optional[int] = None,
         minimization: bool = False,
         show_progress_each: Optional[int] = None,
         keep_history: bool = False,
     ):
-        self._fitness_function = fitness_function
-        self._iters = iters
-        self._pop_size = pop_size
-        self._genotype_to_phenotype = genotype_to_phenotype
-        self._no_increase_num = no_increase_num
-        self._show_progress_each = show_progress_each
-        self._keep_history = keep_history
+        self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]] = fitness_function
+        self._iters: int = iters
+        self._pop_size: int = pop_size
+        self._genotype_to_phenotype: Callable = genotype_to_phenotype
+        self._no_increase_num: Optional[int] = no_increase_num
+        self._show_progress_each: Optional[int] = show_progress_each
+        self._keep_history: bool = keep_history
 
-        self._sign = -1 if minimization else 1
-        self._get_aim(optimal_value, termination_error_value)
-        self._calls = 0
+        self._sign: int = -1 if minimization else 1
+        self._aim: Union[float, int] = self._get_aim(optimal_value, termination_error_value)
+        self._calls: int = 0
 
         self._thefittest: TheFittest = TheFittest()
         self._stats: Statistics = Statistics()
 
     def _get_aim(
-        self, optimal_value: Optional[float], termination_error_value: float
-    ) -> None:
+        self, optimal_value: Optional[Union[float, int]], termination_error_value: Union[float, int]
+    ) -> Union[float, int]:
         if optimal_value is not None:
-            self._aim = self._sign * optimal_value - termination_error_value
+            return self._sign * optimal_value - termination_error_value
         else:
-            self._aim = np.inf
+            return np.inf
 
-    def _get_fitness(self, population_ph: NDArray[Any]) -> NDArray[Any]:
+    def _get_fitness(self, population_ph: NDArray[Any]) -> NDArray[np.float64]:
         self._calls += len(population_ph)
         return self._sign * self._fitness_function(population_ph)
 
-    def _show_progress(self, iter_number: int) -> None:
+    def _show_progress(self, current_iter: int) -> None:
         if self._show_progress_each is not None:
-            cond_show_now = iter_number % self._show_progress_each == 0
+            cond_show_now = current_iter % self._show_progress_each == 0
             if cond_show_now:
                 current_best = self._sign * self._thefittest._fitness
-                print(f"{iter_number} iteration with fitness = {current_best}")
+                print(f"{current_iter} iteration with fitness = {current_best}")
 
     def _termitation_check(self) -> bool:
         cond_aim = self._thefittest._fitness >= self._aim
@@ -143,7 +140,7 @@ class EvolutionaryAlgorithm:
     def get_stats(self) -> Statistics:
         return self._stats
 
-    def clear(self):
+    def clear(self) -> None:
         self._calls = 0
         self._thefittest = TheFittest()
         self._stats = Statistics()

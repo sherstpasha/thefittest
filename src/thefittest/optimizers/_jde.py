@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 from functools import partial
+from typing import Any
 from typing import Callable
 from typing import Optional
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ._differentialevolution import DifferentialEvolution
 from ..tools import donothing
@@ -17,12 +21,12 @@ class jDE(DifferentialEvolution):
 
     def __init__(
         self,
-        fitness_function: Callable,
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         iters: int,
         pop_size: int,
-        left: np.ndarray,
-        right: np.ndarray,
-        genotype_to_phenotype: Callable = donothing,
+        left: NDArray[np.float64],
+        right: NDArray[np.float64],
+        genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -53,7 +57,7 @@ class jDE(DifferentialEvolution):
 
         self.set_strategy()
 
-    def _get_new_F(self, F: np.ndarray) -> np.ndarray:
+    def _get_new_F(self, F: NDArray[np.float64]) -> NDArray[np.float64]:
         F = F.copy()
         mask = np.random.random(size=len(F)) < self._t_f
 
@@ -61,7 +65,7 @@ class jDE(DifferentialEvolution):
         F[mask] = self._F_left + random_values * self._F_right
         return F
 
-    def _get_new_CR(self, CR: np.ndarray) -> np.ndarray:
+    def _get_new_CR(self, CR: NDArray[np.float64]) -> NDArray[np.float64]:
         CR = CR.copy()
         mask = np.random.random(size=len(CR)) < self._t_cr
 
@@ -77,7 +81,7 @@ class jDE(DifferentialEvolution):
         t_f_param: float = 0.1,
         t_cr_param: float = 0.1,
         elitism_param: bool = True,
-        initial_population: Optional[np.ndarray] = None,
+        initial_population: Optional[NDArray[np.float64]] = None,
     ) -> None:
         """
         - mutation oper: must be a Tuple of:
@@ -93,7 +97,7 @@ class jDE(DifferentialEvolution):
         self._elitism = elitism_param
         self._initial_population = initial_population
 
-    def fit(self):
+    def fit(self) -> jDE:
         if self._initial_population is None:
             population_g = float_population(self._pop_size, self._left, self._right)
         else:

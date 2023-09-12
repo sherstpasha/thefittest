@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 from functools import partial
+from typing import Any
 from typing import Callable
 from typing import Optional
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..base._ea import EvolutionaryAlgorithm
 from ..tools import donothing
@@ -25,11 +29,11 @@ from ..tools.transformations import scale_data
 class GeneticAlgorithm(EvolutionaryAlgorithm):
     def __init__(
         self,
-        fitness_function: Callable,
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         iters: int,
         pop_size: int,
         str_len: int,
-        genotype_to_phenotype: Callable = donothing,
+        genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -55,7 +59,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         self._selection_pool: dict
         self._crossover_pool: dict
         self._mutation_pool: dict
-        self._initial_population: np.ndarray
+        self._initial_population: Optional[NDArray[np.int64]]
         self._tour_size: int
         self._elitism: bool
         self._parents_num: int
@@ -66,7 +70,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
         self.set_strategy()
 
-    def _update_pool(self):
+    def _update_pool(self) -> None:
         self._selection_pool = {
             "proportional": (proportional_selection, 0),
             "rank": (rank_selection, 0),
@@ -102,8 +106,12 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         }
 
     def _get_new_individ_g(
-        self, population_g: np.ndarray, fitness_scale: np.ndarray, fitness_rank: np.ndarray, *args
-    ) -> np.ndarray:
+        self,
+        population_g: NDArray[np.byte],
+        fitness_scale: NDArray[np.float64],
+        fitness_rank: NDArray[np.float64],
+        i: np.int64,
+    ) -> NDArray[np.byte]:
         selection_func, tour_size = self._specified_selection
         crossover_func, quantity = self._specified_crossover
         mutation_func, proba = self._specified_mutation
@@ -127,7 +135,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         crossover_oper: str = "uniform2",
         mutation_oper: str = "weak",
         tour_size_param: int = 2,
-        initial_population: Optional[np.ndarray] = None,
+        initial_population: Optional[NDArray[np.byte]] = None,
         elitism_param: bool = True,
         parents_num_param: int = 7,
         mutation_rate_param: float = 0.05,
@@ -154,7 +162,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         self._specified_crossover = self._crossover_pool[crossover_oper]
         self._specified_mutation = self._mutation_pool[mutation_oper]
 
-    def fit(self):
+    def fit(self) -> GeneticAlgorithm:
         if self._initial_population is None:
             population_g = binary_string_population(self._pop_size, self._str_len)
         else:

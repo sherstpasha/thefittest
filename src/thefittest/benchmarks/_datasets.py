@@ -30,16 +30,16 @@ class Dataset:
         self._X_names = X_names
         self._y_names = y_names
 
-    def get_X(self):
+    def get_X(self) -> NDArray[np.float64]:
         return self._X
 
-    def get_y(self):
+    def get_y(self) -> NDArray[Union[np.int64, np.float64]]:
         return self._y
 
-    def get_X_names(self):
+    def get_X_names(self) -> Dict[int, str]:
         return self._X_names
 
-    def get_y_names(self):
+    def get_y_names(self) -> Dict[int, str]:
         return self._y_names
 
 
@@ -47,7 +47,7 @@ class IrisDataset(Dataset):
     """Fisher R. A.. (1988). Iris. UCI Machine Learning Repository.
     https://doi.org/10.24432/C56C76."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         Dataset.__init__(
             self,
             X=iris_data[:, :-1].astype(np.float64),
@@ -66,7 +66,7 @@ class WineDataset(Dataset):
     """Aeberhard,Stefan and Forina,M.. (1991). Wine. UCI Machine
     Learning Repository. https://doi.org/10.24432/C5PC7J."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         Dataset.__init__(
             self,
             X=wine_data[:, 1:].astype(np.float64),
@@ -96,7 +96,7 @@ class BreastCancerDataset(Dataset):
     Breast Cancer Wisconsin (Diagnostic). UCI Machine Learning Repository.
     https://doi.org/10.24432/C5DW2B."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         Dataset.__init__(
             self,
             X=breast_data[:, 2:].astype(np.float64),
@@ -141,7 +141,7 @@ class DigitsDataset(Dataset):
     """Alpaydin,E. and Kaynak,C.. (1998). Optical Recognition of Handwritten Digits.
     UCI Machine Learning Repository. https://doi.org/10.24432/C50P49."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         Dataset.__init__(
             self,
             X=digits_data[:, :-1].astype(np.float64),
@@ -154,7 +154,7 @@ class DigitsDataset(Dataset):
 class CreditRiskDataset(Dataset):
     """https://www.kaggle.com/datasets/upadorprofzs/credit-risk"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         Dataset.__init__(
             self,
             X=credit_data[:, 1:-1].astype(np.float64),
@@ -168,7 +168,7 @@ class UserKnowladgeDataset(Dataset):
     """Kahraman,Hamdi, Colak,Ilhami, and Sagiroglu,Seref. (2013). User Knowledge Modeling.
     UCI Machine Learning Repository. https://doi.org/10.24432/C5231X."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         Dataset.__init__(
             self,
             X=know_data[:, :-1].astype(np.float64),
@@ -189,7 +189,7 @@ class BanknoteDataset(Dataset):
     Lohweg,Volker. (2013). banknote authentication.
     UCI Machine Learning Repository. https://doi.org/10.24432/C55P57."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         Dataset.__init__(
             self,
             X=banknote_data[:, :-1].astype(np.float64),

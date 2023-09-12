@@ -40,7 +40,7 @@ def common_region(trees: List) -> Tuple:
                 break
 
         for j in range(len(indexes)):
-            _, right = trees[j].subtree(common_indexes[j][-1])
+            _, right = trees[j].subtree_id(common_indexes[j][-1])
             delete_to = indexes[j].index(right - 1) + 1
             indexes[j] = indexes[j][delete_to:]
 

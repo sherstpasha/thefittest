@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 from functools import partial
+from typing import Any
 from typing import Callable
 from typing import Optional
 from typing import Tuple
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ._jade import JADE
 from ..tools import donothing
@@ -24,12 +28,12 @@ class SHADE(JADE):
 
     def __init__(
         self,
-        fitness_function: Callable,
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         iters: int,
         pop_size: int,
-        left: np.ndarray,
-        right: np.ndarray,
-        genotype_to_phenotype: Callable = donothing,
+        left: NDArray[np.float64],
+        right: NDArray[np.float64],
+        genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -55,15 +59,15 @@ class SHADE(JADE):
 
         self._H_size: int = pop_size
 
-    def _mutation_and_crossover(
+    def _shade_mutation_and_crossover(
         self,
-        popuation_g: np.ndarray,
-        popuation_g_archive: np.ndarray,
-        pbest_id: np.ndarray,
-        individ_g: np.ndarray,
+        popuation_g: NDArray[np.float64],
+        popuation_g_archive: NDArray[np.float64],
+        pbest_id: NDArray[np.int64],
+        individ_g: NDArray[np.float64],
         F: float,
         CR: float,
-    ) -> np.ndarray:
+    ) -> NDArray[np.float64]:
         mutant = current_to_pbest_1_archive_p_min(
             individ_g, popuation_g, pbest_id, F, popuation_g_archive
         )
@@ -74,11 +78,11 @@ class SHADE(JADE):
 
     def _evaluate_and_selection(
         self,
-        mutant_cr_g: np.ndarray,
-        population_g: np.ndarray,
-        population_ph: np.ndarray,
-        fitness: np.ndarray,
-    ) -> np.ndarray:
+        mutant_cr_g: NDArray[np.float64],
+        population_g: NDArray[np.float64],
+        population_ph: NDArray,
+        fitness: NDArray[np.float64],
+    ) -> Tuple:
         offspring_g = population_g.copy()
         offspring_ph = population_ph.copy()
         offspring_fit = fitness.copy()
@@ -92,7 +96,9 @@ class SHADE(JADE):
         mask_more = mutant_cr_fit > fitness
         return offspring_g, offspring_ph, offspring_fit, mask_more
 
-    def _generate_F_CR(self, H_F_i: np.ndarray, H_CR_i: np.ndarray, size: int) -> Tuple:
+    def _generate_F_CR(
+        self, H_F_i: NDArray[np.float64], H_CR_i: NDArray[np.float64], size: int
+    ) -> Tuple:
         F_i = np.zeros(size)
         CR_i = np.zeros(size)
         for i in range(size):
@@ -103,12 +109,14 @@ class SHADE(JADE):
             CR_i[i] = randn01(np.float64(u_CR))
         return F_i, CR_i
 
-    def _update_u_F(self, u_F: float, S_F: np.ndarray) -> float:
+    def _shade_update_u_F(self, u_F: float, S_F: NDArray[np.float64]) -> float:
         if len(S_F):
             return lehmer_mean(S_F)
         return u_F
 
-    def _update_u_CR(self, u_CR: float, S_CR: np.ndarray, df: np.ndarray) -> float:
+    def _shade_update_u_CR(
+        self, u_CR: float, S_CR: NDArray[np.float64], df: NDArray[np.float64]
+    ) -> float:
         if len(S_CR):
             sum_ = np.sum(df)
             if sum_ > 0:
@@ -117,13 +125,13 @@ class SHADE(JADE):
         return u_CR
 
     def set_strategy(
-        self, elitism_param: bool = True, initial_population: Optional[int] = None
+        self, elitism_param: bool = True, initial_population: Optional[NDArray[np.float64]] = None
     ) -> None:
         self._update_pool()
         self._elitism = elitism_param
         self._initial_population = initial_population
 
-    def fit(self):
+    def fit(self) -> SHADE:
         if self._initial_population is None:
             population_g = float_population(self._pop_size, self._left, self._right)
         else:
@@ -152,7 +160,7 @@ class SHADE(JADE):
                 pop_archive = np.vstack([population_g, external_archive])
 
                 mutation_and_crossover = partial(
-                    self._mutation_and_crossover, population_g, pop_archive, pbest_id
+                    self._shade_mutation_and_crossover, population_g, pop_archive, pbest_id
                 )
                 mutant_cr_g = np.array(list(map(mutation_and_crossover, population_g, F_i, CR_i)))
 
@@ -185,8 +193,8 @@ class SHADE(JADE):
                 if next_k == self._H_size:
                     next_k = 0
 
-                H_F[next_k] = self._update_u_F(H_F[k], s_F)
-                H_CR[next_k] = self._update_u_CR(H_CR[k], s_CR, df)
+                H_F[next_k] = self._shade_update_u_F(H_F[k], s_F)
+                H_CR[next_k] = self._shade_update_u_CR(H_CR[k], s_CR, df)
 
                 if k == self._H_size - 1:
                     k = 0

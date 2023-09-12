@@ -1,6 +1,7 @@
 import random
 from typing import List
 from typing import Tuple
+from typing import Union
 
 from numba import boolean
 from numba import float64
@@ -208,7 +209,9 @@ def stratified_sample(data: NDArray[np.int64], sample_ratio: float) -> NDArray[n
 
 
 def train_test_split_stratified(
-    X: NDArray[np.float64], y: NDArray[np.int64], tests_size: float
+    X: NDArray[Union[np.float64, np.int64]],
+    y: NDArray[Union[np.float64, np.int64]],
+    tests_size: float,
 ) -> Tuple:
     indexes = np.arange(len(y), dtype=np.int64)
     sample_id = stratified_sample(y, tests_size)

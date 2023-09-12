@@ -1,4 +1,6 @@
+from typing import Dict
 from typing import Optional
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -71,7 +73,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         self._optimizer_weights_eval_num = optimizer_weights_eval_num
         self._optimizer_weights_n_bit = optimizer_weights_n_bit
         self._cache_condition = cache
-        self._cache = {}
+        self._cache: Dict = {}
 
         Model.__init__(self)
 
@@ -101,10 +103,15 @@ class GeneticProgrammingNeuralNetClassifier(Model):
             )
         return optimizer
 
-    def _train_net(self, net, X_train, proba_train):
+    def _train_net(
+        self,
+        net: Net,
+        X_train: NDArray[np.float64],
+        proba_train: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         self.optimizer_weights.clear()
 
-        def fitness_function(population):
+        def fitness_function(population: NDArray[np.float64]) -> float:
             return self._evaluate_nets(population, net, X_train, proba_train)
 
         left = np.full(
@@ -148,7 +155,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
             args = []
             for _ in range(node._n_args):
                 args.append(pack.pop())
-            if node.is_functional():
+            if isinstance(node, FunctionalNode):
                 pack.append(node._value(*args))
             else:
                 if type(node) is TerminalNode:
@@ -167,7 +174,13 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         to_return = to_return._fix(set(range(n_variables)))
         return to_return
 
-    def _evaluate_nets(self, weights: np.ndarray, net, X: np.ndarray, targets: np.ndarray) -> float:
+    def _evaluate_nets(
+        self,
+        weights: NDArray[np.float64],
+        net: Net,
+        X: NDArray[np.float64],
+        targets: NDArray[np.float64],
+    ) -> float:
         output3d = net.forward(X, weights)
         error = categorical_crossentropy3d(targets, output3d)
         return error
@@ -177,7 +190,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         X_train: NDArray[np.float64],
         proba_train: NDArray[np.float64],
         population_g: NDArray,
-        n_outputs,
+        n_outputs: int,
     ) -> NDArray:
         n_variables = X_train.shape[1]
 
@@ -222,7 +235,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
         functional_set = (FunctionalNode(Add()), FunctionalNode(More()))
 
-        def random_hidden_block():
+        def random_hidden_block() -> HiddenBlock:
             return HiddenBlock(self._max_hidden_block_size)
 
         terminal_set = [
@@ -235,15 +248,19 @@ class GeneticProgrammingNeuralNetClassifier(Model):
             )
         terminal_set.append(EphemeralNode(random_hidden_block))
 
-        uniset = UniversalSet(functional_set, terminal_set)
+        uniset = UniversalSet(functional_set, tuple(terminal_set))
         return uniset
 
-    def _fitness_function(self, population: np.ndarray, X, targets: np.ndarray) -> np.ndarray:
+    def _fitness_function(
+        self, population: NDArray, X: NDArray[np.float64], targets: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
         output3d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)
         fitness = categorical_crossentropy3d(targets, output3d)
         return fitness
 
-    def _fit(self, X: np.ndarray, y: np.ndarray):
+    def _fit(
+        self, X: NDArray[Union[np.float64, np.int64]], y: NDArray[Union[np.float64, np.int64]]
+    ) -> None:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
