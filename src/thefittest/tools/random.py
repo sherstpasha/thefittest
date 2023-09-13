@@ -11,6 +11,9 @@ from numba import njit
 import numpy as np
 from numpy.typing import NDArray
 
+from ..base import EphemeralNode
+from ..base import FunctionalNode
+from ..base import TerminalNode
 from ..base import Tree
 from ..base import UniversalSet
 from ..tools import binary_search_interval
@@ -18,7 +21,7 @@ from ..tools import check_for_value
 from ..tools.transformations import numpy_group_by
 
 
-def sattolo_shuffle(items: List) -> None:
+def sattolo_shuffle(items: Union[List, NDArray]) -> None:
     i = len(items)
     while i > 1:
         i = i - 1
@@ -46,7 +49,7 @@ def cauchy_distribution(loc: np.float64, scale: np.float64, size: np.int64) -> N
 
 
 @njit(float64(float64))
-def randc01(u):
+def randc01(u: np.float64) -> np.float64:
     value = cauchy_distribution(loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
     while value <= 0:
         value = cauchy_distribution(loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
@@ -56,17 +59,17 @@ def randc01(u):
 
 
 @njit(float64(float64))
-def randn01(u):
-    value = np.random.normal(u, 0.1)
+def randn01(u: np.float64) -> Union[float, np.float64]:
+    value = np.random.normal(u, 0.1, size=1)[0]
     if value < 0:
-        value = 0
+        return 0.0
     elif value > 1:
-        value = 1
+        return 1.0
     return value
 
 
 def full_growing_method(uniset: UniversalSet, max_level: int) -> Tree:
-    nodes = []
+    nodes: List[Union[FunctionalNode, TerminalNode, EphemeralNode]] = []
     levels = []
     n_args = []
     possible_steps = [1]
@@ -94,7 +97,7 @@ def full_growing_method(uniset: UniversalSet, max_level: int) -> Tree:
 
 
 def growing_method(uniset: UniversalSet, max_level: int) -> Tree:
-    nodes = []
+    nodes: List[Union[FunctionalNode, TerminalNode, EphemeralNode]] = []
     levels = []
     n_args = []
     possible_steps = [1]
@@ -148,7 +151,7 @@ def half_and_half(pop_size: int, uniset: UniversalSet, max_level: int) -> NDArra
 
 @njit(int64[:](float64[:], int64, boolean))
 def random_weighted_sample(
-    weights: NDArray[np.float64], quantity: np.int64 = 1, replace: bool = True
+    weights: NDArray[np.float64], quantity: Union[np.int64, int] = 1, replace: bool = True
 ) -> NDArray[np.int64]:
     if not replace:
         assert len(weights) >= quantity
@@ -210,7 +213,7 @@ def stratified_sample(data: NDArray[np.int64], sample_ratio: float) -> NDArray[n
 
 def train_test_split_stratified(
     X: NDArray[Union[np.float64, np.int64]],
-    y: NDArray[Union[np.float64, np.int64]],
+    y: NDArray[np.int64],
     tests_size: float,
 ) -> Tuple:
     indexes = np.arange(len(y), dtype=np.int64)
@@ -225,7 +228,11 @@ def train_test_split_stratified(
     )
 
 
-def train_test_split(X: NDArray[np.float64], y: NDArray[np.int64], tests_size: float) -> Tuple:
+def train_test_split(
+    X: NDArray[Union[np.float64, np.int64]],
+    y: NDArray[Union[np.float64, np.int64]],
+    tests_size: float,
+) -> Tuple:
     data_size = len(X)
     sample_size = int(tests_size * data_size)
     indexes = np.arange(data_size, dtype=np.int64)

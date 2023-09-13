@@ -1,6 +1,7 @@
 from typing import List
 from typing import Optional
 from typing import Tuple
+from typing import Union
 
 from numba import float64
 from numba import njit
@@ -12,11 +13,11 @@ from ..tools import find_end_subtree_from_i
 from ..tools import find_first_difference_between_two
 
 
-def common_region(trees: List) -> Tuple:
+def common_region(trees: Union[List, NDArray]) -> Tuple:
     terminate = False
     indexes = []
-    common_indexes = []
-    border_indexes = []
+    common_indexes: List[List[int]] = []
+    border_indexes: List[List[int]] = []
     for tree in trees:
         indexes.append(list(range(len(tree._nodes))))
         common_indexes.append([])
@@ -51,14 +52,16 @@ def common_region(trees: List) -> Tuple:
     return common_indexes, border_indexes
 
 
-def common_region_two_trees(n_args_array_1: np.ndarray, n_args_array_2: np.ndarray) -> Tuple:
+def common_region_two_trees(
+    n_args_array_1: NDArray[np.int64], n_args_array_2: NDArray[np.int64]
+) -> Tuple:
     index_list_1 = range(len(n_args_array_1))
     index_list_2 = range(len(n_args_array_2))
     index_1 = np.int64(0)
     index_2 = np.int64(0)
 
-    common_1 = []
-    common_2 = []
+    common_1: List[List[int]] = []
+    common_2: List[List[int]] = []
     border_1 = []
     border_2 = []
 
@@ -83,7 +86,7 @@ def common_region_two_trees(n_args_array_1: np.ndarray, n_args_array_2: np.ndarr
     return [common_1, common_2], [border_1, border_2]
 
 
-def common_region_(trees: List) -> Tuple:
+def common_region_(trees: Union[List, NDArray]) -> Tuple:
     if len(trees) == 2:
         to_return = common_region_two_trees(trees[0]._n_args, trees[1]._n_args)
     else:
@@ -92,7 +95,7 @@ def common_region_(trees: List) -> Tuple:
     return to_return
 
 
-def numpy_group_by(group: np.ndarray, by: np.ndarray) -> Tuple:
+def numpy_group_by(group: NDArray, by: NDArray) -> Tuple:
     argsort = np.argsort(by)
     group = group[argsort]
     by = by[argsort]
@@ -102,15 +105,21 @@ def numpy_group_by(group: np.ndarray, by: np.ndarray) -> Tuple:
     return keys, groups
 
 
-def lehmer_mean(x: np.ndarray, power: int = 2, weight: Optional[np.ndarray] = None) -> float:
+def lehmer_mean(
+    x: NDArray[np.float64], power: int = 2, weight: Optional[NDArray[np.float64]] = None
+) -> float:
+    weight_arg: Union[NDArray[np.float64], int]
     if weight is None:
-        weight = 1
-    x_up = weight * np.power(x, power)
-    x_down = weight * np.power(x, power - 1)
+        weight_arg = 1
+    else:
+        weight_arg = weight
+
+    x_up = weight_arg * np.power(x, power)
+    x_down = weight_arg * np.power(x, power - 1)
     return np.sum(x_up) / np.sum(x_down)
 
 
-def rank_data(arr: np.ndarray) -> np.ndarray:
+def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
     arange = np.arange(len(arr), dtype=np.int64)
 
     argsort = np.argsort(arr)
@@ -127,7 +136,7 @@ def rank_data(arr: np.ndarray) -> np.ndarray:
 
 
 @njit(float64[:](float64[:]))
-def protect_norm(x: np.ndarray) -> np.ndarray:
+def protect_norm(x: NDArray[np.float64]) -> NDArray[np.float64]:
     result = np.empty(len(x), dtype=np.float64)
     sum_ = np.sum(x, dtype=np.float64)
     if sum_ > 0:
@@ -140,7 +149,7 @@ def protect_norm(x: np.ndarray) -> np.ndarray:
     return result
 
 
-def scale_data(arr: np.ndarray) -> np.ndarray:
+def scale_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
     arr = arr.copy()
     max_ = arr.max()
     min_ = arr.min()
@@ -151,15 +160,17 @@ def scale_data(arr: np.ndarray) -> np.ndarray:
     return to_return
 
 
-def numpy_bit_to_int(bit_array: np.ndarray, powers: np.ndarray = None) -> np.ndarray:
+def numpy_bit_to_int(
+    bit_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
+) -> NDArray[np.int64]:
     if powers is None:
-        powers = 2 ** np.arange(bit_array.shape[1], dtype=np.int8)
+        powers = 2 ** np.arange(bit_array.shape[1], dtype=np.byte)
     arange_ = powers[: bit_array.shape[1]][::-1]
     int_array = np.sum(bit_array * arange_, axis=1)
     return int_array
 
 
-def numpy_int_to_bit(int_array: np.ndarray) -> np.ndarray:
+def numpy_int_to_bit(int_array: NDArray[np.int64]) -> NDArray[np.byte]:
     result = []
     bit = int_array % 2
     remains = int_array // 2
@@ -172,12 +183,12 @@ def numpy_int_to_bit(int_array: np.ndarray) -> np.ndarray:
     return bit_array
 
 
-def numpy_gray_to_bit(gray_array: np.ndarray) -> np.ndarray:
+def numpy_gray_to_bit(gray_array: NDArray[np.byte]) -> NDArray[np.byte]:
     bit_array = np.logical_xor.accumulate(gray_array, axis=-1).astype(np.byte)
     return bit_array
 
 
-def numpy_bit_to_gray(bit_array: np.ndarray) -> np.ndarray:
+def numpy_bit_to_gray(bit_array: NDArray[np.byte]) -> NDArray[np.byte]:
     cut_gray = np.logical_xor(bit_array[:, :-1], bit_array[:, 1:])
     gray_array = np.hstack([bit_array[:, 0].reshape(-1, 1), cut_gray])
     return gray_array
@@ -186,27 +197,34 @@ def numpy_bit_to_gray(bit_array: np.ndarray) -> np.ndarray:
 class SamplingGrid:
     def __init__(self, fit_by: str = "h") -> None:
         self._fit_by = fit_by
-        self.left: np.ndarray
-        self.right: np.ndarray
-        self.parts: np.ndarray
-        self.h: np.ndarray
-        self._power_arange: np.ndarray
+        self.left: NDArray[np.float64]
+        self.right: NDArray[np.float64]
+        self.parts: NDArray[np.int64]
+        self.h: NDArray[np.float64]
+        self._power_arange: NDArray[np.int64]
 
     def _culc_h_from_parts(
-        self, left: np.ndarray, right: np.ndarray, parts: np.ndarray
-    ) -> np.ndarray:
+        self, left: NDArray[np.float64], right: NDArray[np.float64], parts: NDArray[np.int64]
+    ) -> NDArray[np.float64]:
         h = (right - left) / (2.0**parts - 1)
         return h
 
-    def _culc_parts_from_h(self, left: np.ndarray, right: np.ndarray, h: np.ndarray) -> np.ndarray:
+    def _culc_parts_from_h(
+        self, left: NDArray[np.float64], right: NDArray[np.float64], h: NDArray[np.float64]
+    ) -> NDArray[np.int64]:
         parts = np.ceil(np.log2((right - left) / h + 1)).astype(int)
         return parts
 
-    def _decode(self, bit_array_i: np.ndarray) -> np.ndarray:
+    def _decode(self, bit_array_i: NDArray[np.byte]) -> NDArray[np.int64]:
         int_convert = numpy_bit_to_int(bit_array_i, self._power_arange)
         return int_convert
 
-    def fit(self, left: np.ndarray, right: np.ndarray, arg: np.ndarray):
+    def fit(
+        self,
+        left: NDArray[np.float64],
+        right: NDArray[np.float64],
+        arg: Union[NDArray[np.float64], NDArray[np.int64]],
+    ):
         self.left = left
         self.right = right
 

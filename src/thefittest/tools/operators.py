@@ -18,6 +18,8 @@ from .random import random_weighted_sample
 from .random import sattolo_shuffle
 from .transformations import common_region
 from ..base import FunctionalNode
+from ..base import TerminalNode
+from ..base import EphemeralNode
 from ..base import Tree
 from ..base import UniversalSet
 from ..base._tree import Operator
@@ -29,7 +31,7 @@ max_value = np.finfo(np.float64).max
 # MUTATUIONS
 # genetic algorithm
 @njit(int8[:](int8[:], float64))
-def flip_mutation(individ: np.ndarray, proba: float):
+def flip_mutation(individ: NDArray[np.byte], proba: float) -> NDArray[np.byte]:
     offspring = individ.copy()
     for i in range(offspring.size):
         if random.random() < proba:
@@ -162,7 +164,9 @@ def current_to_pbest_1_archive_p_min(
 
 
 # genetic propramming
-def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) -> Tree:
+def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: int) -> Tree:
+    new_node: Union[FunctionalNode, TerminalNode, EphemeralNode]
+
     to_return = tree.copy()
     if random.random() < proba:
         i = random.randrange(len(to_return))
@@ -175,7 +179,7 @@ def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) ->
     return to_return
 
 
-def growing_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) -> Tree:
+def growing_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: int) -> Tree:
     to_return = tree.copy()
     if random.random() < proba:
         i = random.randrange(len(to_return))
@@ -184,7 +188,7 @@ def growing_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) 
     return to_return
 
 
-def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) -> Tree:
+def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_leve: int) -> Tree:
     to_return = tree.copy()
     if random.random() < proba:
         more_one_args_cond = to_return._n_args > 1
@@ -200,7 +204,7 @@ def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) -> 
     return to_return
 
 
-def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) -> Tree:
+def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: int) -> Tree:
     to_return = tree.copy()
     if len(to_return) > 2:
         if random.random() < proba:
@@ -217,14 +221,16 @@ def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level) -
 # CROSSOVERS
 # genetic algorithm
 def empty_crossover(
-    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray, *args
+    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray, *args: Any
 ) -> np.ndarray:
     offspring = individs[0].copy()
     return offspring
 
 
 @njit(int8[:](int8[:], int8[:], float64))
-def binomialGA(individ: NDArray[np.int8], mutant: NDArray[np.int8], CR: np.float64):
+def binomialGA(
+    individ: NDArray[np.int8], mutant: NDArray[np.int8], CR: np.float64
+) -> NDArray[np.byte]:
     size = len(individ)
     offspring = individ.copy()
     j = random.randrange(size)
@@ -236,7 +242,9 @@ def binomialGA(individ: NDArray[np.int8], mutant: NDArray[np.int8], CR: np.float
 
 
 @njit(int8[:](int8[:, :], float64[:], float64[:]))
-def one_point_crossover(individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray) -> np.ndarray:
+def one_point_crossover(
+    individs: NDArray[np.byte], fitness: NDArray[np.float64], rank: NDArray[np.float64]
+) -> NDArray[np.byte]:
     cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
     if random.random() > 0.5:
         offspring = individs[0].copy()
@@ -252,7 +260,9 @@ def one_point_crossover(individs: np.ndarray, fitness: np.ndarray, rank: np.ndar
 
 
 @njit(int8[:](int8[:, :], float64[:], float64[:]))
-def two_point_crossover(individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray) -> np.ndarray:
+def two_point_crossover(
+    individs: NDArray[np.byte], fitness: NDArray[np.float64], rank: NDArray[np.float64]
+) -> NDArray[np.byte]:
     size = len(individs[0])
     c_points = random_sample(range_size=len(individs[0]), quantity=2, replace=False)
     c_points = sorted(c_points)
@@ -270,7 +280,9 @@ def two_point_crossover(individs: np.ndarray, fitness: np.ndarray, rank: np.ndar
 
 
 @njit(int8[:](int8[:, :], float64[:], float64[:]))
-def uniform_crossover(individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray) -> np.ndarray:
+def uniform_crossover(
+    individs: NDArray[np.byte], fitness: NDArray[np.float64], rank: NDArray[np.float64]
+) -> NDArray[np.byte]:
     choosen = random_sample(range_size=len(fitness), quantity=len(individs[0]), replace=True)
     offspring = np.empty_like(individs[0])
     for i in range(individs.shape[1]):
@@ -280,8 +292,8 @@ def uniform_crossover(individs: np.ndarray, fitness: np.ndarray, rank: np.ndarra
 
 @njit(int8[:](int8[:, :], float64[:], float64[:]))
 def uniform_prop_crossover(
-    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray
-) -> np.ndarray:
+    individs: NDArray[np.byte], fitness: NDArray[np.float64], rank: NDArray[np.float64]
+) -> NDArray[np.byte]:
     choosen = random_weighted_sample(weights=fitness, quantity=len(individs[0]), replace=True)
     offspring = np.empty_like(individs[0])
     for i in range(individs.shape[1]):
@@ -291,8 +303,8 @@ def uniform_prop_crossover(
 
 @njit(int8[:](int8[:, :], float64[:], float64[:]))
 def uniform_rank_crossover(
-    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray
-) -> np.ndarray:
+    individs: NDArray[np.byte], fitness: NDArray[np.float64], rank: NDArray[np.float64]
+) -> NDArray[np.byte]:
     choosen = random_weighted_sample(weights=rank, quantity=len(individs[0]), replace=True)
     offspring = np.empty_like(individs[0])
     for i in range(individs.shape[1]):
@@ -301,8 +313,8 @@ def uniform_rank_crossover(
 
 
 def uniform_tour_crossover(
-    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray
-) -> np.ndarray:
+    individs: NDArray[np.byte], fitness: NDArray[np.float64], rank: NDArray[np.float64]
+) -> NDArray[np.byte]:
     range_ = np.arange(len(individs))
     diag = np.arange(len(individs[0]))
 
@@ -315,7 +327,9 @@ def uniform_tour_crossover(
 
 # differential evolution
 @njit(float64[:](float64[:], float64[:], float64))
-def binomial(individ: NDArray[np.float64], mutant: NDArray[np.float64], CR: np.float64):
+def binomial(
+    individ: NDArray[np.float64], mutant: NDArray[np.float64], CR: np.float64
+) -> NDArray[np.float64]:
     size = len(individ)
     offspring = individ.copy()
     j = random.randrange(size)
@@ -328,7 +342,7 @@ def binomial(individ: NDArray[np.float64], mutant: NDArray[np.float64], CR: np.f
 
 # genetic propramming
 def standart_crossover(
-    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray, max_level: int
+    individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     individ_1 = individs[0].copy()
     individ_2 = individs[1].copy()
@@ -349,7 +363,7 @@ def standart_crossover(
 
 
 def one_point_crossoverGP(
-    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray, max_level: int
+    individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     individ_1 = individs[0]
     individ_2 = individs[1]
@@ -368,7 +382,7 @@ def one_point_crossoverGP(
 
 
 def uniform_crossoverGP(
-    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray, max_level: int
+    individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     """Poli, Riccardo & Langdon, W.. (2001). On the Search
     Properties of Different Crossover Operators in Genetic Programming."""
@@ -388,12 +402,12 @@ def uniform_crossoverGP(
             new_n_args.append(individs[j]._n_args[id_])
 
     to_return = to_return.copy()
-    to_return._n_args = new_n_args.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
     return to_return
 
 
 def uniform_crossoverGP_prop(
-    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray, max_level: int
+    individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     to_return = Tree([], [])
     new_n_args = []
@@ -411,12 +425,12 @@ def uniform_crossoverGP_prop(
             new_n_args.append(individs[j]._n_args[id_])
 
     to_return = to_return.copy()
-    to_return._n_args = new_n_args.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
     return to_return
 
 
 def uniform_crossoverGP_rank(
-    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray, max_level: int
+    individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     to_return = Tree([], [])
     new_n_args = []
@@ -435,12 +449,12 @@ def uniform_crossoverGP_rank(
             new_n_args.append(individs[j]._n_args[id_])
 
     to_return = to_return.copy()
-    to_return._n_args = new_n_args.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
     return to_return
 
 
 def uniform_crossoverGP_tour(
-    individs: np.ndarray, fitness: np.ndarray, rank: np.ndarray, max_level: int
+    individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     to_return = Tree([], [])
     new_n_args = []
@@ -459,7 +473,7 @@ def uniform_crossoverGP_tour(
             new_n_args.append(individs[j]._n_args[id_])
 
     to_return = to_return.copy()
-    to_return._n_args = new_n_args.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
     return to_return
 
 
@@ -570,11 +584,12 @@ class Div(Operator):
     def __call__(
         self, x: Union[float, np.ndarray], y: Union[float, np.ndarray]
     ) -> Union[float, np.ndarray]:
+        result: Union[float, np.ndarray]
         if isinstance(y, np.ndarray):
             result = np.divide(x, y, out=np.ones_like(y, dtype=np.float64), where=y != 0)
         else:
             if y == 0:
-                result = 0
+                result = 0.0
             else:
                 result = x / y
         result = np.clip(result, min_value, max_value)
@@ -586,6 +601,8 @@ class Inv(Operator):
         Operator.__init__(self, formula="(1/{})", name="Inv", sign="1/")
 
     def __call__(self, y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result: Union[float, np.ndarray]
+
         if isinstance(y, np.ndarray):
             result = np.divide(1, y, out=np.ones_like(y, dtype=np.float64), where=y != 0)
         else:
@@ -679,7 +696,7 @@ def multiactivation2d(X: NDArray[np.float64], activ_id: np.int64) -> NDArray[np.
 
 
 @njit(float64[:, ::1](float64[:], int64[:, :]))
-def mask2d(arr, mask):
+def mask2d(arr: NDArray[np.float64], mask: NDArray[np.int64]) -> NDArray[np.float64]:
     arr_mask = arr[mask.flatten()]
     arr_mask_reshape = arr_mask.reshape(mask.shape)
     return arr_mask_reshape

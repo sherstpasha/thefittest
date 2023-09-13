@@ -60,7 +60,7 @@ def find_first_difference_between_two(
 
 
 @njit(int64(float64, float64[:]))
-def binary_search_interval(value: np.float64, intervals: NDArray[np.float64]) -> np.int64:
+def binary_search_interval(value: np.float64, intervals: NDArray[np.float64]) -> int:
     if value <= intervals[0]:
         ind = 0
     else:
@@ -112,7 +112,7 @@ def find_pbest_id(array: NDArray[np.float64], p: np.float64) -> NDArray[np.int64
 
 
 @njit(float64[:](float64[:, :]))
-def max_axis(array):
+def max_axis(array: NDArray[np.float64]) -> NDArray[np.float64]:
     res = np.zeros((array.shape[1]), dtype=np.float64)
     for i in range(array.shape[1]):
         res[i] = np.max(array[:, i])

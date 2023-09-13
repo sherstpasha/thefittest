@@ -80,7 +80,9 @@ def accuracy_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> n
 
 
 @njit(float64[:](int64[:], int64[:, :]))
-def accuracy_score2d(y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]) -> np.float64:
+def accuracy_score2d(
+    y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]
+) -> NDArray[np.float64]:
     size = len(y_predict2d)
     to_return = np.empty(size, dtype=np.float64)
     for i in range(size):

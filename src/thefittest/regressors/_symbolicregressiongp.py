@@ -1,7 +1,12 @@
+from __future__ import annotations
+
+from typing import List
 from typing import Optional
 from typing import Tuple
+from typing import Union
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..base import EphemeralNode
 from ..base import FunctionalNode
@@ -31,7 +36,7 @@ class SymbolicRegressionGP(Model):
         show_progress_each: Optional[int] = None,
         keep_history: bool = False,
         optimizer: OptimizerTreeType = SelfCGP,
-        functional_set: Optional[Tuple[FunctionalNode]] = None,
+        functional_set: Optional[Tuple[FunctionalNode, ...]] = None,
     ) -> None:
         Model.__init__(self)
         self._functional_set = functional_set
@@ -48,12 +53,12 @@ class SymbolicRegressionGP(Model):
         )
         Model.__init__(self)
 
-    def _evaluate_tree(self, tree: Tree, y: np.ndarray) -> float:
+    def _evaluate_tree(self, tree: Tree, y: NDArray[np.float64]) -> float:
         y_pred = tree() * np.ones(len(y))
         fitness = coefficient_determination(y, y_pred)
         return fitness
 
-    def _fitness_function(self, trees: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def _fitness_function(self, trees: NDArray, y: NDArray[np.float64]) -> NDArray[np.float64]:
         fitness = [self._evaluate_tree(tree, y) for tree in trees]
         return np.array(fitness)
 
@@ -65,7 +70,7 @@ class SymbolicRegressionGP(Model):
         value = np.random.randint(0, 10)
         return value
 
-    def _define_uniset(self, X: np.ndarray) -> UniversalSet:
+    def _define_uniset(self, X: NDArray[np.float64]) -> UniversalSet:
         n_dimension = X.shape[1]
         if self._functional_set is None:
             functional_set = (
@@ -80,18 +85,22 @@ class SymbolicRegressionGP(Model):
         else:
             functional_set = self._functional_set
 
-        terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
+        terminal_set: List[Union[TerminalNode, EphemeralNode]] = [
+            TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)
+        ]
         terminal_set.extend([EphemeralNode(self._generator1), EphemeralNode(self._generator2)])
-        uniset = UniversalSet(functional_set, terminal_set)
+        uniset = UniversalSet(functional_set, tuple(terminal_set))
         return uniset
 
-    def _fit(self, X: np.ndarray, y: np.ndarray):
+    def _fit(
+        self, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
+    ) -> SymbolicRegressionGP:
         self.optimizer._fitness_function = lambda trees: self._fitness_function(trees, y)
         self.optimizer._uniset = self._define_uniset(X)
         self.optimizer.fit()
         return self
 
-    def _predict(self, X: np.ndarray) -> np.ndarray:
+    def _predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
         n_dimension = X.shape[1]
         solution = self.optimizer.get_fittest()
         genotype, *_ = solution.get().values()

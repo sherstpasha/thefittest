@@ -1,4 +1,10 @@
-def print_net(net, ax=None):
+from typing import Any
+
+from ..base._net import Net
+from ..base import Tree
+
+
+def print_net(net: Net, ax: Any = None) -> None:
     import networkx as nx
 
     graph = net.get_graph()
@@ -25,10 +31,10 @@ def print_net(net, ax=None):
     nx.draw_networkx_labels(G, graph["positions"], graph["labels"], font_size=10, ax=ax)
 
 
-def print_tree(some_tree, ax):
+def print_tree(tree: Tree, ax: Any = None) -> None:
     import networkx as nx
 
-    graph = some_tree.get_graph(False)
+    graph = tree.get_graph(False)
 
     G = nx.Graph()
     G.add_nodes_from(graph["nodes"])

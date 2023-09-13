@@ -1,7 +1,12 @@
+from __future__ import annotations
+
 from typing import Optional
+from typing import Union
 
 import numpy as np
+from numpy.typing import NDArray
 
+from ..base._net import Net
 from ..classifiers import GeneticProgrammingNeuralNetClassifier
 from ..optimizers import OptimizerStringType
 from ..optimizers import OptimizerTreeType
@@ -51,17 +56,27 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
             cache=cache,
         )
 
-    def _evaluate_nets(self, weights: np.ndarray, net, X: np.ndarray, targets: np.ndarray) -> float:
+    def _evaluate_nets(
+        self,
+        weights: NDArray[np.float64],
+        net: Net,
+        X: NDArray[np.float64],
+        targets: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         output2d = net.forward(X, weights)[:, :, 0]
         error = root_mean_square_error2d(targets, output2d)
         return error
 
-    def _fitness_function(self, population: np.ndarray, X, targets: np.ndarray) -> np.ndarray:
+    def _fitness_function(
+        self, population: NDArray, X: NDArray[np.float64], targets: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
         output2d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)[:, :, 0]
         fitness = root_mean_square_error2d(targets, output2d)
         return fitness
 
-    def _fit(self, X: np.ndarray, y: np.ndarray):
+    def _fit(
+        self, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
+    ) -> GeneticProgrammingNeuralNetRegressor:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
@@ -82,7 +97,7 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
 
         return self
 
-    def _predict(self, X):
+    def _predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 

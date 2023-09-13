@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 from typing import Optional
 from typing import Tuple
+from typing import Union
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..base._model import Model
 from ..base._net import ACTIV_NAME_INV
@@ -69,7 +73,7 @@ class MLPClassifierEA(Model):
             )
         return optimizer
 
-    def _defitne_net(self, n_inputs, n_outputs):
+    def _defitne_net(self, n_inputs: int, n_outputs: int) -> Net:
         start = 0
         end = n_inputs
         inputs_id = set(range(start, end))
@@ -79,7 +83,7 @@ class MLPClassifierEA(Model):
         for n_layer in self._hidden_layers:
             start = end
             end = end + n_layer
-            inputs_id = set([n_inputs - 1])
+            inputs_id = {(n_inputs - 1)}
             hidden_id = set(range(start, end))
             activs = dict(zip(hidden_id, [ACTIV_NAME_INV[self._activation]] * len(hidden_id)))
 
@@ -92,7 +96,7 @@ class MLPClassifierEA(Model):
 
         start = end
         end = end + n_outputs
-        inputs_id = set([n_inputs - 1])
+        inputs_id = {(n_inputs - 1)}
         output_id = set(range(start, end))
         activs = dict(zip(output_id, [ACTIV_NAME_INV[self._output_activation]] * len(output_id)))
 
@@ -102,19 +106,29 @@ class MLPClassifierEA(Model):
             layer_net = Net(outputs=output_id, activs=activs)
 
         net = net > layer_net
+        net._get_order()
+        return net
 
-        self._net = net
-        self._net._get_order()
-
-    def _evaluate_nets(self, weights: np.ndarray, net, X: np.ndarray, targets: np.ndarray) -> float:
+    def _evaluate_nets(
+        self,
+        weights: NDArray[np.float64],
+        net: Net,
+        X: NDArray[np.float64],
+        targets: NDArray[Union[np.float64, np.int64]],
+    ) -> NDArray[np.float64]:
         output3d = net.forward(X, weights)
         error = categorical_crossentropy3d(targets, output3d)
         return error
 
-    def _train_net(self, net, X_train, proba_train):
+    def _train_net(
+        self,
+        net: Net,
+        X_train: NDArray[np.float64],
+        proba_train: NDArray[Union[np.float64, np.int64]],
+    ) -> NDArray[np.float64]:
         self.optimizer_weights.clear()
 
-        def fitness_function(population):
+        def fitness_function(population: NDArray) -> NDArray[np.float64]:
             return self._evaluate_nets(population, net, X_train, proba_train)
 
         left = np.full(
@@ -150,7 +164,9 @@ class MLPClassifierEA(Model):
         fittest = self.optimizer_weights.get_fittest().get()
         return fittest["phenotype"]
 
-    def _fit(self, X, y):
+    def _fit(
+        self, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
+    ) -> MLPClassifierEA:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
@@ -159,12 +175,12 @@ class MLPClassifierEA(Model):
         eye = np.eye(n_outputs)
         target_probas = eye[y]
 
-        self._defitne_net(n_inputs, n_outputs)
+        self._net = self._defitne_net(n_inputs, n_outputs)
 
         self._net._weights = self._train_net(self._net, X, target_probas)
         return self
 
-    def _predict(self, X):
+    def _predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 

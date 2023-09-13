@@ -1,4 +1,8 @@
+from __future__ import annotations
+
+from typing import Any
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Union
 
@@ -111,7 +115,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
     ) -> NDArray[np.float64]:
         self.optimizer_weights.clear()
 
-        def fitness_function(population: NDArray[np.float64]) -> float:
+        def fitness_function(population: NDArray[np.float64]) -> NDArray[np.float64]:
             return self._evaluate_nets(population, net, X_train, proba_train)
 
         left = np.full(
@@ -149,7 +153,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         return fittest["phenotype"]
 
     def _genotype_to_phenotype_tree(self, n_variables: int, n_outputs: int, tree: Tree) -> Net:
-        pack = []
+        pack: Any = []
         n = n_variables
         for node in reversed(tree._nodes):
             args = []
@@ -180,7 +184,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         net: Net,
         X: NDArray[np.float64],
         targets: NDArray[np.float64],
-    ) -> float:
+    ) -> NDArray[np.float64]:
         output3d = net.forward(X, weights)
         error = categorical_crossentropy3d(targets, output3d)
         return error
@@ -238,13 +242,13 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         def random_hidden_block() -> HiddenBlock:
             return HiddenBlock(self._max_hidden_block_size)
 
-        terminal_set = [
+        terminal_set: List[Union[TerminalNode, EphemeralNode]] = [
             TerminalNode(set(variables), "in{}".format(i))
             for i, variables in enumerate(variables_pool)
         ]
         if self._offset:
             terminal_set.append(
-                TerminalNode(value=set([n_dimension]), name="in{}".format(len(variables_pool)))
+                TerminalNode(value={(n_dimension)}, name="in{}".format(len(variables_pool)))
             )
         terminal_set.append(EphemeralNode(random_hidden_block))
 
@@ -259,8 +263,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         return fitness
 
     def _fit(
-        self, X: NDArray[Union[np.float64, np.int64]], y: NDArray[Union[np.float64, np.int64]]
-    ) -> None:
+        self, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
+    ) -> GeneticProgrammingNeuralNetClassifier:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
@@ -286,13 +290,12 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
         return self
 
-    def _predict(self, X):
+    def _predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        fittest = self.optimizer.get_fittest()
-        genotype, phenotype, fitness = fittest.get().values()
+        fittest = self.optimizer.get_fittest().get()
 
-        output = phenotype.forward(X)[0]
+        output = fittest["phenotype"].forward(X)[0]
         y_pred = np.argmax(output, axis=1)
         return y_pred
