@@ -14,3 +14,4 @@ black
 mypy
 typing-extensions<=4.6.3
 networkx
+matplotlib

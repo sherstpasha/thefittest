@@ -3,24 +3,38 @@ from __future__ import annotations
 from functools import partial
 from typing import Any
 from typing import Callable
+from typing import Dict
 from typing import Optional
+from typing import Tuple
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
+from ..base import Tree
 from ..base._ea import EvolutionaryAlgorithm
 from ..tools import donothing
 from ..tools.operators import empty_crossover
 from ..tools.operators import flip_mutation
+from ..tools.operators import growing_mutation
 from ..tools.operators import one_point_crossover
+from ..tools.operators import one_point_crossoverGP
+from ..tools.operators import point_mutation
 from ..tools.operators import proportional_selection
 from ..tools.operators import rank_selection
+from ..tools.operators import shrink_mutation
+from ..tools.operators import standart_crossover
+from ..tools.operators import swap_mutation
 from ..tools.operators import tournament_selection
 from ..tools.operators import two_point_crossover
 from ..tools.operators import uniform_crossover
+from ..tools.operators import uniform_crossoverGP
 from ..tools.operators import uniform_prop_crossover
+from ..tools.operators import uniform_prop_crossover_GP
 from ..tools.operators import uniform_rank_crossover
+from ..tools.operators import uniform_rank_crossover_GP
 from ..tools.operators import uniform_tour_crossover
+from ..tools.operators import uniform_tour_crossover_GP
 from ..tools.random import binary_string_population
 from ..tools.transformations import rank_data
 from ..tools.transformations import scale_data
@@ -33,6 +47,14 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         iters: int,
         pop_size: int,
         str_len: int,
+        tour_size: int = 2,
+        mutation_rate: float = 0.05,
+        parents_num: int = 2,
+        elitism: bool = True,
+        selection: str = "tournament_5",
+        crossover: str = "uniform_2",
+        mutation: str = "weak",
+        init_population: Optional[NDArray[np.byte]] = None,
         genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
@@ -54,24 +76,16 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             show_progress_each=show_progress_each,
             keep_history=keep_history,
         )
+        self._str_len: int = str_len
+        self._tour_size: int = tour_size
+        self._parents_num: int = parents_num
+        self._mutation_rate: float = mutation_rate
+        self._elitism: bool = elitism
+        self._specified_selection: str = selection
+        self._specified_crossover: str = crossover
+        self._specified_mutation: str = mutation
 
-        self._str_len = str_len
-        self._selection_pool: dict
-        self._crossover_pool: dict
-        self._mutation_pool: dict
-        self._initial_population: Optional[NDArray[np.int64]]
-        self._tour_size: int
-        self._elitism: bool
-        self._parents_num: int
-        self._mutation_rate: float
-        self._specified_selection: tuple
-        self._specified_crossover: tuple
-        self._specified_mutation: tuple
-
-        self.set_strategy()
-
-    def _update_pool(self) -> None:
-        self._selection_pool = {
+        self._selection_pool: Dict[str, Tuple[Callable, Union[float, int]]] = {
             "proportional": (proportional_selection, 0),
             "rank": (rank_selection, 0),
             "tournament_k": (tournament_selection, self._tour_size),
@@ -80,43 +94,85 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             "tournament_7": (tournament_selection, 7),
         }
 
-        self._crossover_pool = {
+        self._crossover_pool: Dict[str, Tuple[Callable, Union[float, int]]] = {
             "empty": (empty_crossover, 1),
             "one_point": (one_point_crossover, 2),
             "two_point": (two_point_crossover, 2),
-            "uniform2": (uniform_crossover, 2),
-            "uniform7": (uniform_crossover, 7),
-            "uniformk": (uniform_crossover, self._parents_num),
-            "uniform_prop2": (uniform_prop_crossover, 2),
-            "uniform_prop7": (uniform_prop_crossover, 7),
-            "uniform_propk": (uniform_prop_crossover, self._parents_num),
-            "uniform_rank2": (uniform_rank_crossover, 2),
-            "uniform_rank7": (uniform_rank_crossover, 7),
-            "uniform_rankk": (uniform_rank_crossover, self._parents_num),
-            "uniform_tour3": (uniform_tour_crossover, 3),
-            "uniform_tour7": (uniform_tour_crossover, 7),
-            "uniform_tourk": (uniform_tour_crossover, self._parents_num),
+            "uniform_2": (uniform_crossover, 2),
+            "uniform_7": (uniform_crossover, 7),
+            "uniform_k": (uniform_crossover, self._parents_num),
+            "uniform_prop_2": (uniform_prop_crossover, 2),
+            "uniform_prop_7": (uniform_prop_crossover, 7),
+            "uniform_prop_k": (uniform_prop_crossover, self._parents_num),
+            "uniform_rank_2": (uniform_rank_crossover, 2),
+            "uniform_rank_7": (uniform_rank_crossover, 7),
+            "uniform_rank_k": (uniform_rank_crossover, self._parents_num),
+            "uniform_tour_3": (uniform_tour_crossover, 3),
+            "uniform_tour_7": (uniform_tour_crossover, 7),
+            "uniform_tour_k": (uniform_tour_crossover, self._parents_num),
+            "gp_standart": (standart_crossover, 2),
+            "gp_one_point": (one_point_crossoverGP, 2),
+            "gp_uniform_2": (uniform_crossoverGP, 2),
+            "gp_uniform_7": (uniform_crossoverGP, 7),
+            "gp_uniform_k": (uniform_crossoverGP, self._parents_num),
+            "gp_uniform_prop_2": (uniform_prop_crossover_GP, 2),
+            "gp_uniform_prop_7": (uniform_prop_crossover_GP, 7),
+            "gp_uniform_prop_k": (uniform_prop_crossover_GP, self._parents_num),
+            "gp_uniform_rank_2": (uniform_rank_crossover_GP, 2),
+            "gp_uniform_rank_7": (uniform_rank_crossover_GP, 7),
+            "gp_uniform_rank_k": (uniform_rank_crossover_GP, self._parents_num),
+            "gp_uniform_tour_3": (uniform_tour_crossover_GP, 3),
+            "gp_uniform_tour_7": (uniform_tour_crossover_GP, 7),
+            "gp_uniform_tour_k": (uniform_tour_crossover_GP, self._parents_num),
         }
 
-        self._mutation_pool = {
-            "weak": (flip_mutation, lambda: 1 / (3 * self._str_len)),
-            "average": (flip_mutation, lambda: 1 / (self._str_len)),
-            "strong": (flip_mutation, lambda: min(1, 3 / self._str_len)),
-            "custom_rate": (flip_mutation, self._mutation_rate),
+        self._mutation_pool: Dict[str, Tuple[Callable, Union[float, int], bool]] = {
+            "weak": (flip_mutation, 1 / 3, False),
+            "average": (flip_mutation, 1, False),
+            "strong": (flip_mutation, 3, False),
+            "custom_rate": (flip_mutation, self._mutation_rate, True),
+            "gp_weak_point": (point_mutation, 0.25, False),
+            "gp_average_point": (point_mutation, 1, False),
+            "gp_strong_point": (point_mutation, 4, False),
+            "gp_custom_rate_point": (point_mutation, self._mutation_rate, True),
+            "gp_weak_grow": (growing_mutation, 0.25, False),
+            "gp_average_grow": (growing_mutation, 1, False),
+            "gp_strong_grow": (growing_mutation, 4, False),
+            "gp_custom_rate_grow": (growing_mutation, self._mutation_rate, True),
+            "gp_weak_swap": (swap_mutation, 0.25, False),
+            "gp_average_swap": (swap_mutation, 1, False),
+            "gp_strong_swap": (swap_mutation, 4, False),
+            "gp_custom_rate_swap": (swap_mutation, self._mutation_rate, True),
+            "gp_weak_shrink": (shrink_mutation, 0.25, False),
+            "gp_average_shrink": (shrink_mutation, 1, False),
+            "gp_strong_shrink": (shrink_mutation, 4, False),
+            "gp_custom_rate_shrink": (shrink_mutation, self._mutation_rate, True),
         }
+
+        self._population_g_i: Union[NDArray[Any], NDArray[np.byte]]
+
+        if init_population is None:
+            self._population_g_i = binary_string_population(self._pop_size, self._str_len)
+        else:
+            self._population_g_i = init_population.copy()
+
+        self._population_ph_i: NDArray
+        self._fitness_i: NDArray[np.float64]
+        self._fitness_scale_i: NDArray[np.float64]
+        self._fitness_rank_i: NDArray[np.float64]
 
     def _get_new_individ_g(
-        self,
-        population_g: NDArray[np.byte],
+        self: GeneticAlgorithm,
+        population_g: Union[NDArray[Any], NDArray[np.byte]],
         fitness_scale: NDArray[np.float64],
         fitness_rank: NDArray[np.float64],
-        i: np.int64,
-    ) -> NDArray[np.byte]:
-        selection_func, tour_size = self._specified_selection
-        crossover_func, quantity = self._specified_crossover
-        mutation_func, proba = self._specified_mutation
-        if callable(proba):
-            proba = proba()
+        specified_selection: str,
+        specified_crossover: str,
+        specified_mutation: str,
+    ) -> Union[Tree, np.byte]:
+        selection_func, tour_size = self._selection_pool[specified_selection]
+        crossover_func, quantity = self._crossover_pool[specified_crossover]
+        mutation_func, proba, is_constant_rate = self._mutation_pool[specified_mutation]
 
         selected_id = selection_func(
             fitness_scale, fitness_rank, np.int64(tour_size), np.int64(quantity)
@@ -126,65 +182,66 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             population_g[selected_id], fitness_scale[selected_id], fitness_rank[selected_id]
         )
 
+        if is_constant_rate:
+            proba = proba
+        else:
+            proba = proba / len(offspring_no_mutated)
+
         offspring = mutation_func(offspring_no_mutated, np.float64(proba))
         return offspring
 
-    def set_strategy(
-        self,
-        selection_oper: str = "tournament_k",
-        crossover_oper: str = "uniform2",
-        mutation_oper: str = "weak",
-        tour_size_param: int = 2,
-        initial_population: Optional[NDArray[np.byte]] = None,
-        elitism_param: bool = True,
-        parents_num_param: int = 7,
-        mutation_rate_param: float = 0.05,
-    ) -> None:
-        """
-        - selection_oper: should be one of:
-            'proportional', 'rank', 'tournament_k', 'tournament_3', 'tournament_5', 'tournament_7'
-        - crossover oper: should be one of:
-            'empty', 'one_point', 'two_point', 'uniform2', 'uniform7', 'uniformk', 'uniform_prop2',
-            'uniform_prop7', 'uniform_propk', 'uniform_rank2', 'uniform_rank7', 'uniform_rankk',
-            'uniform_tour3', 'uniform_tour7', 'uniform_tourk'
-        - mutation oper: should be one of:
-            'weak', 'average', 'strong', 'custom_rate'
-        """
-        self._tour_size = tour_size_param
-        self._initial_population = initial_population
-        self._elitism = elitism_param
-        self._parents_num = parents_num_param
-        self._mutation_rate = mutation_rate_param
+    def _get_new_population(self: GeneticAlgorithm) -> None:
+        get_new_individ_g = partial(
+            self._get_new_individ_g,
+            self._population_g_i,
+            self._fitness_scale_i,
+            self._fitness_rank_i,
+            self._specified_selection,
+            self._specified_crossover,
+            self._specified_mutation,
+        )
 
-        self._update_pool()
+        self._population_g_i = np.array(
+            [get_new_individ_g() for _ in range(self._pop_size)], dtype=self._population_g_i.dtype
+        )
 
-        self._specified_selection = self._selection_pool[selection_oper]
-        self._specified_crossover = self._crossover_pool[crossover_oper]
-        self._specified_mutation = self._mutation_pool[mutation_oper]
+        self._from_population_g_to_fitness()
 
-    def fit(self) -> GeneticAlgorithm:
-        if self._initial_population is None:
-            population_g = binary_string_population(self._pop_size, self._str_len)
-        else:
-            population_g = self._initial_population.copy()
+    def _update_data(self: GeneticAlgorithm) -> None:
+        self._update_fittest(self._population_g_i, self._population_ph_i, self._fitness_i)
+        self._update_stats(
+            population_g=self._population_ph_i, fitness_max=self._thefittest._fitness
+        )
 
-        for i in range(self._iters):
-            population_ph = self._get_phenotype(population_g)
-            fitness = self._get_fitness(population_ph)
+    def _update_proba(self: GeneticAlgorithm) -> None:
+        return None
 
-            self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats(population_g=population_g, fitness_max=self._thefittest._fitness)
+    def _from_population_g_to_fitness(self: GeneticAlgorithm) -> None:
+        self._population_ph_i = self._get_phenotype(self._population_g_i)
+        self._fitness_i = self._get_fitness(self._population_ph_i)
 
-            if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get().values()
+        self._update_data()
 
+        if self._elitism:
+            (
+                self._population_g_i[-1],
+                self._population_ph_i[-1],
+                self._fitness_i[-1],
+            ) = self._thefittest.get().values()
+
+        self._fitness_scale_i = scale_data(self._fitness_i)
+        self._fitness_rank_i = rank_data(self._fitness_i)
+
+        self._update_proba()
+
+    def fit(self: GeneticAlgorithm) -> GeneticAlgorithm:
+        self._from_population_g_to_fitness()
+
+        for i in range(self._iters - 1):
             self._show_progress(i)
             if self._termitation_check():
                 break
             else:
-                get_new_individ_g = partial(
-                    self._get_new_individ_g, population_g, scale_data(fitness), rank_data(fitness)
-                )
-                map_ = map(get_new_individ_g, range(self._pop_size))
-                population_g = np.array(list(map_), dtype=np.byte)
+                self._get_new_population()
+
         return self

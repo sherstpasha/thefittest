@@ -406,7 +406,7 @@ def uniform_crossoverGP(
     return to_return
 
 
-def uniform_crossoverGP_prop(
+def uniform_prop_crossover_GP(
     individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     to_return = Tree([], [])
@@ -429,7 +429,7 @@ def uniform_crossoverGP_prop(
     return to_return
 
 
-def uniform_crossoverGP_rank(
+def uniform_rank_crossover_GP(
     individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     to_return = Tree([], [])
@@ -453,7 +453,7 @@ def uniform_crossoverGP_rank(
     return to_return
 
 
-def uniform_crossoverGP_tour(
+def  uniform_tour_crossover_GP(
     individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     to_return = Tree([], [])

@@ -6,16 +6,14 @@ from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
 from ._geneticalgorithm import GeneticAlgorithm
 from ..tools import donothing
-from ..tools.random import binary_string_population
 from ..tools.transformations import numpy_group_by
-from ..tools.transformations import rank_data
-from ..tools.transformations import scale_data
 
 
 class SelfCGA(GeneticAlgorithm):
@@ -25,6 +23,34 @@ class SelfCGA(GeneticAlgorithm):
         iters: int,
         pop_size: int,
         str_len: int,
+        tour_size: int = 2,
+        mutation_rate: float = 0.05,
+        parents_num: int = 2,
+        elitism: bool = True,
+        selections: Tuple[str, ...] = (
+            "proportional",
+            "rank",
+            "tournament_3",
+            "tournament_5",
+            "tournament_7",
+        ),
+        crossovers: Tuple[str, ...] = (
+            "empty",
+            "one_point",
+            "two_point",
+            "uniform_2",
+            "uniform_7",
+            "uniform_prop_2",
+            "uniform_prop_7",
+            "uniform_rank_2",
+            "uniform_rank_7",
+            "uniform_tour_3",
+            "uniform_tour_7",
+        ),
+        mutations: Tuple[str, ...] = ("weak", "average", "strong"),
+        init_population: Optional[NDArray[np.byte]] = None,
+        K: float = 2,
+        threshold: float = 0.05,
         genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
@@ -39,6 +65,11 @@ class SelfCGA(GeneticAlgorithm):
             iters=iters,
             pop_size=pop_size,
             str_len=str_len,
+            tour_size=tour_size,
+            mutation_rate=mutation_rate,
+            parents_num=parents_num,
+            elitism=elitism,
+            init_population=init_population,
             genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
@@ -48,45 +79,72 @@ class SelfCGA(GeneticAlgorithm):
             keep_history=keep_history,
         )
 
-        self._selection_set: dict
-        self._crossover_set: dict
-        self._mutation_set: dict
-        self._K: float
-        self._threshold: float
+        self._K = K
+        self._threshold = threshold
 
-        self.set_strategy()
+        self._selection_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
+        self._crossover_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
+        self._mutation_set: Dict[str, Tuple[Callable, Union[float, int], bool]] = {}
 
-    def _selfcga_get_new_individ_g(
-        self,
-        population_g: NDArray[np.byte],
-        fitness_scale: NDArray[np.float64],
-        fitness_rank: NDArray[np.float64],
-        selection: str,
-        crossover: str,
-        mutation: str,
-    ) -> NDArray[np.byte]:
-        selection_func, tour_size = self._selection_set[selection]
-        crossover_func, quantity = self._crossover_set[crossover]
-        mutation_func, proba = self._mutation_set[mutation]
-        if callable(proba):
-            proba = proba()
+        self._selection_proba: Dict[str, float]
+        self._crossover_proba: Dict[str, float]
+        self._mutation_proba: Dict[str, float]
 
-        selected_id = selection_func(
-            fitness_scale, fitness_rank, np.int64(tour_size), np.int64(quantity)
+        for operator_name in selections:
+            self._selection_set[operator_name] = self._selection_pool[operator_name]
+        self._selection_set = dict(sorted(self._selection_set.items()))
+
+        for operator_name in crossovers:
+            self._crossover_set[operator_name] = self._crossover_pool[operator_name]
+        self._crossover_set = dict(sorted(self._crossover_set.items()))
+
+        for operator_name in mutations:
+            self._mutation_set[operator_name] = self._mutation_pool[operator_name]
+        self._mutation_set = dict(sorted(self._mutation_set.items()))
+
+        self._z_selection = len(self._selection_set)
+        self._z_crossover = len(self._crossover_set)
+        self._z_mutation = len(self._mutation_set)
+
+        self._selection_proba = dict(
+            zip(list(self._selection_set.keys()), np.full(self._z_selection, 1 / self._z_selection))
         )
-        offspring_no_mutated = crossover_func(
-            population_g[selected_id], fitness_scale[selected_id], fitness_rank[selected_id]
+        if "empty" in self._crossover_set.keys():
+            self._crossover_proba = dict(
+                zip(
+                    list(self._crossover_set.keys()),
+                    np.full(self._z_crossover, 0.9 / (self._z_crossover - 1)),
+                )
+            )
+            self._crossover_proba["empty"] = 0.1
+        else:
+            self._crossover_proba = dict(
+                zip(
+                    list(self._crossover_set.keys()),
+                    np.full(self._z_crossover, 1 / self._z_crossover),
+                )
+            )
+        self._mutation_proba = dict(
+            zip(list(self._mutation_set.keys()), np.full(self._z_mutation, 1 / self._z_mutation))
         )
-        offspring = mutation_func(offspring_no_mutated, np.float64(proba))
-        return offspring
 
-    def _choice_operators(self, proba_dict: Dict) -> NDArray:
+        self._selection_operators: NDArray = self._choice_operators(
+            proba_dict=self._selection_proba
+        )
+        self._crossover_operators: NDArray = self._choice_operators(
+            proba_dict=self._crossover_proba
+        )
+        self._mutation_operators: NDArray = self._choice_operators(proba_dict=self._mutation_proba)
+
+    def _choice_operators(self: SelfCGA, proba_dict: Dict["str", float]) -> NDArray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
         chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
         return chosen_operator
 
-    def _update_proba(self, proba_dict: Dict, operator: str) -> Dict:
+    def _get_new_proba(
+        self: SelfCGA, proba_dict: Dict["str", float], operator: str
+    ) -> Dict["str", float]:
         proba_dict[operator] += self._K / self._iters
         proba_value = np.array(list(proba_dict.values()))
         proba_value -= self._K / (len(proba_dict) * self._iters)
@@ -95,145 +153,62 @@ class SelfCGA(GeneticAlgorithm):
         new_proba_dict = dict(zip(proba_dict.keys(), proba_value))
         return new_proba_dict
 
-    def _find_fittest_operator(self, operators: NDArray, fitness: NDArray[np.float64]) -> str:
+    def _find_fittest_operator(
+        self: SelfCGA, operators: NDArray, fitness: NDArray[np.float64]
+    ) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
         fittest_operator = keys[np.argmax(mean_fit)]
         return fittest_operator
 
-    def set_strategy(
-        self,
-        selection_opers: Tuple = (
-            "proportional",
-            "rank",
-            "tournament_3",
-            "tournament_5",
-            "tournament_7",
-        ),
-        crossover_opers: Tuple = (
-            "empty",
-            "one_point",
-            "two_point",
-            "uniform2",
-            "uniform7",
-            "uniform_prop2",
-            "uniform_prop7",
-            "uniform_rank2",
-            "uniform_rank7",
-            "uniform_tour3",
-            "uniform_tour7",
-        ),
-        mutation_opers: Tuple = ("weak", "average", "strong"),
-        tour_size_param: int = 2,
-        initial_population: Optional[NDArray[np.byte]] = None,
-        elitism_param: bool = True,
-        parents_num_param: int = 7,
-        mutation_rate_param: float = 0.05,
-        K_param: float = 2,
-        threshold_param: float = 0.05,
-    ) -> None:
-        """
-        - selection_oper: must be a Tuple of:
-            'proportional', 'rank', 'tournament_k', 'tournament_3', 'tournament_5', 'tournament_7'
-        - crossover oper: must be a Tuple of:
-            'empty', 'one_point', 'two_point', 'uniform2', 'uniform7', 'uniformk', 'uniform_prop2',
-            'uniform_prop7', 'uniform_propk', 'uniform_rank2', 'uniform_rank7', 'uniform_rankk',
-            'uniform_tour3', 'uniform_tour7', 'uniform_tourk'
-        - mutation oper: must be a Tuple of:
-            'weak', 'average', 'strong', 'custom_rate'
-        """
-        self._tour_size = tour_size_param
-        self._initial_population = initial_population
-        self._elitism = elitism_param
-        self._parents_num = parents_num_param
-        self._mutation_rate = mutation_rate_param
-        self._K = K_param
-        self._threshold = threshold_param
+    def _update_data(self: SelfCGA) -> None:
+        self._update_fittest(self._population_g_i, self._population_ph_i, self._fitness_i)
+        self._update_stats(
+            population_g=self._population_ph_i,
+            fitness_max=self._thefittest._fitness,
+            s_proba=self._selection_proba,
+            c_proba=self._crossover_proba,
+            m_proba=self._mutation_proba,
+        )
 
-        self._update_pool()
+    def _update_proba(self: SelfCGA) -> None:
+        s_fittest_oper = self._find_fittest_operator(
+            self._selection_operators, self._fitness_scale_i
+        )
+        self._selection_proba = self._get_new_proba(self._selection_proba, s_fittest_oper)
 
-        selection_set = {}
-        for operator_name in selection_opers:
-            value = self._selection_pool[operator_name]
-            selection_set[operator_name] = value
-        self._selection_set = dict(sorted(selection_set.items()))
+        c_fittest_oper = self._find_fittest_operator(
+            self._crossover_operators, self._fitness_scale_i
+        )
+        self._crossover_proba = self._get_new_proba(self._crossover_proba, c_fittest_oper)
 
-        crossover_set = {}
-        for operator_name in crossover_opers:
-            value = self._crossover_pool[operator_name]
-            crossover_set[operator_name] = value
-        self._crossover_set = dict(sorted(crossover_set.items()))
+        m_fittest_oper = self._find_fittest_operator(
+            self._mutation_operators, self._fitness_scale_i
+        )
+        self._mutation_proba = self._get_new_proba(self._mutation_proba, m_fittest_oper)
 
-        mutation_set = {}
-        for operator_name in mutation_opers:
-            value = self._mutation_pool[operator_name]
-            mutation_set[operator_name] = value
-        self._mutation_set = dict(sorted(mutation_set.items()))
+    def _get_new_population(self: SelfCGA) -> None:
+        self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
+        self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
+        self._mutation_operators = self._choice_operators(proba_dict=self._mutation_proba)
 
-    def fit(self) -> SelfCGA:
-        z_selection = len(self._selection_set)
-        z_crossover = len(self._crossover_set)
-        z_mutation = len(self._mutation_set)
+        get_new_individ_g = partial(
+            self._get_new_individ_g,
+            self._population_g_i,
+            self._fitness_scale_i,
+            self._fitness_rank_i,
+        )
 
-        s_proba = dict(zip(list(self._selection_set.keys()), np.full(z_selection, 1 / z_selection)))
-        if "empty" in self._crossover_set.keys():
-            c_proba = dict(
-                zip(list(self._crossover_set.keys()), np.full(z_crossover, 0.9 / (z_crossover - 1)))
-            )
-            c_proba["empty"] = 0.1
-        else:
-            c_proba = dict(
-                zip(list(self._crossover_set.keys()), np.full(z_crossover, 1 / z_crossover))
-            )
-        m_proba = dict(zip(list(self._mutation_set.keys()), np.full(z_mutation, 1 / z_mutation)))
-
-        if self._initial_population is None:
-            population_g = binary_string_population(self._pop_size, self._str_len)
-        else:
-            population_g = self._initial_population.copy()
-
-        for i in range(self._iters):
-            s_operators: NDArray
-            c_operators: NDArray
-            m_operators: NDArray
-
-            population_ph = self._get_phenotype(population_g)
-            fitness = self._get_fitness(population_ph)
-
-            self._update_fittest(population_g, population_ph, fitness)
-            self._update_stats(
-                population_g=population_g,
-                fitness_max=self._thefittest._fitness,
-                s_proba=s_proba,
-                c_proba=c_proba,
-                m_proba=m_proba,
-            )
-            if self._elitism:
-                population_g[-1], population_ph[-1], fitness[-1] = self._thefittest.get().values()
-            fitness_scale = scale_data(fitness)
-
-            if i > 0:
-                s_fittest_oper = self._find_fittest_operator(s_operators, fitness_scale)
-                s_proba = self._update_proba(s_proba, s_fittest_oper)
-
-                c_fittest_oper = self._find_fittest_operator(c_operators, fitness_scale)
-                c_proba = self._update_proba(c_proba, c_fittest_oper)
-
-                m_fittest_oper = self._find_fittest_operator(m_operators, fitness_scale)
-                m_proba = self._update_proba(m_proba, m_fittest_oper)
-
-            self._show_progress(i)
-            if self._termitation_check():
-                break
-            else:
-                s_operators = self._choice_operators(s_proba)
-                c_operators = self._choice_operators(c_proba)
-                m_operators = self._choice_operators(m_proba)
-
-                get_new_individ_g = partial(
-                    self._selfcga_get_new_individ_g, population_g, fitness_scale, rank_data(fitness)
+        self._population_g_i = np.array(
+            [
+                get_new_individ_g(
+                    self._selection_operators[i],
+                    self._crossover_operators[i],
+                    self._mutation_operators[i],
                 )
-                map_ = map(get_new_individ_g, s_operators, c_operators, m_operators)
-                population_g = np.array(list(map_), dtype=np.byte)
+                for i in range(self._pop_size)
+            ],
+            dtype=self._population_g_i.dtype,
+        )
 
-        return self
+        self._from_population_g_to_fitness()
