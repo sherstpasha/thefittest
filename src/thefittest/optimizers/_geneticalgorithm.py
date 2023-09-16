@@ -41,6 +41,8 @@ from ..tools.transformations import scale_data
 
 
 class GeneticAlgorithm(EvolutionaryAlgorithm):
+    """Holland, J. H. (1992). Genetic algorithms. Scientific American, 267(1), 66-72"""
+
     def __init__(
         self,
         fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],

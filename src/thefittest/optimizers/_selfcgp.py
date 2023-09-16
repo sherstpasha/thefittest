@@ -15,6 +15,9 @@ from ..tools import donothing
 
 
 class SelfCGP(GeneticProgramming, SelfCGA):
+    """Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming
+    algorithm with modified uniform crossover. 1-6. http://dx.doi.org/10.1109/CEC.2012.6256587"""
+
     def __init__(
         self,
         fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],

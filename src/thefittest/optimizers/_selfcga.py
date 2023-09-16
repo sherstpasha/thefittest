@@ -16,6 +16,10 @@ from ..tools.transformations import numpy_group_by
 
 
 class SelfCGA(GeneticAlgorithm):
+    """Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform
+    Crossover Operator. LNCS, 7331, 2012, pp. 414-421. https://doi.org/10.1007/978-3-642-30976-2_50
+    """
+
     def __init__(
         self,
         fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
