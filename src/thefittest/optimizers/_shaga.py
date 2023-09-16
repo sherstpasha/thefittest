@@ -30,6 +30,8 @@ class SHAGA(EvolutionaryAlgorithm):
         iters: int,
         pop_size: int,
         str_len: int,
+        elitism: bool = True,
+        init_population: Optional[NDArray[np.byte]] = None,
         genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
@@ -43,6 +45,8 @@ class SHAGA(EvolutionaryAlgorithm):
             fitness_function=fitness_function,
             iters=iters,
             pop_size=pop_size,
+            elitism=elitism,
+            init_population=init_population,
             genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
@@ -53,65 +57,26 @@ class SHAGA(EvolutionaryAlgorithm):
         )
 
         self._str_len = str_len
-        self._H_size = pop_size
-        self._elitism: bool
-        self._initial_population: Optional[NDArray[np.byte]]
-        self.set_strategy()
+        self._MR: NDArray[np.float64]
+        self._CR: NDArray[np.float64]
+        self._H_size: int = pop_size
+        self._H_MR = np.full(self._H_size, 1 / (self._str_len), dtype=np.float64)
+        self._H_CR = np.full(self._H_size, 0.5, dtype=np.float64)
+        self._k: int = 0
 
-    def _selection_crossover_mutation(
-        self,
-        population_g: NDArray[np.byte],
-        fitness: NDArray[np.float64],
-        current: NDArray[np.byte],
-        MR: float,
-        CR: float,
-    ) -> NDArray[np.byte]:
-        second_parent_id = tournament_selection(fitness, fitness, 2, 1)[0]
-        second_parent = population_g[second_parent_id].copy()
-        offspring = binomialGA(current, second_parent, CR)
-        mutant = flip_mutation(offspring, MR)
-        return mutant
+    def _get_init_population(self: SHAGA) -> None:
+        if self._init_population is None:
+            self._population_g_i = binary_string_population(self._pop_size, self._str_len)
+        else:
+            self._population_g_i = self._init_population.copy()
 
-    def _evaluate_replace(
-        self,
-        mutant_cr_g: NDArray[np.byte],
-        population_g: NDArray[np.byte],
-        population_ph: NDArray,
-        fitness: NDArray[np.float64],
-    ) -> Tuple:
-        offspring_g = population_g.copy()
-        offspring_ph = population_ph.copy()
-        offspring_fit = fitness.copy()
-
-        mutant_cr_ph = self._get_phenotype(mutant_cr_g)
-        mutant_cr_fit = self._get_fitness(mutant_cr_ph)
-        mask_more_equal = mutant_cr_fit >= fitness
-        offspring_g[mask_more_equal] = mutant_cr_g[mask_more_equal]
-        offspring_ph[mask_more_equal] = mutant_cr_ph[mask_more_equal]
-        offspring_fit[mask_more_equal] = mutant_cr_fit[mask_more_equal]
-        mask_more = mutant_cr_fit > fitness
-        return offspring_g, offspring_ph, offspring_fit, mask_more
-
-    def _generate_MR_CR(
-        self, H_MR_i: NDArray[np.float64], H_CR_i: NDArray[np.float64], size: int
-    ) -> Tuple:
-        MR_i = np.zeros(size)
-        CR_i = np.zeros(size)
-        for i in range(size):
-            r_i = np.random.randint(0, len(H_MR_i))
-            u_MR = H_MR_i[r_i]
-            u_CR = H_CR_i[r_i]
-            MR_i[i] = self._randc(u_MR, 0.1 / self._str_len)
-            CR_i[i] = self._randn(u_CR, 0.1)
-        return MR_i, CR_i
-
-    def _randc(self, u: float, scale: float) -> NDArray[np.float64]:
+    def _randc(self: SHAGA, u: float, scale: float) -> NDArray[np.float64]:
         value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
         while value <= 0 or value > 5 / self._str_len:
             value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
         return value
 
-    def _randn(self, u: float, scale: float) -> float:
+    def _randn(self: SHAGA, u: float, scale: float) -> float:
         value = np.random.normal(u, scale)
         if value < 0:
             value = 0
@@ -119,7 +84,18 @@ class SHAGA(EvolutionaryAlgorithm):
             value = 1
         return value
 
-    def _update_u(self, u: float, S: NDArray[np.float64], df: NDArray[np.float64]) -> float:
+    def _generate_MR_CR(self: SHAGA) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+        MR_i = np.zeros(self._pop_size)
+        CR_i = np.zeros(self._pop_size)
+        for i in range(self._pop_size):
+            r_i = np.random.randint(0, self._H_size)
+            u_MR = self._H_MR[r_i]
+            u_CR = self._H_CR[r_i]
+            MR_i[i] = self._randc(u_MR, 0.1 / self._str_len)
+            CR_i[i] = self._randn(u_CR, 0.1)
+        return MR_i, CR_i
+
+    def _update_u(self: SHAGA, u: float, S: NDArray[np.float64], df: NDArray[np.float64]) -> float:
         if len(S):
             sum_ = np.sum(df)
             if sum_ > 0:
@@ -127,84 +103,61 @@ class SHAGA(EvolutionaryAlgorithm):
                 return lehmer_mean(x=S, weight=weight_i)
         return u
 
-    def set_strategy(
-        self, elitism_param: bool = True, initial_population: Optional[NDArray[np.byte]] = None
-    ) -> None:
-        self._elitism = elitism_param
-        self._initial_population = initial_population
+    def _get_new_individ_g(
+        self: SHAGA,
+        individ_g: NDArray[np.float64],
+        MR: float,
+        CR: float,
+    ) -> NDArray[np.float64]:
+        second_parent_id = tournament_selection(self._fitness_i, self._fitness_i, 2, 1)[0]
+        second_parent = self._population_g_i[second_parent_id].copy()
+        offspring = binomialGA(individ_g, second_parent, CR)
+        mutant = flip_mutation(offspring, MR)
+        return mutant
 
-    def fit(self) -> SHAGA:
-        H_MR = np.full(self._H_size, 1 / (self._str_len))
-        H_CR = np.full(self._H_size, 0.5)
-        k = 0
-        next_k = 1
+    def _get_new_population(self: SHAGA) -> None:
+        get_new_individ_g = partial(
+            self._get_new_individ_g,
+        )
+        self._MR, self._CR = self._generate_MR_CR()
 
-        if self._initial_population is None:
-            population_g = binary_string_population(self._pop_size, self._str_len)
-        else:
-            population_g = self._initial_population.copy()
-
-        population_ph = self._get_phenotype(population_g)
-        fitness = self._get_fitness(population_ph)
-        self._update_fittest(population_g, population_ph, fitness)
-        self._update_stats(
-            population_g=population_g, fitness_max=self._thefittest._fitness, H_MR=H_MR, H_CR=H_CR
+        mutant_cr_b_g = np.array(
+            [
+                get_new_individ_g(individ_g=self._population_g_i[i], MR=self._MR[i], CR=self._CR[i])
+                for i in range(self._pop_size)
+            ],
+            dtype=np.float64,
         )
 
-        for i in range(self._iters - 1):
-            self._show_progress(i)
-            if self._termitation_check():
-                break
-            else:
-                MR_i, CR_i = self._generate_MR_CR(H_MR, H_CR, self._pop_size)
+        mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)
+        mutant_cr_fit = self._get_fitness(mutant_cr_ph)
+        mask = mutant_cr_fit >= self._fitness_i
+        succeses = mutant_cr_fit > self._fitness_i
 
-                partial_operators = partial(
-                    self._selection_crossover_mutation, population_g, fitness
-                )
+        succeses_MR = self._MR[succeses]
+        succeses_CR = self._CR[succeses]
 
-                mutant_cr_g = np.array(list(map(partial_operators, population_g, MR_i, CR_i)))
+        will_be_replaced_fit = self._fitness_i[succeses].copy()
 
-                stack = self._evaluate_replace(
-                    mutant_cr_g.copy(), population_g.copy(), population_ph.copy(), fitness.copy()
-                )
+        self._population_g_i[mask] = mutant_cr_b_g[mask]
+        self._population_ph_i[mask] = mutant_cr_ph[mask]
+        self._fitness_i[mask] = mutant_cr_fit[mask]
 
-                succeses = stack[3]
-                will_be_replaced_fit = fitness[succeses].copy()
-                s_MR = MR_i[succeses]
-                s_CR = CR_i[succeses]
+        d_fitness = np.abs(will_be_replaced_fit - self._fitness_i[succeses])
 
-                population_g = stack[0]
-                population_ph = stack[1]
-                fitness = stack[2]
+        if self._k + 1 == self._H_size:
+            next_k = 0
+        else:
+            next_k = self._k + 1
 
-                df = np.abs(will_be_replaced_fit - fitness[succeses])
+        self._H_MR[next_k] = self._update_u(self._H_MR[self._k], succeses_MR, d_fitness)
+        self._H_CR[next_k] = self._update_u(self._H_CR[self._k], succeses_CR, d_fitness)
 
-                if self._elitism:
-                    (
-                        population_g[-1],
-                        population_ph[-1],
-                        fitness[-1],
-                    ) = self._thefittest.get().values()
+        if self._k == self._H_size - 1:
+            self._k = 0
+        else:
+            self._k += 1
 
-                if next_k == self._H_size:
-                    next_k = 0
-
-                H_MR[next_k] = self._update_u(H_MR[k], s_MR, df)
-                H_CR[next_k] = self._update_u(H_CR[k], s_CR, df)
-
-                if k == self._H_size - 1:
-                    k = 0
-                    next_k = 1
-                else:
-                    k += 1
-                    next_k += 1
-
-                self._update_fittest(population_g, population_ph, fitness)
-                self._update_stats(
-                    population_g=population_g,
-                    fitness_max=self._thefittest._fitness,
-                    H_MR=H_MR,
-                    H_CR=H_CR,
-                )
-
-        return self
+    def _update_data(self: SHAGA) -> None:
+        super()._update_data()
+        self._update_stats(H_MR=self._H_MR, H_CR=self._H_CR)

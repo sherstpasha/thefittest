@@ -310,8 +310,8 @@ class SampleHybridCompositionFunction:
 
 
 class OneMax(TestFunction):
-    def f(self, x: NDArray[Union[np.byte, np.float64]]) -> NDArray[Union[np.int64, np.float64]]:
-        return np.sum(x, axis=1)
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        return np.sum(x, axis=1, dtype=np.float64)
 
 
 class Sphere(TestFunction):

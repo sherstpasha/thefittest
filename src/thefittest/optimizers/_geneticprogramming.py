@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from functools import partial
 from typing import Any
 from typing import Callable
 from typing import Optional
-from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -71,18 +69,16 @@ class GeneticProgramming(GeneticAlgorithm):
         self._max_level: int = max_level
         self._init_level: int = init_level
 
-        if init_population is None:
-            self._population_g_i = half_and_half(
+    def _get_init_population(self: GeneticProgramming) -> None:
+        if self._init_population is None:
+            self._population_g_i = self._population_g_i = half_and_half(
                 pop_size=self._pop_size, uniset=self._uniset, max_level=self._init_level
             )
         else:
-            self._population_g_i = init_population.copy()
+            self._population_g_i = self._init_population.copy()
 
     def _get_new_individ_g(
         self: GeneticProgramming,
-        population_g: Union[NDArray[Any], NDArray[np.byte]],
-        fitness_scale: NDArray[np.float64],
-        fitness_rank: NDArray[np.float64],
         specified_selection: str,
         specified_crossover: str,
         specified_mutation: str,
@@ -92,13 +88,13 @@ class GeneticProgramming(GeneticAlgorithm):
         mutation_func, proba, is_constant_rate = self._mutation_pool[specified_mutation]
 
         selected_id = selection_func(
-            fitness_scale, fitness_rank, np.int64(tour_size), np.int64(quantity)
+            self._fitness_scale_i, self._fitness_rank_i, np.int64(tour_size), np.int64(quantity)
         )
 
         offspring_no_mutated = crossover_func(
-            population_g[selected_id],
-            fitness_scale[selected_id],
-            fitness_rank[selected_id],
+            self._population_g_i[selected_id],
+            self._fitness_scale_i[selected_id],
+            self._fitness_rank_i[selected_id],
             self._max_level,
         )
 

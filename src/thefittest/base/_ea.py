@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -67,6 +69,10 @@ class EvolutionaryAlgorithm:
         fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         iters: int,
         pop_size: int,
+        elitism: bool = True,
+        init_population: Optional[
+            Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
+        ] = None,
         genotype_to_phenotype: Callable[[NDArray[Any]], NDArray[Any]] = donothing,
         optimal_value: Optional[Union[float, int]] = None,
         termination_error_value: Union[float, int] = 0.0,
@@ -78,6 +84,10 @@ class EvolutionaryAlgorithm:
         self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]] = fitness_function
         self._iters: int = iters
         self._pop_size: int = pop_size
+        self._elitism: bool = elitism
+        self._init_population: Optional[
+            Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
+        ] = init_population
         self._genotype_to_phenotype: Callable = genotype_to_phenotype
         self._no_increase_num: Optional[int] = no_increase_num
         self._show_progress_each: Optional[int] = show_progress_each
@@ -90,32 +100,43 @@ class EvolutionaryAlgorithm:
         self._thefittest: TheFittest = TheFittest()
         self._stats: Statistics = Statistics()
 
+        self._population_g_i: Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
+        self._population_ph_i: NDArray
+        self._fitness_i: NDArray[np.float64]
+
+    def _get_init_population(self: EvolutionaryAlgorithm) -> None:
+        return None
+
     def _get_aim(
-        self, optimal_value: Optional[Union[float, int]], termination_error_value: Union[float, int]
+        self: EvolutionaryAlgorithm,
+        optimal_value: Optional[Union[float, int]],
+        termination_error_value: Union[float, int],
     ) -> Union[float, int]:
         if optimal_value is not None:
             return self._sign * optimal_value - termination_error_value
         else:
             return np.inf
 
-    def _get_fitness(self, population_ph: NDArray[Any]) -> NDArray[np.float64]:
+    def _get_fitness(
+        self: EvolutionaryAlgorithm, population_ph: NDArray[Any]
+    ) -> NDArray[np.float64]:
         self._calls += len(population_ph)
         return self._sign * self._fitness_function(population_ph)
 
-    def _show_progress(self, current_iter: int) -> None:
+    def _show_progress(self: EvolutionaryAlgorithm, current_iter: int) -> None:
         if self._show_progress_each is not None:
             cond_show_now = current_iter % self._show_progress_each == 0
             if cond_show_now:
                 current_best = self._sign * self._thefittest._fitness
                 print(f"{current_iter} iteration with fitness = {current_best}")
 
-    def _termitation_check(self) -> bool:
+    def _termitation_check(self: EvolutionaryAlgorithm) -> bool:
         cond_aim = self._thefittest._fitness >= self._aim
         cond_no_increase = self._thefittest._no_update_counter == self._no_increase_num
         return bool(cond_aim or cond_no_increase)
 
     def _update_fittest(
-        self,
+        self: EvolutionaryAlgorithm,
         population_g: NDArray[Any],
         population_ph: NDArray[Any],
         fitness: NDArray[np.float64],
@@ -124,23 +145,55 @@ class EvolutionaryAlgorithm:
             population_g=population_g, population_ph=population_ph, fitness=fitness
         )
 
-    def _update_stats(self, **kwargs: Any) -> None:
+    def _update_stats(self: EvolutionaryAlgorithm, **kwargs: Any) -> None:
         if self._keep_history:
             self._stats._update(kwargs)
 
     def _get_phenotype(self, popultion_g: NDArray[Any]) -> NDArray[Any]:
         return self._genotype_to_phenotype(popultion_g)
 
-    def get_remains_calls(self) -> int:
+    def get_remains_calls(self: EvolutionaryAlgorithm) -> int:
         return (self._pop_size * self._iters) - self._calls
 
-    def get_fittest(self) -> TheFittest:
-        return self._thefittest
+    def get_fittest(self: EvolutionaryAlgorithm) -> Dict:
+        return self._thefittest.get()
 
-    def get_stats(self) -> Statistics:
+    def get_stats(self: EvolutionaryAlgorithm) -> Statistics:
         return self._stats
 
-    def clear(self) -> None:
-        self._calls = 0
-        self._thefittest = TheFittest()
-        self._stats = Statistics()
+    def _update_data(self: EvolutionaryAlgorithm) -> None:
+        self._update_fittest(self._population_g_i, self._population_ph_i, self._fitness_i)
+        self._update_stats(population_g=self._population_g_i, fitness_max=self._thefittest._fitness)
+
+    def _adapt(self: EvolutionaryAlgorithm) -> None:
+        return None
+
+    def _from_population_g_to_fitness(self: EvolutionaryAlgorithm) -> None:
+        self._population_ph_i = self._get_phenotype(self._population_g_i)
+        self._fitness_i = self._get_fitness(self._population_ph_i)
+
+        self._update_data()
+
+        if self._elitism:
+            (
+                self._population_g_i[-1],
+                self._population_ph_i[-1],
+                self._fitness_i[-1],
+            ) = self._thefittest.get().values()
+
+    def _get_new_population(self: EvolutionaryAlgorithm) -> None:
+        return None
+
+    def fit(self: EvolutionaryAlgorithm) -> EvolutionaryAlgorithm:
+        self._get_init_population()
+        self._from_population_g_to_fitness()
+
+        for i in range(self._iters - 1):
+            self._show_progress(i)
+            if self._termitation_check():
+                break
+            else:
+                self._get_new_population()
+                self._from_population_g_to_fitness()
+
+        return self

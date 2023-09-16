@@ -8,10 +8,8 @@ from ..base._ea import TheFittest
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 from ..optimizers import GeneticProgramming
-from ..optimizers import JADE
 from ..optimizers import SHADE
 from ..optimizers import SHAGA
-from ..optimizers import SaDE2005
 from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE

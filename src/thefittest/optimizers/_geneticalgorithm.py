@@ -69,6 +69,8 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             genotype_to_phenotype=genotype_to_phenotype,
             iters=iters,
             pop_size=pop_size,
+            elitism=elitism,
+            init_population=init_population,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
             no_increase_num=no_increase_num,
@@ -80,7 +82,6 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         self._tour_size: int = tour_size
         self._parents_num: int = parents_num
         self._mutation_rate: float = mutation_rate
-        self._elitism: bool = elitism
         self._specified_selection: str = selection
         self._specified_crossover: str = crossover
         self._specified_mutation: str = mutation
@@ -149,23 +150,17 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             "gp_custom_rate_shrink": (shrink_mutation, self._mutation_rate, True),
         }
 
-        self._population_g_i: Union[NDArray[Any], NDArray[np.byte]]
-
-        if init_population is None:
-            self._population_g_i = binary_string_population(self._pop_size, self._str_len)
-        else:
-            self._population_g_i = init_population.copy()
-
-        self._population_ph_i: NDArray
-        self._fitness_i: NDArray[np.float64]
         self._fitness_scale_i: NDArray[np.float64]
         self._fitness_rank_i: NDArray[np.float64]
 
+    def _get_init_population(self: GeneticAlgorithm) -> None:
+        if self._init_population is None:
+            self._population_g_i = binary_string_population(self._pop_size, self._str_len)
+        else:
+            self._population_g_i = self._init_population.copy()
+
     def _get_new_individ_g(
         self: GeneticAlgorithm,
-        population_g: Union[NDArray[Any], NDArray[np.byte]],
-        fitness_scale: NDArray[np.float64],
-        fitness_rank: NDArray[np.float64],
         specified_selection: str,
         specified_crossover: str,
         specified_mutation: str,
@@ -175,11 +170,13 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         mutation_func, proba, is_constant_rate = self._mutation_pool[specified_mutation]
 
         selected_id = selection_func(
-            fitness_scale, fitness_rank, np.int64(tour_size), np.int64(quantity)
+            self._fitness_scale_i, self._fitness_rank_i, np.int64(tour_size), np.int64(quantity)
         )
 
         offspring_no_mutated = crossover_func(
-            population_g[selected_id], fitness_scale[selected_id], fitness_rank[selected_id]
+            self._population_g_i[selected_id],
+            self._fitness_scale_i[selected_id],
+            self._fitness_rank_i[selected_id],
         )
 
         if is_constant_rate:
@@ -193,9 +190,6 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
     def _get_new_population(self: GeneticAlgorithm) -> None:
         get_new_individ_g = partial(
             self._get_new_individ_g,
-            self._population_g_i,
-            self._fitness_scale_i,
-            self._fitness_rank_i,
             self._specified_selection,
             self._specified_crossover,
             self._specified_mutation,
@@ -205,43 +199,10 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             [get_new_individ_g() for _ in range(self._pop_size)], dtype=self._population_g_i.dtype
         )
 
-        self._from_population_g_to_fitness()
-
-    def _update_data(self: GeneticAlgorithm) -> None:
-        self._update_fittest(self._population_g_i, self._population_ph_i, self._fitness_i)
-        self._update_stats(
-            population_g=self._population_ph_i, fitness_max=self._thefittest._fitness
-        )
-
-    def _update_proba(self: GeneticAlgorithm) -> None:
-        return None
-
     def _from_population_g_to_fitness(self: GeneticAlgorithm) -> None:
-        self._population_ph_i = self._get_phenotype(self._population_g_i)
-        self._fitness_i = self._get_fitness(self._population_ph_i)
-
-        self._update_data()
-
-        if self._elitism:
-            (
-                self._population_g_i[-1],
-                self._population_ph_i[-1],
-                self._fitness_i[-1],
-            ) = self._thefittest.get().values()
+        super()._from_population_g_to_fitness()
 
         self._fitness_scale_i = scale_data(self._fitness_i)
         self._fitness_rank_i = rank_data(self._fitness_i)
 
-        self._update_proba()
-
-    def fit(self: GeneticAlgorithm) -> GeneticAlgorithm:
-        self._from_population_g_to_fitness()
-
-        for i in range(self._iters - 1):
-            self._show_progress(i)
-            if self._termitation_check():
-                break
-            else:
-                self._get_new_population()
-
-        return self
+        self._adapt()

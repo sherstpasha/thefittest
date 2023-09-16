@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import partial
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -171,7 +170,7 @@ class SelfCGA(GeneticAlgorithm):
             m_proba=self._mutation_proba,
         )
 
-    def _update_proba(self: SelfCGA) -> None:
+    def _adapt(self: SelfCGA) -> None:
         s_fittest_oper = self._find_fittest_operator(
             self._selection_operators, self._fitness_scale_i
         )
@@ -192,16 +191,9 @@ class SelfCGA(GeneticAlgorithm):
         self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
         self._mutation_operators = self._choice_operators(proba_dict=self._mutation_proba)
 
-        get_new_individ_g = partial(
-            self._get_new_individ_g,
-            self._population_g_i,
-            self._fitness_scale_i,
-            self._fitness_rank_i,
-        )
-
         self._population_g_i = np.array(
             [
-                get_new_individ_g(
+                self._get_new_individ_g(
                     self._selection_operators[i],
                     self._crossover_operators[i],
                     self._mutation_operators[i],
@@ -210,5 +202,3 @@ class SelfCGA(GeneticAlgorithm):
             ],
             dtype=self._population_g_i.dtype,
         )
-
-        self._from_population_g_to_fitness()

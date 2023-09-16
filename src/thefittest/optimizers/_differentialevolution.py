@@ -3,8 +3,9 @@ from __future__ import annotations
 from functools import partial
 from typing import Any
 from typing import Callable
+from typing import Dict
 from typing import Optional
-from typing import Tuple
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -34,6 +35,11 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         pop_size: int,
         left: NDArray[np.float64],
         right: NDArray[np.float64],
+        mutation: str = "rand_1",
+        F: float = 0.5,
+        CR: float = 0.5,
+        elitism: bool = True,
+        init_population: Optional[NDArray[np.float64]] = None,
         genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
@@ -47,6 +53,8 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             fitness_function=fitness_function,
             iters=iters,
             pop_size=pop_size,
+            elitism=elitism,
+            init_population=init_population,
             genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
@@ -56,19 +64,13 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             keep_history=keep_history,
         )
 
-        self._left = left
-        self._right = right
-        self._initial_population: Optional[NDArray[np.float64]]
-        self._mutation_pool: dict
-        self._specified_mutation: Callable
-        self._F: float
-        self._CR: float
-        self._elitism: bool
+        self._left: NDArray[np.float64] = left
+        self._right: NDArray[np.float64] = right
+        self._specified_mutation: str = mutation
+        self._F: Union[float, NDArray[np.float64]] = F
+        self._CR: Union[float, NDArray[np.float64]] = CR
 
-        self.set_strategy()
-
-    def _update_pool(self) -> None:
-        self._mutation_pool = {
+        self._mutation_pool: Dict[str, Callable] = {
             "best_1": best_1,
             "rand_1": rand_1,
             "current_to_best_1": current_to_best_1,
@@ -77,89 +79,60 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             "rand_2": rand_2,
         }
 
-    def _mutation_and_crossover(
-        self, popuation_g: NDArray[np.float64], individ_g: NDArray[np.float64], F: float, CR: float
-    ) -> NDArray[np.float64]:
-        mutant = self._specified_mutation(
-            individ_g, self._thefittest._genotype, popuation_g, np.float64(F)
-        )
-        mutant_cr_g = binomial(individ_g, mutant, np.float64(CR))
-        mutant_cr_g = bounds_control(mutant_cr_g, self._left, self._right)
-        return mutant_cr_g
-
-    def _evaluate_and_selection(
-        self,
-        mutant_cr_g: NDArray[np.float64],
-        population_g: NDArray[np.float64],
-        population_ph: NDArray[Any],
-        fitness: NDArray[np.float64],
-    ) -> Tuple:
-        offspring_g = population_g.copy()
-        offspring_ph = population_ph.copy()
-        offspring_fit = fitness.copy()
-
-        mutant_cr_ph = self._get_phenotype(mutant_cr_g)
-        mutant_cr_fit = self._get_fitness(mutant_cr_ph)
-        mask = mutant_cr_fit >= fitness
-        offspring_g[mask] = mutant_cr_g[mask]
-        offspring_ph[mask] = mutant_cr_ph[mask]
-        offspring_fit[mask] = mutant_cr_fit[mask]
-        return offspring_g, offspring_ph, offspring_fit, mask
-
-    def set_strategy(
-        self,
-        mutation_oper: str = "rand_1",
-        F_param: float = 0.5,
-        CR_param: float = 0.5,
-        elitism_param: bool = True,
-        initial_population: Optional[NDArray[np.float64]] = None,
-    ) -> None:
-        """
-        - mutation oper: must be a Tuple of:
-            'best_1', 'rand_1', 'current_to_best_1',
-            'rand_to_best1', 'best_2', 'rand_2'
-        """
-        self._update_pool()
-        self._specified_mutation = self._mutation_pool[mutation_oper]
-        self._F = F_param
-        self._CR = CR_param
-        self._elitism = elitism_param
-        self._initial_population = initial_population
-
-    def fit(self) -> DifferentialEvolution:
-        if self._initial_population is None:
-            population_g = float_population(self._pop_size, self._left, self._right)
+    def _get_init_population(self: DifferentialEvolution) -> None:
+        if self._init_population is None:
+            self._population_g_i = float_population(
+                pop_size=self._pop_size, left=self._left, right=self._right
+            )
         else:
-            population_g = self._initial_population.copy()
+            self._population_g_i = self._init_population.copy()
 
-        population_ph = self._get_phenotype(population_g)
-        fitness = self._get_fitness(population_ph)
-        self._update_fittest(population_g, population_ph, fitness)
-        self._update_stats(population_g=population_g, fitness_max=self._thefittest._fitness)
+        self._population_ph_i = self._get_phenotype(self._population_g_i)
+        self._fitness_i = self._get_fitness(self._population_ph_i)
 
-        for i in range(self._iters - 1):
-            self._show_progress(i)
-            if self._termitation_check():
-                break
-            else:
-                F_i = [self._F] * self._pop_size
-                CR_i = [self._CR] * self._pop_size
+    def _get_new_individ_g(
+        self: DifferentialEvolution,
+        individ_g: NDArray[np.float64],
+        F: float,
+        CR: float,
+    ) -> NDArray[np.float64]:
+        mutation_func = self._mutation_pool[self._specified_mutation]
 
-                mutation_and_crossover = partial(self._mutation_and_crossover, population_g)
-                mutant_cr_g = np.array(list(map(mutation_and_crossover, population_g, F_i, CR_i)))
+        mutant_g = mutation_func(
+            individ_g, self._thefittest._genotype, self._population_g_i, np.float64(F)
+        )
 
-                stack = self._evaluate_and_selection(
-                    mutant_cr_g, population_g, population_ph, fitness
-                )
-                population_g, population_ph, fitness, _ = stack
+        mutant_cr_g = binomial(individ_g, mutant_g, np.float64(CR))
+        return bounds_control(mutant_cr_g, self._left, self._right)
 
-                if self._elitism:
-                    (
-                        population_g[-1],
-                        population_ph[-1],
-                        fitness[-1],
-                    ) = self._thefittest.get().values()
-                self._update_fittest(population_g, population_ph, fitness)
-                self._update_stats(population_g=population_g, fitness_max=self._thefittest._fitness)
+    def _get_new_population(self: DifferentialEvolution) -> None:
+        get_new_individ_g = partial(
+            self._get_new_individ_g,
+            F=self._F,
+            CR=self._CR,
+        )
 
-        return self
+        mutant_cr_b_g = np.array(
+            [get_new_individ_g(individ_g=self._population_g_i[i]) for i in range(self._pop_size)],
+            dtype=np.float64,
+        )
+
+        mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)
+        mutant_cr_fit = self._get_fitness(mutant_cr_ph)
+        mask = mutant_cr_fit >= self._fitness_i
+
+        self._population_g_i[mask] = mutant_cr_b_g[mask]
+        self._population_ph_i[mask] = mutant_cr_ph[mask]
+        self._fitness_i[mask] = mutant_cr_fit[mask]
+
+    def _from_population_g_to_fitness(self: EvolutionaryAlgorithm) -> None:
+        self._update_data()
+
+        if self._elitism:
+            (
+                self._population_g_i[-1],
+                self._population_ph_i[-1],
+                self._fitness_i[-1],
+            ) = self._thefittest.get().values()
+
+        self._adapt()

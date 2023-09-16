@@ -3,9 +3,7 @@ from typing import Union
 from ._differentialevolution import DifferentialEvolution
 from ._geneticalgorithm import GeneticAlgorithm
 from ._geneticprogramming import GeneticProgramming
-from ._jade import JADE
 from ._jde import jDE
-from ._sade2005 import SaDE2005
 from ._selfaga import SelfAGA
 from ._selfcga import SelfCGA
 from ._selfcgp import SelfCGP
@@ -18,9 +16,9 @@ _optimizer_tree_type = [GeneticProgramming, SelfCGP]
 OptimizerTreeType = Union[GeneticProgramming, SelfCGP]
 
 
-optimizer_real_coded = [DifferentialEvolution, JADE, SHADE, jDE, SaDE2005]
+optimizer_real_coded = [DifferentialEvolution, SHADE, jDE]
 
-OptimizerRealCoded = Union[DifferentialEvolution, JADE, SHADE, jDE, SaDE2005]
+OptimizerRealCoded = Union[DifferentialEvolution, SHADE, jDE]
 
 optimizer_binary_coded = [GeneticAlgorithm, SelfCGA, SHAGA, SelfAGA]
 
@@ -38,9 +36,7 @@ __all__ = [
     "DifferentialEvolution",
     "GeneticAlgorithm",
     "GeneticProgramming",
-    "JADE",
     "jDE",
-    "SaDE2005",
     "SelfAGA",
     "SelfCGA",
     "SelfCGP",

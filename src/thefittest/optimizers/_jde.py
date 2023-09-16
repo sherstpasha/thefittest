@@ -10,7 +10,6 @@ from numpy.typing import NDArray
 
 from ._differentialevolution import DifferentialEvolution
 from ..tools import donothing
-from ..tools.random import float_population
 
 
 class jDE(DifferentialEvolution):
@@ -26,6 +25,13 @@ class jDE(DifferentialEvolution):
         pop_size: int,
         left: NDArray[np.float64],
         right: NDArray[np.float64],
+        mutation: str = "rand_1",
+        F_min: float = 0.1,
+        F_max: float = 0.9,
+        t_F: float = 0.1,
+        t_CR: float = 0.1,
+        elitism: bool = True,
+        init_population: Optional[NDArray[np.float64]] = None,
         genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
@@ -41,6 +47,9 @@ class jDE(DifferentialEvolution):
             pop_size=pop_size,
             left=left,
             right=right,
+            mutation=mutation,
+            elitism=elitism,
+            init_population=init_population,
             genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
@@ -50,104 +59,56 @@ class jDE(DifferentialEvolution):
             keep_history=keep_history,
         )
 
-        self._F_left: float
-        self._F_right: float
-        self._t_f: float
-        self._t_cr: float
+        self._F_min: float = F_min
+        self._F_max: float = F_max
+        self._t_F: float = t_F
+        self._t_CR: float = t_CR
 
-        self.set_strategy()
+        self._F: NDArray[np.float64] = np.full(self._pop_size, 0.5, dtype=np.float64)
+        self._CR: NDArray[np.float64] = np.full(self._pop_size, 0.9, dtype=np.float64)
 
-    def _get_new_F(self, F: NDArray[np.float64]) -> NDArray[np.float64]:
-        F = F.copy()
-        mask = np.random.random(size=len(F)) < self._t_f
-
-        random_values = np.random.random(size=np.sum(mask))
-        F[mask] = self._F_left + random_values * self._F_right
-        return F
-
-    def _get_new_CR(self, CR: NDArray[np.float64]) -> NDArray[np.float64]:
-        CR = CR.copy()
-        mask = np.random.random(size=len(CR)) < self._t_cr
+    def _get_mutate_F(self: jDE) -> NDArray[np.float64]:
+        mutate_F = self._F.copy()
+        mask = np.random.random(size=self._pop_size) < self._t_F
 
         random_values = np.random.random(size=np.sum(mask))
-        CR[mask] = random_values
-        return CR
+        mutate_F[mask] = self._F_min + random_values * self._F_max
+        return mutate_F
 
-    def set_strategy(
-        self,
-        mutation_oper: str = "rand_1",
-        F_left_param: float = 0.1,
-        F_right_param: float = 0.9,
-        t_f_param: float = 0.1,
-        t_cr_param: float = 0.1,
-        elitism_param: bool = True,
-        initial_population: Optional[NDArray[np.float64]] = None,
-    ) -> None:
-        """
-        - mutation oper: must be a Tuple of:
-            'best_1', 'rand_1', 'current_to_best_1', 'current_to_pbest_1',
-            'rand_to_best1', 'best_2', 'rand_2'
-        """
-        self._update_pool()
-        self._specified_mutation = self._mutation_pool[mutation_oper]
-        self._F_left = F_left_param
-        self._F_right = F_right_param
-        self._t_f = t_f_param
-        self._t_cr = t_cr_param
-        self._elitism = elitism_param
-        self._initial_population = initial_population
+    def _get_mutate_CR(self: jDE) -> NDArray[np.float64]:
+        mutate_CR = self._CR.copy()
+        mask = np.random.random(size=self._pop_size) < self._t_CR
 
-    def fit(self) -> jDE:
-        if self._initial_population is None:
-            population_g = float_population(self._pop_size, self._left, self._right)
-        else:
-            population_g = self._initial_population.copy()
+        random_values = np.random.random(size=np.sum(mask))
+        mutate_CR[mask] = random_values
+        return mutate_CR
 
-        population_ph = self._get_phenotype(population_g)
-        fitness = self._get_fitness(population_ph)
-
-        F_i = np.full(self._pop_size, 0.5)
-        CR_i = np.full(self._pop_size, 0.9)
-
-        self._update_fittest(population_g, population_ph, fitness)
-        self._update_stats(
-            population_g=population_g, fitness_max=self._thefittest._fitness, F=F_i, CR=CR_i
+    def _get_new_population(self: jDE) -> None:
+        get_new_individ_g = partial(
+            self._get_new_individ_g,
         )
 
-        for i in range(self._iters - 1):
-            self._show_progress(i)
-            if self._termitation_check():
-                break
-            else:
-                F_i_new = self._get_new_F(F_i)
-                CR_i_new = self._get_new_CR(CR_i)
+        mutate_F = self._get_mutate_F()
+        mutate_CR = self._get_mutate_CR()
 
-                mutation_and_crossover = partial(self._mutation_and_crossover, population_g)
-                mutant_cr_g = np.array(
-                    list(map(mutation_and_crossover, population_g, F_i_new, CR_i_new))
-                )
+        mutant_cr_b_g = np.array(
+            [
+                get_new_individ_g(individ_g=self._population_g_i[i], F=mutate_F[i], CR=mutate_CR[i])
+                for i in range(self._pop_size)
+            ],
+            dtype=np.float64,
+        )
 
-                stack = self._evaluate_and_selection(
-                    mutant_cr_g, population_g, population_ph, fitness
-                )
-                population_g = stack[0]
-                population_ph = stack[1]
-                fitness = stack[2]
+        mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)
+        mutant_cr_fit = self._get_fitness(mutant_cr_ph)
+        mask = mutant_cr_fit >= self._fitness_i
 
-                succeses = stack[3]
-                F_i[succeses] = F_i_new[succeses]
-                CR_i[succeses] = CR_i_new[succeses]
+        self._population_g_i[mask] = mutant_cr_b_g[mask]
+        self._population_ph_i[mask] = mutant_cr_ph[mask]
+        self._fitness_i[mask] = mutant_cr_fit[mask]
+        self._F[mask] = mutate_F[mask]
+        self._CR[mask] = mutate_CR[mask]
 
-                if self._elitism:
-                    (
-                        population_g[-1],
-                        population_ph[-1],
-                        fitness[-1],
-                    ) = self._thefittest.get().values()
-
-                self._update_fittest(population_g, population_ph, fitness)
-                self._update_stats(
-                    population_g=population_g, fitness_max=self._thefittest._fitness, F=F_i, CR=CR_i
-                )
-
-        return self
+    def _update_data(self: jDE) -> None:
+        super()._update_data()
+        self._update_stats(F=self._F, CR=self._CR)
