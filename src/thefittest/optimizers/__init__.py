@@ -4,7 +4,6 @@ from ._differentialevolution import DifferentialEvolution
 from ._geneticalgorithm import GeneticAlgorithm
 from ._geneticprogramming import GeneticProgramming
 from ._jde import jDE
-from ._selfaga import SelfAGA
 from ._selfcga import SelfCGA
 from ._selfcgp import SelfCGP
 from ._shade import SHADE
@@ -20,9 +19,9 @@ optimizer_real_coded = [DifferentialEvolution, SHADE, jDE]
 
 OptimizerRealCoded = Union[DifferentialEvolution, SHADE, jDE]
 
-optimizer_binary_coded = [GeneticAlgorithm, SelfCGA, SHAGA, SelfAGA]
+optimizer_binary_coded = [GeneticAlgorithm, SelfCGA, SHAGA]
 
-OptimizerBinaryCoded = Union[GeneticAlgorithm, SelfCGA, SHAGA, SelfAGA]
+OptimizerBinaryCoded = Union[GeneticAlgorithm, SelfCGA, SHAGA]
 
 optimizer_string_type = optimizer_real_coded + optimizer_binary_coded
 
@@ -37,7 +36,6 @@ __all__ = [
     "GeneticAlgorithm",
     "GeneticProgramming",
     "jDE",
-    "SelfAGA",
     "SelfCGA",
     "SelfCGP",
     "SHADE",
