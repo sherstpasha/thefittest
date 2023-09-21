@@ -1,8 +1,6 @@
 import os
-from typing import Any
 from typing import Callable
 from typing import Tuple
-from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray

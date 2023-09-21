@@ -184,57 +184,58 @@ def test_symbolicregression17():
     F15(X)
 
 
-# def test_CEC2005():
-#     iters = 10
-#     pop_size = 10
+def test_CEC2005():
+    iters = 10
+    pop_size = 10
 
-#     for problem in problems_dict.values():
-#         n_dimension = 2
-#         sample_size = 100
+    for problem in problems_dict.values():
+        n_dimension = 2
+        sample_size = 100
 
-#         left_scalar = problem["bounds"][0]
-#         right_scalar = problem["bounds"][1]
+        left_scalar = problem["bounds"][0]
+        right_scalar = problem["bounds"][1]
 
-#         X = np.array(
-#             [np.linspace(left_scalar, right_scalar, sample_size) for _ in range(n_dimension)],
-#             dtype=np.float64,
-#         ).T
+        X = np.array(
+            [np.linspace(left_scalar, right_scalar, sample_size) for _ in range(n_dimension)],
+            dtype=np.float64,
+        ).T
 
-#         function = problem["function"]()
+        function = problem["function"]()
 
-#         function.build_grid(x=X[:, 0], y=X[:, 1])
+        function.build_grid(x=X[:, 0], y=X[:, 1])
 
-#         for dim in problem["dimentions"]:
-#             print(problem, dim)
+        for dim in problem["dimentions"]:
+            print(problem, dim)
 
-#             left = np.full(shape=dim, fill_value=left_scalar, dtype=np.float64)
-#             right = np.full(shape=dim, fill_value=right_scalar, dtype=np.float64)
+            left = np.full(shape=dim, fill_value=left_scalar, dtype=np.float64)
+            right = np.full(shape=dim, fill_value=right_scalar, dtype=np.float64)
 
-#             model = DifferentialEvolution(
-#                 fitness_function=function,
-#                 iters=iters,
-#                 pop_size=pop_size,
-#                 left=left,
-#                 right=right,
-#                 minimization=True,
-#             )
+            optimizer_args = {
+                "fitness_function": function,
+                "iters": iters,
+                "pop_size": pop_size,
+                "left": left,
+                "right": right,
+                "minimization": True,
+            }
 
-#             if "init_bounds" in problem.keys():
-#                 init_left_scalar = problem["init_bounds"][1]
-#                 init_left = np.full(shape=dim, fill_value=init_left_scalar, dtype=np.float64)
-#                 init_right_scalar = problem["init_bounds"][1]
-#                 init_right = np.full(shape=dim, fill_value=init_right_scalar, dtype=np.float64)
+            if "init_bounds" in problem.keys():
+                init_left_scalar = problem["init_bounds"][1]
+                init_left = np.full(shape=dim, fill_value=init_left_scalar, dtype=np.float64)
+                init_right_scalar = problem["init_bounds"][1]
+                init_right = np.full(shape=dim, fill_value=init_right_scalar, dtype=np.float64)
 
-#                 initial_population = float_population(
-#                     pop_size=pop_size, left=init_left, right=init_right
-#                 )
+                initial_population = float_population(
+                    pop_size=pop_size, left=init_left, right=init_right
+                )
 
-#                 model.set_strategy(initial_population=initial_population)
+                optimizer_args["init_population"] = initial_population
 
-#             model.fit()
+            optimizer = DifferentialEvolution(**optimizer_args)
+            optimizer.fit()
 
-#     problem = OneMax()
+    problem = OneMax()
 
-#     model = GeneticAlgorithm(fitness_function=problem, iters=iters, pop_size=pop_size, str_len=100)
+    model = GeneticAlgorithm(fitness_function=problem, iters=iters, pop_size=pop_size, str_len=100)
 
-#     model.fit()
+    model.fit()
