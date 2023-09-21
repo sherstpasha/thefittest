@@ -69,6 +69,8 @@ class SHAGA(EvolutionaryAlgorithm):
             self._population_g_i = binary_string_population(self._pop_size, self._str_len)
         else:
             self._population_g_i = self._init_population.copy()
+        self._population_ph_i = self._get_phenotype(self._population_g_i)
+        self._fitness_i = self._get_fitness(self._population_ph_i)
 
     def _randc(self: SHAGA, u: float, scale: float) -> NDArray[np.float64]:
         value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
@@ -161,3 +163,15 @@ class SHAGA(EvolutionaryAlgorithm):
     def _update_data(self: SHAGA) -> None:
         super()._update_data()
         self._update_stats(H_MR=self._H_MR, H_CR=self._H_CR)
+
+    def _from_population_g_to_fitness(self: EvolutionaryAlgorithm) -> None:
+        self._update_data()
+
+        if self._elitism:
+            (
+                self._population_g_i[-1],
+                self._population_ph_i[-1],
+                self._fitness_i[-1],
+            ) = self._thefittest.get().values()
+
+        self._adapt()

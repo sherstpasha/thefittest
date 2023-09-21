@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 from typing import Any
 from typing import Union
@@ -17,9 +19,9 @@ from .random import random_sample
 from .random import random_weighted_sample
 from .random import sattolo_shuffle
 from .transformations import common_region
+from ..base import EphemeralNode
 from ..base import FunctionalNode
 from ..base import TerminalNode
-from ..base import EphemeralNode
 from ..base import Tree
 from ..base import UniversalSet
 from ..base._tree import Operator
@@ -453,7 +455,7 @@ def uniform_rank_crossover_GP(
     return to_return
 
 
-def  uniform_tour_crossover_GP(
+def uniform_tour_crossover_GP(
     individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     to_return = Tree([], [])

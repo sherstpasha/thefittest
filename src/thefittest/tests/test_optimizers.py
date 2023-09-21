@@ -4,7 +4,6 @@ from ..base import EphemeralNode
 from ..base import FunctionalNode
 from ..base import TerminalNode
 from ..base import UniversalSet
-from ..base._ea import TheFittest
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 from ..optimizers import GeneticProgramming
@@ -18,18 +17,6 @@ from ..tools.operators import Add
 from ..tools.operators import Div
 from ..tools.operators import Mul
 from ..tools.operators import Neg
-from ..tools.operators import best_1
-from ..tools.operators import current_to_best_1
-from ..tools.operators import growing_mutation
-from ..tools.operators import one_point_crossover
-from ..tools.operators import one_point_crossoverGP
-from ..tools.operators import point_mutation
-from ..tools.operators import proportional_selection
-from ..tools.operators import rand_1
-from ..tools.operators import rank_selection
-from ..tools.operators import tournament_selection
-from ..tools.operators import uniform_crossover
-from ..tools.operators import uniform_crossoverGP
 from ..tools.random import binary_string_population
 from ..tools.random import float_population
 from ..tools.random import half_and_half
@@ -313,27 +300,21 @@ def test_SelfCGA_set_strategy():
             "rank",
             "tournament_k",
             "tournament_3",
-            "tournament_5",
-            "tournament_7",
         ),
         crossovers=(
             "empty",
             "one_point",
             "two_point",
             "uniform_2",
-            "uniform_7",
             "uniform_k",
             "uniform_prop_2",
-            "uniform_prop_7",
             "uniform_prop_k",
             "uniform_rank_2",
-            "uniform_rank_7",
             "uniform_rank_k",
             "uniform_tour_3",
-            "uniform_tour_7",
             "uniform_tour_k",
         ),
-        mutations=("weak", "average", "strong", "custom_rate"),
+        mutations=("weak", "custom_rate"),
         tour_size=tour_size,
         elitism=True,
         parents_num=parents_num,
@@ -344,1272 +325,869 @@ def test_SelfCGA_set_strategy():
     assert np.all(stats["population_g"][0] == initial_population)
 
 
-# def test_DifferentialEvolution_start_settings():
-#     def fitness_function(x):
-#         return np.sum(x, axis=1, dtype=np.float64)
-
-#     iters = 100
-#     pop_size = 50
-#     n_vars = 10
-#     left = np.full(n_vars, -1, dtype=np.float64)
-#     right = np.full(n_vars, 1, dtype=np.float64)
-
-#     # simple start
-#     optimizer = DifferentialEvolution(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=True,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-
-#     fittest = optimizer.get_fittest()
-#     assert isinstance(fittest, TheFittest)
-
-#     stats = optimizer.get_stats()
-
-#     assert optimizer.get_remains_calls() == 0
-#     assert len(stats["fitness_max"]) == iters
-#     for i in range(len(stats["fitness_max"][:-1])):
-#         assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
-#     assert optimizer._sign == -1
-
-#     # start with the no_increase_num is equal 15
-#     def fitness_function(x):
-#         return np.ones(len(x), dtype=np.float64)
-
-#     no_increase_num = 15
-#     optimizer = DifferentialEvolution(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=no_increase_num,
-#         minimization=False,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-
-#     assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
-#     assert optimizer._sign == 1
-
-#     # start with the optimal_value is equal 1
-#     optimizer = DifferentialEvolution(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=1,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=False,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-#     assert optimizer.get_remains_calls() == pop_size * (iters - 1)
-
-
-# def test_DifferentialEvolution_set_strategy():
-#     def fitness_function(x):
-#         return np.sum(x, axis=1, dtype=np.float64)
-
-#     iters = 10
-#     pop_size = 10
-#     n_vars = 10
-#     left = np.full(n_vars, -1, dtype=np.float64)
-#     right = np.full(n_vars, 1, dtype=np.float64)
-
-#     optimizer = DifferentialEvolution(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=True,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     initial_population = float_population(pop_size=pop_size, left=left, right=right)
-
-#     optimizer.set_strategy(
-#         mutation_oper="current_to_best_1",
-#         F_param=0.35,
-#         CR_param=0.7,
-#         elitism_param=False,
-#         initial_population=initial_population,
-#     )
-
-#     assert optimizer._specified_mutation == current_to_best_1
-#     assert optimizer._F == 0.35
-#     assert optimizer._CR == 0.7
-#     assert optimizer._elitism is False
-
-#     optimizer.set_strategy(
-#         mutation_oper="best_1",
-#         F_param=0.11,
-#         CR_param=0.3,
-#         elitism_param=True,
-#         initial_population=initial_population,
-#     )
-
-#     assert optimizer._specified_mutation == best_1
-#     assert optimizer._F == 0.11
-#     assert optimizer._CR == 0.3
-#     assert optimizer._elitism is True
-
-#     optimizer.fit()
-
-#     stats = optimizer.get_stats()
-
-#     assert np.all(stats["population_g"][0] == initial_population)
-
-
-# def test_JADE_start_settings():
-#     def fitness_function(x):
-#         return np.sum(x, axis=1, dtype=np.float64)
-
-#     iters = 100
-#     pop_size = 50
-#     n_vars = 10
-#     left = np.full(n_vars, -1, dtype=np.float64)
-#     right = np.full(n_vars, 1, dtype=np.float64)
-
-#     # simple start
-#     optimizer = JADE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=True,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-
-#     fittest = optimizer.get_fittest()
-#     assert isinstance(fittest, TheFittest)
-
-#     stats = optimizer.get_stats()
-
-#     assert optimizer.get_remains_calls() == 0
-#     assert len(stats["fitness_max"]) == iters
-#     for i in range(len(stats["fitness_max"][:-1])):
-#         assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
-#     assert optimizer._sign == -1
-
-#     # start with the no_increase_num is equal 15
-#     def fitness_function(x):
-#         return np.ones(len(x), dtype=np.float64)
-
-#     no_increase_num = 15
-#     optimizer = JADE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=no_increase_num,
-#         minimization=False,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-
-#     assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
-#     assert optimizer._sign == 1
-
-#     # start with the optimal_value is equal 1
-#     optimizer = JADE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=1,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=False,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-#     assert optimizer.get_remains_calls() == pop_size * (iters - 1)
-
-
-# def test_JADE_set_strategy():
-#     def fitness_function(x):
-#         return np.sum(x, axis=1, dtype=np.float64)
-
-#     iters = 10
-#     pop_size = 10
-#     n_vars = 10
-#     left = np.full(n_vars, -1, dtype=np.float64)
-#     right = np.full(n_vars, 1, dtype=np.float64)
-
-#     optimizer = JADE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=True,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     initial_population = float_population(pop_size=pop_size, left=left, right=right)
-
-#     optimizer.set_strategy(
-#         c_param=0.2, p_param=0.1, elitism_param=False, initial_population=initial_population
-#     )
-
-#     assert optimizer._c == 0.2
-#     assert optimizer._p == 0.1
-#     assert optimizer._elitism is False
-
-#     optimizer.set_strategy(
-#         c_param=0.33, p_param=0.22, elitism_param=True, initial_population=initial_population
-#     )
-
-#     assert optimizer._c == 0.33
-#     assert optimizer._p == 0.22
-#     assert optimizer._elitism is True
-
-#     optimizer.fit()
-
-#     stats = optimizer.get_stats()
-
-#     assert np.all(stats["population_g"][0] == initial_population)
-
-
-# def test_jDE_start_settings():
-#     def fitness_function(x):
-#         return np.sum(x, axis=1, dtype=np.float64)
-
-#     iters = 100
-#     pop_size = 50
-#     n_vars = 10
-#     left = np.full(n_vars, -1, dtype=np.float64)
-#     right = np.full(n_vars, 1, dtype=np.float64)
-
-#     # simple start
-#     optimizer = jDE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=True,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-
-#     fittest = optimizer.get_fittest()
-#     assert isinstance(fittest, TheFittest)
-
-#     stats = optimizer.get_stats()
-
-#     assert optimizer.get_remains_calls() == 0
-#     assert len(stats["fitness_max"]) == iters
-#     for i in range(len(stats["fitness_max"][:-1])):
-#         assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
-#     assert optimizer._sign == -1
-
-#     # start with the no_increase_num is equal 15
-#     def fitness_function(x):
-#         return np.ones(len(x), dtype=np.float64)
-
-#     no_increase_num = 15
-#     optimizer = jDE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=no_increase_num,
-#         minimization=False,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-
-#     assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
-#     assert optimizer._sign == 1
-
-#     # start with the optimal_value is equal 1
-#     optimizer = jDE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=1,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=False,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-#     assert optimizer.get_remains_calls() == pop_size * (iters - 1)
-
-
-# def test_jDE_set_strategy():
-#     def fitness_function(x):
-#         return np.sum(x, axis=1, dtype=np.float64)
-
-#     iters = 10
-#     pop_size = 10
-#     n_vars = 10
-#     left = np.full(n_vars, -1, dtype=np.float64)
-#     right = np.full(n_vars, 1, dtype=np.float64)
-
-#     optimizer = jDE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=True,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     initial_population = float_population(pop_size=pop_size, left=left, right=right)
-
-#     optimizer.set_strategy(
-#         mutation_oper="rand_1",
-#         F_left_param=0.22,
-#         F_right_param=0.33,
-#         t_f_param=0.44,
-#         t_cr_param=0.55,
-#         elitism_param=False,
-#         initial_population=initial_population,
-#     )
-
-#     assert optimizer._specified_mutation == rand_1
-#     assert optimizer._F_left == 0.22
-#     assert optimizer._F_right == 0.33
-#     assert optimizer._t_f == 0.44
-#     assert optimizer._t_cr == 0.55
-#     assert optimizer._elitism is False
-
-#     optimizer.set_strategy(
-#         mutation_oper="best_1",
-#         F_left_param=0.222,
-#         F_right_param=0.333,
-#         t_f_param=0.444,
-#         t_cr_param=0.555,
-#         elitism_param=True,
-#         initial_population=initial_population,
-#     )
-
-#     assert optimizer._specified_mutation == best_1
-#     assert optimizer._F_left == 0.222
-#     assert optimizer._F_right == 0.333
-#     assert optimizer._t_f == 0.444
-#     assert optimizer._t_cr == 0.555
-#     assert optimizer._elitism is True
-
-#     optimizer.fit()
-
-#     stats = optimizer.get_stats()
-
-#     assert np.all(stats["population_g"][0] == initial_population)
-
-
-# def test_SaDE2005_start_settings():
-#     def fitness_function(x):
-#         return np.sum(x, axis=1, dtype=np.float64)
-
-#     iters = 100
-#     pop_size = 50
-#     n_vars = 10
-#     left = np.full(n_vars, -1, dtype=np.float64)
-#     right = np.full(n_vars, 1, dtype=np.float64)
-
-#     # simple start
-#     optimizer = SaDE2005(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=True,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-
-#     fittest = optimizer.get_fittest()
-#     assert isinstance(fittest, TheFittest)
-
-#     stats = optimizer.get_stats()
-
-#     assert optimizer.get_remains_calls() == 0
-#     assert len(stats["fitness_max"]) == iters
-#     for i in range(len(stats["fitness_max"][:-1])):
-#         assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
-#     assert optimizer._sign == -1
-
-#     # start with the no_increase_num is equal 15
-#     def fitness_function(x):
-#         return np.ones(len(x), dtype=np.float64)
-
-#     no_increase_num = 15
-#     optimizer = SaDE2005(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=no_increase_num,
-#         minimization=False,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-
-#     assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
-#     assert optimizer._sign == 1
-
-#     # start with the optimal_value is equal 1
-#     optimizer = SaDE2005(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=1,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=False,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-#     assert optimizer.get_remains_calls() == pop_size * (iters - 1)
-
-
-# def test_SaDE2005_set_strategy():
-#     def fitness_function(x):
-#         return np.sum(x, axis=1, dtype=np.float64)
-
-#     iters = 100
-#     pop_size = 100
-#     n_vars = 10
-#     left = np.full(n_vars, -1, dtype=np.float64)
-#     right = np.full(n_vars, 1, dtype=np.float64)
-
-#     optimizer = SaDE2005(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=True,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     initial_population = float_population(pop_size=pop_size, left=left, right=right)
-
-#     optimizer.set_strategy(
-#         m_learning_period_param=15,
-#         CR_update_timer_param=5,
-#         CR_m_learning_period_param=25,
-#         threshold_params=0.11,
-#         Fm_param=0.55,
-#         F_sigma_param=0.33,
-#         CR_sigma_param=0.12,
-#         elitism_param=False,
-#         initial_population=initial_population,
-#     )
-
-#     assert optimizer._m_learning_period == 15
-#     assert optimizer._CR_update_timer == 5
-#     assert optimizer._CR_m_learning_period == 25
-#     assert optimizer._threshold == 0.11
-#     assert optimizer._Fm == 0.55
-#     assert optimizer._F_sigma == 0.33
-#     assert optimizer._CR_sigma == 0.12
-#     assert optimizer._elitism is False
-
-#     optimizer.set_strategy(
-#         m_learning_period_param=16,
-#         CR_update_timer_param=6,
-#         CR_m_learning_period_param=26,
-#         threshold_params=0.111,
-#         Fm_param=0.555,
-#         F_sigma_param=0.333,
-#         CR_sigma_param=0.122,
-#         elitism_param=True,
-#         initial_population=initial_population,
-#     )
-
-#     assert optimizer._m_learning_period == 16
-#     assert optimizer._CR_update_timer == 6
-#     assert optimizer._CR_m_learning_period == 26
-#     assert optimizer._threshold == 0.111
-#     assert optimizer._Fm == 0.555
-#     assert optimizer._F_sigma == 0.333
-#     assert optimizer._CR_sigma == 0.122
-#     assert optimizer._elitism is True
-#     optimizer.fit()
-
-#     stats = optimizer.get_stats()
-
-#     assert np.all(stats["population_g"][0] == initial_population)
-
-
-# def test_SHADE_start_settings():
-#     def fitness_function(x):
-#         return np.sum(x, axis=1, dtype=np.float64)
-
-#     iters = 100
-#     pop_size = 50
-#     n_vars = 10
-#     left = np.full(n_vars, -1, dtype=np.float64)
-#     right = np.full(n_vars, 1, dtype=np.float64)
-
-#     # simple start
-#     optimizer = SHADE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=True,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-
-#     fittest = optimizer.get_fittest()
-#     assert isinstance(fittest, TheFittest)
-
-#     stats = optimizer.get_stats()
-
-#     assert optimizer.get_remains_calls() == 0
-#     assert len(stats["fitness_max"]) == iters
-#     for i in range(len(stats["fitness_max"][:-1])):
-#         assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
-#     assert optimizer._sign == -1
-
-#     # start with the no_increase_num is equal 15
-#     def fitness_function(x):
-#         return np.ones(len(x), dtype=np.float64)
-
-#     no_increase_num = 15
-#     optimizer = SHADE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=no_increase_num,
-#         minimization=False,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-
-#     assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
-#     assert optimizer._sign == 1
-
-#     # start with the optimal_value is equal 1
-#     optimizer = SHADE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=1,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=False,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     optimizer.fit()
-#     assert optimizer.get_remains_calls() == pop_size * (iters - 1)
-
-
-# def test_SHADE_set_strategy():
-#     def fitness_function(x):
-#         return np.sum(x, axis=1, dtype=np.float64)
-
-#     iters = 10
-#     pop_size = 10
-#     n_vars = 10
-#     left = np.full(n_vars, -1, dtype=np.float64)
-#     right = np.full(n_vars, 1, dtype=np.float64)
-
-#     optimizer = SHADE(
-#         fitness_function,
-#         iters=iters,
-#         pop_size=pop_size,
-#         left=left,
-#         right=right,
-#         optimal_value=None,
-#         termination_error_value=0,
-#         no_increase_num=None,
-#         minimization=True,
-#         show_progress_each=1,
-#         keep_history=True,
-#     )
-
-#     initial_population = float_population(pop_size=pop_size, left=left, right=right)
-
-#     optimizer.set_strategy(elitism_param=False, initial_population=initial_population)
-
-#     assert optimizer._elitism is False
-
-#     optimizer.set_strategy(elitism_param=True, initial_population=initial_population)
-
-#     assert optimizer._elitism is True
-
-#     optimizer.fit()
-
-#     stats = optimizer.get_stats()
-
-#     assert np.all(stats["population_g"][0] == initial_population)
-
-
-# # def test_SHAGA_start_settings():
-# #     def fitness_function(x):
-# #         return np.sum(x, axis=1, dtype=np.float64)
-
-# #     iters = 100
-# #     pop_size = 50
-# #     str_len = 200
-
-# #     # simple start
-# #     optimizer = SHAGA(
-# #         fitness_function,
-# #         iters=iters,
-# #         pop_size=pop_size,
-# #         str_len=str_len,
-# #         optimal_value=None,
-# #         termination_error_value=0,
-# #         no_increase_num=None,
-# #         minimization=True,
-# #         show_progress_each=1,
-# #         keep_history=True,
-# #     )
-
-# #     optimizer.fit()
-
-# #     fittest = optimizer.get_fittest()
-# #     assert isinstance(fittest, TheFittest)
-
-# #     stats = optimizer.get_stats()
-
-# #     assert optimizer.get_remains_calls() == 0
-# #     assert len(stats["fitness_max"]) == iters
-# #     for i in range(len(stats["fitness_max"][:-1])):
-# #         assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
-# #     assert optimizer._sign == -1
-
-# #     # start with the no_increase_num is equal 15
-# #     def fitness_function(x):
-# #         return np.ones(len(x), dtype=np.float64)
-
-# #     no_increase_num = 15
-# #     optimizer = SHAGA(
-# #         fitness_function,
-# #         iters=iters,
-# #         pop_size=pop_size,
-# #         str_len=str_len,
-# #         optimal_value=None,
-# #         termination_error_value=0,
-# #         no_increase_num=no_increase_num,
-# #         minimization=False,
-# #         show_progress_each=1,
-# #         keep_history=True,
-# #     )
-
-# #     optimizer.fit()
-
-# #     assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
-# #     assert optimizer._sign == 1
-
-# #     # start with the optimal_value is equal 1
-# #     optimizer = SHAGA(
-# #         fitness_function,
-# #         iters=iters,
-# #         pop_size=pop_size,
-# #         str_len=str_len,
-# #         optimal_value=1,
-# #         termination_error_value=0,
-# #         no_increase_num=None,
-# #         minimization=False,
-# #         show_progress_each=1,
-# #         keep_history=True,
-# #     )
-
-# #     optimizer.fit()
-# #     assert optimizer.get_remains_calls() == pop_size * (iters - 1)
-
-
-# # def test_SHAGA_set_strategy():
-# #     def fitness_function(x):
-# #         return np.sum(x, axis=1, dtype=np.float64)
-
-# #     iters = 10
-# #     pop_size = 10
-# #     str_len = 5
-
-# #     optimizer = SHAGA(
-# #         fitness_function,
-# #         iters=iters,
-# #         pop_size=pop_size,
-# #         str_len=str_len,
-# #         optimal_value=None,
-# #         termination_error_value=0,
-# #         no_increase_num=None,
-# #         minimization=False,
-# #         show_progress_each=None,
-# #         keep_history=True,
-# #     )
-
-# #     initial_population = binary_string_population(pop_size=pop_size, str_len=str_len)
-# #     optimizer.set_strategy(initial_population=initial_population, elitism_param=False)
-
-# #     assert optimizer._elitism is False
-
-# #     optimizer.set_strategy(initial_population=initial_population, elitism_param=True)
-
-# #     assert optimizer._elitism is True
-
-# #     optimizer.fit()
-
-# #     stats = optimizer.get_stats()
-
-# #     assert np.all(stats["population_g"][0] == initial_population)
-
-
-# # def test_GeneticProgramming_start_settings():
-# #     def generator1():
-# #         return np.round(np.random.uniform(0, 10), 4)
-
-# #     def generator2():
-# #         return np.random.randint(0, 10)
-
-# #     def problem(x):
-# #         return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
-
-# #     function = problem
-# #     left_border = -4.5
-# #     right_border = 4.5
-# #     sample_size = 300
-# #     n_dimension = 1
-
-# #     iters = 20
-# #     pop_size = 15
-
-# #     X = np.array(
-# #         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
-# #     ).T
-# #     y = function(X)
-
-# #     functional_set = (
-# #         FunctionalNode(Add()),
-# #         FunctionalNode(Mul()),
-# #         FunctionalNode(Neg()),
-# #         FunctionalNode(Div()),
-# #     )
-
-# #     terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
-# #     terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
-# #     uniset = UniversalSet(functional_set, terminal_set)
-
-# #     def fitness_function(trees):
-# #         fitness = []
-# #         for tree in trees:
-# #             y_pred = tree() * np.ones(len(y))
-# #             fitness.append(-coefficient_determination(y, y_pred))
-# #         return np.array(fitness)
-
-# #     # simple start
-# #     optimizer = GeneticProgramming(
-# #         fitness_function=fitness_function,
-# #         uniset=uniset,
-# #         pop_size=pop_size,
-# #         iters=iters,
-# #         optimal_value=None,
-# #         termination_error_value=0,
-# #         no_increase_num=None,
-# #         show_progress_each=1,
-# #         minimization=True,
-# #         keep_history=True,
-# #     )
-
-# #     optimizer.fit()
-
-# #     fittest = optimizer.get_fittest()
-# #     assert isinstance(fittest, TheFittest)
-
-# #     stats = optimizer.get_stats()
-
-# #     assert optimizer.get_remains_calls() == 0
-# #     assert len(stats["fitness_max"]) == iters
-# #     for i in range(len(stats["fitness_max"][:-1])):
-# #         assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
-# #     assert optimizer._sign == -1
-
-# #     # start with the no_increase_num is equal 15
-# #     def fitness_function(x):
-# #         return np.ones(len(x), dtype=np.float64)
-
-# #     no_increase_num = 15
-
-# #     optimizer = GeneticProgramming(
-# #         fitness_function=fitness_function,
-# #         uniset=uniset,
-# #         pop_size=pop_size,
-# #         iters=iters,
-# #         optimal_value=None,
-# #         termination_error_value=0,
-# #         no_increase_num=no_increase_num,
-# #         show_progress_each=1,
-# #         minimization=False,
-# #         keep_history=True,
-# #     )
-
-# #     optimizer.fit()
-
-# #     assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
-# #     assert optimizer._sign == 1
-
-# #     # start with the optimal_value is equal 1
-# #     optimizer = GeneticProgramming(
-# #         fitness_function=fitness_function,
-# #         uniset=uniset,
-# #         pop_size=pop_size,
-# #         iters=iters,
-# #         optimal_value=1,
-# #         termination_error_value=0,
-# #         no_increase_num=None,
-# #         show_progress_each=1,
-# #         minimization=False,
-# #         keep_history=True,
-# #     )
-
-# #     optimizer.fit()
-# #     assert optimizer.get_remains_calls() == pop_size * (iters - 1)
-
-
-# # def test_GeneticProgramming_set_strategy():
-# #     def generator1():
-# #         return np.round(np.random.uniform(0, 10), 4)
-
-# #     def generator2():
-# #         return np.random.randint(0, 10)
-
-# #     def problem(x):
-# #         return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
-
-# #     function = problem
-# #     left_border = -4.5
-# #     right_border = 4.5
-# #     sample_size = 300
-# #     n_dimension = 1
-
-# #     iters = 20
-# #     pop_size = 15
-
-# #     X = np.array(
-# #         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
-# #     ).T
-# #     y = function(X)
-
-# #     functional_set = (
-# #         FunctionalNode(Add()),
-# #         FunctionalNode(Mul()),
-# #         FunctionalNode(Neg()),
-# #         FunctionalNode(Div()),
-# #     )
-
-# #     terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
-# #     terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
-# #     uniset = UniversalSet(functional_set, terminal_set)
-
-# #     def fitness_function(trees):
-# #         fitness = []
-# #         for tree in trees:
-# #             y_pred = tree() * np.ones(len(y))
-# #             fitness.append(-coefficient_determination(y, y_pred))
-# #         return np.array(fitness)
-
-# #     # simple start
-# #     optimizer = GeneticProgramming(
-# #         fitness_function=fitness_function,
-# #         uniset=uniset,
-# #         pop_size=pop_size,
-# #         iters=iters,
-# #         optimal_value=None,
-# #         termination_error_value=0,
-# #         no_increase_num=None,
-# #         show_progress_each=1,
-# #         minimization=True,
-# #         keep_history=True,
-# #     )
-
-# #     initial_population = half_and_half(pop_size=pop_size, uniset=uniset, max_level=14)
-
-# #     optimizer.set_strategy(
-# #         selection_oper="rank",
-# #         crossover_oper="one_point",
-# #         mutation_oper="average_grow",
-# #         initial_population=initial_population,
-# #         max_level_param=14,
-# #         elitism_param=False,
-# #         init_level_param=3,
-# #         mutation_rate_param=0.22,
-# #     )
-
-# #     assert optimizer._specified_selection == (rank_selection, 0)
-# #     assert optimizer._specified_crossover == (one_point_crossoverGP, 2)
-# #     assert optimizer._specified_mutation == (growing_mutation, 1, True)
-# #     assert optimizer._max_level == 14
-# #     assert optimizer._init_level == 3
-# #     assert optimizer._mutation_rate == 0.22
-# #     assert optimizer._elitism is False
-# #     assert np.all(optimizer._initial_population == initial_population)
-
-# #     optimizer.set_strategy(
-# #         selection_oper="tournament_k",
-# #         crossover_oper="uniformk",
-# #         mutation_oper="custom_rate_point",
-# #         initial_population=initial_population,
-# #         max_level_param=13,
-# #         elitism_param=True,
-# #         init_level_param=2,
-# #         parents_num_param=8,
-# #         tour_size_param=6,
-# #         mutation_rate_param=0.223,
-# #     )
-
-# #     assert optimizer._specified_selection == (tournament_selection, 6)
-# #     assert optimizer._specified_crossover == (uniform_crossoverGP, 8)
-# #     assert optimizer._specified_mutation == (point_mutation, 0.223, False)
-# #     assert optimizer._max_level == 13
-# #     assert optimizer._init_level == 2
-# #     assert optimizer._mutation_rate == 0.223
-# #     assert optimizer._elitism is True
-# #     assert np.all(optimizer._initial_population == initial_population)
-
-# #     optimizer.fit()
-
-# #     stats = optimizer.get_stats()
-
-# #     assert np.all(stats["population_g"][0] == initial_population)
-
-
-# # def test_SelfCGP_start_settings():
-# #     def generator1():
-# #         return np.round(np.random.uniform(0, 10), 4)
-
-# #     def generator2():
-# #         return np.random.randint(0, 10)
-
-# #     def problem(x):
-# #         return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
-
-# #     function = problem
-# #     left_border = -4.5
-# #     right_border = 4.5
-# #     sample_size = 300
-# #     n_dimension = 1
-
-# #     iters = 20
-# #     pop_size = 15
-
-# #     X = np.array(
-# #         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
-# #     ).T
-# #     y = function(X)
-
-# #     functional_set = (
-# #         FunctionalNode(Add()),
-# #         FunctionalNode(Mul()),
-# #         FunctionalNode(Neg()),
-# #         FunctionalNode(Div()),
-# #     )
-
-# #     terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
-# #     terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
-# #     uniset = UniversalSet(functional_set, terminal_set)
-
-# #     def fitness_function(trees):
-# #         fitness = []
-# #         for tree in trees:
-# #             y_pred = tree() * np.ones(len(y))
-# #             fitness.append(-coefficient_determination(y, y_pred))
-# #         return np.array(fitness)
-
-# #     # simple start
-# #     optimizer = SelfCGP(
-# #         fitness_function=fitness_function,
-# #         uniset=uniset,
-# #         pop_size=pop_size,
-# #         iters=iters,
-# #         optimal_value=None,
-# #         termination_error_value=0,
-# #         no_increase_num=None,
-# #         show_progress_each=1,
-# #         minimization=True,
-# #         keep_history=True,
-# #     )
-
-# #     optimizer.fit()
-
-# #     fittest = optimizer.get_fittest()
-# #     assert isinstance(fittest, TheFittest)
-
-# #     stats = optimizer.get_stats()
-
-# #     assert optimizer.get_remains_calls() == 0
-# #     assert len(stats["fitness_max"]) == iters
-# #     for i in range(len(stats["fitness_max"][:-1])):
-# #         assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
-# #     assert optimizer._sign == -1
-
-# #     # start with the no_increase_num is equal 15
-# #     def fitness_function(x):
-# #         return np.ones(len(x), dtype=np.float64)
-
-# #     no_increase_num = 15
-
-# #     optimizer = SelfCGP(
-# #         fitness_function=fitness_function,
-# #         uniset=uniset,
-# #         pop_size=pop_size,
-# #         iters=iters,
-# #         optimal_value=None,
-# #         termination_error_value=0,
-# #         no_increase_num=no_increase_num,
-# #         show_progress_each=1,
-# #         minimization=False,
-# #         keep_history=True,
-# #     )
-
-# #     optimizer.fit()
-
-# #     assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
-# #     assert optimizer._sign == 1
-
-# #     # start with the optimal_value is equal 1
-# #     optimizer = SelfCGP(
-# #         fitness_function=fitness_function,
-# #         uniset=uniset,
-# #         pop_size=pop_size,
-# #         iters=iters,
-# #         optimal_value=1,
-# #         termination_error_value=0,
-# #         no_increase_num=None,
-# #         show_progress_each=1,
-# #         minimization=False,
-# #         keep_history=True,
-# #     )
-
-# #     optimizer.fit()
-# #     assert optimizer.get_remains_calls() == pop_size * (iters - 1)
-
-
-# # def test_SelfCGP_set_strategy():
-# #     def generator1():
-# #         return np.round(np.random.uniform(0, 10), 4)
-
-# #     def generator2():
-# #         return np.random.randint(0, 10)
-
-# #     def problem(x):
-# #         return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
-
-# #     function = problem
-# #     left_border = -4.5
-# #     right_border = 4.5
-# #     sample_size = 300
-# #     n_dimension = 1
-
-# #     iters = 20
-# #     pop_size = 15
-
-# #     X = np.array(
-# #         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
-# #     ).T
-# #     y = function(X)
-
-# #     functional_set = (
-# #         FunctionalNode(Add()),
-# #         FunctionalNode(Mul()),
-# #         FunctionalNode(Neg()),
-# #         FunctionalNode(Div()),
-# #     )
-
-# #     terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
-# #     terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
-# #     uniset = UniversalSet(functional_set, terminal_set)
-
-# #     def fitness_function(trees):
-# #         fitness = []
-# #         for tree in trees:
-# #             y_pred = tree() * np.ones(len(y))
-# #             fitness.append(-coefficient_determination(y, y_pred))
-# #         return np.array(fitness)
-
-# #     # simple start
-# #     optimizer = SelfCGP(
-# #         fitness_function=fitness_function,
-# #         uniset=uniset,
-# #         pop_size=pop_size,
-# #         iters=iters,
-# #         optimal_value=None,
-# #         termination_error_value=0,
-# #         no_increase_num=None,
-# #         show_progress_each=1,
-# #         minimization=True,
-# #         keep_history=True,
-# #     )
-
-# #     initial_population = half_and_half(pop_size=pop_size, uniset=uniset, max_level=14)
-
-# #     optimizer.set_strategy(
-# #         selection_opers=("tournament_3", "tournament_k"),
-# #         crossover_opers=("one_point", "uniformk"),
-# #         mutation_opers=("average_grow", "weak_point"),
-# #         tour_size_param=5,
-# #         initial_population=initial_population,
-# #         elitism_param=False,
-# #         parents_num_param=4,
-# #         mutation_rate_param=0.1,
-# #         threshold_param=0.02,
-# #         max_level_param=13,
-# #         init_level_param=3,
-# #     )
-
-# #     selection_set = {
-# #         "tournament_3": (tournament_selection, 3),
-# #         "tournament_k": (tournament_selection, 5),
-# #     }
-# #     crossover_set = {"one_point": (one_point_crossoverGP, 2), "uniformk": (uniform_crossoverGP, 4)}
-# #     mutation_set = {
-# #         "average_grow": (growing_mutation, 1, True),
-# #         "weak_point": (point_mutation, 0.25, True),
-# #     }
-
-# #     assert optimizer._selection_set == selection_set
-# #     assert optimizer._crossover_set == crossover_set
-# #     assert optimizer._mutation_set == mutation_set
-# #     assert optimizer._tour_size == 5
-# #     assert np.all(optimizer._initial_population == initial_population)
-# #     assert optimizer._elitism is False
-# #     assert optimizer._parents_num == 4
-# #     assert optimizer._mutation_rate == 0.1
-# #     assert optimizer._threshold == 0.02
-# #     assert optimizer._max_level == 13
-# #     assert optimizer._init_level == 3
-
-# #     optimizer.set_strategy(
-# #         selection_opers=("tournament_5", "rank"),
-# #         crossover_opers=("uniform2",),
-# #         mutation_opers=("weak_grow", "custom_rate_point"),
-# #         tour_size_param=4,
-# #         initial_population=initial_population,
-# #         elitism_param=True,
-# #         parents_num_param=9,
-# #         mutation_rate_param=0.11,
-# #         threshold_param=0.022,
-# #         max_level_param=11,
-# #         init_level_param=9,
-# #     )
-
-# #     selection_set = {"tournament_5": (tournament_selection, 5), "rank": (rank_selection, 0)}
-# #     crossover_set = {"uniform2": (uniform_crossoverGP, 2)}
-# #     mutation_set = {
-# #         "weak_grow": (growing_mutation, 0.25, True),
-# #         "custom_rate_point": (point_mutation, 0.11, False),
-# #     }
-
-# #     assert optimizer._selection_set == selection_set
-# #     assert optimizer._crossover_set == crossover_set
-# #     assert optimizer._mutation_set == mutation_set
-# #     assert optimizer._tour_size == 4
-# #     assert np.all(optimizer._initial_population == initial_population)
-# #     assert optimizer._elitism is True
-# #     assert optimizer._parents_num == 9
-# #     assert optimizer._mutation_rate == 0.11
-# #     assert optimizer._threshold == 0.022
-# #     assert optimizer._max_level == 11
-# #     assert optimizer._init_level == 9
-
-# #     optimizer.fit()
-
-# #     stats = optimizer.get_stats()
-
-# #     assert np.all(stats["population_g"][0] == initial_population)
+def test_GeneticProgramming_start_settings():
+    def generator1():
+        return np.round(np.random.uniform(0, 10), 4)
+
+    def generator2():
+        return np.random.randint(0, 10)
+
+    def problem(x):
+        return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
+
+    function = problem
+    left_border = -4.5
+    right_border = 4.5
+    sample_size = 300
+    n_dimension = 1
+
+    iters = 20
+    pop_size = 15
+
+    X = np.array(
+        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
+    ).T
+    y = function(X)
+
+    functional_set = (
+        FunctionalNode(Add()),
+        FunctionalNode(Mul()),
+        FunctionalNode(Neg()),
+        FunctionalNode(Div()),
+    )
+
+    terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
+    terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
+    uniset = UniversalSet(functional_set, terminal_set)
+
+    def fitness_function(trees):
+        fitness = []
+        for tree in trees:
+            y_pred = tree() * np.ones(len(y))
+            fitness.append(-coefficient_determination(y, y_pred))
+        return np.array(fitness)
+
+    # simple start
+    optimizer = GeneticProgramming(
+        fitness_function=fitness_function,
+        uniset=uniset,
+        pop_size=pop_size,
+        iters=iters,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        show_progress_each=1,
+        minimization=True,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, dict)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats["fitness_max"]) == iters
+    for i in range(len(stats["fitness_max"][:-1])):
+        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+
+    no_increase_num = 15
+
+    optimizer = GeneticProgramming(
+        fitness_function=fitness_function,
+        uniset=uniset,
+        pop_size=pop_size,
+        iters=iters,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=no_increase_num,
+        show_progress_each=1,
+        minimization=False,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = GeneticProgramming(
+        fitness_function=fitness_function,
+        uniset=uniset,
+        pop_size=pop_size,
+        iters=iters,
+        optimal_value=1,
+        termination_error_value=0,
+        no_increase_num=None,
+        show_progress_each=1,
+        minimization=False,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_GeneticProgramming_set_strategy():
+    def generator1():
+        return np.round(np.random.uniform(0, 10), 4)
+
+    def generator2():
+        return np.random.randint(0, 10)
+
+    def problem(x):
+        return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
+
+    function = problem
+    left_border = -4.5
+    right_border = 4.5
+    sample_size = 30
+    n_dimension = 1
+
+    iters = 2
+    pop_size = 10
+
+    X = np.array(
+        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
+    ).T
+    y = function(X)
+
+    functional_set = (
+        FunctionalNode(Add()),
+        FunctionalNode(Mul()),
+        FunctionalNode(Neg()),
+        FunctionalNode(Div()),
+    )
+
+    terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
+    terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
+    uniset = UniversalSet(functional_set, terminal_set)
+
+    def fitness_function(trees):
+        fitness = []
+        for tree in trees:
+            y_pred = tree() * np.ones(len(y))
+            fitness.append(-coefficient_determination(y, y_pred))
+        return np.array(fitness)
+
+    initial_population = half_and_half(pop_size=pop_size, uniset=uniset, max_level=14)
+    selections = (
+        "proportional",
+        "rank",
+        "tournament_k",
+        "tournament_3",
+    )
+    crossover = (
+        "empty",
+        "gp_standart",
+        "gp_one_point",
+        "gp_uniform_2",
+        "gp_uniform_k",
+        "gp_uniform_prop_2",
+        "gp_uniform_prop_k",
+        "gp_uniform_rank_2",
+        "gp_uniform_rank_k",
+        "gp_uniform_tour_3",
+        "gp_uniform_tour_k",
+    )
+
+    mutation = (
+        "gp_weak_point",
+        "gp_custom_rate_point",
+        "gp_weak_grow",
+        "gp_custom_rate_grow",
+        "gp_weak_swap",
+        "gp_custom_rate_swap",
+        "gp_weak_shrink",
+        "gp_custom_rate_shrink",
+    )
+
+    for selections_i in selections:
+        for crossover_i in crossover:
+            for mutation_i in mutation:
+                optimizer = GeneticProgramming(
+                    fitness_function,
+                    iters=iters,
+                    pop_size=pop_size,
+                    uniset=uniset,
+                    optimal_value=None,
+                    termination_error_value=0,
+                    no_increase_num=None,
+                    minimization=False,
+                    show_progress_each=None,
+                    keep_history=True,
+                    init_population=initial_population,
+                    selection=selections_i,
+                    crossover=crossover_i,
+                    mutation=mutation_i,
+                    tour_size=3,
+                    elitism=True,
+                    parents_num=3,
+                    mutation_rate=0.33,
+                )
+
+                assert optimizer._specified_selection == selections_i
+                assert optimizer._specified_crossover == crossover_i
+                assert optimizer._specified_mutation == mutation_i
+                assert optimizer._tour_size == 3
+                assert optimizer._parents_num == 3
+                assert optimizer._mutation_rate == 0.33
+
+                if selections_i[-2:] == "_k":
+                    assert optimizer._selection_pool[optimizer._specified_selection][1] == 3
+                if crossover_i[-2:] == "_k":
+                    assert optimizer._crossover_pool[optimizer._specified_crossover][1] == 3
+                if mutation_i[:9] == "gp_custom":
+                    assert optimizer._mutation_pool[optimizer._specified_mutation][1] == 0.33
+
+                optimizer.fit()
+
+                stats = optimizer.get_stats()
+                assert np.all(stats["population_g"][0] == initial_population)
+
+
+def test_SelfCGP_start_settings():
+    def generator1():
+        return np.round(np.random.uniform(0, 10), 4)
+
+    def generator2():
+        return np.random.randint(0, 10)
+
+    def problem(x):
+        return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
+
+    function = problem
+    left_border = -4.5
+    right_border = 4.5
+    sample_size = 300
+    n_dimension = 1
+
+    iters = 20
+    pop_size = 15
+
+    X = np.array(
+        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
+    ).T
+    y = function(X)
+
+    functional_set = (
+        FunctionalNode(Add()),
+        FunctionalNode(Mul()),
+        FunctionalNode(Neg()),
+        FunctionalNode(Div()),
+    )
+
+    terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
+    terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
+    uniset = UniversalSet(functional_set, terminal_set)
+
+    def fitness_function(trees):
+        fitness = []
+        for tree in trees:
+            y_pred = tree() * np.ones(len(y))
+            fitness.append(-coefficient_determination(y, y_pred))
+        return np.array(fitness)
+
+    # simple start
+    optimizer = SelfCGP(
+        fitness_function=fitness_function,
+        uniset=uniset,
+        pop_size=pop_size,
+        iters=iters,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        show_progress_each=1,
+        minimization=True,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, dict)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats["fitness_max"]) == iters
+    for i in range(len(stats["fitness_max"][:-1])):
+        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+
+    no_increase_num = 15
+
+    optimizer = SelfCGP(
+        fitness_function=fitness_function,
+        uniset=uniset,
+        pop_size=pop_size,
+        iters=iters,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=no_increase_num,
+        show_progress_each=1,
+        minimization=False,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = SelfCGP(
+        fitness_function=fitness_function,
+        uniset=uniset,
+        pop_size=pop_size,
+        iters=iters,
+        optimal_value=1,
+        termination_error_value=0,
+        no_increase_num=None,
+        show_progress_each=1,
+        minimization=False,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_SelfCGP_set_strategy():
+    def generator1():
+        return np.round(np.random.uniform(0, 10), 4)
+
+    def generator2():
+        return np.random.randint(0, 10)
+
+    def problem(x):
+        return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
+
+    function = problem
+    left_border = -4.5
+    right_border = 4.5
+    sample_size = 300
+    n_dimension = 1
+
+    X = np.array(
+        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
+    ).T
+    y = function(X)
+
+    functional_set = (
+        FunctionalNode(Add()),
+        FunctionalNode(Mul()),
+        FunctionalNode(Neg()),
+        FunctionalNode(Div()),
+    )
+
+    terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
+    terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
+    uniset = UniversalSet(functional_set, terminal_set)
+
+    def fitness_function(trees):
+        fitness = []
+        for tree in trees:
+            y_pred = tree() * np.ones(len(y))
+            fitness.append(-coefficient_determination(y, y_pred))
+        return np.array(fitness)
+
+    iters = 10
+    pop_size = 10
+    initial_population = half_and_half(pop_size=pop_size, uniset=uniset, max_level=14)
+    tour_size = 8
+    parents_num = 8
+    mutation_rate = 0.5
+
+    optimizer = SelfCGP(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        uniset=uniset,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=False,
+        show_progress_each=None,
+        keep_history=True,
+        init_population=initial_population,
+        selections=(
+            "proportional",
+            "rank",
+            "tournament_k",
+            "tournament_3",
+            "tournament_5",
+            "tournament_7",
+        ),
+        crossovers=(
+            "empty",
+            "gp_standart",
+            "gp_one_point",
+            "gp_uniform_2",
+            "gp_uniform_7",
+            "gp_uniform_k",
+            "gp_uniform_prop_2",
+            "gp_uniform_prop_7",
+            "gp_uniform_prop_k",
+            "gp_uniform_rank_2",
+            "gp_uniform_rank_7",
+            "gp_uniform_rank_k",
+            "gp_uniform_tour_3",
+            "gp_uniform_tour_7",
+            "gp_uniform_tour_k",
+        ),
+        mutations=(
+            "gp_weak_point",
+            "gp_average_point",
+            "gp_strong_point",
+            "gp_custom_rate_point",
+            "gp_weak_grow",
+            "gp_average_grow",
+            "gp_strong_grow",
+            "gp_custom_rate_grow",
+            "gp_weak_swap",
+            "gp_average_swap",
+            "gp_strong_swap",
+            "gp_custom_rate_swap",
+            "gp_weak_shrink",
+            "gp_average_shrink",
+            "gp_strong_shrink",
+            "gp_custom_rate_shrink",
+        ),
+        tour_size=tour_size,
+        elitism=True,
+        parents_num=parents_num,
+        mutation_rate=mutation_rate,
+    )
+    optimizer.fit()
+    stats = optimizer.get_stats()
+    assert np.all(stats["population_g"][0] == initial_population)
+
+
+def test_DifferentialEvolution_start_settings():
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    iters = 100
+    pop_size = 50
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    # simple start
+    optimizer = DifferentialEvolution(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        left=left,
+        right=right,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=True,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, dict)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats["fitness_max"]) == iters
+    for i in range(len(stats["fitness_max"][:-1])):
+        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+
+    no_increase_num = 15
+    optimizer = DifferentialEvolution(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        left=left,
+        right=right,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=no_increase_num,
+        minimization=False,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = DifferentialEvolution(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        left=left,
+        right=right,
+        optimal_value=1,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=False,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_DifferentialEvolution_set_strategy():
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    iters = 2
+    pop_size = 10
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+    initial_population = float_population(pop_size=pop_size, left=left, right=right)
+
+    mutations = ("best_1", "rand_1", "current_to_best_1", "rand_to_best1", "best_2", "rand_2")
+    F = (0.5, 0.3)
+    CR = (0.31, 0.33)
+
+    for mutation_i in mutations:
+        for F_i in F:
+            for CR_i in CR:
+                optimizer = DifferentialEvolution(
+                    fitness_function,
+                    iters=iters,
+                    pop_size=pop_size,
+                    left=left,
+                    right=right,
+                    optimal_value=None,
+                    termination_error_value=0,
+                    no_increase_num=None,
+                    minimization=True,
+                    show_progress_each=1,
+                    keep_history=True,
+                    mutation=mutation_i,
+                    init_population=initial_population,
+                    F=F_i,
+                    CR=CR_i,
+                )
+                optimizer.fit()
+                stats = optimizer.get_stats()
+
+                assert optimizer._specified_mutation == mutation_i
+                assert optimizer._F == F_i
+                assert optimizer._CR == CR_i
+                print(stats.keys())
+                assert np.all(stats["population_g"][0] == initial_population)
+
+
+def test_jDE_start_settings():
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    iters = 100
+    pop_size = 50
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    # simple start
+    optimizer = jDE(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        left=left,
+        right=right,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=True,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, dict)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats["fitness_max"]) == iters
+    for i in range(len(stats["fitness_max"][:-1])):
+        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+
+    no_increase_num = 15
+    optimizer = jDE(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        left=left,
+        right=right,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=no_increase_num,
+        minimization=False,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = jDE(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        left=left,
+        right=right,
+        optimal_value=1,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=False,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_jDE_set_strategy():
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    iters = 2
+    pop_size = 10
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+    initial_population = float_population(pop_size=pop_size, left=left, right=right)
+
+    mutations = ("best_1", "rand_1", "current_to_best_1", "rand_to_best1", "best_2", "rand_2")
+    F_min = (0.05, 0.1)
+    F_max = (0.9, 0.95)
+    t_F = (0.051, 0.21)
+    t_CR = (0.05, 0.1)
+
+    for mutation_i in mutations:
+        for F_min_i in F_min:
+            for F_max_i in F_max:
+                for t_F_i in t_F:
+                    for t_CR_i in t_CR:
+                        optimizer = jDE(
+                            fitness_function,
+                            iters=iters,
+                            pop_size=pop_size,
+                            left=left,
+                            right=right,
+                            optimal_value=None,
+                            termination_error_value=0,
+                            no_increase_num=None,
+                            minimization=True,
+                            show_progress_each=1,
+                            keep_history=True,
+                            mutation=mutation_i,
+                            F_min=F_min_i,
+                            F_max=F_max_i,
+                            t_CR=t_CR_i,
+                            t_F=t_F_i,
+                            init_population=initial_population,
+                        )
+                        optimizer.fit()
+                        stats = optimizer.get_stats()
+
+                        assert optimizer._specified_mutation == mutation_i
+                        assert optimizer._F_min == F_min_i
+                        assert optimizer._F_max == F_max_i
+                        assert optimizer._t_CR == t_CR_i
+                        assert optimizer._t_F == t_F_i
+                        print(stats.keys())
+                        assert np.all(stats["population_g"][0] == initial_population)
+
+
+def test_SHADE_start_settings():
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    iters = 100
+    pop_size = 50
+    n_vars = 10
+    left = np.full(n_vars, -1, dtype=np.float64)
+    right = np.full(n_vars, 1, dtype=np.float64)
+
+    # simple start
+    optimizer = SHADE(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        left=left,
+        right=right,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=True,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, dict)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats["fitness_max"]) == iters
+    for i in range(len(stats["fitness_max"][:-1])):
+        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+
+    no_increase_num = 15
+    optimizer = SHADE(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        left=left,
+        right=right,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=no_increase_num,
+        minimization=False,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = SHADE(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        left=left,
+        right=right,
+        optimal_value=1,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=False,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_SHAGA_start_settings():
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    iters = 100
+    pop_size = 50
+    str_len = 200
+
+    # simple start
+    optimizer = SHAGA(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        str_len=str_len,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=True,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    fittest = optimizer.get_fittest()
+    assert isinstance(fittest, dict)
+
+    stats = optimizer.get_stats()
+
+    assert optimizer.get_remains_calls() == 0
+    assert len(stats["fitness_max"]) == iters
+    for i in range(len(stats["fitness_max"][:-1])):
+        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert optimizer._sign == -1
+
+    # start with the no_increase_num is equal 15
+    def fitness_function(x):
+        return np.ones(len(x), dtype=np.float64)
+
+    no_increase_num = 15
+    optimizer = SHAGA(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        str_len=str_len,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=no_increase_num,
+        minimization=False,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+
+    assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer._sign == 1
+
+    # start with the optimal_value is equal 1
+    optimizer = SHAGA(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        str_len=str_len,
+        optimal_value=1,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=False,
+        show_progress_each=1,
+        keep_history=True,
+    )
+
+    optimizer.fit()
+    assert optimizer.get_remains_calls() == pop_size * (iters - 1)

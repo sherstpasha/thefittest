@@ -1,19 +1,22 @@
 from __future__ import annotations
 
+from typing import Any
 from typing import Optional
+from typing import Type
 from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
+from ..base import UniversalSet
 from ..base._net import Net
 from ..classifiers import GeneticProgrammingNeuralNetClassifier
-from ..optimizers import OptimizerStringType
-from ..optimizers import OptimizerTreeType
+from ..optimizers import GeneticProgramming
 from ..optimizers import SHADE
 from ..optimizers import SelfCGP
 from ..tools.metrics import root_mean_square_error2d
 from ..tools.random import train_test_split
+from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
 
 
 class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier):
@@ -26,14 +29,10 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
         offset: bool = True,
         output_activation: str = "sigma",
         test_sample_ratio: float = 0.5,
-        no_increase_num: Optional[int] = None,
-        show_progress_each: Optional[int] = None,
-        keep_history: bool = False,
-        optimizer: OptimizerTreeType = SelfCGP,
-        optimizer_weights: OptimizerStringType = SHADE,
-        optimizer_weights_bounds: tuple = (-2, 2),
-        optimizer_weights_eval_num: int = 10000,
-        optimizer_weights_n_bit: int = 16,
+        optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,
+        optimizer_args: Optional[dict[str, Any]] = None,
+        weights_optimizer: weights_type_optimizer_alias = SHADE,
+        weights_optimizer_args: Optional[dict[str, Any]] = None,
         cache: bool = True,
     ):
         GeneticProgrammingNeuralNetClassifier.__init__(
@@ -45,19 +44,15 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
             offset=offset,
             output_activation=output_activation,
             test_sample_ratio=test_sample_ratio,
-            no_increase_num=no_increase_num,
-            show_progress_each=show_progress_each,
-            keep_history=keep_history,
             optimizer=optimizer,
-            optimizer_weights=optimizer_weights,
-            optimizer_weights_bounds=optimizer_weights_bounds,
-            optimizer_weights_eval_num=optimizer_weights_eval_num,
-            optimizer_weights_n_bit=optimizer_weights_n_bit,
+            optimizer_args=optimizer_args,
+            weights_optimizer=weights_optimizer,
+            weights_optimizer_args=weights_optimizer_args,
             cache=cache,
         )
 
     def _evaluate_nets(
-        self,
+        self: GeneticProgrammingNeuralNetRegressor,
         weights: NDArray[np.float64],
         net: Net,
         X: NDArray[np.float64],
@@ -68,41 +63,69 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
         return error
 
     def _fitness_function(
-        self, population: NDArray, X: NDArray[np.float64], targets: NDArray[np.float64]
+        self: GeneticProgrammingNeuralNetRegressor,
+        population: NDArray,
+        X: NDArray[np.float64],
+        targets: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         output2d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)[:, :, 0]
         fitness = root_mean_square_error2d(targets, output2d)
         return fitness
 
     def _fit(
-        self, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
-    ) -> GeneticProgrammingNeuralNetRegressor:
-        if self._offset:
-            X = np.hstack([X, np.ones((X.shape[0], 1))])
+        self: GeneticProgrammingNeuralNetClassifier,
+        X: NDArray[np.float64],
+        y: NDArray[Union[np.float64, np.int64]],
+    ) -> GeneticProgrammingNeuralNetClassifier:
+        optimizer_args: dict[str, Any]
 
-        n_outputs = 1
+        if self._offset:
+            X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])
+
+        n_outputs: int = 1
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, self._test_sample_ratio)
 
-        self.optimizer._fitness_function = lambda population: self._fitness_function(
+        if self._optimizer_args is not None:
+            assert (
+                "iters" not in self._optimizer_args.keys()
+                and "pop_size" not in self._optimizer_args.keys()
+            ), """Do not set the "iters" or "pop_size" in the "optimizer_args". Instead,
+              use the "SymbolicRegressionGP" arguments"""
+            for arg in (
+                "fitness_function",
+                "uniset",
+                "minimization",
+            ):
+                assert (
+                    arg not in self._optimizer_args.keys()
+                ), f"""Do not set the "{arg}"
+                to the "optimizer_args". It is defined automatically"""
+            optimizer_args = self._optimizer_args.copy()
+
+        else:
+            optimizer_args = {}
+
+        uniset: UniversalSet = self._get_uniset(X)
+
+        optimizer_args["fitness_function"] = lambda population: self._fitness_function(
             population, X_test, y_test
         )
-
-        self.optimizer._genotype_to_phenotype = lambda trees: self._genotype_to_phenotype(
+        optimizer_args["genotype_to_phenotype"] = lambda trees: self._genotype_to_phenotype(
             X_train, y_train, trees, n_outputs
         )
+        print(y_train)
+        optimizer_args["iters"] = self._iters
+        optimizer_args["pop_size"] = self._pop_size
+        optimizer_args["uniset"] = uniset
+        optimizer_args["minimization"] = True
 
-        self.optimizer._uniset = self._define_uniset(X)
-        self.optimizer.fit()
+        self._optimizer = self._optimizer_class(**optimizer_args)
+        self._optimizer.fit()
 
         return self
 
-    def _predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
-        if self._offset:
-            X = np.hstack([X, np.ones((X.shape[0], 1))])
-
-        fittest = self.optimizer.get_fittest().get()
-
-        output = fittest["phenotype"].forward(X)[0, :, 0]
-        y_pred = output
-        return y_pred
+    def _prepare_output(
+        self: GeneticProgrammingNeuralNetClassifier, output: NDArray[np.float64]
+    ) -> Union[NDArray[np.float64], NDArray[np.int64]]:
+        return output

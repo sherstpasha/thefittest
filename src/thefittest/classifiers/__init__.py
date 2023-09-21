@@ -1,5 +1,5 @@
 from ._gpnnclassifier import GeneticProgrammingNeuralNetClassifier
-from ._mlpeaclassifier import MLPClassifierEA
+from ._mlpeaclassifier import MLPEAClassifier
 
 
-__all__ = ["MLPClassifierEA", "GeneticProgrammingNeuralNetClassifier"]
+__all__ = ["MLPEAClassifier", "GeneticProgrammingNeuralNetClassifier"]

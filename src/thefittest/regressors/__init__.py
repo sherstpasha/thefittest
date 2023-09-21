@@ -1,6 +1,6 @@
 from ._gpnnregression import GeneticProgrammingNeuralNetRegressor
-from ._mlpearegressor import MLPRegressorrEA
+from ._mlpearegressor import MLPEARegressor
 from ._symbolicregressiongp import SymbolicRegressionGP
 
 
-__all__ = ["SymbolicRegressionGP", "GeneticProgrammingNeuralNetRegressor", "MLPRegressorrEA"]
+__all__ = ["SymbolicRegressionGP", "GeneticProgrammingNeuralNetRegressor", "MLPEARegressor"]

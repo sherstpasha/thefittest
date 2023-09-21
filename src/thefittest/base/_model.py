@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from typing import Any
+from typing import Tuple
 from typing import Union
 
 import numpy as np
@@ -15,6 +18,9 @@ class Model:
 
     def _predict(self, X: NDArray[np.float64]) -> Any:
         pass
+
+    def get_optimizers(self: Model) -> Tuple:
+        return tuple()
 
     def fit(
         self,

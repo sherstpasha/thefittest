@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any
 from typing import Optional
 from typing import Tuple
 from typing import Union
@@ -8,29 +9,25 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..base._net import Net
-from ..classifiers import MLPClassifierEA
-from ..optimizers import OptimizerStringType
+from ..classifiers import MLPEAClassifier
 from ..optimizers import SHADE
 from ..tools.metrics import root_mean_square_error2d
+from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
 
 
-class MLPRegressorrEA(MLPClassifierEA):
+class MLPEARegressor(MLPEAClassifier):
     def __init__(
         self,
         iters: int,
         pop_size: int,
-        hidden_layers: Tuple,
+        hidden_layers: Tuple[int, ...],
         activation: str = "sigma",
         output_activation: str = "sigma",
         offset: bool = True,
-        no_increase_num: Optional[int] = None,
-        show_progress_each: Optional[int] = None,
-        keep_history: bool = False,
-        optimizer_weights: OptimizerStringType = SHADE,
-        optimizer_weights_bounds: tuple = (-10, 10),
-        optimizer_weights_n_bit: int = 16,
+        weights_optimizer: weights_type_optimizer_alias = SHADE,
+        weights_optimizer_args: Optional[dict[str, Any]] = None,
     ):
-        MLPClassifierEA.__init__(
+        MLPEAClassifier.__init__(
             self,
             iters=iters,
             pop_size=pop_size,
@@ -38,16 +35,12 @@ class MLPRegressorrEA(MLPClassifierEA):
             activation=activation,
             output_activation=output_activation,
             offset=offset,
-            no_increase_num=no_increase_num,
-            show_progress_each=show_progress_each,
-            keep_history=keep_history,
-            optimizer_weights=optimizer_weights,
-            optimizer_weights_bounds=optimizer_weights_bounds,
-            optimizer_weights_n_bit=optimizer_weights_n_bit,
+            weights_optimizer=weights_optimizer,
+            weights_optimizer_args=weights_optimizer_args,
         )
 
     def _evaluate_nets(
-        self,
+        self: MLPEARegressor,
         weights: NDArray[np.float64],
         net: Net,
         X: NDArray[np.float64],
@@ -58,27 +51,32 @@ class MLPRegressorrEA(MLPClassifierEA):
         return error
 
     def _fitness_function(
-        self, population: NDArray, X: NDArray[np.float64], targets: NDArray[np.float64]
+        self: MLPEARegressor,
+        population: NDArray,
+        X: NDArray[np.float64],
+        targets: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         output2d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)[:, :, 0]
         fitness = root_mean_square_error2d(targets, output2d)
         return fitness
 
     def _fit(
-        self, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
-    ) -> MLPRegressorrEA:
+        self: MLPEARegressor, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
+    ) -> MLPEARegressor:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        n_inputs = X.shape[1]
-        n_outputs = len(set(y))
+        n_inputs: int = X.shape[1]
+        n_outputs: int = len(set(y))
 
         self._net = self._defitne_net(n_inputs, n_outputs)
 
-        self._net._weights = self._train_net(self._net, X, y)
+        self._net._weights = self._train_net(self._net, X, y.astype(np.float64))
         return self
 
-    def _predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
+    def _predict(
+        self: MLPEARegressor, X: NDArray[np.float64]
+    ) -> NDArray[Union[np.float64, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
