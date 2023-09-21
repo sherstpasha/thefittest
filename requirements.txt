@@ -4,6 +4,7 @@ scipy>0.16
 pytest
 pytest-cov
 flake8
+Flake8-pyproject
 flake8-bugbear
 pep8-naming
 flake8-builtins

@@ -15,15 +15,31 @@ where = ["src"]
 line-length = 100
 target-version = ['py37']
 
+[tool.flake8]
+exclude = ['.git','__pycache__','env']
+max-line-length = 100
+max-complexity = 12
+ignore = ['N803','N806','N802','N801','E203','E231','E712','C417','W503','C408']
+
+[tool.mypy]
+python_version = "3.7"
+disallow_untyped_defs = true
+ignore_missing_imports = true
+ignore_missing_imports_per_module = true
+disable_error_code = 'annotation-unchecked'
+exclude = ['(?x)(^env|^src/thefittest/tests)']
+
+
 [project]
 name = "thefittest"
-version = "0.1.14"
+version = "0.2.0"
+dependencies = ["numpy>=1.18,<1.24", "numba>=0.56.4", "scipy>0.16"]
+requires-python = ">=3.7,<3.11"
 authors = [
   { name="Pavel Sherstnev", email="sherstpasha99@gmail.com" },
 ]
 description = "Implementation of data mining methods that use evolutionary algorithms"
 readme = "README.md"
-requires-python = ">=3.7,<3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",

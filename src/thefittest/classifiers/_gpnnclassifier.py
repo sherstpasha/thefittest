@@ -48,6 +48,9 @@ weights_optimizer_alias = Union[DifferentialEvolution, jDE, SHADE, GeneticAlgori
 
 
 class GeneticProgrammingNeuralNetClassifier(Model):
+    """(Lipinsky L., Semenkin E., Bulletin of the Siberian State Aerospace University., 3(10),
+    22-26 (2006). In Russian);"""
+
     def __init__(
         self,
         iters: int,
