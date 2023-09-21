@@ -1,6 +1,6 @@
-numpy>=1.18,<1.24
-numba>=0.56.4
-scipy>=1.7.3
+numpy
+numba
+scipy
 pytest
 pytest-cov
 flake8
