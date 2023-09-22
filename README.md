@@ -15,10 +15,10 @@ pip install thefittest
 
 ## Dependencies
 thefittest requires:
-*   python (>=3.7,<3.11);
-*   numpy (>=1.21.6,<1.24);
-*   numba (>=0.56.4);
-*   scipy (>0.16).
+*   python (>=3.7,<3.12);
+*   numpy;
+*   numba;
+*   scipy.
 
 ## The package contains methods
 *   **Genetic algorithm** (Holland, J. H. (1992). Genetic algorithms. Scientific American, 267(1), 66-72):
