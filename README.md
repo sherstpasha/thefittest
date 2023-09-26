@@ -15,10 +15,10 @@ pip install thefittest
 
 ## Dependencies
 thefittest requires:
-*   python (>=3.7,<3.11);
-*   numpy (>=1.21.6,<1.24);
-*   numba (>=0.56.4);
-*   scipy (>0.16).
+*   python (>=3.7,<3.12);
+*   numpy;
+*   numba;
+*   scipy.
 
 ## The package contains methods
 *   **Genetic algorithm** (Holland, J. H. (1992). Genetic algorithms. Scientific American, 267(1), 66-72):
@@ -46,9 +46,6 @@ Notebooks on how to use thefittest:
 *   [**Solving binary and real-valued optimization problems with a genetic algorithm;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb) 
 *   [**Solving real-valued optimization problems with a differential evolution;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb) 
 *   [**Symbolic regression problems solving using genetic programming algorithm;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_programming_symbolic_regression_problem.ipynb) 
-*   [**SelfCGA self-configuring visualisation;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/selfcga_animation_proba.ipynb) 
-*   [**SelfCGP self-configuring visualisation;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/selfcgp_proba.ipynb) 
-*   [**The process of adapting SaDE parameters;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/sade2005_rastrigin.ipynb) 
-
+* Neural network training using evolutionary algorithms for regression and classification problems
 
  **If some notebooks are <u>too big to display</u>, you can use [<u>NBviewer</u>](https://nbviewer.org/)**.
