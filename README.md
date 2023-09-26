@@ -46,7 +46,7 @@ Notebooks on how to use thefittest:
 *   [**Solving binary and real-valued optimization problems with a genetic algorithm;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb) 
 *   [**Solving real-valued optimization problems with a differential evolution;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb) 
 *   [**Symbolic regression problems solving using genetic programming algorithm;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_programming_symbolic_regression_problem.ipynb)
-*   [**Neural network training using evolutionary algorithms for regression and classification problems;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/mlpea_regression_classification_problem.ipynb) 
-*   [**Optimization of neural network structure using genetic programming;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/gpnn_regression_classification_problems.ipynb) 
+*   [**Neural network training using evolutionary algorithms for regression and classification problems;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/mlpea_regression_classification_problem.ipynb)
+*   [**Optimization of neural network structure using genetic programming;**](https://github.com/sherstpasha/thefittest-notebooks/blob/main/gpnn_regression_classification_problems.ipynb)
 
  **If some notebooks are <u>too big to display</u>, you can use [<u>NBviewer</u>](https://nbviewer.org/)**.
