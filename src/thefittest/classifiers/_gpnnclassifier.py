@@ -258,8 +258,19 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
         return population_ph
 
-    def get_optimizers(self: GeneticProgrammingNeuralNetClassifier) -> Tuple:
-        return (self._optimizer,)
+    def get_optimizers(
+        self: GeneticProgrammingNeuralNetClassifier,
+    ) -> Union[
+        DifferentialEvolution,
+        GeneticAlgorithm,
+        GeneticProgramming,
+        jDE,
+        SelfCGA,
+        SelfCGP,
+        SHADE,
+        SHAGA,
+    ]:
+        return self._optimizer
 
     def _fit(
         self: GeneticProgrammingNeuralNetClassifier,

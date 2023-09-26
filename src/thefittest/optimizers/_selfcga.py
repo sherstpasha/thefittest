@@ -165,10 +165,8 @@ class SelfCGA(GeneticAlgorithm):
         return fittest_operator
 
     def _update_data(self: SelfCGA) -> None:
-        self._update_fittest(self._population_g_i, self._population_ph_i, self._fitness_i)
+        super()._update_data()
         self._update_stats(
-            population_g=self._population_ph_i,
-            fitness_max=self._thefittest._fitness,
             s_proba=self._selection_proba,
             c_proba=self._crossover_proba,
             m_proba=self._mutation_proba,

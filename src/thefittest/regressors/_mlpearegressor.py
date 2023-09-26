@@ -67,7 +67,7 @@ class MLPEARegressor(MLPEAClassifier):
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
         n_inputs: int = X.shape[1]
-        n_outputs: int = len(set(y))
+        n_outputs: int = 1
 
         self._net = self._defitne_net(n_inputs, n_outputs)
 

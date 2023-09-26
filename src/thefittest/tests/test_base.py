@@ -68,18 +68,18 @@ def test_statistic_class():
     statistics_ = Statistics()
     fitness_max = np.max(fitness)
     statistics_._update(
-        {"population_g": population_g, "population_ph": population_ph, "fitness_max": fitness_max}
+        {"population_g": population_g, "population_ph": population_ph, "max_fitness": fitness_max}
     )
 
-    assert statistics_["fitness_max"][0] == fitness_max
+    assert statistics_["max_fitness"][0] == fitness_max
     assert np.all(statistics_["population_g"][0] == population_g)
     assert np.all(statistics_["population_ph"][0] == population_ph)
 
     statistics_._update(
-        {"population_g": population_g, "population_ph": population_ph, "fitness_max": fitness_max}
+        {"population_g": population_g, "population_ph": population_ph, "max_fitness": fitness_max}
     )
 
-    assert len(statistics_["fitness_max"]) == 2
+    assert len(statistics_["max_fitness"]) == 2
     assert len(statistics_["population_g"]) == 2
     assert len(statistics_["population_ph"]) == 2
 

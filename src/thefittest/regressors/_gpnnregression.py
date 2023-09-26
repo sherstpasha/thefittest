@@ -114,7 +114,7 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
         optimizer_args["genotype_to_phenotype"] = lambda trees: self._genotype_to_phenotype(
             X_train, y_train, trees, n_outputs
         )
-        print(y_train)
+
         optimizer_args["iters"] = self._iters
         optimizer_args["pop_size"] = self._pop_size
         optimizer_args["uniset"] = uniset
@@ -128,4 +128,4 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
     def _prepare_output(
         self: GeneticProgrammingNeuralNetClassifier, output: NDArray[np.float64]
     ) -> Union[NDArray[np.float64], NDArray[np.int64]]:
-        return output
+        return output[:, 0]

@@ -14,7 +14,12 @@ from ..base._net import Net
 from ..classifiers._gpnnclassifier import weights_optimizer_alias
 from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
 from ..optimizers import DifferentialEvolution
+from ..optimizers import GeneticAlgorithm
+from ..optimizers import GeneticProgramming
 from ..optimizers import SHADE
+from ..optimizers import SHAGA
+from ..optimizers import SelfCGA
+from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..tools.metrics import categorical_crossentropy3d
 from ..tools.random import float_population
@@ -44,6 +49,7 @@ class MLPEAClassifier(Model):
         self._weights_optimizer: weights_optimizer_alias
         self._weights_optimizer_class: weights_type_optimizer_alias = weights_optimizer
         self._weights_optimizer_args: Optional[dict[str, Any]] = weights_optimizer_args
+        self._net: Net
 
     def _defitne_net(self: MLPEAClassifier, n_inputs: int, n_outputs: int) -> Net:
         start = 0
@@ -110,7 +116,8 @@ class MLPEAClassifier(Model):
                 assert (
                     "iters" not in self._weights_optimizer_args.keys()
                     and "pop_size" not in self._weights_optimizer_args.keys()
-                ), """Do not set the "iters" or "pop_size", or "uniset" in the "optimizer_args". Instead, use the "MLPClassifierEA" arguments"""
+                ), """Do not set the "iters" or "pop_size", or "uniset" in the "optimizer_args".
+                  Instead, use the "MLPClassifierEA" arguments"""
                 assert (
                     arg not in self._weights_optimizer_args.keys()
                 ), f"""Do not set the "{arg}"
@@ -155,8 +162,22 @@ class MLPEAClassifier(Model):
 
         return phenotype
 
-    def get_optimizers(self: MLPEAClassifier) -> Tuple:
-        return (self._weights_optimizer,)
+    def get_optimizers(
+        self: MLPEAClassifier,
+    ) -> Union[
+        DifferentialEvolution,
+        GeneticAlgorithm,
+        GeneticProgramming,
+        jDE,
+        SelfCGA,
+        SelfCGP,
+        SHADE,
+        SHAGA,
+    ]:
+        return self._weights_optimizer
+
+    def get_net(self: MLPEAClassifier) -> Net:
+        return self._net
 
     def _fit(
         self: MLPEAClassifier, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]

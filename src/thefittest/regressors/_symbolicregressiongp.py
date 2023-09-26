@@ -16,8 +16,14 @@ from ..base import TerminalNode
 from ..base import Tree
 from ..base import UniversalSet
 from ..base._model import Model
+from ..optimizers import DifferentialEvolution
+from ..optimizers import GeneticAlgorithm
 from ..optimizers import GeneticProgramming
+from ..optimizers import SHADE
+from ..optimizers import SHAGA
+from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
+from ..optimizers import jDE
 from ..tools.metrics import coefficient_determination
 from ..tools.operators import Add
 from ..tools.operators import Cos
@@ -88,8 +94,19 @@ class SymbolicRegressionGP(Model):
         fitness = [self._evaluate_tree(tree, y) for tree in trees]
         return np.array(fitness)
 
-    def get_optimizers(self: SymbolicRegressionGP) -> Tuple:
-        return (self._optimizer,)
+    def get_optimizers(
+        self: SymbolicRegressionGP,
+    ) -> Union[
+        DifferentialEvolution,
+        GeneticAlgorithm,
+        GeneticProgramming,
+        jDE,
+        SelfCGA,
+        SelfCGP,
+        SHADE,
+        SHAGA,
+    ]:
+        return self._optimizer
 
     def _fit(
         self: SymbolicRegressionGP, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
@@ -138,7 +155,7 @@ class SymbolicRegressionGP(Model):
         self: SymbolicRegressionGP, X: NDArray[np.float64]
     ) -> NDArray[Union[np.float64, np.int64]]:
         n_dimension = X.shape[1]
-        solution = self.get_optimizers()[0].get_fittest()
+        solution = self.get_optimizers().get_fittest()
 
         genotype_for_pred = solution["phenotype"].set_terminals(
             **{f"x{i}": X[:, i] for i in range(n_dimension)}

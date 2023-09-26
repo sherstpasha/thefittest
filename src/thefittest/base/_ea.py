@@ -128,7 +128,7 @@ class EvolutionaryAlgorithm:
             cond_show_now = current_iter % self._show_progress_each == 0
             if cond_show_now:
                 current_best = self._sign * self._thefittest._fitness
-                print(f"{current_iter} iteration with fitness = {current_best}")
+                print(f"{current_iter}-th iteration with the best fitness = {current_best}")
 
     def _termitation_check(self: EvolutionaryAlgorithm) -> bool:
         cond_aim = self._thefittest._fitness >= self._aim
@@ -162,8 +162,14 @@ class EvolutionaryAlgorithm:
         return self._stats
 
     def _update_data(self: EvolutionaryAlgorithm) -> None:
+        max_fitness_id = np.argmax(self._fitness_i)
         self._update_fittest(self._population_g_i, self._population_ph_i, self._fitness_i)
-        self._update_stats(population_g=self._population_g_i, fitness_max=self._thefittest._fitness)
+        self._update_stats(
+            population_g=self._population_g_i,
+            fitness=self._fitness_i,
+            max_fitness=self._fitness_i[max_fitness_id],
+            max_fitness_g=self._population_g_i[max_fitness_id],
+        )
 
     def _adapt(self: EvolutionaryAlgorithm) -> None:
         return None

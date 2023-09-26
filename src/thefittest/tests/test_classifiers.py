@@ -64,7 +64,7 @@ def test_GeneticProgrammingNeuralNetClassifier():
 
     model.predict(X)
 
-    optimizer = model.get_optimizers()[0]
+    optimizer = model.get_optimizers()
 
     assert isinstance(optimizer, model._optimizer_class)
 
@@ -121,6 +121,6 @@ def test_MLPEAClassifier():
 
     model.predict(X)
 
-    optimizer = model.get_optimizers()[0]
+    optimizer = model.get_optimizers()
 
     assert isinstance(optimizer, model._weights_optimizer_class)

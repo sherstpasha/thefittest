@@ -73,7 +73,7 @@ def test_SymbolicRegressionGP():
 
     model.fit(X, y)
 
-    optimizer = model.get_optimizers()[0]
+    optimizer = model.get_optimizers()
 
     assert optimizer._iters == iters
     assert optimizer._pop_size == pop_size
@@ -158,7 +158,7 @@ def test_GeneticProgrammingNeuralNetRegressor():
 
     model.predict(X)
 
-    optimizer = model.get_optimizers()[0]
+    optimizer = model.get_optimizers()
 
     assert isinstance(optimizer, model._optimizer_class)
 
@@ -220,6 +220,6 @@ def test_MLPEARegressor():
 
     model.predict(X)
 
-    optimizer = model.get_optimizers()[0]
+    optimizer = model.get_optimizers()
 
     assert isinstance(optimizer, model._weights_optimizer_class)

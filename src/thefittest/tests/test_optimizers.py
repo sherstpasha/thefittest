@@ -52,9 +52,7 @@ def test_GeneticAlgorithm_start_settings():
     stats = optimizer.get_stats()
 
     assert optimizer.get_remains_calls() == 0
-    assert len(stats["fitness_max"]) == iters
-    for i in range(len(stats["fitness_max"][:-1])):
-        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert len(stats["max_fitness"]) == iters
     assert optimizer._sign == -1
 
     # start with the no_increase_num is equal 15
@@ -225,9 +223,7 @@ def test_SelfCGA_start_settings():
     stats = optimizer.get_stats()
 
     assert optimizer.get_remains_calls() == 0
-    assert len(stats["fitness_max"]) == iters
-    for i in range(len(stats["fitness_max"][:-1])):
-        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert len(stats["max_fitness"]) == iters
     assert optimizer._sign == -1
 
     # start with the no_increase_num is equal 15
@@ -389,9 +385,7 @@ def test_GeneticProgramming_start_settings():
     stats = optimizer.get_stats()
 
     assert optimizer.get_remains_calls() == 0
-    assert len(stats["fitness_max"]) == iters
-    for i in range(len(stats["fitness_max"][:-1])):
-        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert len(stats["max_fitness"]) == iters
     assert optimizer._sign == -1
 
     # start with the no_increase_num is equal 15
@@ -618,9 +612,7 @@ def test_SelfCGP_start_settings():
     stats = optimizer.get_stats()
 
     assert optimizer.get_remains_calls() == 0
-    assert len(stats["fitness_max"]) == iters
-    for i in range(len(stats["fitness_max"][:-1])):
-        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert len(stats["max_fitness"]) == iters
     assert optimizer._sign == -1
 
     # start with the no_increase_num is equal 15
@@ -809,9 +801,7 @@ def test_DifferentialEvolution_start_settings():
     stats = optimizer.get_stats()
 
     assert optimizer.get_remains_calls() == 0
-    assert len(stats["fitness_max"]) == iters
-    for i in range(len(stats["fitness_max"][:-1])):
-        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert len(stats["max_fitness"]) == iters
     assert optimizer._sign == -1
 
     # start with the no_increase_num is equal 15
@@ -935,9 +925,7 @@ def test_jDE_start_settings():
     stats = optimizer.get_stats()
 
     assert optimizer.get_remains_calls() == 0
-    assert len(stats["fitness_max"]) == iters
-    for i in range(len(stats["fitness_max"][:-1])):
-        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert len(stats["max_fitness"]) == iters
     assert optimizer._sign == -1
 
     # start with the no_increase_num is equal 15
@@ -1069,9 +1057,7 @@ def test_SHADE_start_settings():
     stats = optimizer.get_stats()
 
     assert optimizer.get_remains_calls() == 0
-    assert len(stats["fitness_max"]) == iters
-    for i in range(len(stats["fitness_max"][:-1])):
-        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert len(stats["max_fitness"]) == iters
     assert optimizer._sign == -1
 
     # start with the no_increase_num is equal 15
@@ -1147,9 +1133,7 @@ def test_SHAGA_start_settings():
     stats = optimizer.get_stats()
 
     assert optimizer.get_remains_calls() == 0
-    assert len(stats["fitness_max"]) == iters
-    for i in range(len(stats["fitness_max"][:-1])):
-        assert stats["fitness_max"][i] <= stats["fitness_max"][i + 1]
+    assert len(stats["max_fitness"]) == iters
     assert optimizer._sign == -1
 
     # start with the no_increase_num is equal 15

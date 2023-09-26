@@ -214,10 +214,10 @@ def stratified_sample(data: NDArray[np.int64], sample_ratio: float) -> NDArray[n
 def train_test_split_stratified(
     X: NDArray[Union[np.float64, np.int64]],
     y: NDArray[np.int64],
-    tests_size: float,
+    test_size: float,
 ) -> Tuple:
     indexes = np.arange(len(y), dtype=np.int64)
-    sample_id = stratified_sample(y, tests_size)
+    sample_id = stratified_sample(y, test_size)
     test_id = sample_id
     train_id = np.setdiff1d(indexes, test_id)
     return (
@@ -231,10 +231,10 @@ def train_test_split_stratified(
 def train_test_split(
     X: NDArray[Union[np.float64, np.int64]],
     y: NDArray[Union[np.float64, np.int64]],
-    tests_size: float,
+    test_size: float,
 ) -> Tuple:
     data_size = len(X)
-    sample_size = int(tests_size * data_size)
+    sample_size = int(test_size * data_size)
     indexes = np.arange(data_size, dtype=np.int64)
     sample_id = random_sample(range_size=data_size, quantity=sample_size, replace=False)
     test_id = sample_id
