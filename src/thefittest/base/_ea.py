@@ -165,10 +165,12 @@ class EvolutionaryAlgorithm:
         max_fitness_id = np.argmax(self._fitness_i)
         self._update_fittest(self._population_g_i, self._population_ph_i, self._fitness_i)
         self._update_stats(
-            population_g=self._population_g_i,
             fitness=self._fitness_i,
+            population_g=self._population_g_i,
+            population_ph=self._population_ph_i,
             max_fitness=self._fitness_i[max_fitness_id],
-            max_fitness_g=self._population_g_i[max_fitness_id],
+            max_g=self._population_g_i[max_fitness_id],
+            max_ph=self._population_ph_i[max_fitness_id],
         )
 
     def _adapt(self: EvolutionaryAlgorithm) -> None:

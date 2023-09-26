@@ -162,7 +162,7 @@ class MLPEAClassifier(Model):
 
         return phenotype
 
-    def get_optimizers(
+    def get_optimizer(
         self: MLPEAClassifier,
     ) -> Union[
         DifferentialEvolution,

@@ -5,6 +5,7 @@ from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticProgramming
 from ..optimizers import SelfCGA
 from ..tools.transformations import scale_data
+from ..base._net import Net
 
 
 def test_GeneticProgrammingNeuralNetClassifier():
@@ -64,8 +65,11 @@ def test_GeneticProgrammingNeuralNetClassifier():
 
     model.predict(X)
 
-    optimizer = model.get_optimizers()
+    optimizer = model.get_optimizer()
 
+    net = model.get_net()
+
+    assert isinstance(net, Net)
     assert isinstance(optimizer, model._optimizer_class)
 
 
@@ -121,6 +125,8 @@ def test_MLPEAClassifier():
 
     model.predict(X)
 
-    optimizer = model.get_optimizers()
+    optimizer = model.get_optimizer()
+    net = model.get_net()
 
+    assert isinstance(net, Net)
     assert isinstance(optimizer, model._weights_optimizer_class)

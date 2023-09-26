@@ -4,7 +4,6 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
-from typing import Tuple
 from typing import Type
 from typing import Union
 
@@ -258,7 +257,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
         return population_ph
 
-    def get_optimizers(
+    def get_optimizer(
         self: GeneticProgrammingNeuralNetClassifier,
     ) -> Union[
         DifferentialEvolution,
@@ -271,6 +270,11 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         SHAGA,
     ]:
         return self._optimizer
+
+    def get_net(self: GeneticProgrammingNeuralNetClassifier) -> Net:
+        optimizer = self.get_optimizer()
+        net = optimizer.get_fittest()["phenotype"]
+        return net
 
     def _fit(
         self: GeneticProgrammingNeuralNetClassifier,

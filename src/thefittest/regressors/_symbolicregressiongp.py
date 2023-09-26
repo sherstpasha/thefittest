@@ -94,7 +94,7 @@ class SymbolicRegressionGP(Model):
         fitness = [self._evaluate_tree(tree, y) for tree in trees]
         return np.array(fitness)
 
-    def get_optimizers(
+    def get_optimizer(
         self: SymbolicRegressionGP,
     ) -> Union[
         DifferentialEvolution,
@@ -155,7 +155,7 @@ class SymbolicRegressionGP(Model):
         self: SymbolicRegressionGP, X: NDArray[np.float64]
     ) -> NDArray[Union[np.float64, np.int64]]:
         n_dimension = X.shape[1]
-        solution = self.get_optimizers().get_fittest()
+        solution = self.get_optimizer().get_fittest()
 
         genotype_for_pred = solution["phenotype"].set_terminals(
             **{f"x{i}": X[:, i] for i in range(n_dimension)}
