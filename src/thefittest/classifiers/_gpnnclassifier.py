@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import Any
-from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
@@ -80,7 +79,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         self._cache_condition: bool = cache
 
         self._optimizer: Union[SelfCGP, GeneticProgramming]
-        self._cache: Dict = {}
+        self._cache: List[Net] = []
 
     def _get_uniset(
         self: GeneticProgrammingNeuralNetClassifier, X: NDArray[np.float64]
@@ -165,7 +164,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         net: Net,
         X_train: NDArray[np.float64],
         proba_train: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
+    ) -> Net:
         if self._weights_optimizer_args is not None:
             for arg in (
                 "fitness_function",
@@ -213,7 +212,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         optimizer.fit()
 
         phenotype = optimizer.get_fittest()["phenotype"]
-        return phenotype
+        net._weights = phenotype
+        return net
 
     def _genotype_to_phenotype(
         self: GeneticProgrammingNeuralNetClassifier,
@@ -224,36 +224,21 @@ class GeneticProgrammingNeuralNetClassifier(Model):
     ) -> NDArray:
         n_variables: int = X_train.shape[1]
 
-        population_ph: NDArray = np.empty(shape=len(population_g), dtype=object)
-        need_to_train_cond: NDArray[np.bool_] = np.full_like(
-            population_ph, fill_value=False, dtype=bool
-        )
-
-        need_to_train_list: List[Net] = []
-        need_to_train_list_str: List = []
+        population_ph = np.empty(shape=len(population_g), dtype=object)
 
         for i, individ_g in enumerate(population_g):
-            str_tree = str(individ_g)
-            if str_tree in self._cache.keys():
-                population_ph[i] = self._cache[str_tree].copy()
-            else:
-                net = self._genotype_to_phenotype_tree(n_variables, n_outputs, individ_g)
-
-                need_to_train_list.append(net)
-                need_to_train_list_str.append(str_tree)
-                need_to_train_cond[i] = True
-
-        trained_weights = list(
-            map(lambda net: self._train_net(net, X_train, proba_train), need_to_train_list)
-        )
-
-        for net, weight in zip(need_to_train_list, trained_weights):
-            net._weights = weight
-
-        population_ph[need_to_train_cond] = need_to_train_list
-
-        new_cache = dict(zip(need_to_train_list_str, need_to_train_list))
-        self._cache = dict(list(self._cache.items()) + list(new_cache.items()))
+            net = self._genotype_to_phenotype_tree(n_variables, n_outputs, individ_g)
+            trained = False
+            if self._cache_condition:
+                for net_i in self._cache:
+                    if net_i == net:
+                        population_ph[i] = net_i.copy()
+                        trained = True
+                        break
+            if not trained:
+                population_ph[i] = self._train_net(net, X_train, proba_train)
+                trained = True
+                self._cache.append(population_ph[i].copy())
 
         return population_ph
 
@@ -282,6 +267,15 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         y: NDArray[Union[np.float64, np.int64]],
     ) -> GeneticProgrammingNeuralNetClassifier:
         optimizer_args: dict[str, Any]
+
+        indexes = np.arange(len(X))
+        np.random.shuffle(indexes)
+
+        X = X.copy()
+        X = X[indexes]
+
+        y = y.copy()
+        y = y[indexes]
 
         if self._offset:
             X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])
@@ -327,7 +321,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         optimizer_args["iters"] = self._iters
         optimizer_args["pop_size"] = self._pop_size
         optimizer_args["uniset"] = uniset
-        optimizer_args["minimization"] = True
+        optimizer_args["minimization"] = False
 
         self._optimizer = self._optimizer_class(**optimizer_args)
         self._optimizer.fit()

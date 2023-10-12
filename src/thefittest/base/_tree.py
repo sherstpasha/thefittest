@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+from collections import Counter
 from collections import defaultdict
 from inspect import signature
 from typing import Any
@@ -91,6 +92,21 @@ class EphemeralNode(Node):
         return node
 
 
+class DualNode(Operator):
+    def __init__(
+        self, top_node: Union[TerminalNode, EphemeralNode], bottom_node: FunctionalNode
+    ) -> None:
+        self._top_node = top_node
+        self._bottom_node = bottom_node
+
+        name = f"{self._top_node._name}\n{self._bottom_node._name}"
+        sign = f"{self._top_node._sign}\n{self._bottom_node._sign}"
+        formula = f"{name}|" + "({} + {})"
+
+        Operator.__init__(self, formula=formula, name=name, sign=sign)
+        self.__call__ = self._bottom_node._value.__call__
+
+
 class UniversalSet:
     def __init__(
         self,
@@ -120,6 +136,45 @@ class UniversalSet:
         n_args_functionals = self._functional_set[n_args]
         node = random.choice(n_args_functionals)
         return node
+
+
+class EnsembleUniversalSet(UniversalSet):
+    def __init__(
+        self,
+        functional_set: Tuple[FunctionalNode, ...],
+        terminal_set: Tuple[Union[TerminalNode, EphemeralNode], ...],
+    ) -> None:
+        UniversalSet.__init__(self, functional_set, terminal_set)
+        self._functional_set_proba = self._define_functional_set_proba()
+
+    def _define_functional_set_proba(self: EnsembleUniversalSet) -> defaultdict:
+        functional_set_proba = defaultdict(list)
+        for n_args, value in self._functional_set.items():
+            count = Counter([type(node._value) for node in value])
+            for node in value:
+                type_ = type(node._value)
+                functional_set_proba[n_args].append(count[type_])
+            proba = np.array(functional_set_proba[n_args], dtype=np.float64)
+            functional_set_proba[n_args] = 1 / proba
+
+        return functional_set_proba
+
+    def _random_functional(self, n_args: int = -1) -> FunctionalNode:
+        from ..tools.random import random_weighted_sample
+
+        n_args_functionals = self._functional_set[n_args]
+        weights = self._functional_set_proba[n_args]
+        index = random_weighted_sample(weights=weights, quantity=1, replace=True)[0]
+        choosen = n_args_functionals[index]
+
+        if isinstance(choosen._value, DualNode):
+            if isinstance(choosen._value._top_node, EphemeralNode):
+                choosen = FunctionalNode(
+                    DualNode(
+                        top_node=choosen._value._top_node(), bottom_node=choosen._value._bottom_node
+                    )
+                )
+        return choosen
 
 
 class Tree:

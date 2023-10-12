@@ -276,3 +276,26 @@ def test_net():
 
     assert hb._activ in [0, 1, 2, 3]
     assert hb._size <= 10
+
+    net17 = net16.copy()
+    net17._inputs.add(3)
+
+    net18 = net16.copy()
+    net18._outputs.add(9)
+
+    net19 = net16.copy()
+    net19._activs[2] = 2
+
+    net20 = net16.copy()
+    net20._hidden_layers[0].add(22)
+
+    net21 = net16.copy()
+    net21._connects[0][1] = 3
+
+    assert net16 == net16
+    for i, net_i in enumerate([net16, net17, net18, net19, net20, net21]):
+        for j, net_j in enumerate([net16, net17, net18, net19, net20, net21]):
+            if i == j:
+                assert net_i == net_j
+            else:
+                assert net_i != net_j

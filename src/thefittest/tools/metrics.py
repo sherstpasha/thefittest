@@ -112,12 +112,12 @@ def recall_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.
     y_true = np.array([0, 1, 0, 2 ...], dtype = np.int64)
     y_predict = np.array([1, 2, 0, 2 ...], dtype = np.int64)
     """
-    classes = np.unique(y_true)
-    n_classes = len(classes)
+    n_classes = len(np.unique(y_true))
     size = len(y_true)
 
     up = np.zeros(shape=n_classes, dtype=np.int64)
     down = np.zeros(shape=n_classes, dtype=np.int64)
+    recall = np.zeros(shape=n_classes, dtype=np.float64)
 
     for i in range(size):
         if y_true[i] == y_predict[i]:
@@ -125,8 +125,9 @@ def recall_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.
         else:
             down[y_true[i]] += 1
 
-    recall = up / (down + up)
-    recall[np.isnan(recall)] = 1
+    for i in range(n_classes):
+        if up[i] != 0:
+            recall[i] = up[i] / (down[i] + up[i])
 
     return np.mean(recall)
 
@@ -154,6 +155,7 @@ def precision_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> 
 
     up = np.zeros(shape=n_classes, dtype=np.int64)
     down = np.zeros(shape=n_classes, dtype=np.int64)
+    precision = np.zeros(shape=n_classes, dtype=np.float64)
 
     for i in range(size):
         if y_true[i] == y_predict[i]:
@@ -161,8 +163,9 @@ def precision_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> 
         else:
             down[y_predict[i]] += 1
 
-    precision = up / (down + up)
-    precision[np.isnan(precision)] = 1
+    for i in range(n_classes):
+        if up[i] != 0:
+            precision[i] = up[i] / (down[i] + up[i])
 
     return np.mean(precision)
 
@@ -184,13 +187,13 @@ def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.floa
     y_true = np.array([0, 1, 0, 2 ...], dtype = np.int64)
     y_predict = np.array([1, 2, 0, 2 ...], dtype = np.int64)
     """
-    classes = np.unique(y_true)
-    n_classes = len(classes)
+    n_classes = len(np.unique(y_true))
     size = len(y_true)
 
     up = np.zeros(shape=n_classes, dtype=np.int64)
     down_recall = np.zeros(shape=n_classes, dtype=np.int64)
     down_precision = np.zeros(shape=n_classes, dtype=np.int64)
+    f1 = np.zeros(shape=n_classes, dtype=np.float64)
 
     for i in range(size):
         if y_true[i] == y_predict[i]:
@@ -199,13 +202,12 @@ def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.floa
             down_recall[y_true[i]] += 1
             down_precision[y_predict[i]] += 1
 
-    precision = up / (down_precision + up)
-    recall = up / (down_recall + up)
+    for i in range(n_classes):
+        if up[i] != 0:
+            precision = up[i] / (down_precision[i] + up[i])
+            recall = up[i] / (down_recall[i] + up[i])
+            f1[i] = 2 * (precision * recall) / (precision + recall)
 
-    precision[np.isnan(precision)] = 1
-    recall[np.isnan(recall)] = 1
-
-    f1 = 2 * (precision * recall) / (precision + recall)
     return np.mean(f1)
 
 

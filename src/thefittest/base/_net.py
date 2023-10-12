@@ -15,6 +15,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from thefittest.tools.transformations import scale_data
+from thefittest.tools._numba_funcs import voting
 
 from ..tools.operators import forward2d
 
@@ -56,6 +57,20 @@ class Net:
     def __len__(self) -> int:
         return len(self._weights)
 
+    def __eq__(self, other: Net) -> bool:
+        if self._inputs != other._inputs:
+            return False
+        elif any(h_1 != h_2 for h_1, h_2 in zip(self._hidden_layers, other._hidden_layers)):
+            return False
+        elif self._outputs != other._outputs:
+            return False
+        elif np.any(self._connects != other._connects):
+            return False
+        elif self._activs != other._activs:
+            return False
+        else:
+            return True
+
     def _set_connects(self, values: Optional[NDArray[np.int64]]) -> NDArray[np.int64]:
         if values is None:
             to_return = np.empty((0, 2), dtype=np.int64)
@@ -72,9 +87,10 @@ class Net:
         return to_return
 
     def copy(self) -> Net:
+        hidden_layers = [layer.copy() for layer in self._hidden_layers]
         return Net(
             inputs=self._inputs.copy(),
-            hidden_layers=self._hidden_layers.copy(),
+            hidden_layers=hidden_layers,
             outputs=self._outputs.copy(),
             connects=self._connects.copy(),
             weights=self._weights.copy(),
@@ -323,3 +339,69 @@ class HiddenBlock:
 
     def __str__(self) -> str:
         return "{}{}".format(ACTIVATION_NAME[self._activ], self._size)
+
+
+class NetEnsemble:
+    def __init__(self, nets: NDArray):
+        self._nets = nets
+
+    def __len__(self) -> int:
+        return len(self._nets)
+
+    def __eq__(self, other: NetEnsemble) -> bool:
+        if len(self) != len(other):
+            return False
+        elif any((net_i != net_j for net_i, net_j in zip(self._nets, other._nets))):
+            return False
+        else:
+            return True
+
+    def get_nets(self: NetEnsemble) -> NDArray:
+        return self._nets
+
+    def forward(
+        self: NetEnsemble,
+        X: NDArray[np.float64],
+        weights_list: Optional[List[NDArray[np.float64]]] = None,
+    ) -> NDArray[np.float64]:
+        if weights_list is not None:
+            to_return = [
+                net_i.forward(X, weights_i) for net_i, weights_i in zip(self._nets, weights_list)
+            ]
+        else:
+            to_return = [net_i.forward(X) for net_i in self._nets]
+
+        return np.array(to_return, dtype=np.float64)
+
+    def voting_output_classifier(
+        self: NetEnsemble,
+        X: NDArray[np.float64],
+        weights_list: Optional[List[NDArray[np.float64]]] = None,
+    ) -> NDArray[np.float64]:
+        outputs = self.forward(X, weights_list)
+        argmax = np.argmax(outputs, axis=-1)
+        to_return = np.empty(shape = (argmax.shape[1], argmax.shape[2]), dtype = np.int64)
+        for j in range(argmax.shape[1]):
+            to_return[j] = voting(argmax[:, j])
+
+        return to_return
+
+    def average_output(
+        self: NetEnsemble,
+        X: NDArray[np.float64],
+        weights_list: Optional[List[NDArray[np.float64]]] = None,
+    ) -> NDArray[np.float64]:
+        outputs = self.forward(X, weights_list)
+        outputs_mean = np.mean(outputs, axis=0)
+        return outputs_mean
+
+    def average_output_classifier(
+        self: NetEnsemble,
+        X: NDArray[np.float64],
+        weights_list: Optional[List[NDArray[np.float64]]] = None,
+    ) -> NDArray[np.float64]:
+        outputs_mean = self.average_output(X, weights_list)
+        return np.argmax(outputs_mean, axis=-1)
+
+    def copy(self) -> NetEnsemble:
+        return NetEnsemble(np.array([net_i.copy() for net_i in self._nets], dtype=object))

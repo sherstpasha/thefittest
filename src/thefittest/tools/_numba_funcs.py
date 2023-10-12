@@ -2,6 +2,7 @@ from numba import boolean
 from numba import float64
 from numba import int64
 from numba import njit
+from numba.typed import Dict as numbaDict
 
 import numpy as np
 from numpy.typing import NDArray
@@ -117,3 +118,26 @@ def max_axis(array: NDArray[np.float64]) -> NDArray[np.float64]:
     for i in range(array.shape[1]):
         res[i] = np.max(array[:, i])
     return res
+
+
+@njit(int64[:](int64[:, :]))
+def voting(argmax_y: NDArray[np.int64]) -> NDArray[np.int64]:
+    winner = np.empty(argmax_y.shape[1], dtype=np.int64)
+    for i in range(argmax_y.shape[1]):
+        counter = numbaDict.empty(key_type=int64, value_type=int64)
+
+        for argmax_y_i_j in argmax_y[:, i]:
+            if argmax_y_i_j not in counter:
+                counter[argmax_y_i_j] = 1
+            else:
+                counter[argmax_y_i_j] += 1
+
+        max_key = -1
+        max_value = 0
+        for key, value in counter.items():
+            if value > max_value:
+                max_value = value
+                max_key = key
+
+        winner[i] = max_key
+    return winner
