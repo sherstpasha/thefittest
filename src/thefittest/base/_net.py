@@ -64,6 +64,8 @@ class Net:
             return False
         elif self._outputs != other._outputs:
             return False
+        elif len(self._connects) != len(other._connects):
+            return False
         elif np.any(self._connects != other._connects):
             return False
         elif self._activs != other._activs:

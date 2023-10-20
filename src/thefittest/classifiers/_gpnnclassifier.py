@@ -321,7 +321,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         optimizer_args["iters"] = self._iters
         optimizer_args["pop_size"] = self._pop_size
         optimizer_args["uniset"] = uniset
-        optimizer_args["minimization"] = False
+        optimizer_args["minimization"] = True
 
         self._optimizer = self._optimizer_class(**optimizer_args)
         self._optimizer.fit()
