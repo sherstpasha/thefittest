@@ -85,6 +85,7 @@ class MLPEAClassifier(Model):
 
         net = net > layer_net
         net._get_order()
+        net._offset = self._offset
         return net
 
     def _evaluate_nets(

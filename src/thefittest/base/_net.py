@@ -43,6 +43,7 @@ class Net:
         self._connects = self._set_connects(values=connects)
         self._weights = self._set_weights(values=weights)
         self._activs = activs or {}
+        self._offset: bool = False
 
         self._numpy_inputs: Optional[NDArray[np.int64]] = None
         self._numpy_outputs: NDArray[np.int64]
@@ -90,7 +91,7 @@ class Net:
 
     def copy(self) -> Net:
         hidden_layers = [layer.copy() for layer in self._hidden_layers]
-        return Net(
+        copy_net = Net(
             inputs=self._inputs.copy(),
             hidden_layers=hidden_layers,
             outputs=self._outputs.copy(),
@@ -98,6 +99,8 @@ class Net:
             weights=self._weights.copy(),
             activs=self._activs.copy(),
         )
+        copy_net._offset = self._offset
+        return copy_net
 
     def _assemble_hiddens(self) -> Set[int]:
         if len(self._hidden_layers) > 0:
@@ -268,7 +271,6 @@ class Net:
 
         if self._numpy_inputs is None:
             self._get_order()
-
         outputs = forward2d(
             X,
             self._numpy_inputs,
@@ -344,8 +346,9 @@ class HiddenBlock:
 
 
 class NetEnsemble:
-    def __init__(self, nets: NDArray):
+    def __init__(self, nets: NDArray, meta_algorithm: Optional[Net] = None):
         self._nets = nets
+        self._meta_algorithm = meta_algorithm
 
     def __len__(self) -> int:
         return len(self._nets)
@@ -375,35 +378,29 @@ class NetEnsemble:
 
         return np.array(to_return, dtype=np.float64)
 
-    def voting_output_classifier(
+    def _get_meta_inputs(
+        self: NetEnsemble, X: NDArray[np.float64], offset: bool = True
+    ) -> NDArray[np.float64]:
+        outputs = self.forward(X)[:, 0]
+        X_input = np.concatenate(outputs, axis=1)
+        if offset:
+            X_input = np.hstack([X_input, np.ones((X_input.shape[0], 1))])
+
+        return X_input
+
+    def meta_output(
         self: NetEnsemble,
         X: NDArray[np.float64],
-        weights_list: Optional[List[NDArray[np.float64]]] = None,
     ) -> NDArray[np.float64]:
-        outputs = self.forward(X, weights_list)
-        argmax = np.argmax(outputs, axis=-1)
-        to_return = np.empty(shape = (argmax.shape[1], argmax.shape[2]), dtype = np.int64)
-        for j in range(argmax.shape[1]):
-            to_return[j] = voting(argmax[:, j])
-
-        return to_return
-
-    def average_output(
-        self: NetEnsemble,
-        X: NDArray[np.float64],
-        weights_list: Optional[List[NDArray[np.float64]]] = None,
-    ) -> NDArray[np.float64]:
-        outputs = self.forward(X, weights_list)
-        outputs_mean = np.mean(outputs, axis=0)
-        return outputs_mean
-
-    def average_output_classifier(
-        self: NetEnsemble,
-        X: NDArray[np.float64],
-        weights_list: Optional[List[NDArray[np.float64]]] = None,
-    ) -> NDArray[np.float64]:
-        outputs_mean = self.average_output(X, weights_list)
-        return np.argmax(outputs_mean, axis=-1)
+        if self._meta_algorithm is not None:
+            X_input = self._get_meta_inputs(X, offset=self._meta_algorithm._offset)
+            output = self._meta_algorithm.forward(X=X_input)[0]
+            return output
+        else:
+            raise ValueError("text222")
 
     def copy(self) -> NetEnsemble:
-        return NetEnsemble(np.array([net_i.copy() for net_i in self._nets], dtype=object))
+        copy_ = NetEnsemble(np.array([net_i.copy() for net_i in self._nets], dtype=object))
+        if self._meta_algorithm is not None:
+            copy_._meta_algorithm = self._meta_algorithm.copy()
+        return copy_

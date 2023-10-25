@@ -63,6 +63,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         weights_optimizer: weights_type_optimizer_alias = SHADE,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
         cache: bool = True,
+        net_size_penalty: float = 0.0,
     ):
         Model.__init__(self)
         self._iters: int = iters
@@ -80,6 +81,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
         self._optimizer: Union[SelfCGP, GeneticProgramming]
         self._cache: List[Net] = []
+        self._net_size_penalty: float = net_size_penalty
 
     def _get_uniset(
         self: GeneticProgrammingNeuralNetClassifier, X: NDArray[np.float64]
@@ -117,7 +119,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         self, population: NDArray, X: NDArray[np.float64], targets: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         output3d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)
-        fitness = categorical_crossentropy3d(targets, output3d)
+        lens = np.array(list(map(len, population)))
+        fitness = categorical_crossentropy3d(targets, output3d) + self._net_size_penalty * lens
         return fitness
 
     def _genotype_to_phenotype_tree(self, n_variables: int, n_outputs: int, tree: Tree) -> Net:
@@ -145,6 +148,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         activs = dict(zip(output_id, [ACTIV_NAME_INV[self._output_activation]] * len(output_id)))
         to_return = pack[0] > Net(outputs=output_id, activs=activs)
         to_return = to_return._fix(set(range(n_variables)))
+        to_return._offset = self._offset
 
         return to_return
 
@@ -213,6 +217,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
         phenotype = optimizer.get_fittest()["phenotype"]
         net._weights = phenotype
+        print(optimizer.get_fittest()["fitness"])
         return net
 
     def _genotype_to_phenotype(
@@ -267,15 +272,6 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         y: NDArray[Union[np.float64, np.int64]],
     ) -> GeneticProgrammingNeuralNetClassifier:
         optimizer_args: dict[str, Any]
-
-        indexes = np.arange(len(X))
-        np.random.shuffle(indexes)
-
-        X = X.copy()
-        X = X[indexes]
-
-        y = y.copy()
-        y = y[indexes]
 
         if self._offset:
             X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])

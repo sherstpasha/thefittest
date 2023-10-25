@@ -38,10 +38,11 @@ from ..tools.metrics import f1_score2d
 from ..tools.operators import Add
 from ..tools.operators import More
 from ..tools.random import float_population
-from ..tools.random import train_test_split_stratified
+from ..tools.random import train_test_split_stratified, train_test_split
 from ..tools.transformations import GrayCode
 from ..base._tree import Operator
 from ..classifiers import GeneticProgrammingNeuralNetClassifier
+from ..classifiers import MLPEAClassifier
 
 
 weights_type_optimizer_alias = Union[
@@ -55,7 +56,7 @@ weights_type_optimizer_alias = Union[
 weights_optimizer_alias = Union[DifferentialEvolution, jDE, SHADE, GeneticAlgorithm, SelfCGA, SHAGA]
 
 
-class GeneticProgrammingNeuralNetEnsemblesClassifier(GeneticProgrammingNeuralNetClassifier):
+class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetClassifier):
     def __init__(
         self,
         iters: int,
@@ -89,7 +90,7 @@ class GeneticProgrammingNeuralNetEnsemblesClassifier(GeneticProgrammingNeuralNet
         self._cache: List[NetEnsemble] = []
 
     def _get_uniset(
-        self: GeneticProgrammingNeuralNetEnsemblesClassifier, X: NDArray[np.float64]
+        self: GeneticProgrammingNeuralNetStackingClassifier, X: NDArray[np.float64]
     ) -> EnsembleUniversalSet:
         uniset: EnsembleUniversalSet
         if self._offset:
@@ -131,7 +132,7 @@ class GeneticProgrammingNeuralNetEnsemblesClassifier(GeneticProgrammingNeuralNet
         return uniset
 
     def _split_tree(
-        self: GeneticProgrammingNeuralNetEnsemblesClassifier, tree: Tree
+        self: GeneticProgrammingNeuralNetStackingClassifier, tree: Tree
     ) -> Tuple[Tree, Tree]:
         new_tree = Tree([])
         remain_tree = tree.copy()
@@ -175,22 +176,28 @@ class GeneticProgrammingNeuralNetEnsemblesClassifier(GeneticProgrammingNeuralNet
         return NetEnsemble(nets=np.array(nets, dtype=object))
 
     def _genotype_to_phenotype(
-        self: GeneticProgrammingNeuralNetEnsemblesClassifier,
-        X_train: NDArray[np.float64],
-        proba_train: NDArray[np.float64],
+        self: GeneticProgrammingNeuralNetStackingClassifier,
+        X_train_ens: NDArray[np.float64],
+        proba_train_ens: NDArray[np.float64],
+        X_train_meta: NDArray[np.float64],
+        proba_train_meta: NDArray[np.float64],
         population_g: NDArray,
         n_outputs: int,
     ) -> NDArray:
-        n_variables: int = X_train.shape[1]
+        n_variables: int = X_train_ens.shape[1]
 
         population_ph: NDArray = np.empty(shape=len(population_g), dtype=object)
 
         population_ph = np.array(
             [
                 self._train_ensemble(
-                    self._genotype_to_phenotype_ensemble(n_variables, n_outputs, individ_g),
-                    X_train,
-                    proba_train,
+                    ensemble=self._genotype_to_phenotype_ensemble(
+                        n_variables, n_outputs, individ_g
+                    ),
+                    X_train_ens=X_train_ens,
+                    proba_train_ens=proba_train_ens,
+                    X_train_meta=X_train_meta,
+                    proba_train_meta=proba_train_meta,
                 )
                 for individ_g in population_g
             ],
@@ -204,18 +211,19 @@ class GeneticProgrammingNeuralNetEnsemblesClassifier(GeneticProgrammingNeuralNet
     ) -> NDArray[np.float64]:
         fitness = np.empty(shape=self._pop_size, dtype=np.float64)
         for i, ensemble in enumerate(population):
-            # output2d = ensemble.average_output(X)[0]
-            output3d = ensemble.voting_output_classifier(X)[0]
-            # fitness[i] = categorical_crossentropy(targets, output2d)
-            y_true = np.argmax(targets, axis=1)
-            fitness[i] = f1_score(y_true, output3d)
+            output2d = ensemble.meta_output(X)
+            fitness[i] = categorical_crossentropy(targets, output2d)
+            print(fitness[i])
+
         return fitness
 
     def _train_ensemble(
         self,
         ensemble: NetEnsemble,
-        X_train: NDArray[np.float64],
-        proba_train: NDArray[np.float64],
+        X_train_ens: NDArray[np.float64],
+        proba_train_ens: NDArray[np.float64],
+        X_train_meta: NDArray[np.float64],
+        proba_train_meta: NDArray[np.float64],
     ) -> NetEnsemble:
         if self._cache_condition:
             for ensemble_i in self._cache:
@@ -225,106 +233,117 @@ class GeneticProgrammingNeuralNetEnsemblesClassifier(GeneticProgrammingNeuralNet
         n_nets = len(ensemble)
         print(n_nets)
 
-        step = int(np.ceil(len(X_train) / n_nets))
-        split_points = np.arange(step, len(X_train), step)
+        trained_ensemble = self._train_ensemble_individually(ensemble, X_train_ens, proba_train_ens)
+        X_meta = trained_ensemble._get_meta_inputs(X_train_meta, offset=False)
+        print(X_meta.shape)
 
-        # X_train_groups = np.split(X_train, split_points)
-        # proba_train_groups = np.split(proba_train, split_points)
-        # # for i, net_i in enumerate(ensemble._nets):
-        # #     ensemble._nets[i] = self._train_net(net_i, X_train, proba_train)
+        y_meta = np.argmax(proba_train_meta, axis=1)
 
-        return self._train_all_ensemble(ensemble, X_train, proba_train)
+        meta_model = MLPEAClassifier(
+            iters=100,
+            pop_size=100,
+            hidden_layers=(5,),
+            weights_optimizer=self._weights_optimizer_class,
+            offset=True,
+        )
 
-    def _evaluate_ensemble(
-        self,
-        all_weights: NDArray[np.float64],
-        cut_points: NDArray[np.int64],
-        ensemble: NetEnsemble,
-        X: NDArray[np.float64],
-        targets: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
-        weights_list = np.split(all_weights, cut_points, axis=-1)
-        # output3d = ensemble.average_output(X, weights_list)
-        output3d = ensemble.voting_output_classifier(X, weights_list)
-        y_true = np.argmax(targets, axis=-1)
-        error = f1_score2d(y_true, output3d)
-        return error
+        meta_model.fit(X_meta, y_meta)
+        optimizer = meta_model.get_optimizer()
+        trained_ensemble._meta_algorithm = meta_model._net.copy()
 
-    def _train_all_ensemble(
-        self,
-        ensemble: NetEnsemble,
-        X_train: NDArray[np.float64],
-        proba_train: NDArray[np.float64],
+        print("meta error optimization", optimizer.get_fittest()["fitness"], X_meta.shape)
+
+        output2d = ensemble.meta_output(X_train_ens)
+        error_meta_train = categorical_crossentropy(proba_train_ens, output2d)
+        print("meta error ", error_meta_train)
+
+        return trained_ensemble
+
+    def _train_ensemble_individually(
+        self, ensemble: NetEnsemble, X_train: NDArray[np.float64], proba_train: NDArray[np.float64]
     ) -> NetEnsemble:
         if self._cache_condition:
             for ensemble_i in self._cache:
                 if ensemble_i == ensemble:
                     return ensemble_i.copy()
+        for net in ensemble._nets:
+            self._train_net(net, X_train, proba_train)
 
-        net_lens = [len(net_i) for net_i in ensemble._nets]
-        cut_points = np.add.accumulate(net_lens, dtype=np.int64)[:-1]
+        return ensemble
 
-        n_variables = sum(net_lens)
-        initial_weights = np.concatenate([net_i._weights for net_i in ensemble._nets])
+    def _fit(
+        self: GeneticProgrammingNeuralNetStackingClassifier,
+        X: NDArray[np.float64],
+        y: NDArray[Union[np.float64, np.int64]],
+    ) -> GeneticProgrammingNeuralNetStackingClassifier:
+        optimizer_args: dict[str, Any]
 
-        if self._weights_optimizer_args is not None:
+        if self._offset:
+            X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])
+
+        n_outputs: int = len(set(y))
+        eye: NDArray[np.float64] = np.eye(n_outputs, dtype=np.float64)
+
+        X_train, X_test, y_train, y_test = train_test_split_stratified(
+            X, y.astype(np.int64), self._test_sample_ratio
+        )
+
+        X_train_ens, X_train_meta, y_train_ens, y_train_meta = train_test_split_stratified(
+            X_train, y_train, 0.5
+        )
+
+        proba_test: NDArray[np.float64] = eye[y_test]
+        proba_train_ens: NDArray[np.float64] = eye[y_train_ens]
+        proba_train_meta: NDArray[np.float64] = eye[y_train_meta]
+
+        if self._optimizer_args is not None:
+            assert (
+                "iters" not in self._optimizer_args.keys()
+                and "pop_size" not in self._optimizer_args.keys()
+            ), """Do not set the "iters" or "pop_size" in the "optimizer_args". Instead,
+              use the "SymbolicRegressionGP" arguments"""
             for arg in (
                 "fitness_function",
-                "left",
-                "right",
-                "str_len",
-                "genotype_to_phenotype",
+                "uniset",
                 "minimization",
             ):
                 assert (
-                    arg not in self._weights_optimizer_args.keys()
+                    arg not in self._optimizer_args.keys()
                 ), f"""Do not set the "{arg}"
-              to the "weights_optimizer_args". It is defined automatically"""
-            weights_optimizer_args = self._weights_optimizer_args.copy()
+                to the "optimizer_args". It is defined automatically"""
+            optimizer_args = self._optimizer_args.copy()
 
         else:
-            weights_optimizer_args = {"iters": 100, "pop_size": 100}
+            optimizer_args = {}
 
-        weights_optimizer_args["iters"] = weights_optimizer_args["iters"] * len(net_lens)
-        left: NDArray[np.float64] = np.full(shape=n_variables, fill_value=-10, dtype=np.float64)
-        right: NDArray[np.float64] = np.full(shape=n_variables, fill_value=10, dtype=np.float64)
-        initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = float_population(
-            weights_optimizer_args["pop_size"], left, right
+        uniset: EnsembleUniversalSet = self._get_uniset(X)
+
+        optimizer_args["fitness_function"] = lambda population: self._fitness_function(
+            population, X_test, proba_test
         )
-        initial_population[0] = initial_weights.copy()
-        weights_optimizer_args["fitness_function"] = lambda population: self._evaluate_ensemble(
-            all_weights=population,
-            ensemble=ensemble,
-            cut_points=cut_points,
-            X=X_train,
-            targets=proba_train,
+        optimizer_args["genotype_to_phenotype"] = lambda trees: self._genotype_to_phenotype(
+            X_train_ens=X_train_ens,
+            proba_train_ens=proba_train_ens,
+            X_train_meta=X_train_meta,
+            proba_train_meta=proba_train_meta,
+            population_g=trees,
+            n_outputs=n_outputs,
         )
-        if self._weights_optimizer_class in (SHADE, DifferentialEvolution, jDE):
-            weights_optimizer_args["left"] = left
-            weights_optimizer_args["right"] = right
-        else:
-            parts: NDArray[np.int64] = np.full(shape=n_variables, fill_value=16, dtype=np.int64)
-            genotype_to_phenotype = GrayCode(fit_by="parts").fit(left, right, parts)
-            weights_optimizer_args["str_len"] = np.sum(parts)
-            weights_optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype.transform
+        optimizer_args["iters"] = self._iters
+        optimizer_args["pop_size"] = self._pop_size
+        optimizer_args["uniset"] = uniset
+        optimizer_args["minimization"] = True
 
-        weights_optimizer_args["minimization"] = False
-        optimizer = self._weights_optimizer_class(**weights_optimizer_args)
-        optimizer.fit()
+        self._optimizer = self._optimizer_class(**optimizer_args)
+        self._optimizer.fit()
 
-        phenotype = optimizer.get_fittest()["phenotype"]
-
-        list_weights = np.split(phenotype, cut_points)
-        for i, weights_i in enumerate(list_weights):
-            ensemble._nets[i]._weights = weights_i.copy()
-
-        print(optimizer.get_fittest()["fitness"])
-        return ensemble
+        return self
 
     def _predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
         fittest = self._optimizer.get_fittest()
-        predict = fittest["phenotype"].average_output_classifier(X)[0]
-        return predict
+        output = fittest["phenotype"].meta_output(X)
+
+        return np.argmax(output, axis=1)
