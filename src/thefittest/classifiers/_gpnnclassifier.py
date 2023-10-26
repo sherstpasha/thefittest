@@ -33,6 +33,8 @@ from ..tools.random import float_population
 from ..tools.random import train_test_split_stratified
 from ..tools.transformations import GrayCode
 
+from joblib import Parallel, delayed
+
 
 weights_type_optimizer_alias = Union[
     Type[DifferentialEvolution],
@@ -163,12 +165,63 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         error = categorical_crossentropy3d(targets, output3d)
         return error
 
-    def _train_net(
-        self,
-        net: Net,
-        X_train: NDArray[np.float64],
-        proba_train: NDArray[np.float64],
-    ) -> Net:
+    # def _train_net(
+    #     self,
+    #     net: Net,
+    #     X_train: NDArray[np.float64],
+    #     proba_train: NDArray[np.float64],
+    # ) -> Net:
+    #     if self._weights_optimizer_args is not None:
+    #         for arg in (
+    #             "fitness_function",
+    #             "left",
+    #             "right",
+    #             "str_len",
+    #             "genotype_to_phenotype",
+    #             "minimization",
+    #         ):
+    #             assert (
+    #                 arg not in self._weights_optimizer_args.keys()
+    #             ), f"""Do not set the "{arg}"
+    #           to the "weights_optimizer_args". It is defined automatically"""
+    #         weights_optimizer_args = self._weights_optimizer_args.copy()
+
+    #     else:
+    #         weights_optimizer_args = {"iters": 100, "pop_size": 100}
+
+    #     left: NDArray[np.float64] = np.full(
+    #         shape=len(net._weights), fill_value=-10, dtype=np.float64
+    #     )
+    #     right: NDArray[np.float64] = np.full(
+    #         shape=len(net._weights), fill_value=10, dtype=np.float64
+    #     )
+    #     initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = float_population(
+    #         weights_optimizer_args["pop_size"], left, right
+    #     )
+    #     initial_population[0] = net._weights.copy()
+    #     weights_optimizer_args["fitness_function"] = lambda population: self._evaluate_nets(
+    #         population, net, X_train, proba_train
+    #     )
+    #     if self._weights_optimizer_class in (SHADE, DifferentialEvolution, jDE):
+    #         weights_optimizer_args["left"] = left
+    #         weights_optimizer_args["right"] = right
+    #     else:
+    #         parts: NDArray[np.int64] = np.full(
+    #             shape=len(net._weights), fill_value=16, dtype=np.int64
+    #         )
+    #         genotype_to_phenotype = GrayCode(fit_by="parts").fit(left, right, parts)
+    #         weights_optimizer_args["str_len"] = np.sum(parts)
+    #         weights_optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype.transform
+
+    #     weights_optimizer_args["minimization"] = True
+    #     optimizer = self._weights_optimizer_class(**weights_optimizer_args)
+    #     optimizer.fit()
+
+    #     phenotype = optimizer.get_fittest()["phenotype"]
+    #     net._weights = phenotype
+    #     return net
+
+    def _define_weights_optimizer(self, net, X_train, proba_train):
         if self._weights_optimizer_args is not None:
             for arg in (
                 "fitness_function",
@@ -197,7 +250,18 @@ class GeneticProgrammingNeuralNetClassifier(Model):
             weights_optimizer_args["pop_size"], left, right
         )
         initial_population[0] = net._weights.copy()
-        weights_optimizer_args["fitness_function"] = lambda population: self._evaluate_nets(
+
+        def _evaluate_nets(
+            weights: NDArray[np.float64],
+            net: Net,
+            X: NDArray[np.float64],
+            targets: NDArray[np.float64],
+        ) -> NDArray[np.float64]:
+            output3d = net.forward(X, weights)
+            error = categorical_crossentropy3d(targets, output3d)
+            return error
+
+        weights_optimizer_args["fitness_function"] = lambda population: _evaluate_nets(
             population, net, X_train, proba_train
         )
         if self._weights_optimizer_class in (SHADE, DifferentialEvolution, jDE):
@@ -213,12 +277,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
         weights_optimizer_args["minimization"] = True
         optimizer = self._weights_optimizer_class(**weights_optimizer_args)
-        optimizer.fit()
-
-        phenotype = optimizer.get_fittest()["phenotype"]
-        net._weights = phenotype
-        print(optimizer.get_fittest()["fitness"])
-        return net
+        return optimizer
 
     def _genotype_to_phenotype(
         self: GeneticProgrammingNeuralNetClassifier,
@@ -230,20 +289,17 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         n_variables: int = X_train.shape[1]
 
         population_ph = np.empty(shape=len(population_g), dtype=object)
+        optimizers = np.empty(shape=len(population_g), dtype=object)
 
         for i, individ_g in enumerate(population_g):
-            net = self._genotype_to_phenotype_tree(n_variables, n_outputs, individ_g)
-            trained = False
-            if self._cache_condition:
-                for net_i in self._cache:
-                    if net_i == net:
-                        population_ph[i] = net_i.copy()
-                        trained = True
-                        break
-            if not trained:
-                population_ph[i] = self._train_net(net, X_train, proba_train)
-                trained = True
-                self._cache.append(population_ph[i].copy())
+            population_ph[i] = self._genotype_to_phenotype_tree(n_variables, n_outputs, individ_g)
+            optimizers[i] = self._define_weights_optimizer(population_ph[i], X_train, proba_train)
+
+        func = lambda optimizer_i: optimizer_i.fit().get_fittest()["phenotype"].copy()
+
+        nets_weights = Parallel(n_jobs=2)(delayed(func)(optimizer_i) for optimizer_i in optimizers)
+        for individ_ph, weights in zip(population_ph, nets_weights):
+            individ_ph._weights = weights.copy()
 
         return population_ph
 

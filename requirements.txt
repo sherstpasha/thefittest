@@ -16,3 +16,4 @@ mypy
 typing-extensions<=4.6.3
 networkx
 matplotlib
+joblib

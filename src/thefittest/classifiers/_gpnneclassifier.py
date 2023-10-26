@@ -204,6 +204,12 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
             dtype=object,
         )
 
+        func = lambda ens: self._train_ensemble(
+            ens, X_train_ens, proba_train_ens, X_train_meta, proba_train_meta
+        )
+
+        population_ph = np.array(list(map(func, population_g)), dtype=object)
+
         return population_ph
 
     def _fitness_function(
@@ -225,10 +231,10 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
         X_train_meta: NDArray[np.float64],
         proba_train_meta: NDArray[np.float64],
     ) -> NetEnsemble:
-        if self._cache_condition:
-            for ensemble_i in self._cache:
-                if ensemble_i == ensemble:
-                    return ensemble_i.copy()
+        # if self._cache_condition:
+        #     for ensemble_i in self._cache:
+        #         if ensemble_i == ensemble:
+        #             return ensemble_i.copy()
 
         n_nets = len(ensemble)
         print(n_nets)
