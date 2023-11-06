@@ -69,7 +69,7 @@ class GeneticProgramming(GeneticAlgorithm):
         self._max_level: int = max_level
         self._init_level: int = init_level
 
-    def _get_init_population(self: GeneticProgramming) -> None:
+    def _first_generation(self: GeneticProgramming) -> None:
         if self._init_population is None:
             self._population_g_i = self._population_g_i = half_and_half(
                 pop_size=self._pop_size, uniset=self._uniset, max_level=self._init_level

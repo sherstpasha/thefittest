@@ -693,6 +693,8 @@ def multiactivation2d(X: NDArray[np.float64], activ_id: np.int64) -> NDArray[np.
     elif activ_id == 3:
         result = np.tanh(X)
     elif activ_id == 4:
+        result = X
+    elif activ_id == 5:
         result = softmax_numba(X)
     return result
 

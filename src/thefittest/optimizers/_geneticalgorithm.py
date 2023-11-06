@@ -155,7 +155,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         self._fitness_scale_i: NDArray[np.float64]
         self._fitness_rank_i: NDArray[np.float64]
 
-    def _get_init_population(self: GeneticAlgorithm) -> None:
+    def _first_generation(self: GeneticAlgorithm) -> None:
         if self._init_population is None:
             self._population_g_i = binary_string_population(self._pop_size, self._str_len)
         else:

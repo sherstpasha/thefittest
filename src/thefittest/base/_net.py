@@ -23,8 +23,8 @@ from ..tools.operators import forward2d
 INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
 HIDDEN_COLOR_CODE = (0.0, 0.74, 0.99, 1)
 OUTPUT_COLOR_CODE = (0.94, 0.50, 0.50, 1)
-ACTIVATION_NAME = {0: "sg", 1: "rl", 2: "gs", 3: "th", 4: "sm"}
-ACTIV_NAME_INV = {"sigma": 0, "relu": 1, "gauss": 2, "tanh": 3, "softmax": 4}
+ACTIVATION_NAME = {0: "sg", 1: "rl", 2: "gs", 3: "th", 4: "ln", 5: "sm"}
+ACTIV_NAME_INV = {"sigma": 0, "relu": 1, "gauss": 2, "tanh": 3, "ln": 4, "softmax": 5}
 
 
 class Net:
@@ -338,7 +338,7 @@ class Net:
 
 class HiddenBlock:
     def __init__(self, max_size: int) -> None:
-        self._activ = random.sample([0, 1, 2, 3], k=1)[0]
+        self._activ = random.sample([0, 1, 2, 3, 4], k=1)[0]
         self._size = random.randrange(1, max_size)
 
     def __str__(self) -> str:
@@ -349,6 +349,7 @@ class NetEnsemble:
     def __init__(self, nets: NDArray, meta_algorithm: Optional[Net] = None):
         self._nets = nets
         self._meta_algorithm = meta_algorithm
+        self._meta_tree = None
 
     def __len__(self) -> int:
         return len(self._nets)
@@ -403,4 +404,7 @@ class NetEnsemble:
         copy_ = NetEnsemble(np.array([net_i.copy() for net_i in self._nets], dtype=object))
         if self._meta_algorithm is not None:
             copy_._meta_algorithm = self._meta_algorithm.copy()
+
+        if self._meta_tree is not None:
+            copy_._meta_tree = self._meta_tree.copy()
         return copy_

@@ -165,61 +165,62 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         error = categorical_crossentropy3d(targets, output3d)
         return error
 
-    # def _train_net(
-    #     self,
-    #     net: Net,
-    #     X_train: NDArray[np.float64],
-    #     proba_train: NDArray[np.float64],
-    # ) -> Net:
-    #     if self._weights_optimizer_args is not None:
-    #         for arg in (
-    #             "fitness_function",
-    #             "left",
-    #             "right",
-    #             "str_len",
-    #             "genotype_to_phenotype",
-    #             "minimization",
-    #         ):
-    #             assert (
-    #                 arg not in self._weights_optimizer_args.keys()
-    #             ), f"""Do not set the "{arg}"
-    #           to the "weights_optimizer_args". It is defined automatically"""
-    #         weights_optimizer_args = self._weights_optimizer_args.copy()
+    def _train_net(
+        self,
+        net: Net,
+        X_train: NDArray[np.float64],
+        proba_train: NDArray[np.float64],
+    ) -> Net:
+        if self._weights_optimizer_args is not None:
+            for arg in (
+                "fitness_function",
+                "left",
+                "right",
+                "str_len",
+                "genotype_to_phenotype",
+                "minimization",
+            ):
+                assert (
+                    arg not in self._weights_optimizer_args.keys()
+                ), f"""Do not set the "{arg}"
+              to the "weights_optimizer_args". It is defined automatically"""
+            weights_optimizer_args = self._weights_optimizer_args.copy()
 
-    #     else:
-    #         weights_optimizer_args = {"iters": 100, "pop_size": 100}
+        else:
+            weights_optimizer_args = {"iters": 100, "pop_size": 100}
 
-    #     left: NDArray[np.float64] = np.full(
-    #         shape=len(net._weights), fill_value=-10, dtype=np.float64
-    #     )
-    #     right: NDArray[np.float64] = np.full(
-    #         shape=len(net._weights), fill_value=10, dtype=np.float64
-    #     )
-    #     initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = float_population(
-    #         weights_optimizer_args["pop_size"], left, right
-    #     )
-    #     initial_population[0] = net._weights.copy()
-    #     weights_optimizer_args["fitness_function"] = lambda population: self._evaluate_nets(
-    #         population, net, X_train, proba_train
-    #     )
-    #     if self._weights_optimizer_class in (SHADE, DifferentialEvolution, jDE):
-    #         weights_optimizer_args["left"] = left
-    #         weights_optimizer_args["right"] = right
-    #     else:
-    #         parts: NDArray[np.int64] = np.full(
-    #             shape=len(net._weights), fill_value=16, dtype=np.int64
-    #         )
-    #         genotype_to_phenotype = GrayCode(fit_by="parts").fit(left, right, parts)
-    #         weights_optimizer_args["str_len"] = np.sum(parts)
-    #         weights_optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype.transform
+        left: NDArray[np.float64] = np.full(
+            shape=len(net._weights), fill_value=-10, dtype=np.float64
+        )
+        right: NDArray[np.float64] = np.full(
+            shape=len(net._weights), fill_value=10, dtype=np.float64
+        )
+        initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = float_population(
+            weights_optimizer_args["pop_size"], left, right
+        )
+        initial_population[0] = net._weights.copy()
+        weights_optimizer_args["fitness_function"] = lambda population: self._evaluate_nets(
+            population, net, X_train, proba_train
+        )
+        if self._weights_optimizer_class in (SHADE, DifferentialEvolution, jDE):
+            weights_optimizer_args["left"] = left
+            weights_optimizer_args["right"] = right
+        else:
+            parts: NDArray[np.int64] = np.full(
+                shape=len(net._weights), fill_value=16, dtype=np.int64
+            )
+            genotype_to_phenotype = GrayCode(fit_by="parts").fit(left, right, parts)
+            weights_optimizer_args["str_len"] = np.sum(parts)
+            weights_optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype.transform
 
-    #     weights_optimizer_args["minimization"] = True
-    #     optimizer = self._weights_optimizer_class(**weights_optimizer_args)
-    #     optimizer.fit()
+        weights_optimizer_args["minimization"] = True
+        optimizer = self._weights_optimizer_class(**weights_optimizer_args)
+        optimizer.fit()
 
-    #     phenotype = optimizer.get_fittest()["phenotype"]
-    #     net._weights = phenotype
-    #     return net
+        phenotype = optimizer.get_fittest()["phenotype"]
+        net._weights = phenotype
+        print(optimizer.get_fittest()["fitness"])
+        return net
 
     def _define_weights_optimizer(self, net, X_train, proba_train):
         if self._weights_optimizer_args is not None:

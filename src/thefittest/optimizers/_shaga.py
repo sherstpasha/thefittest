@@ -64,11 +64,14 @@ class SHAGA(EvolutionaryAlgorithm):
         self._H_CR = np.full(self._H_size, 0.5, dtype=np.float64)
         self._k: int = 0
 
-    def _get_init_population(self: SHAGA) -> None:
+    def _first_generation(self: SHAGA) -> None:
         if self._init_population is None:
             self._population_g_i = binary_string_population(self._pop_size, self._str_len)
         else:
             self._population_g_i = self._init_population.copy()
+
+    def _get_init_population(self: SHAGA) -> None:
+        self._first_generation()
         self._population_ph_i = self._get_phenotype(self._population_g_i)
         self._fitness_i = self._get_fitness(self._population_ph_i)
 

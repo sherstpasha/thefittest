@@ -79,7 +79,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             "rand_2": rand_2,
         }
 
-    def _get_init_population(self: DifferentialEvolution) -> None:
+    def _first_generation(self: DifferentialEvolution) -> None:
         if self._init_population is None:
             self._population_g_i = float_population(
                 pop_size=self._pop_size, left=self._left, right=self._right
@@ -87,6 +87,8 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         else:
             self._population_g_i = self._init_population.copy()
 
+    def _get_init_population(self: DifferentialEvolution) -> None:
+        self._first_generation()
         self._population_ph_i = self._get_phenotype(self._population_g_i)
         self._fitness_i = self._get_fitness(self._population_ph_i)
 
