@@ -64,6 +64,10 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         minimization: bool = False,
         show_progress_each: Optional[int] = None,
         keep_history: bool = False,
+        n_jobs: int = 1,
+        fitness_function_args: Optional[Dict] = None,
+        terminate_function: Optional[Callable[[NDArray[Any]], NDArray[np.bool]]] = None,
+        terminate_function_args: Optional[Dict] = None,
     ):
         EvolutionaryAlgorithm.__init__(
             self,
@@ -79,6 +83,10 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             minimization=minimization,
             show_progress_each=show_progress_each,
             keep_history=keep_history,
+            n_jobs=n_jobs,
+            fitness_function_args=fitness_function_args,
+            terminate_function=terminate_function,
+            terminate_function_args=terminate_function_args,
         )
         self._str_len: int = str_len
         self._tour_size: int = tour_size

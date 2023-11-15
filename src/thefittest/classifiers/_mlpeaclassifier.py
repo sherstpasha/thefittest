@@ -26,6 +26,17 @@ from ..tools.random import float_population
 from ..tools.transformations import GrayCode
 
 
+def fitness_function(
+    weights: NDArray[np.float64],
+    net: Net,
+    X: NDArray[np.float64],
+    targets: NDArray[Union[np.float64, np.int64]],
+) -> NDArray[np.float64]:
+    output3d = net.forward(X, weights)
+    error = categorical_crossentropy3d(targets, output3d)
+    return error
+
+
 class MLPEAClassifier(Model):
     def __init__(
         self,
@@ -84,20 +95,8 @@ class MLPEAClassifier(Model):
             layer_net = Net(outputs=output_id, activs=activs)
 
         net = net > layer_net
-        net._get_order()
         net._offset = self._offset
         return net
-
-    def _evaluate_nets(
-        self: MLPEAClassifier,
-        weights: NDArray[np.float64],
-        net: Net,
-        X: NDArray[np.float64],
-        targets: NDArray[Union[np.float64, np.int64]],
-    ) -> NDArray[np.float64]:
-        output3d = net.forward(X, weights)
-        error = categorical_crossentropy3d(targets, output3d)
-        return error
 
     def _train_net(
         self: MLPEAClassifier,
@@ -139,9 +138,14 @@ class MLPEAClassifier(Model):
             weights_optimizer_args["pop_size"], left, right
         )
         initial_population[0] = net._weights.copy()
-        weights_optimizer_args["fitness_function"] = lambda population: self._evaluate_nets(
-            population, net, X_train, proba_train
-        )
+
+        weights_optimizer_args["fitness_function"] = fitness_function
+        weights_optimizer_args["fitness_function_args"] = {
+            "net": net,
+            "X": X_train,
+            "targets": proba_train,
+        }
+
         if self._weights_optimizer_class in (SHADE, DifferentialEvolution, jDE):
             weights_optimizer_args["left"] = left
             weights_optimizer_args["right"] = right
@@ -157,9 +161,9 @@ class MLPEAClassifier(Model):
         optimizer = self._weights_optimizer_class(**weights_optimizer_args)
         optimizer.fit()
 
-        phenotype = optimizer.get_fittest()["phenotype"]
-
         self._weights_optimizer = optimizer
+
+        phenotype = optimizer.get_fittest()["phenotype"]
 
         return phenotype
 
@@ -189,11 +193,12 @@ class MLPEAClassifier(Model):
         n_inputs: int = X.shape[1]
         n_outputs: int = len(set(y))
         eye: NDArray[np.float64] = np.eye(n_outputs, dtype=np.float64)
-        target_probas: NDArray[np.float64] = eye[y]
+
+        proba: NDArray[np.float64] = eye[y]
 
         self._net = self._defitne_net(n_inputs, n_outputs)
 
-        self._net._weights = self._train_net(self._net, X, target_probas)
+        self._net._weights = self._train_net(self._net, X, proba)
         return self
 
     def _predict(

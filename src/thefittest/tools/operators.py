@@ -699,16 +699,8 @@ def multiactivation2d(X: NDArray[np.float64], activ_id: np.int64) -> NDArray[np.
     return result
 
 
-@njit(float64[:, ::1](float64[:], int64[:, :]))
-def mask2d(arr: NDArray[np.float64], mask: NDArray[np.int64]) -> NDArray[np.float64]:
-    arr_mask = arr[mask.flatten()]
-    arr_mask_reshape = arr_mask.reshape(mask.shape)
-    return arr_mask_reshape
-
-
 @njit
 def forward(
-    X: NDArray[np.float64],
     weights: NDArray[np.float64],
     nodes: NDArray[np.float64],
     from_: numbaListType(NDArray[np.int64]),
@@ -720,7 +712,8 @@ def forward(
     for from_i, to_i, weights_id_i, a_code_i, a_nodes_i in zip(
         from_, to_, weights_id, activs_code, activs_nodes
     ):
-        weights_i = mask2d(weights, weights_id_i)
+        arr_mask = weights[weights_id_i.flatten()]
+        weights_i = arr_mask.reshape(weights_id_i.shape)
         out = np.dot(nodes[from_i].T, weights_i.T)
         nodes[to_i] = out.T
 
@@ -750,7 +743,7 @@ def forward2d(
     nodes[inputs] = X.T[inputs]
 
     for n in range(outs.shape[0]):
-        forward(X, weights[n], nodes, from_, to_, weights_id, activs_code, activs_nodes)
+        forward(weights[n], nodes, from_, to_, weights_id, activs_code, activs_nodes)
 
         outs[n] = nodes[outputs].T
     return outs

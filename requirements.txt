@@ -16,4 +16,6 @@ mypy
 typing-extensions<=4.6.3
 networkx
 matplotlib
-joblib
+joblib==1.2.0
+psutil 
+scikit-learn

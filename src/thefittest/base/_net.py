@@ -15,7 +15,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from thefittest.tools.transformations import scale_data
-from thefittest.tools._numba_funcs import voting
 
 from ..tools.operators import forward2d
 

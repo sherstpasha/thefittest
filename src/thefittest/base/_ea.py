@@ -3,8 +3,14 @@ from __future__ import annotations
 from typing import Any
 from typing import Callable
 from typing import Dict
+from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
+
+from joblib import Parallel
+from joblib import cpu_count
+from joblib import delayed
 
 import numpy as np
 from numpy.typing import NDArray
@@ -80,6 +86,10 @@ class EvolutionaryAlgorithm:
         minimization: bool = False,
         show_progress_each: Optional[int] = None,
         keep_history: bool = False,
+        n_jobs: int = 1,
+        fitness_function_args: Optional[Dict] = None,
+        terminate_function: Optional[Callable[[NDArray[Any]], NDArray[np.bool]]] = None,
+        terminate_function_args: Optional[Dict] = None,
     ):
         self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]] = fitness_function
         self._iters: int = iters
@@ -92,6 +102,18 @@ class EvolutionaryAlgorithm:
         self._no_increase_num: Optional[int] = no_increase_num
         self._show_progress_each: Optional[int] = show_progress_each
         self._keep_history: bool = keep_history
+        self._n_jobs: int = self._get_n_jobs(n_jobs)
+
+        if fitness_function_args is not None:
+            self._fitness_function_args = fitness_function_args
+        else:
+            self._fitness_function_args = {}
+
+        self._terminate_function = terminate_function
+        if terminate_function_args is not None:
+            self._terminate_function_args = terminate_function_args
+        else:
+            self._terminate_function_args = {}
 
         self._sign: int = -1 if minimization else 1
         self._aim: Union[float, int] = self._get_aim(optimal_value, termination_error_value)
@@ -103,6 +125,8 @@ class EvolutionaryAlgorithm:
         self._population_g_i: Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
         self._population_ph_i: NDArray
         self._fitness_i: NDArray[np.float64]
+
+        self._parallel = Parallel(self._n_jobs)
 
     def _first_generation(self: EvolutionaryAlgorithm) -> None:
         return None
@@ -120,12 +144,6 @@ class EvolutionaryAlgorithm:
         else:
             return np.inf
 
-    def _get_fitness(
-        self: EvolutionaryAlgorithm, population_ph: NDArray[Any]
-    ) -> NDArray[np.float64]:
-        self._calls += len(population_ph)
-        return self._sign * self._fitness_function(population_ph)
-
     def _show_progress(self: EvolutionaryAlgorithm, current_iter: int) -> None:
         if self._show_progress_each is not None:
             cond_show_now = current_iter % self._show_progress_each == 0
@@ -136,7 +154,11 @@ class EvolutionaryAlgorithm:
     def _termitation_check(self: EvolutionaryAlgorithm) -> bool:
         cond_aim = self._thefittest._fitness >= self._aim
         cond_no_increase = self._thefittest._no_update_counter == self._no_increase_num
-        return bool(cond_aim or cond_no_increase)
+        if self._terminate_function is not None:
+            cond_function = self._terminate_function(self, **self._terminate_function_args)
+        else:
+            cond_function = False
+        return bool(cond_aim or cond_no_increase or cond_function)
 
     def _update_fittest(
         self: EvolutionaryAlgorithm,
@@ -152,8 +174,27 @@ class EvolutionaryAlgorithm:
         if self._keep_history:
             self._stats._update(kwargs)
 
-    def _get_phenotype(self, popultion_g: NDArray[Any]) -> NDArray[Any]:
-        return self._genotype_to_phenotype(popultion_g)
+    def _get_phenotype(self, population_g: NDArray[Any]) -> NDArray[Any]:
+        populations_g = self._split_population(population_g)
+        populations_ph = self._parallel(
+            delayed(self._genotype_to_phenotype)(populations_g_i)
+            for populations_g_i in populations_g
+        )
+        population_ph = np.concatenate(populations_ph, axis=0)
+        return population_ph
+
+    def _get_fitness(
+        self: EvolutionaryAlgorithm, population_ph: NDArray[Any]
+    ) -> NDArray[np.float64]:
+        populations_ph = self._split_population(population_ph)
+        values = self._parallel(
+            delayed(self._fitness_function)(populations_ph_i, **self._fitness_function_args)
+            for populations_ph_i in populations_ph
+        )
+        value = np.concatenate(values, axis=0)
+
+        self._calls += len(value)
+        return self._sign * value
 
     def get_remains_calls(self: EvolutionaryAlgorithm) -> int:
         return (self._pop_size * self._iters) - self._calls
@@ -194,6 +235,23 @@ class EvolutionaryAlgorithm:
 
     def _get_new_population(self: EvolutionaryAlgorithm) -> None:
         return None
+
+    def _get_n_jobs(self: EvolutionaryAlgorithm, n_jobs: int) -> int:
+        if n_jobs < 0:
+            return max(cpu_count() + 1 + n_jobs, 1)
+        elif n_jobs == 0:
+            raise ValueError("Parameter n_jobs == 0 has no meaning.")
+        elif n_jobs > self._pop_size:
+            return self._pop_size
+        else:
+            return n_jobs
+
+    def _split_population(self: EvolutionaryAlgorithm, population: NDArray) -> List:
+        indexes = np.linspace(start=0, stop=self._pop_size, num=self._n_jobs + 1, dtype=np.int64)
+        indexes = indexes[1:-1]
+
+        population_split = np.split(population, indexes)
+        return population_split
 
     def fit(self: EvolutionaryAlgorithm) -> EvolutionaryAlgorithm:
         self._get_init_population()

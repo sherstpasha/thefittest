@@ -13,7 +13,6 @@ from numpy.typing import NDArray
 from ..base import EphemeralNode
 from ..base import FunctionalNode
 from ..base import TerminalNode
-from ..base import Tree
 from ..base import UniversalSet
 from ..base._model import Model
 from ..optimizers import DifferentialEvolution
@@ -34,6 +33,24 @@ from ..tools.operators import Pow2
 from ..tools.operators import Sin
 
 
+def fitness_function(trees: NDArray, y: NDArray[np.float64]) -> NDArray[np.float64]:
+    fitness = []
+    for tree in trees:
+        y_pred = tree() * np.ones(len(y))
+        fitness.append(coefficient_determination(y, y_pred))
+    return np.array(fitness, dtype=np.float64)
+
+
+def generator1() -> float:
+    value = np.round(np.random.uniform(0, 10), 4)
+    return value
+
+
+def generator2() -> int:
+    value = np.random.randint(0, 10)
+    return value
+
+
 class SymbolicRegressionGP(Model):
     def __init__(
         self,
@@ -52,16 +69,6 @@ class SymbolicRegressionGP(Model):
         self._optimizer_class: Union[Type[SelfCGP], Type[GeneticProgramming]] = optimizer
         self._optimizer: Union[SelfCGP, GeneticProgramming]
 
-    @staticmethod
-    def _generator1() -> float:
-        value = np.round(np.random.uniform(0, 10), 4)
-        return value
-
-    @staticmethod
-    def _generator2() -> int:
-        value = np.random.randint(0, 10)
-        return value
-
     def _get_uniset(self: SymbolicRegressionGP, X: NDArray[np.float64]) -> UniversalSet:
         uniset: UniversalSet
         terminal_set: Union[
@@ -79,20 +86,9 @@ class SymbolicRegressionGP(Model):
             FunctionalNode(Sin()),
         )
         terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
-        terminal_set.extend([EphemeralNode(self._generator1), EphemeralNode(self._generator2)])
+        terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
         uniset = UniversalSet(functional_set, tuple(terminal_set))
         return uniset
-
-    def _evaluate_tree(self: SymbolicRegressionGP, tree: Tree, y: NDArray[np.float64]) -> float:
-        y_pred = tree() * np.ones(len(y))
-        fitness = coefficient_determination(y, y_pred)
-        return fitness
-
-    def _fitness_function(
-        self: SymbolicRegressionGP, trees: NDArray, y: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
-        fitness = [self._evaluate_tree(tree, y) for tree in trees]
-        return np.array(fitness)
 
     def get_optimizer(
         self: SymbolicRegressionGP,
@@ -139,9 +135,8 @@ class SymbolicRegressionGP(Model):
         else:
             optimizer_args = {}
 
-        optimizer_args["fitness_function"] = lambda trees: self._fitness_function(
-            trees, y.astype(np.float64)
-        )
+        optimizer_args["fitness_function"] = fitness_function
+        optimizer_args["fitness_function_args"] = {"y": y}
         optimizer_args["iters"] = self._iters
         optimizer_args["pop_size"] = self._pop_size
         optimizer_args["uniset"] = uniset
