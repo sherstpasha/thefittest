@@ -212,15 +212,13 @@ class Tree:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Tree):
-            return NotImplemented
-        else:
-            if len(self) != len(other):
+            raise TypeError(f"Cannot compare Tree with {type(other).__name__}")
+        if len(self) != len(other):
+            return False
+        for node_1, node_2 in zip(self._nodes, other._nodes):
+            if node_1 != node_2:
                 return False
-            else:
-                for node_1, node_2 in zip(self._nodes, other._nodes):
-                    if node_1 != node_2:
-                        return False
-            return True
+        return True
 
     def __call__(self) -> Any:
         pack: Any = []

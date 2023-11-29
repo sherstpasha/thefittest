@@ -175,6 +175,16 @@ def train_net(
     return net.copy()
 
 
+def fitness_function(
+    weights: NDArray[np.float64],
+    net: Net,
+    X: NDArray[np.float64],
+    targets: NDArray[Union[np.float64, np.int64]],
+) -> NDArray[np.float64]:
+    output3d = net.forward(X, weights)
+    error = categorical_crossentropy3d(targets, output3d)
+    return error
+
 class GeneticProgrammingNeuralNetClassifier(Model):
     """(Lipinsky L., Semenkin E., Bulletin of the Siberian State Aerospace University., 3(10),
     22-26 (2006). In Russian);"""

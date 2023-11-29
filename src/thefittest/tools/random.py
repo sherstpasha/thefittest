@@ -68,6 +68,12 @@ def randn01(u: np.float64) -> Union[float, np.float64]:
     return value
 
 
+# @njit(float64(float64))
+# def randn01(u: np.float64) -> np.float64:
+#     value = np.random.normal(u, 0.1)
+#     return np.clip(value, 0, 1)
+
+
 def full_growing_method(uniset: UniversalSet, max_level: int) -> Tree:
     nodes: List[Union[FunctionalNode, TerminalNode, EphemeralNode]] = []
     levels = []

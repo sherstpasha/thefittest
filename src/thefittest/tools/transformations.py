@@ -119,6 +119,21 @@ def lehmer_mean(
     return np.sum(x_up) / np.sum(x_down)
 
 
+# def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
+#     order = np.argsort(arr)
+#     arr = arr[order]
+#     index = np.empty(len(arr), 'bool')
+#     index[-1] = True
+#     index[:-1] = arr[1:] != arr[:-1]
+#     raw_ranks = index.cumsum()
+#     ranks = raw_ranks.astype(np.float64)
+#     count = np.diff(np.r_[0, np.flatnonzero(index)])
+#     results = np.repeat(ranks, count)
+#     inverse = np.empty(len(order), dtype=order.dtype)
+#     inverse[order] = np.arange(len(order))
+#     return results[inverse]
+
+
 def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
     arange = np.arange(len(arr), dtype=np.int64)
 
@@ -136,28 +151,28 @@ def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
 
 
 @njit(float64[:](float64[:]))
-def protect_norm(x: NDArray[np.float64]) -> NDArray[np.float64]:
-    result = np.empty(len(x), dtype=np.float64)
-    sum_ = np.sum(x, dtype=np.float64)
-    if sum_ > 0:
-        for i in range(result.size):
-            result[i] = x[i] / sum_
+def protect_norm(input_array: NDArray[np.float64]) -> NDArray[np.float64]:
+    normalized_array = np.empty(len(input_array), dtype=np.float64)
+    total_sum = np.sum(input_array, dtype=np.float64)
+    if total_sum > 0:
+        for i in range(normalized_array.size):
+            normalized_array[i] = input_array[i] / total_sum
     else:
-        value = 1 / len(x)
-        for i in range(result.size):
-            result[i] = value
-    return result
+        uniform_value = 1 / len(input_array)
+        for i in range(normalized_array.size):
+            normalized_array[i] = uniform_value
+    return normalized_array
 
 
-def scale_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
-    arr = arr.copy()
-    max_ = arr.max()
-    min_ = arr.min()
-    if max_ == min_:
-        to_return = np.ones_like(arr, dtype=np.float64)
+def scale_data(data: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
+    data_copy = data.copy()
+    max_value = data_copy.max()
+    min_value = data_copy.min()
+    if max_value == min_value:
+        scaled_data = np.ones_like(data_copy, dtype=np.float64)
     else:
-        to_return = ((arr - min_) / (max_ - min_)).astype(np.float64)
-    return to_return
+        scaled_data = ((data_copy - min_value) / (max_value - min_value)).astype(np.float64)
+    return scaled_data
 
 
 def numpy_bit_to_int(
@@ -183,6 +198,11 @@ def numpy_int_to_bit(int_array: NDArray[np.int64]) -> NDArray[np.byte]:
     return bit_array
 
 
+# def numpy_int_to_bit(int_array: NDArray[np.int64]) -> NDArray[np.byte]:
+#     bit_array = np.unpackbits(int_array.view(np.uint8))[-1::-1].reshape(-1, 8)
+#     return bit_array
+
+
 def numpy_gray_to_bit(gray_array: NDArray[np.byte]) -> NDArray[np.byte]:
     bit_array = np.logical_xor.accumulate(gray_array, axis=-1).astype(np.byte)
     return bit_array
@@ -192,6 +212,14 @@ def numpy_bit_to_gray(bit_array: NDArray[np.byte]) -> NDArray[np.byte]:
     cut_gray = np.logical_xor(bit_array[:, :-1], bit_array[:, 1:])
     gray_array = np.hstack([bit_array[:, 0].reshape(-1, 1), cut_gray])
     return gray_array
+
+
+# def numpy_bit_to_gray(bit_array: NDArray[np.byte]) -> NDArray[np.byte]:
+#     gray_array = np.zeros_like(bit_array)
+#     gray_array[:, 0] = bit_array[:, 0]
+#     for i in range(1, bit_array.shape[1]):
+#         gray_array[:, i] = np.logical_xor(gray_array[:, i-1], bit_array[:, i])
+#     return gray_array
 
 
 class SamplingGrid:
