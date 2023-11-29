@@ -1,63 +1,54 @@
+import numpy as np
 import matplotlib.pyplot as plt
 
-from thefittest.regressors import MLPEARegressor
-from thefittest.optimizers import SHAGA
-
-from sklearn.metrics import r2_score
-import numpy as np
-
+from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import SHADE
 from thefittest.benchmarks import BanknoteDataset
-from thefittest.classifiers import MLPEAClassifier
+from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
 from thefittest.tools.print import print_net
+from thefittest.tools.print import print_tree
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import minmax_scale
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
+import time
 
-
-def problem(x):
-    return np.sin(x[:, 0])
-
-
-function = problem
-left_border = -4.5
-right_border = 4.5
-sample_size = 200
-n_dimension = 1
-
-X = np.array([np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]).T
-y = function(X)
+data = BanknoteDataset()
+X = data.get_X()
+y = data.get_y()
 
 X_scaled = minmax_scale(X)
-y_scaled = minmax_scale(y)
 
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled, test_size=0.33)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.9)
 
-model = MLPEARegressor(
-    iters=500,
-    pop_size=250,
-    hidden_layers=(5, 5),
-    activation="sigma",
-    weights_optimizer=SHAGA,
-    weights_optimizer_args={"show_progress_each": 1, "n_jobs": 1},
+model = GeneticProgrammingNeuralNetClassifier(
+    iters=15,
+    pop_size=300,
+    optimizer=SelfCGP,
+    optimizer_args={"show_progress_each": 1, "n_jobs": 3},
+    weights_optimizer=SHADE,
+    weights_optimizer_args={"iters": 400, "pop_size": 400},
 )
 
+t1 = time.time()
 model.fit(X_train, y_train)
+t2 = time.time()
 
-predict = model.predict(X_test)
-net = model.get_net()
+print(t2 - t1)
+# predict = model.predict(X_test)
+# optimizer = model.get_optimizers()
 
-print("coefficient_determination: \n", r2_score(y_test, predict))
+# tree = optimizer.get_fittest()["genotype"]
+# net = optimizer.get_fittest()["phenotype"]
 
-fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=1)
+# print("confusion_matrix: \n", confusion_matrix(y_test, predict))
+# print("f1_score: \n", f1_score(y_test, predict))
 
-ax[0].plot(X_scaled[:, 0], y_scaled, label="True y")
-ax[0].scatter(X_test[:, 0], predict, label="Predict y")
-ax[0].legend()
+# fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=1)
+# print_net(net=net, ax=ax[0])
 
-print_net(net=net, ax=ax[1])
+# print_tree(tree=tree, ax=ax[1])
 
-plt.tight_layout()
-plt.show()
+# plt.tight_layout()
+# plt.show()

@@ -88,6 +88,7 @@ class EvolutionaryAlgorithm:
         keep_history: bool = False,
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
+        genotype_to_phenotype_args: Optional[Dict] = None,
         terminate_function: Optional[Callable[[NDArray[Any]], NDArray[np.bool]]] = None,
         terminate_function_args: Optional[Dict] = None,
     ):
@@ -108,6 +109,11 @@ class EvolutionaryAlgorithm:
             self._fitness_function_args = fitness_function_args
         else:
             self._fitness_function_args = {}
+
+        if genotype_to_phenotype_args is not None:
+            self._genotype_to_phenotype_args = genotype_to_phenotype_args
+        else:
+            self._genotype_to_phenotype_args = {}
 
         self._terminate_function = terminate_function
         if terminate_function_args is not None:
@@ -177,7 +183,9 @@ class EvolutionaryAlgorithm:
     def _get_phenotype(self, population_g: NDArray[Any]) -> NDArray[Any]:
         populations_g = self._split_population(population_g)
         populations_ph = self._parallel(
-            delayed(self._genotype_to_phenotype)(populations_g_i)
+            delayed(self._genotype_to_phenotype)(
+                populations_g_i, **self._genotype_to_phenotype_args
+            )
             for populations_g_i in populations_g
         )
         population_ph = np.concatenate(populations_ph, axis=0)

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 from typing import Optional
 from typing import Tuple
+from typing import Type
 from typing import Union
 
 import numpy as np
@@ -11,8 +12,6 @@ from numpy.typing import NDArray
 from ..base._model import Model
 from ..base._net import ACTIV_NAME_INV
 from ..base._net import Net
-from ..classifiers._gpnnclassifier import weights_optimizer_alias
-from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 from ..optimizers import GeneticProgramming
@@ -24,6 +23,17 @@ from ..optimizers import jDE
 from ..tools.metrics import categorical_crossentropy3d
 from ..tools.random import float_population
 from ..tools.transformations import GrayCode
+
+
+weights_type_optimizer_alias = Union[
+    Type[DifferentialEvolution],
+    Type[jDE],
+    Type[SHADE],
+    Type[GeneticAlgorithm],
+    Type[SelfCGA],
+    Type[SHAGA],
+]
+weights_optimizer_alias = Union[DifferentialEvolution, jDE, SHADE, GeneticAlgorithm, SelfCGA, SHAGA]
 
 
 def fitness_function(
