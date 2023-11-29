@@ -82,10 +82,6 @@ def genotype_to_phenotype_tree(
     return to_return
 
 
-def ff(X_, net, X, targets):
-    return np.ones(len(X_), dtype=np.float64)
-
-
 def genotype_to_phenotype(
     population_g: NDArray,
     n_outputs: int,
@@ -124,7 +120,6 @@ def train_net(
     weights_optimizer_args: Dict,
     weights_optimizer_class: weights_type_optimizer_alias,
 ) -> Net:
-    weights_optimizer_args = None
 
     if weights_optimizer_args is not None:
         for arg in (
@@ -174,16 +169,6 @@ def train_net(
     net._weights = phenotype
     return net.copy()
 
-
-def fitness_function(
-    weights: NDArray[np.float64],
-    net: Net,
-    X: NDArray[np.float64],
-    targets: NDArray[Union[np.float64, np.int64]],
-) -> NDArray[np.float64]:
-    output3d = net.forward(X, weights)
-    error = categorical_crossentropy3d(targets, output3d)
-    return error
 
 class GeneticProgrammingNeuralNetClassifier(Model):
     """(Lipinsky L., Semenkin E., Bulletin of the Siberian State Aerospace University., 3(10),
