@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from typing import Any
+from typing import Dict
+from typing import Callable
 from typing import List
 from typing import Optional
 from typing import Type
 from typing import Union
-from typing import Dict
 
 import numpy as np
 from numpy.typing import NDArray
@@ -20,7 +21,6 @@ from ..base._net import ACTIV_NAME_INV
 from ..base._net import HiddenBlock
 from ..base._net import Net
 from ..classifiers._mlpeaclassifier import fitness_function as evaluate_nets
-from ..classifiers._mlpeaclassifier import weights_optimizer_alias
 from ..classifiers._mlpeaclassifier import weights_type_optimizer_alias
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
@@ -91,6 +91,7 @@ def genotype_to_phenotype(
     weights_optimizer_class: weights_type_optimizer_alias,
     output_activation: str,
     offset: bool,
+    evaluate_nets: Callable,
 ) -> NDArray:
     n_variables: int = X_train.shape[1]
 
@@ -104,6 +105,7 @@ def genotype_to_phenotype(
                 proba_train=proba_train,
                 weights_optimizer_args=weights_optimizer_args,
                 weights_optimizer_class=weights_optimizer_class,
+                fitness_function=evaluate_nets,
             )
             for individ_g in population_g
         ],
@@ -119,8 +121,8 @@ def train_net(
     proba_train: NDArray[np.float64],
     weights_optimizer_args: Dict,
     weights_optimizer_class: weights_type_optimizer_alias,
+    fitness_function: Callable,
 ) -> Net:
-
     if weights_optimizer_args is not None:
         for arg in (
             "fitness_function",
@@ -145,7 +147,7 @@ def train_net(
         weights_optimizer_args["pop_size"], left, right
     )
     initial_population[0] = net._weights.copy()
-    weights_optimizer_args["fitness_function"] = evaluate_nets
+    weights_optimizer_args["fitness_function"] = fitness_function
     weights_optimizer_args["fitness_function_args"] = {
         "net": net,
         "X": X_train,
@@ -167,6 +169,7 @@ def train_net(
 
     phenotype = optimizer.get_fittest()["phenotype"]
     net._weights = phenotype
+
     return net.copy()
 
 
@@ -245,6 +248,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         target_train: NDArray[np.float64],
         X_test: NDArray[np.float64],
         target_test: NDArray[np.float64],
+        fitness_function: Callable,
+        evaluate_nets: Callable,
     ) -> Union[SelfCGP, GeneticProgramming]:
         optimizer_args: dict[str, Any]
 
@@ -284,6 +289,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
             "weights_optimizer_class": self._weights_optimizer_class,
             "output_activation": self._output_activation,
             "offset": self._offset,
+            "evaluate_nets": evaluate_nets,
         }
 
         optimizer_args["iters"] = self._iters
@@ -339,6 +345,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
             target_train=proba_train,
             X_test=X_test,
             target_test=proba_test,
+            fitness_function=fitness_function,
+            evaluate_nets=evaluate_nets,
         )
 
         self._optimizer.fit()

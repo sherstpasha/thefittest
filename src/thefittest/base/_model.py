@@ -6,15 +6,6 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from ..optimizers import DifferentialEvolution
-from ..optimizers import GeneticAlgorithm
-from ..optimizers import GeneticProgramming
-from ..optimizers import SHADE
-from ..optimizers import SHAGA
-from ..optimizers import SelfCGA
-from ..optimizers import SelfCGP
-from ..optimizers import jDE
-
 
 class Model:
     def _fit(
@@ -29,16 +20,7 @@ class Model:
 
     def get_optimizer(
         self: Model,
-    ) -> Union[
-        DifferentialEvolution,
-        GeneticAlgorithm,
-        GeneticProgramming,
-        jDE,
-        SelfCGA,
-        SelfCGP,
-        SHADE,
-        SHAGA,
-    ]:
+    ) -> Any:
         pass
 
     def fit(
@@ -46,6 +28,8 @@ class Model:
         X: NDArray[np.float64],
         y: NDArray[Union[np.float64, np.int64]],
     ) -> Any:
+        assert np.all(np.isfinite(X))
+        assert np.all(np.isfinite(y))
         return self._fit(X, y)
 
     def predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:

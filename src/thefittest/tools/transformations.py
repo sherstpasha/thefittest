@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -119,21 +121,6 @@ def lehmer_mean(
     return np.sum(x_up) / np.sum(x_down)
 
 
-# def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
-#     order = np.argsort(arr)
-#     arr = arr[order]
-#     index = np.empty(len(arr), 'bool')
-#     index[-1] = True
-#     index[:-1] = arr[1:] != arr[:-1]
-#     raw_ranks = index.cumsum()
-#     ranks = raw_ranks.astype(np.float64)
-#     count = np.diff(np.r_[0, np.flatnonzero(index)])
-#     results = np.repeat(ranks, count)
-#     inverse = np.empty(len(order), dtype=order.dtype)
-#     inverse[order] = np.arange(len(order))
-#     return results[inverse]
-
-
 def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
     arange = np.arange(len(arr), dtype=np.int64)
 
@@ -198,11 +185,6 @@ def numpy_int_to_bit(int_array: NDArray[np.int64]) -> NDArray[np.byte]:
     return bit_array
 
 
-# def numpy_int_to_bit(int_array: NDArray[np.int64]) -> NDArray[np.byte]:
-#     bit_array = np.unpackbits(int_array.view(np.uint8))[-1::-1].reshape(-1, 8)
-#     return bit_array
-
-
 def numpy_gray_to_bit(gray_array: NDArray[np.byte]) -> NDArray[np.byte]:
     bit_array = np.logical_xor.accumulate(gray_array, axis=-1).astype(np.byte)
     return bit_array
@@ -212,14 +194,6 @@ def numpy_bit_to_gray(bit_array: NDArray[np.byte]) -> NDArray[np.byte]:
     cut_gray = np.logical_xor(bit_array[:, :-1], bit_array[:, 1:])
     gray_array = np.hstack([bit_array[:, 0].reshape(-1, 1), cut_gray])
     return gray_array
-
-
-# def numpy_bit_to_gray(bit_array: NDArray[np.byte]) -> NDArray[np.byte]:
-#     gray_array = np.zeros_like(bit_array)
-#     gray_array[:, 0] = bit_array[:, 0]
-#     for i in range(1, bit_array.shape[1]):
-#         gray_array[:, i] = np.logical_xor(gray_array[:, i-1], bit_array[:, i])
-#     return gray_array
 
 
 class SamplingGrid:
@@ -252,7 +226,7 @@ class SamplingGrid:
         left: NDArray[np.float64],
         right: NDArray[np.float64],
         arg: Union[NDArray[np.float64], NDArray[np.int64]],
-    ):
+    ) -> SamplingGrid:
         self.left = left
         self.right = right
 

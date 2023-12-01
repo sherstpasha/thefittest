@@ -134,7 +134,7 @@ class MLPEARegressor(MLPEAClassifier):
 
         self._net = self._defitne_net(n_inputs, n_outputs)
 
-        self._net._weights = self._train_net(self._net, X, y)
+        self._net._weights = self._train_net(self._net, X, y.astype(np.float64))
         return self
 
     def _predict(

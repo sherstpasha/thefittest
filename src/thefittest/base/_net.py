@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 from collections import defaultdict
 from itertools import product
+from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -57,21 +58,24 @@ class Net:
     def __len__(self) -> int:
         return len(self._weights)
 
-    def __eq__(self, other: Net) -> bool:
-        if self._inputs != other._inputs:
-            return False
-        elif any(h_1 != h_2 for h_1, h_2 in zip(self._hidden_layers, other._hidden_layers)):
-            return False
-        elif self._outputs != other._outputs:
-            return False
-        elif len(self._connects) != len(other._connects):
-            return False
-        elif np.any(self._connects != other._connects):
-            return False
-        elif self._activs != other._activs:
-            return False
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, Net):
+            if self._inputs != other._inputs:
+                return False
+            elif any(h_1 != h_2 for h_1, h_2 in zip(self._hidden_layers, other._hidden_layers)):
+                return False
+            elif self._outputs != other._outputs:
+                return False
+            elif len(self._connects) != len(other._connects):
+                return False
+            elif np.any(self._connects != other._connects):
+                return False
+            elif self._activs != other._activs:
+                return False
+            else:
+                return True
         else:
-            return True
+            return NotImplemented
 
     def _set_connects(self, values: Optional[NDArray[np.int64]]) -> NDArray[np.int64]:
         if values is None:
@@ -353,13 +357,15 @@ class NetEnsemble:
     def __len__(self) -> int:
         return len(self._nets)
 
-    def __eq__(self, other: NetEnsemble) -> bool:
-        if len(self) != len(other):
-            return False
-        elif any((net_i != net_j for net_i, net_j in zip(self._nets, other._nets))):
-            return False
-        else:
-            return True
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, NetEnsemble):
+            if len(self) != len(other):
+                return False
+            elif any((net_i != net_j for net_i, net_j in zip(self._nets, other._nets))):
+                return False
+            else:
+                return True
+        return NotImplemented
 
     def get_nets(self: NetEnsemble) -> NDArray:
         return self._nets

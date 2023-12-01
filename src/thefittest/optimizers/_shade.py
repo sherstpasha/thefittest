@@ -6,6 +6,7 @@ from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -45,8 +46,6 @@ class SHADE(DifferentialEvolution):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
-        terminate_function: Optional[Callable[[NDArray[Any]], NDArray[np.bool]]] = None,
-        terminate_function_args: Optional[Dict] = None,
     ):
         DifferentialEvolution.__init__(
             self,
@@ -67,8 +66,6 @@ class SHADE(DifferentialEvolution):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
-            terminate_function=terminate_function,
-            terminate_function_args=terminate_function_args,
         )
 
         self._F: NDArray[np.float64]
@@ -94,8 +91,10 @@ class SHADE(DifferentialEvolution):
         return (F_i, CR_i)
 
     def _append_archive(
-        self, archive: NDArray[np.float64], worse_g: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
+        self,
+        archive: Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]],
+        worse_g: Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]],
+    ) -> Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]:
         archive = np.append(archive, worse_g, axis=0)
         if len(archive) > self._pop_size:
             np.random.shuffle(archive)

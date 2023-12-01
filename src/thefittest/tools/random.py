@@ -31,7 +31,7 @@ def sattolo_shuffle(items: Union[List, NDArray]) -> None:
 
 def binary_string_population(pop_size: int, str_len: int) -> NDArray[np.byte]:
     size = (pop_size, str_len)
-    return np.random.randint(low=2, size=size, dtype=np.byte)
+    return np.random.randint(low=0, high=2, size=size, dtype=np.byte).astype(np.byte)
 
 
 def float_population(
@@ -66,12 +66,6 @@ def randn01(u: np.float64) -> Union[float, np.float64]:
     elif value > 1:
         return 1.0
     return value
-
-
-# @njit(float64(float64))
-# def randn01(u: np.float64) -> np.float64:
-#     value = np.random.normal(u, 0.1)
-#     return np.clip(value, 0, 1)
 
 
 def full_growing_method(uniset: UniversalSet, max_level: int) -> Tree:
@@ -188,7 +182,7 @@ def random_sample(
     to_return = np.empty(quantity, dtype=np.int64)
     i = 0
     while i < quantity:
-        ind = random.randrange(range_size)
+        ind = random.randrange(int(range_size))
 
         if not replace:
             if check_for_value(ind, to_return, i):

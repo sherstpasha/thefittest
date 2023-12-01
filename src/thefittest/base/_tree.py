@@ -147,16 +147,17 @@ class EnsembleUniversalSet(UniversalSet):
         UniversalSet.__init__(self, functional_set, terminal_set)
         self._functional_set_proba = self._define_functional_set_proba()
 
-    def _define_functional_set_proba(self: EnsembleUniversalSet) -> defaultdict:
-        functional_set_proba = defaultdict(list)
+    def _define_functional_set_proba(self: EnsembleUniversalSet) -> Dict[int, NDArray[np.float64]]:
+        functional_set_proba: Dict[int, NDArray[np.float64]] = defaultdict(
+            lambda: np.array([], dtype=np.float64)
+        )
         for n_args, value in self._functional_set.items():
             count = Counter([type(node._value) for node in value])
             for node in value:
                 type_ = type(node._value)
-                functional_set_proba[n_args].append(count[type_])
-            proba = np.array(functional_set_proba[n_args], dtype=np.float64)
+                functional_set_proba[n_args] = np.append(functional_set_proba[n_args], count[type_])
+            proba = functional_set_proba[n_args]
             functional_set_proba[n_args] = 1 / proba
-
         return functional_set_proba
 
     def _random_functional(self, n_args: int = -1) -> FunctionalNode:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from typing import Dict
 from typing import Optional
 from typing import Type
 from typing import Union
@@ -9,14 +10,61 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..base import UniversalSet
-from ..base._net import Net
 from ..classifiers import GeneticProgrammingNeuralNetClassifier
+from ..classifiers._gpnnclassifier import genotype_to_phenotype_tree
+from ..classifiers._gpnnclassifier import train_net
+from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
 from ..optimizers import GeneticProgramming
 from ..optimizers import SHADE
 from ..optimizers import SelfCGP
+from ..regressors._mlpearegressor import fitness_function as evaluate_nets
 from ..tools.metrics import root_mean_square_error2d
 from ..tools.random import train_test_split
-from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
+
+
+def fitness_function(
+    population: NDArray,
+    X: NDArray[np.float64],
+    targets: NDArray[np.float64],
+    net_size_penalty: float,
+) -> NDArray[np.float64]:
+    output2d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)[:, :, 0]
+    lens = np.array(list(map(len, population)))
+    print(output2d.shape)
+    fitness = root_mean_square_error2d(targets, output2d) + net_size_penalty * lens
+    return fitness
+
+
+def genotype_to_phenotype(
+    population_g: NDArray,
+    n_outputs: int,
+    X_train: NDArray[np.float64],
+    proba_train: NDArray[np.float64],
+    weights_optimizer_args: Dict,
+    weights_optimizer_class: weights_type_optimizer_alias,
+    output_activation: str,
+    offset: bool,
+) -> NDArray:
+    n_variables: int = X_train.shape[1]
+
+    population_ph = np.array(
+        [
+            train_net(
+                genotype_to_phenotype_tree(
+                    individ_g, n_variables, n_outputs, output_activation, offset
+                ),
+                X_train=X_train,
+                proba_train=proba_train,
+                weights_optimizer_args=weights_optimizer_args,
+                weights_optimizer_class=weights_optimizer_class,
+                fitness_function=evaluate_nets,
+            )
+            for individ_g in population_g
+        ],
+        dtype=object,
+    )
+
+    return population_ph
 
 
 class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier):
@@ -33,7 +81,7 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
         optimizer_args: Optional[dict[str, Any]] = None,
         weights_optimizer: weights_type_optimizer_alias = SHADE,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
-        cache: bool = True,
+        net_size_penalty: float = 0.0,
     ):
         GeneticProgrammingNeuralNetClassifier.__init__(
             self,
@@ -48,37 +96,14 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
             optimizer_args=optimizer_args,
             weights_optimizer=weights_optimizer,
             weights_optimizer_args=weights_optimizer_args,
-            cache=cache,
+            net_size_penalty=net_size_penalty,
         )
-
-    def _evaluate_nets(
-        self: GeneticProgrammingNeuralNetRegressor,
-        weights: NDArray[np.float64],
-        net: Net,
-        X: NDArray[np.float64],
-        targets: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
-        output2d = net.forward(X, weights)[:, :, 0]
-        error = root_mean_square_error2d(targets, output2d)
-        return error
-
-    def _fitness_function(
-        self: GeneticProgrammingNeuralNetRegressor,
-        population: NDArray,
-        X: NDArray[np.float64],
-        targets: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
-        output2d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)[:, :, 0]
-        fitness = root_mean_square_error2d(targets, output2d)
-        return fitness
 
     def _fit(
         self: GeneticProgrammingNeuralNetClassifier,
         X: NDArray[np.float64],
         y: NDArray[Union[np.float64, np.int64]],
     ) -> GeneticProgrammingNeuralNetClassifier:
-        optimizer_args: dict[str, Any]
-
         if self._offset:
             X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])
 
@@ -86,41 +111,19 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, self._test_sample_ratio)
 
-        if self._optimizer_args is not None:
-            assert (
-                "iters" not in self._optimizer_args.keys()
-                and "pop_size" not in self._optimizer_args.keys()
-            ), """Do not set the "iters" or "pop_size" in the "optimizer_args". Instead,
-              use the "SymbolicRegressionGP" arguments"""
-            for arg in (
-                "fitness_function",
-                "uniset",
-                "minimization",
-            ):
-                assert (
-                    arg not in self._optimizer_args.keys()
-                ), f"""Do not set the "{arg}"
-                to the "optimizer_args". It is defined automatically"""
-            optimizer_args = self._optimizer_args.copy()
-
-        else:
-            optimizer_args = {}
-
         uniset: UniversalSet = self._get_uniset(X)
 
-        optimizer_args["fitness_function"] = lambda population: self._fitness_function(
-            population, X_test, y_test
-        )
-        optimizer_args["genotype_to_phenotype"] = lambda trees: self._genotype_to_phenotype(
-            X_train, y_train, trees, n_outputs
+        self._optimizer = self._define_optimizer(
+            uniset=uniset,
+            n_outputs=n_outputs,
+            X_train=X_train,
+            target_train=y_train,
+            X_test=X_test,
+            target_test=y_test,
+            fitness_function=fitness_function,
+            evaluate_nets=evaluate_nets,
         )
 
-        optimizer_args["iters"] = self._iters
-        optimizer_args["pop_size"] = self._pop_size
-        optimizer_args["uniset"] = uniset
-        optimizer_args["minimization"] = True
-
-        self._optimizer = self._optimizer_class(**optimizer_args)
         self._optimizer.fit()
 
         return self

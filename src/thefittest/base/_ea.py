@@ -89,8 +89,6 @@ class EvolutionaryAlgorithm:
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
-        terminate_function: Optional[Callable[[NDArray[Any]], NDArray[np.bool]]] = None,
-        terminate_function_args: Optional[Dict] = None,
     ):
         self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]] = fitness_function
         self._iters: int = iters
@@ -114,12 +112,6 @@ class EvolutionaryAlgorithm:
             self._genotype_to_phenotype_args = genotype_to_phenotype_args
         else:
             self._genotype_to_phenotype_args = {}
-
-        self._terminate_function = terminate_function
-        if terminate_function_args is not None:
-            self._terminate_function_args = terminate_function_args
-        else:
-            self._terminate_function_args = {}
 
         self._sign: int = -1 if minimization else 1
         self._aim: Union[float, int] = self._get_aim(optimal_value, termination_error_value)
@@ -160,11 +152,7 @@ class EvolutionaryAlgorithm:
     def _termitation_check(self: EvolutionaryAlgorithm) -> bool:
         cond_aim = self._thefittest._fitness >= self._aim
         cond_no_increase = self._thefittest._no_update_counter == self._no_increase_num
-        if self._terminate_function is not None:
-            cond_function = self._terminate_function(self, **self._terminate_function_args)
-        else:
-            cond_function = False
-        return bool(cond_aim or cond_no_increase or cond_function)
+        return bool(cond_aim or cond_no_increase)
 
     def _update_fittest(
         self: EvolutionaryAlgorithm,
@@ -278,7 +266,7 @@ class EvolutionaryAlgorithm:
 
 class MultiGenome:
     def __init__(
-        self, genotypes: Tuple[Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]]
+        self, genotypes: Tuple[Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]], ...]
     ) -> None:
         self._genotypes = genotypes
 
@@ -286,7 +274,7 @@ class MultiGenome:
         return self._genotypes[index]
 
     def copy(self) -> MultiGenome:
-        return MultiGenome(genotypes=[genotype.copy() for genotype in self._genotypes])
+        return MultiGenome(genotypes=tuple([genotype.copy() for genotype in self._genotypes]))
 
 
 class MutliGenomeEA(EvolutionaryAlgorithm):
@@ -338,9 +326,9 @@ class MutliGenomeEA(EvolutionaryAlgorithm):
             populations.append(optimizer._population_g_i)
 
         population = np.empty(shape=self._pop_size, dtype=object)
-        for i, population_i in enumerate(population):
+        for i in range(len(population)):
             population[i] = MultiGenome(
-                genotypes=[populations_j[i] for populations_j in populations]
+                genotypes=tuple([populations_j[i] for populations_j in populations])
             )
 
         self._population_g_i = population

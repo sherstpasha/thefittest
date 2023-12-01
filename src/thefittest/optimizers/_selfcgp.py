@@ -60,8 +60,6 @@ class SelfCGP(GeneticProgramming, SelfCGA):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
-        terminate_function: Optional[Callable[[NDArray[Any]], NDArray[np.bool]]] = None,
-        terminate_function_args: Optional[Dict] = None,
     ):
         SelfCGA.__init__(
             self,
@@ -89,8 +87,6 @@ class SelfCGP(GeneticProgramming, SelfCGA):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
-            terminate_function=terminate_function,
-            terminate_function_args=terminate_function_args,
         )
 
         GeneticProgramming.__init__(
@@ -116,6 +112,4 @@ class SelfCGP(GeneticProgramming, SelfCGA):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
-            terminate_function=terminate_function,
-            terminate_function_args=terminate_function_args,
         )
