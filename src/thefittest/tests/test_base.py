@@ -274,7 +274,7 @@ def test_net():
 
     hb = HiddenBlock(max_size=10)
 
-    assert hb._activ in [0, 1, 2, 3]
+    assert hb._activ in [0, 1, 2, 3, 4]
     assert hb._size <= 10
 
     net17 = net16.copy()
