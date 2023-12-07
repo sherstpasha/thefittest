@@ -10,14 +10,19 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ._geneticprogramming import GeneticProgramming
-from ._selfcga import SelfCGA
+from ._pdpga import PDPGA
+from ..base import Tree
 from ..base import UniversalSet
 from ..tools import donothing
 
 
-class SelfCGP(GeneticProgramming, SelfCGA):
-    """Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming
-    algorithm with modified uniform crossover. 1-6. http://dx.doi.org/10.1109/CEC.2012.6256587"""
+class PDPGP(GeneticProgramming, PDPGA):
+    """Niehaus, J., Banzhaf, W. (2001). Adaption of Operator Probabilities in
+    Genetic Programming. In: Miller, J., Tomassini, M., Lanzi, P.L., Ryan, C.,
+    Tettamanzi, A.G.B., Langdon, W.B. (eds) Genetic Programming. EuroGP 2001.
+    Lecture Notes in Computer Science, vol 2038. Springer, Berlin, Heidelberg.
+    https://doi.org/10.1007/3-540-45355-5_26
+    """
 
     def __init__(
         self,
@@ -48,10 +53,6 @@ class SelfCGP(GeneticProgramming, SelfCGA):
         max_level: int = 16,
         init_level: int = 4,
         init_population: Optional[NDArray] = None,
-        K: float = 2,
-        selection_threshold_proba: float = 0.05,
-        crossover_threshold_proba: float = 0.05,
-        mutation_threshold_proba: float = 0.05,
         genotype_to_phenotype: Callable[[NDArray], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
@@ -63,7 +64,7 @@ class SelfCGP(GeneticProgramming, SelfCGA):
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
     ):
-        SelfCGA.__init__(
+        PDPGA.__init__(
             self,
             fitness_function=fitness_function,
             iters=iters,
@@ -77,10 +78,6 @@ class SelfCGP(GeneticProgramming, SelfCGA):
             crossovers=crossovers,
             mutations=mutations,
             init_population=init_population,
-            K=K,
-            selection_threshold_proba=selection_threshold_proba,
-            crossover_threshold_proba=crossover_threshold_proba,
-            mutation_threshold_proba=mutation_threshold_proba,
             genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
@@ -117,3 +114,35 @@ class SelfCGP(GeneticProgramming, SelfCGA):
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
         )
+
+    def _get_new_individ_g(
+        self: PDPGP,
+        specified_selection: str,
+        specified_crossover: str,
+        specified_mutation: str,
+    ) -> Tree:
+        selection_func, tour_size = self._selection_pool[specified_selection]
+        crossover_func, quantity = self._crossover_pool[specified_crossover]
+        mutation_func, proba, is_constant_rate = self._mutation_pool[specified_mutation]
+
+        selected_id = selection_func(
+            self._fitness_scale_i, self._fitness_rank_i, np.int64(tour_size), np.int64(quantity)
+        )
+
+        previous_fitness = self._choice_parent(self._fitness_i[selected_id])
+        self._previous_fitness_i.append(previous_fitness)
+
+        offspring_no_mutated = crossover_func(
+            self._population_g_i[selected_id],
+            self._fitness_scale_i[selected_id],
+            self._fitness_rank_i[selected_id],
+            self._max_level,
+        )
+
+        if is_constant_rate:
+            proba = proba
+        else:
+            proba = proba / len(offspring_no_mutated)
+
+        offspring = mutation_func(offspring_no_mutated, self._uniset, proba, self._max_level)
+        return offspring

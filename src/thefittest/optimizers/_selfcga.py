@@ -53,7 +53,9 @@ class SelfCGA(GeneticAlgorithm):
         mutations: Tuple[str, ...] = ("weak", "average", "strong"),
         init_population: Optional[NDArray[np.byte]] = None,
         K: float = 2,
-        threshold: float = 0.05,
+        selection_threshold_proba: float = 0.05,
+        crossover_threshold_proba: float = 0.05,
+        mutation_threshold_proba: float = 0.05,
         genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
@@ -88,8 +90,12 @@ class SelfCGA(GeneticAlgorithm):
             genotype_to_phenotype_args=genotype_to_phenotype_args,
         )
 
-        self._K = K
-        self._threshold = threshold
+        self._K: float = K
+        self._thresholds: Dict[str, float] = {
+            "selection": selection_threshold_proba,
+            "crossover": crossover_threshold_proba,
+            "mutation": mutation_threshold_proba,
+        }
 
         self._selection_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
         self._crossover_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
@@ -152,12 +158,15 @@ class SelfCGA(GeneticAlgorithm):
         return chosen_operator
 
     def _get_new_proba(
-        self: SelfCGA, proba_dict: Dict["str", float], operator: str
+        self: SelfCGA,
+        proba_dict: Dict["str", float],
+        operator: str,
+        threshold: float,
     ) -> Dict["str", float]:
         proba_dict[operator] += self._K / self._iters
         proba_value = np.array(list(proba_dict.values()))
         proba_value -= self._K / (len(proba_dict) * self._iters)
-        proba_value = proba_value.clip(self._threshold, 1)
+        proba_value = proba_value.clip(threshold, 1)
         proba_value = proba_value / proba_value.sum()
         new_proba_dict = dict(zip(proba_dict.keys(), proba_value))
         return new_proba_dict
@@ -182,17 +191,23 @@ class SelfCGA(GeneticAlgorithm):
         s_fittest_oper = self._find_fittest_operator(
             self._selection_operators, self._fitness_scale_i
         )
-        self._selection_proba = self._get_new_proba(self._selection_proba, s_fittest_oper)
+        self._selection_proba = self._get_new_proba(
+            self._selection_proba, s_fittest_oper, self._thresholds["selection"]
+        )
 
         c_fittest_oper = self._find_fittest_operator(
             self._crossover_operators, self._fitness_scale_i
         )
-        self._crossover_proba = self._get_new_proba(self._crossover_proba, c_fittest_oper)
+        self._crossover_proba = self._get_new_proba(
+            self._crossover_proba, c_fittest_oper, self._thresholds["crossover"]
+        )
 
         m_fittest_oper = self._find_fittest_operator(
             self._mutation_operators, self._fitness_scale_i
         )
-        self._mutation_proba = self._get_new_proba(self._mutation_proba, m_fittest_oper)
+        self._mutation_proba = self._get_new_proba(
+            self._mutation_proba, m_fittest_oper, self._thresholds["mutation"]
+        )
 
     def _get_new_population(self: SelfCGA) -> None:
         self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
