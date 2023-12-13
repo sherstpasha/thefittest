@@ -1,6 +1,6 @@
 from collections import defaultdict
 from thefittest.optimizers import SelfCGP
-from thefittest.optimizers import PDPGP
+from thefittest.optimizers._my_adapt_gp import MyAdaptGP
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -32,12 +32,10 @@ def problem(x):
 function = problem
 left_border = -4.5
 right_border = 4.5
-left_border = -9
-right_border = 9
 sample_size = 300
 n_dimension = 1
 
-number_of_iterations = 1000
+number_of_iterations = 300
 population_size = 1000
 
 X = np.array([np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]).T
@@ -88,18 +86,7 @@ def fitness_function(trees):
     return np.array(fitness)
 
 
-optimizer = SelfCGP(
-    fitness_function=fitness_function,
-    uniset=uniset,
-    pop_size=population_size,
-    iters=number_of_iterations,
-    show_progress_each=10,
-    minimization=False,
-    keep_history=True,
-    max_level=8,
-)
-
-# optimizer = PDPGP(
+# optimizer = SelfCGP(
 #     fitness_function=fitness_function,
 #     uniset=uniset,
 #     pop_size=population_size,
@@ -107,9 +94,20 @@ optimizer = SelfCGP(
 #     show_progress_each=10,
 #     minimization=False,
 #     keep_history=True,
-#     max_level=8,
-#     n_jobs=1,
 # )
+
+optimizer = MyAdaptGP(
+    fitness_function=fitness_function,
+    uniset=uniset,
+    pop_size=population_size,
+    iters=number_of_iterations,
+    show_progress_each=10,
+    minimization=False,
+    keep_history=True,
+    n_jobs=1,
+    max_level=8,
+    adaptation_operator="rank",
+)
 
 
 optimizer.fit()
@@ -131,7 +129,7 @@ ax[0][0].legend()
 
 selectiom_proba = defaultdict(list)
 for i in range(number_of_iterations):
-    for key, value in stats["s_proba"][i].items():
+    for key, value in stats["s_used"][i].items():
         selectiom_proba[key].append(value)
 
 for key, value in selectiom_proba.items():
@@ -140,7 +138,7 @@ ax[0][1].legend()
 
 crossover_proba = defaultdict(list)
 for i in range(number_of_iterations):
-    for key, value in stats["c_proba"][i].items():
+    for key, value in stats["c_used"][i].items():
         crossover_proba[key].append(value)
 
 for key, value in crossover_proba.items():
@@ -149,7 +147,7 @@ ax[1][0].legend()
 
 mutation_proba = defaultdict(list)
 for i in range(number_of_iterations):
-    for key, value in stats["m_proba"][i].items():
+    for key, value in stats["m_used"][i].items():
         mutation_proba[key].append(value)
 
 for key, value in mutation_proba.items():

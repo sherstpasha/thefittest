@@ -1,6 +1,5 @@
 from collections import defaultdict
-from thefittest.optimizers._my_adapt_ga import MyAdaptGA
-from thefittest.optimizers import SelfCGA
+from thefittest.optimizers._my_adapt_ga_var_3 import MyAdaptGAVar3
 from thefittest.benchmarks import Sphere
 import matplotlib.pyplot as plt
 
@@ -14,8 +13,8 @@ left_border = -5.0
 right_border = 5.0
 n_bits_per_variable = 32
 
-number_of_iterations = 300
-population_size = 500
+number_of_iterations = 5
+population_size = 20
 
 left_border_array = np.full(shape=n_dimension, fill_value=left_border, dtype=np.float64)
 right_border_array = np.full(shape=n_dimension, fill_value=right_border, dtype=np.float64)
@@ -24,7 +23,7 @@ parts = np.full(shape=n_dimension, fill_value=n_bits_per_variable, dtype=np.int6
 genotype_to_phenotype = GrayCode(fit_by="parts").fit(
     left=left_border_array, right=right_border_array, arg=parts
 )
-optimizer = MyAdaptGA(
+optimizer = MyAdaptGAVar3(
     fitness_function=Rastrigin(),
     genotype_to_phenotype=genotype_to_phenotype.transform,
     iters=number_of_iterations,
@@ -50,7 +49,6 @@ stats = optimizer.get_stats()
 print("The fittest individ:", fittest["genotype"])
 print("The fittest individ:", fittest["phenotype"])
 print("with fitness", fittest["fitness"])
-
 fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=2)
 
 ax[0][0].plot(range(number_of_iterations), stats["max_fitness"])
@@ -60,7 +58,7 @@ ax[0][0].set_xlabel("Iterations")
 
 selectiom_proba = defaultdict(list)
 for i in range(number_of_iterations):
-    for key, value in stats["s_used"][i].items():
+    for key, value in stats["s_proba"][i].items():
         selectiom_proba[key].append(value)
 
 for key, value in selectiom_proba.items():
@@ -69,7 +67,7 @@ ax[0][1].legend()
 
 crossover_proba = defaultdict(list)
 for i in range(number_of_iterations):
-    for key, value in stats["c_used"][i].items():
+    for key, value in stats["c_proba"][i].items():
         crossover_proba[key].append(value)
 
 for key, value in crossover_proba.items():
@@ -78,7 +76,7 @@ ax[1][0].legend()
 
 mutation_proba = defaultdict(list)
 for i in range(number_of_iterations):
-    for key, value in stats["m_used"][i].items():
+    for key, value in stats["m_proba"][i].items():
         mutation_proba[key].append(value)
 
 for key, value in mutation_proba.items():

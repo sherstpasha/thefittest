@@ -6,6 +6,7 @@ from typing import Dict
 from typing import Optional
 from typing import Tuple
 from typing import Union
+from typing import List
 
 import numpy as np
 from numpy.typing import NDArray
@@ -13,9 +14,10 @@ from numpy.typing import NDArray
 from ._geneticalgorithm import GeneticAlgorithm
 from ..tools import donothing
 from ..tools.transformations import numpy_group_by
+from scipy.stats import zscore
 
 
-class SelfCGA(GeneticAlgorithm):
+class MyAdaptGAVar3(GeneticAlgorithm):
     """Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform
     Crossover Operator. LNCS, 7331, 2012, pp. 414-421. https://doi.org/10.1007/978-3-642-30976-2_50
     """
@@ -151,14 +153,16 @@ class SelfCGA(GeneticAlgorithm):
         )
         self._mutation_operators: NDArray = self._choice_operators(proba_dict=self._mutation_proba)
 
-    def _choice_operators(self: SelfCGA, proba_dict: Dict["str", float]) -> NDArray:
+        self._previous_fitness_i: List = []
+
+    def _choice_operators(self: MyAdaptGAVar3, proba_dict: Dict["str", float]) -> NDArray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
         chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
         return chosen_operator
 
     def _get_new_proba(
-        self: SelfCGA,
+        self: MyAdaptGAVar3,
         proba_dict: Dict["str", float],
         operator: str,
         threshold: float,
@@ -172,14 +176,21 @@ class SelfCGA(GeneticAlgorithm):
         return new_proba_dict
 
     def _find_fittest_operator(
-        self: SelfCGA, operators: NDArray, fitness: NDArray[np.float64]
+        self: MyAdaptGAVar3, operators: NDArray, fitness: NDArray[np.float64]
     ) -> str:
-        keys, groups = numpy_group_by(group=fitness, by=operators)
+        fitness_correct = fitness * self._sign
+        keys, groups = numpy_group_by(group=fitness_correct, by=operators)
+
         mean_fit = np.array(list(map(np.mean, groups)))
+        print(keys, mean_fit, np.mean(fitness_correct))
+        delta = mean_fit - np.mean(fitness_correct)
+        delta_norm = zscore(delta)
+        print(delta_norm)
+
         fittest_operator = keys[np.argmax(mean_fit)]
         return fittest_operator
 
-    def _update_data(self: SelfCGA) -> None:
+    def _update_data(self: MyAdaptGAVar3) -> None:
         super()._update_data()
         self._update_stats(
             s_proba=self._selection_proba,
@@ -187,27 +198,31 @@ class SelfCGA(GeneticAlgorithm):
             m_proba=self._mutation_proba,
         )
 
-    def _adapt(self: SelfCGA) -> None:
+    def _adapt(self: MyAdaptGAVar3) -> None:
+        # print(self._previous_fitness_i, 1)
+        # print(self._fitness_i, 2)
+
         s_fittest_oper = self._find_fittest_operator(self._selection_operators, self._fitness_i)
-        self._selection_proba = self._get_new_proba(
-            self._selection_proba, s_fittest_oper, self._thresholds["selection"]
-        )
+        # self._selection_proba = self._get_new_proba(
+        #     self._selection_proba, s_fittest_oper, self._thresholds["selection"]
+        # )
 
-        c_fittest_oper = self._find_fittest_operator(self._crossover_operators, self._fitness_i)
-        self._crossover_proba = self._get_new_proba(
-            self._crossover_proba, c_fittest_oper, self._thresholds["crossover"]
-        )
+        # c_fittest_oper = self._find_fittest_operator(self._crossover_operators, self._fitness_i)
+        # self._crossover_proba = self._get_new_proba(
+        #     self._crossover_proba, c_fittest_oper, self._thresholds["crossover"]
+        # )
 
-        m_fittest_oper = self._find_fittest_operator(self._mutation_operators, self._fitness_i)
-        self._mutation_proba = self._get_new_proba(
-            self._mutation_proba, m_fittest_oper, self._thresholds["mutation"]
-        )
+        # m_fittest_oper = self._find_fittest_operator(self._mutation_operators, self._fitness_i)
+        # self._mutation_proba = self._get_new_proba(
+        #     self._mutation_proba, m_fittest_oper, self._thresholds["mutation"]
+        # )
 
         self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
         self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
         self._mutation_operators = self._choice_operators(proba_dict=self._mutation_proba)
 
-    def _get_new_population(self: SelfCGA) -> None:
+    def _get_new_population(self: MyAdaptGAVar3) -> None:
+        self._previous_fitness_i = self._fitness_i.copy()
         self._population_g_i = np.array(
             [
                 self._get_new_individ_g(
