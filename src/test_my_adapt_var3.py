@@ -13,8 +13,8 @@ left_border = -5.0
 right_border = 5.0
 n_bits_per_variable = 32
 
-number_of_iterations = 5
-population_size = 20
+number_of_iterations = 300
+population_size = 500
 
 left_border_array = np.full(shape=n_dimension, fill_value=left_border, dtype=np.float64)
 right_border_array = np.full(shape=n_dimension, fill_value=right_border, dtype=np.float64)
