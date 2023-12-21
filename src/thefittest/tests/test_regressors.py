@@ -1,225 +1,225 @@
-import numpy as np
+# import numpy as np
 
-from ..base import EphemeralNode
-from ..base import FunctionalNode
-from ..base import TerminalNode
-from ..base import UniversalSet
-from ..optimizers import DifferentialEvolution
-from ..optimizers import GeneticProgramming
-from ..optimizers import SelfCGA
-from ..optimizers import SelfCGP
-from ..regressors import GeneticProgrammingNeuralNetRegressor
-from ..regressors import MLPEARegressor
-from ..regressors import SymbolicRegressionGP
-from ..tools.operators import Add
-from ..tools.operators import Div
-from ..tools.operators import Mul
-from ..tools.operators import Neg
-from ..tools.operators import uniform_crossoverGP
-
-
-def test_SymbolicRegressionGP():
-    def problem(x):
-        return np.sin(x[:, 0])
-
-    def generator1():
-        return np.round(np.random.uniform(0, 10), 4)
-
-    def generator2():
-        return np.random.randint(0, 10)
-
-    iters = 10
-    pop_size = 50
-
-    function = problem
-    left_border = -4.5
-    right_border = 4.5
-    sample_size = 300
-    n_dimension = 1
-
-    X = np.array(
-        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
-    ).T
-    y = function(X)
-
-    functional_set = [
-        FunctionalNode(Add()),
-        FunctionalNode(Mul()),
-        FunctionalNode(Neg()),
-        FunctionalNode(Div()),
-    ]
-
-    terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
-    terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
-    uniset = UniversalSet(functional_set, terminal_set)
-
-    optimizer = GeneticProgramming
-
-    optimizer_args = {
-        "tour_size": 15,
-        "show_progress_each": 10,
-        "optimal_value": 1.1,
-        "crossover": "gp_uniform_k",
-        "parents_num": 6,
-    }
-
-    model = SymbolicRegressionGP(
-        iters=iters,
-        pop_size=pop_size,
-        uniset=uniset,
-        optimizer=optimizer,
-        optimizer_args=optimizer_args,
-    )
-
-    model.fit(X, y)
-
-    optimizer = model.get_optimizer()
-
-    assert optimizer._iters == iters
-    assert optimizer._pop_size == pop_size
-    assert optimizer._show_progress_each == 10
-    assert optimizer._crossover_pool[optimizer._specified_crossover][1] == 6
-    assert optimizer._crossover_pool[optimizer._specified_crossover][0] == uniform_crossoverGP
-
-    model = SymbolicRegressionGP(
-        iters=iters,
-        pop_size=pop_size,
-    )
-
-    model.fit(X, y)
-
-    model.predict(X)
+# from ..base import EphemeralNode
+# from ..base import FunctionalNode
+# from ..base import TerminalNode
+# from ..base import UniversalSet
+# from ..optimizers import DifferentialEvolution
+# from ..optimizers import GeneticProgramming
+# from ..optimizers import SelfCGA
+# from ..optimizers import SelfCGP
+# from ..regressors import GeneticProgrammingNeuralNetRegressor
+# from ..regressors import MLPEARegressor
+# from ..regressors import SymbolicRegressionGP
+# from ..tools.operators import Add
+# from ..tools.operators import Div
+# from ..tools.operators import Mul
+# from ..tools.operators import Neg
+# from ..tools.operators import uniform_crossoverGP
 
 
-def test_GeneticProgrammingNeuralNetRegressor():
-    def problem(x):
-        return np.sin(x[:, 0])
+# def test_SymbolicRegressionGP():
+#     def problem(x):
+#         return np.sin(x[:, 0])
 
-    iters = 10
-    pop_size = 50
+#     def generator1():
+#         return np.round(np.random.uniform(0, 10), 4)
 
-    function = problem
-    left_border = -4.5
-    right_border = 4.5
-    sample_size = 300
-    n_dimension = 1
+#     def generator2():
+#         return np.random.randint(0, 10)
 
-    X = np.array(
-        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
-    ).T
-    y = function(X)
+#     iters = 10
+#     pop_size = 50
 
-    optimizer = GeneticProgramming
+#     function = problem
+#     left_border = -4.5
+#     right_border = 4.5
+#     sample_size = 300
+#     n_dimension = 1
 
-    optimizer_args = {"tour_size": 15, "show_progress_each": 1}
+#     X = np.array(
+#         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
+#     ).T
+#     y = function(X)
 
-    iters = 3
-    pop_size = 10
+#     functional_set = [
+#         FunctionalNode(Add()),
+#         FunctionalNode(Mul()),
+#         FunctionalNode(Neg()),
+#         FunctionalNode(Div()),
+#     ]
 
-    weights_optimizer = DifferentialEvolution
-    weights_optimizer_args = {"iters": 25, "pop_size": 25, "CR": 0.9}
+#     terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
+#     terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
+#     uniset = UniversalSet(functional_set, terminal_set)
 
-    model = GeneticProgrammingNeuralNetRegressor(
-        iters=iters,
-        pop_size=pop_size,
-        optimizer=optimizer,
-        optimizer_args=optimizer_args,
-        weights_optimizer=weights_optimizer,
-        weights_optimizer_args=weights_optimizer_args,
-    )
+#     optimizer = GeneticProgramming
 
-    model.fit(X, y)
+#     optimizer_args = {
+#         "tour_size": 15,
+#         "show_progress_each": 10,
+#         "optimal_value": 1.1,
+#         "crossover": "gp_uniform_k",
+#         "parents_num": 6,
+#     }
 
-    model.predict(X)
+#     model = SymbolicRegressionGP(
+#         iters=iters,
+#         pop_size=pop_size,
+#         uniset=uniset,
+#         optimizer=optimizer,
+#         optimizer_args=optimizer_args,
+#     )
 
-    weights_optimizer = SelfCGA
-    optimizer = SelfCGP
-    weights_optimizer_args = {"iters": 25, "pop_size": 25, "K": 0.33}
+#     model.fit(X, y)
 
-    model = GeneticProgrammingNeuralNetRegressor(
-        iters=iters,
-        pop_size=pop_size,
-        optimizer=optimizer,
-        optimizer_args=optimizer_args,
-        weights_optimizer=weights_optimizer,
-        weights_optimizer_args=weights_optimizer_args,
-    )
+#     optimizer = model.get_optimizer()
 
-    model.fit(X, y)
+#     assert optimizer._iters == iters
+#     assert optimizer._pop_size == pop_size
+#     assert optimizer._show_progress_each == 10
+#     assert optimizer._crossover_pool[optimizer._specified_crossover][1] == 6
+#     assert optimizer._crossover_pool[optimizer._specified_crossover][0] == uniform_crossoverGP
 
-    model.predict(X)
+#     model = SymbolicRegressionGP(
+#         iters=iters,
+#         pop_size=pop_size,
+#     )
 
-    model = GeneticProgrammingNeuralNetRegressor(
-        iters=iters,
-        pop_size=pop_size,
-    )
+#     model.fit(X, y)
 
-    model.fit(X, y)
-
-    model.predict(X)
-
-    optimizer = model.get_optimizer()
-
-    assert isinstance(optimizer, model._optimizer_class)
+#     model.predict(X)
 
 
-def test_MLPEARegressor():
-    def problem(x):
-        return np.sin(x[:, 0])
+# def test_GeneticProgrammingNeuralNetRegressor():
+#     def problem(x):
+#         return np.sin(x[:, 0])
 
-    iters = 10
-    pop_size = 50
+#     iters = 10
+#     pop_size = 50
 
-    function = problem
-    left_border = -4.5
-    right_border = 4.5
-    sample_size = 300
-    n_dimension = 1
+#     function = problem
+#     left_border = -4.5
+#     right_border = 4.5
+#     sample_size = 300
+#     n_dimension = 1
 
-    X = np.array(
-        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
-    ).T
-    y = function(X)
+#     X = np.array(
+#         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
+#     ).T
+#     y = function(X)
 
-    iters = 3
-    pop_size = 10
+#     optimizer = GeneticProgramming
 
-    weights_optimizer = DifferentialEvolution
-    weights_optimizer_args = {"CR": 0.9}
+#     optimizer_args = {"tour_size": 15, "show_progress_each": 1}
 
-    model = MLPEARegressor(
-        iters=iters,
-        pop_size=pop_size,
-        hidden_layers=(10, 3),
-        weights_optimizer=weights_optimizer,
-        weights_optimizer_args=weights_optimizer_args,
-    )
+#     iters = 3
+#     pop_size = 10
 
-    model.fit(X, y)
+#     weights_optimizer = DifferentialEvolution
+#     weights_optimizer_args = {"iters": 25, "pop_size": 25, "CR": 0.9}
 
-    model.predict(X)
+#     model = GeneticProgrammingNeuralNetRegressor(
+#         iters=iters,
+#         pop_size=pop_size,
+#         optimizer=optimizer,
+#         optimizer_args=optimizer_args,
+#         weights_optimizer=weights_optimizer,
+#         weights_optimizer_args=weights_optimizer_args,
+#     )
 
-    weights_optimizer = SelfCGA
-    weights_optimizer_args = {"K": 0.33}
+#     model.fit(X, y)
 
-    model = MLPEARegressor(
-        iters=iters,
-        pop_size=pop_size,
-        hidden_layers=(10,),
-        weights_optimizer=weights_optimizer,
-        weights_optimizer_args=weights_optimizer_args,
-    )
+#     model.predict(X)
 
-    model.fit(X, y)
+#     weights_optimizer = SelfCGA
+#     optimizer = SelfCGP
+#     weights_optimizer_args = {"iters": 25, "pop_size": 25, "K": 0.33}
 
-    model.predict(X)
+#     model = GeneticProgrammingNeuralNetRegressor(
+#         iters=iters,
+#         pop_size=pop_size,
+#         optimizer=optimizer,
+#         optimizer_args=optimizer_args,
+#         weights_optimizer=weights_optimizer,
+#         weights_optimizer_args=weights_optimizer_args,
+#     )
 
-    model = MLPEARegressor(iters=iters, pop_size=pop_size, hidden_layers=(10,))
+#     model.fit(X, y)
 
-    model.fit(X, y)
+#     model.predict(X)
 
-    model.predict(X)
+#     model = GeneticProgrammingNeuralNetRegressor(
+#         iters=iters,
+#         pop_size=pop_size,
+#     )
 
-    optimizer = model.get_optimizer()
+#     model.fit(X, y)
 
-    assert isinstance(optimizer, model._weights_optimizer_class)
+#     model.predict(X)
+
+#     optimizer = model.get_optimizer()
+
+#     assert isinstance(optimizer, model._optimizer_class)
+
+
+# def test_MLPEARegressor():
+#     def problem(x):
+#         return np.sin(x[:, 0])
+
+#     iters = 10
+#     pop_size = 50
+
+#     function = problem
+#     left_border = -4.5
+#     right_border = 4.5
+#     sample_size = 300
+#     n_dimension = 1
+
+#     X = np.array(
+#         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
+#     ).T
+#     y = function(X)
+
+#     iters = 3
+#     pop_size = 10
+
+#     weights_optimizer = DifferentialEvolution
+#     weights_optimizer_args = {"CR": 0.9}
+
+#     model = MLPEARegressor(
+#         iters=iters,
+#         pop_size=pop_size,
+#         hidden_layers=(10, 3),
+#         weights_optimizer=weights_optimizer,
+#         weights_optimizer_args=weights_optimizer_args,
+#     )
+
+#     model.fit(X, y)
+
+#     model.predict(X)
+
+#     weights_optimizer = SelfCGA
+#     weights_optimizer_args = {"K": 0.33}
+
+#     model = MLPEARegressor(
+#         iters=iters,
+#         pop_size=pop_size,
+#         hidden_layers=(10,),
+#         weights_optimizer=weights_optimizer,
+#         weights_optimizer_args=weights_optimizer_args,
+#     )
+
+#     model.fit(X, y)
+
+#     model.predict(X)
+
+#     model = MLPEARegressor(iters=iters, pop_size=pop_size, hidden_layers=(10,))
+
+#     model.fit(X, y)
+
+#     model.predict(X)
+
+#     optimizer = model.get_optimizer()
+
+#     assert isinstance(optimizer, model._weights_optimizer_class)

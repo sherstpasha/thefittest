@@ -56,8 +56,7 @@ def root_mean_square_error2d(
 @njit(float64(float64[:], float64[:]))
 def coefficient_determination(
     y_true: NDArray[np.float64],
-    y_predict: NDArray[np.float64],
-    total_sum: Optional[np.float64]
+    y_predict: NDArray[np.float64]
 ) -> np.float64:
     """
     The `coefficient_determination` function calculates the coefficient of determination (R^2) for a set of true and predicted values.
@@ -70,12 +69,11 @@ def coefficient_determination(
     Returns:
         np.float64: The calculated coefficient of determination (R^2).
     """
-    if total_sum is None:
-        # Calculate the mean of the true values
-        mean_y_true = np.mean(y_true)
+    # Calculate the mean of the true values
+    mean_y_true = np.mean(y_true)
 
-        # Calculate the total sum of squares
-        total_sum = np.sum((y_true - mean_y_true) ** 2)
+    # Calculate the total sum of squares
+    total_sum = np.sum((y_true - mean_y_true) ** 2)
 
     # Calculate the error between the true values and predicted values
     error = y_true - y_predict
@@ -106,15 +104,12 @@ def coefficient_determination2d(
     size = len(y_predict2d)
     to_return = np.empty(size, dtype=np.float64)
 
-    mean_y_true = np.mean(y_true)
-    total_sum = np.sum((y_true - mean_y_true) ** 2)
-
     for i in range(size):
-        to_return[i] = coefficient_determination(y_true, y_predict2d[i], total_sum)
+        to_return[i] = coefficient_determination(y_true, y_predict2d[i])
 
     return to_return
 
-
+@njit(float64(float64[:, :], float64[:, :]))
 def categorical_crossentropy(
     target: NDArray[np.float64], output: NDArray[np.float64]
 ) -> np.float64:
@@ -324,7 +319,7 @@ def precision_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> 
         if true_positives[i] != 0:
             class_precision[i] = true_positives[i] / (false_negatives[i] + true_positives[i])
 
-    average_precision = np.mean(precision)
+    average_precision = np.mean(class_precision)
     return average_precision
 
 
