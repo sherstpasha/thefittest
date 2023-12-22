@@ -33,8 +33,21 @@ max_value = np.finfo(np.float64).max
 # MUTATUIONS
 # genetic algorithm
 @njit(int8[:](int8[:], float64))
-def flip_mutation(individ: NDArray[np.byte], proba: float) -> NDArray[np.byte]:
-    offspring = individ.copy()
+def flip_mutation(individual: NDArray[np.byte], proba: float) -> NDArray[np.byte]:
+    """
+    Perform a flip mutation on an individual.
+
+    This function takes an individual (a binary array) and a probability. It creates a copy of the individual,
+    then for each bit in the individual, it flips the bit with a certain probability.
+
+    Parameters:
+        individ (NDArray[np.byte]): The individual to be mutated.
+        proba (float): The probability of flipping each bit.
+
+    Returns:
+        NDArray[np.byte]: The mutated individual.
+    """
+    offspring = individual.copy()
     for i in range(offspring.size):
         if random.random() < proba:
             offspring[i] = 1 - offspring[i]
@@ -43,23 +56,47 @@ def flip_mutation(individ: NDArray[np.byte], proba: float) -> NDArray[np.byte]:
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
 def best_1(
-    current: NDArray[np.float64],
-    best: NDArray[np.float64],
+    current_individual: NDArray[np.float64],
+    best_individual: NDArray[np.float64],
     population: NDArray[np.float64],
     F: np.float64,
 ) -> NDArray[np.float64]:
+    """
+    This function is the best-1 mutation operator for differential evolution.
+
+    Parameters:
+        current (NDArray[np.float64]): The current individual.
+        best (NDArray[np.float64]): The best individual found so far.
+        population (NDArray[np.float64]): The population of individuals.
+        F (np.float64): The mutation factor.
+
+    Returns:
+        NDArray[np.float64]: The mutated individual.
+    """
     size = np.int64(len(population))
     r1, r2 = random_sample(range_size=size, quantity=np.int64(2), replace=False)
-    return best + F * (population[r1] - population[r2])
+    return best_individual + F * (population[r1] - population[r2])
 
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
 def rand_1(
-    current: NDArray[np.float64],
-    best: NDArray[np.float64],
+    current_individual: NDArray[np.float64],
+    best_individual: NDArray[np.float64],
     population: NDArray[np.float64],
     F: np.float64,
 ) -> NDArray[np.float64]:
+    """
+    This function is the rand-1 mutation operator for differential evolution.
+
+    Parameters:
+        current_individual (NDArray[np.float64]): The current individual.
+        best_individual (NDArray[np.float64]): The best individual found so far.
+        population (NDArray[np.float64]): The population of individuals.
+        F (np.float64): The mutation factor.
+
+    Returns:
+        NDArray[np.float64]: The mutated individual.
+    """
     size = np.int64(len(population))
     r1, r2, r3 = random_sample(range_size=size, quantity=np.int64(3), replace=False)
     return population[r3] + F * (population[r1] - population[r2])
@@ -67,11 +104,23 @@ def rand_1(
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
 def rand_to_best1(
-    current: NDArray[np.float64],
-    best: NDArray[np.float64],
+    current_individual: NDArray[np.float64],
+    best_individual: NDArray[np.float64],
     population: NDArray[np.float64],
     F: np.float64,
 ) -> NDArray[np.float64]:
+    """
+    This function is the rand-to-best-1 mutation operator for differential evolution.
+
+    Parameters:
+        current_individual (NDArray[np.float64]): The current individual.
+        best_individual (NDArray[np.float64]): The best individual found so far.
+        population (NDArray[np.float64]): The population of individuals.
+        F (np.float64): The mutation factor.
+
+    Returns:
+        NDArray[np.float64]: The mutated individual.
+    """
     size = np.int64(len(population))
     r1, r2, r3 = random_sample(range_size=size, quantity=np.int64(3), replace=False)
     return population[r1] + F * (population[r1]) + F * (population[r2] - population[r3])
@@ -79,35 +128,71 @@ def rand_to_best1(
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
 def current_to_best_1(
-    current: NDArray[np.float64],
-    best: NDArray[np.float64],
+    current_individual: NDArray[np.float64],
+    best_individual: NDArray[np.float64],
     population: NDArray[np.float64],
     F: np.float64,
 ) -> NDArray[np.float64]:
+    '''
+    This function is the rand-to-best-1 mutation operator for differential evolution.
+
+    Parameters:
+        current_individual (NDArray[np.float64]): The current individual.
+        best_individual (NDArray[np.float64]): The best individual found so far.
+        population (NDArray[np.float64]): The population of individuals.
+        F (np.float64): The mutation factor.
+
+    Returns:
+        NDArray[np.float64]: The mutated individual.
+    '''
     size = np.int64(len(population))
     r1, r2 = random_sample(range_size=size, quantity=np.int64(2), replace=False)
-    return current + F * (best - current) + F * (population[r1] - population[r2])
+    return current_individual + F * (best_individual - current_individual) + F * (population[r1] - population[r2])
 
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
 def best_2(
-    current: NDArray[np.float64],
-    best: NDArray[np.float64],
+    current_individual: NDArray[np.float64],
+    best_individual: NDArray[np.float64],
     population: NDArray[np.float64],
     F: np.float64,
 ) -> NDArray[np.float64]:
+    '''
+    This function is the best-2 mutation operator for differential evolution.
+
+    Parameters:
+        current_individual (NDArray[np.float64]): The current individual.
+        best_individual (NDArray[np.float64]): The best individual found so far.
+        population (NDArray[np.float64]): The population of individuals.
+        F (np.float64): The mutation factor.
+
+    Returns:
+        NDArray[np.float64]: The mutated individual.
+    '''
     size = np.int64(len(population))
     r1, r2, r3, r4 = random_sample(range_size=size, quantity=np.int64(4), replace=False)
-    return best + F * (population[r1] - population[r2]) + F * (population[r3] - population[r4])
+    return best_individual + F * (population[r1] - population[r2]) + F * (population[r3] - population[r4])
 
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
 def rand_2(
-    current: NDArray[np.float64],
-    best: NDArray[np.float64],
+    current_individual: NDArray[np.float64],
+    best_individual: NDArray[np.float64],
     population: NDArray[np.float64],
     F: np.float64,
 ) -> NDArray[np.float64]:
+    '''
+    This function is the rand-2 mutation operator for differential evolution.
+
+    Parameters:
+        current_individual (NDArray[np.float64]): The current individual.
+        best_individual (NDArray[np.float64]): The best individual found so far.
+        population (NDArray[np.float64]): The population of individuals.
+        F (np.float64): The mutation factor.
+
+    Returns:
+        NDArray[np.float64]: The mutated individual.
+    '''
     size = np.int64(len(population))
     r1, r2, r3, r4, r5 = random_sample(range_size=size, quantity=np.int64(5), replace=False)
     return (
@@ -118,15 +203,27 @@ def rand_2(
 
 
 @njit(float64[:](float64[:], float64[:], float64[:, :], float64))
-def current_to_rand_1_(
-    current: NDArray[np.float64],
-    best: NDArray[np.float64],
+def current_to_rand_1(
+    current_individual: NDArray[np.float64],
+    best_individual: NDArray[np.float64],
     population: NDArray[np.float64],
     F: np.float64,
 ) -> NDArray[np.float64]:
+    '''
+    This function is the current-to-rand-1 mutation operator for differential evolution.
+
+    Parameters:
+        current_individual (NDArray[np.float64]): The current individual.
+        best_individual (NDArray[np.float64]): The best individual found so far.
+        population (NDArray[np.float64]): The population of individuals.
+        F (np.float64): The mutation factor.
+
+    Returns:
+        NDArray[np.float64]: The mutated individual.
+    '''
     size = np.int64(len(population))
     r1, r2, r3 = random_sample(range_size=size, quantity=np.int64(3), replace=False)
-    return population[r1] + F * (population[r3] - current) + F * (population[r1] - population[r2])
+    return population[r1] + F * (population[r3] - current_individual) + F * (population[r1] - population[r2])
 
 
 @njit(float64[:](float64[:], float64[:, :], int64[:], float64, float64[:, :]))
