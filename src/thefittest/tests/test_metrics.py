@@ -11,6 +11,10 @@ from thefittest.tools.metrics import accuracy_score2d
 from thefittest.tools.metrics import confusion_matrix
 from thefittest.tools.metrics import recall_score
 from thefittest.tools.metrics import recall_score2d
+from thefittest.tools.metrics import precision_score
+from thefittest.tools.metrics import precision_score2d
+from thefittest.tools.metrics import f1_score
+from thefittest.tools.metrics import f1_score2d
 
 
 def test_root_mean_square_error():
@@ -113,12 +117,66 @@ def test_confusion_matrix():
 
 
 def test_recall_score():
-    y_true = np.array([0, 1, 2, 0, 1, 2])
-    y_predict = np.array([0, 2, 1, 0, 1, 2])
+    y_true = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
+    y_predict = np.array([0, 2, 1, 0, 1, 2], dtype=np.int64)
     expected_recall = 2/3
-    assert recall_score(y_true, y_predict) == pytest.approx(expected_recall)
+    assert np.allclose(recall_score(y_true, y_predict), expected_recall)
 
-    y_true = np.array([0, 0, 0, 1, 1, 1])
-    y_predict = np.array([0, 0, 1, 0, 1, 1])
-    expected_recall = 2/3
-    assert recall_score(y_true, y_predict) == pytest.approx(expected_recall)
+    y_true = np.array([0, 0, 0, 1, 1, 1], dtype=np.int64)
+    y_predict = np.array([1, 1, 1, 0, 0, 0], dtype=np.int64)
+    expected_recall = 0.
+    assert np.allclose(recall_score(y_true, y_predict), expected_recall)
+
+
+def test_recall_score2d():
+    y_true = np.array([0, 0, 0, 1, 1, 1], dtype=np.int64)
+    y_predict2d = np.array([[1, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 1]], dtype=np.int64)
+
+    result = recall_score2d(y_true, y_predict2d)
+
+    expected = np.array([0., 2/3], dtype=np.float64)
+    assert np.allclose(result, expected)
+
+
+def test_precision_score():
+    y_true = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
+    y_predict = np.array([0, 2, 1, 0, 1, 2], dtype=np.int64)
+    expected_output = np.float64(0.6666666666666666)
+    assert np.allclose(precision_score(y_true, y_predict), expected_output)
+
+    y_true = np.array([0, 0, 0, 1, 1, 1], dtype=np.int64)
+    y_predict = np.array([1, 1, 1, 0, 0, 0], dtype=np.int64)
+    expected_output = np.float64(0.)
+    assert np.allclose(precision_score(y_true, y_predict), expected_output)
+
+
+def test_precision_score2d():
+    y_true = np.array([0, 0, 0, 1, 1, 1], dtype=np.int64)
+    y_predict2d = np.array([[1, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 1]], dtype=np.int64)
+
+    result = precision_score2d(y_true, y_predict2d)
+
+    expected = np.array([0., 2/3], dtype=np.float64)
+    assert np.allclose(result, expected)
+
+
+def test_f1_score():
+    y_true = np.array([0, 1, 0, 2], dtype=np.int64)
+    y_predict = np.array([1, 2, 0, 2], dtype=np.int64)
+    expected_output = np.float64(0.444444)
+    assert np.allclose(f1_score(y_true, y_predict), expected_output)
+
+    y_true = np.array([0, 0, 1, 1], dtype=np.int64)
+    y_predict = np.array([0, 0, 1, 1], dtype=np.int64)
+    expected_output = np.float64(1.0)
+    assert np.allclose(f1_score(y_true, y_predict), expected_output)
+
+
+def test_f1_score2d():
+    y_true = np.array([0, 1, 0, 2], dtype=np.int64)
+    y_predict2d = np.array([[1, 2, 0, 2], [0, 1, 0, 2]], dtype=np.int64)
+
+    result = f1_score2d(y_true, y_predict2d)
+
+    expected = np.array([0.444444, 1.0], dtype=np.float64)
+    assert np.allclose(result, expected)
