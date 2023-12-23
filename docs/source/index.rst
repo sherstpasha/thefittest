@@ -10,6 +10,8 @@ Welcome to Thefittest's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   ./utils.rst
+
 
 
 Indices and tables
