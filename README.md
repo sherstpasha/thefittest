@@ -7,6 +7,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4c47b6de61c4422180529bbc360262c4)](https://app.codacy.com/gh/sherstpasha/thefittest/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Documentation Status](https://readthedocs.com/projects/sherstpasha-pavel/badge/?version=latest&token=71adf5d63b55f0def96b09e1ce4c60f8d57cbdaed7db777117f34e4718d5a1ea)](https://sherstpasha-pavel.readthedocs-hosted.com/ru/latest/?badge=latest)
 
 ## Installation
 ```bash
