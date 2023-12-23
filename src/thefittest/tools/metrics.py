@@ -1,5 +1,3 @@
-from typing import Optional
-
 from numba import float64
 from numba import int64
 from numba import njit
@@ -23,7 +21,7 @@ def root_mean_square_error(
         np.float64: The root mean square error between the true and predicted values.
     """
     error = y_true - y_predict
-    mean_squared_error = np.mean(error ** 2)
+    mean_squared_error = np.mean(error**2)
     rmse = np.sqrt(mean_squared_error)
 
     return rmse
@@ -34,7 +32,8 @@ def root_mean_square_error2d(
     y_true: NDArray[np.float64], y_predict2d: NDArray[np.float64]
 ) -> NDArray[np.float64]:
     """
-    Calculate the root mean square error (RMSE) between the true values and predicted values for each row in a 2D array.
+    Calculate the root mean square error (RMSE) between the true values and predicted values for
+    each row in a 2D array.
 
     Parameters:
         y_true (NDArray[np.float64]): The true values.
@@ -55,16 +54,19 @@ def root_mean_square_error2d(
 
 @njit(float64(float64[:], float64[:]))
 def coefficient_determination(
-    y_true: NDArray[np.float64],
-    y_predict: NDArray[np.float64]
+    y_true: NDArray[np.float64], y_predict: NDArray[np.float64]
 ) -> np.float64:
     """
-    The `coefficient_determination` function calculates the coefficient of determination (R^2) for a set of true and predicted values.
+    The `coefficient_determination` function calculates the coefficient of determination (R^2) for
+    a set of true and predicted values.
 
     Parameters:
         y_true (NDArray[np.float64]): An array of true values.
-        y_predict (NDArray[np.float64]): An array of predicted values.
-        total_sum (Optional[np.float64]): An optional parameter that represents the total sum of squares. If not provided, the function will calculate it based on the mean of the true values.
+        y_predict (NDArray[np.float64]): An array of
+          predicted values.
+        total_sum (Optional[np.float64]): An optional parameter that represents the total
+          sum of squares. If not provided, the function will calculate it based on the mean of
+            the true values.
 
     Returns:
         np.float64: The calculated coefficient of determination (R^2).
@@ -84,14 +86,18 @@ def coefficient_determination2d(
     y_true: NDArray[np.float64], y_predict2d: NDArray[np.float64]
 ) -> NDArray[np.float64]:
     """
-    The `coefficient_determination2d` function calculates the coefficient of determination (R^2) for a set of true values and a 2D array of predicted values.
+    The `coefficient_determination2d` function calculates the coefficient of determination (R^2)
+      for a set of true values and a 2D array of predicted values.
 
     Parameters:
         y_true (NDArray[np.float64]): An array of true values.
-        y_predict2d (NDArray[np.float64]): A 2D array of predicted values, where each row represents a set of predicted values.
+        y_predict2d (NDArray[np.float64]): A 2D array of predicted values, where each row
+          represents a set of predicted values.
 
     Returns:
-        NDArray[np.float64]: An array of calculated coefficients of determination (R^2), where each element corresponds to the R^2 value for the corresponding row of `y_predict2d`.
+        NDArray[np.float64]: An array of calculated coefficients of determination (R^2),
+          where each element corresponds to the R^2 value for the corresponding row of
+            `y_predict2d`.
     """
     size = len(y_predict2d)
     r2_values = np.empty(size, dtype=np.float64)
@@ -101,6 +107,7 @@ def coefficient_determination2d(
 
     return r2_values
 
+
 @njit(float64(float64[:, :], float64[:, :]))
 def categorical_crossentropy(
     target: NDArray[np.float64], output: NDArray[np.float64]
@@ -109,8 +116,10 @@ def categorical_crossentropy(
     Calculates cross-entropy for categorical classification.
 
     Parameters:
-        target (NDArray[np.float64]): Array of dimension 2d, representing the true probability for each class 
-        output (NDArray[np.float64]): An array of dimension 2d representing the predicted probability values for each class
+        target (NDArray[np.float64]): Array of dimension 2d, representing the true probability for
+          each class
+        output (NDArray[np.float64]): An array of dimension 2d representing the predicted
+          probability values for each class
 
     Returns:
         np.float64: the value of cross-entropy
@@ -119,7 +128,7 @@ def categorical_crossentropy(
     output_clipped = np.clip(output, 1e-7, 1 - 1e-7)
 
     log_prob = np.log(output_clipped)
-    neg_log_prob = - target_clipped * log_prob
+    neg_log_prob = -target_clipped * log_prob
     cross_entropy = np.mean(np.sum(neg_log_prob, axis=1))
 
     return cross_entropy
@@ -133,11 +142,14 @@ def categorical_crossentropy3d(
     Calculates cross-entropy for categorical classification for a 3D array of output values.
 
     Parameters:
-        target (NDArray[np.float64]): Array of dimension 2d, representing the true probability for each class 
-        output3d (NDArray[np.float64]): A 3D array of dimension 3d representing the predicted probability values for each class
+        target (NDArray[np.float64]): Array of dimension 2d, representing the true probability
+          for each class
+        output3d (NDArray[np.float64]): A 3D array of dimension 3d representing the predicted
+          probability values for each class
 
     Returns:
-        NDArray[np.float64]: an array of cross-entropy values, one for each 2D slice in the 3D output array
+        NDArray[np.float64]: an array of cross-entropy values, one for each 2D slice in the
+          3D output array
     """
     size = len(output3d)
     cross_entropy_values = np.empty(size, dtype=np.float64)
@@ -160,7 +172,7 @@ def accuracy_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> n
     Returns:
         np.float64: The accuracy of the predictions.
     """
-    comparison = (y_true == y_predict)
+    comparison = y_true == y_predict
     comparison_int = comparison.astype(np.int64)
     accuracy = np.mean(comparison_int)
 
@@ -205,7 +217,6 @@ def confusion_matrix(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) ->
     """
     classes = np.unique(y_true)
     n_classes = len(classes)
-    size = len(y_true)
 
     confusion = np.zeros(shape=(n_classes, n_classes), dtype=np.int64)
     for true, pred in zip(y_true, y_predict):
@@ -217,7 +228,8 @@ def confusion_matrix(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) ->
 @njit(float64(int64[:], int64[:]))
 def recall_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float64:
     """
-    The recall_score function calculates the average recall score of the predictions for multi-class classification problems.
+    The recall_score function calculates the average recall score of the predictions for
+      multi-class classification problems.
 
     Parameters:
         y_true (NDArray[np.int64]): The true labels.
@@ -323,7 +335,7 @@ def precision_score2d(
 
     for i in range(size):
         average_precision_values[i] = precision_score(y_true, y_predict2d[i])
-        
+
     return average_precision_values
 
 
@@ -340,10 +352,12 @@ def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.floa
         np.float64: Average value of the F1-score for each class.
 
     Description:
-        F1-score is a measure that combines precision and recall into one value. 
+        F1-score is a measure that combines precision and recall into one value.
         It is calculated as 2 * (precision * recall) / (precision + recall), where:
-        - precision is the ratio of correctly predicted positive results out of all predicted positive results.
-        - recall is the ratio of correctly predicted positive results out of all actual positive results.
+        - precision is the ratio of correctly predicted positive results out of all predicted
+          positive results.
+        - recall is the ratio of correctly predicted positive results out of all actual positive
+          results.
         F1-score is calculated for each class separately and then averaged.
     """
     n_classes = len(np.unique(y_true))
@@ -367,7 +381,6 @@ def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.floa
             recall = true_positives[i] / (false_negatives[i] + true_positives[i])
             f1[i] = 2 * (precision * recall) / (precision + recall)
 
-
     average_f1 = np.mean(f1)
     return average_f1
 
@@ -386,8 +399,8 @@ def f1_score2d(y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]) -> NDA
     """
     size = len(y_predict2d)
     average_f1_values = np.empty(size, dtype=np.float64)
-    
+
     for i in range(size):
         average_f1_values[i] = f1_score(y_true, y_predict2d[i])
-        
+
     return average_f1_values
