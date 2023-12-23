@@ -13,31 +13,31 @@ from numpy.typing import NDArray
 
 from ..base import Tree
 from ..base._ea import EvolutionaryAlgorithm
-from ..tools import donothing
-from ..tools.operators import empty_crossover
-from ..tools.operators import flip_mutation
-from ..tools.operators import growing_mutation
-from ..tools.operators import one_point_crossover
-from ..tools.operators import one_point_crossoverGP
-from ..tools.operators import point_mutation
-from ..tools.operators import proportional_selection
-from ..tools.operators import rank_selection
-from ..tools.operators import shrink_mutation
-from ..tools.operators import standart_crossover
-from ..tools.operators import swap_mutation
-from ..tools.operators import tournament_selection
-from ..tools.operators import two_point_crossover
-from ..tools.operators import uniform_crossover
-from ..tools.operators import uniform_crossoverGP
-from ..tools.operators import uniform_prop_crossover
-from ..tools.operators import uniform_prop_crossover_GP
-from ..tools.operators import uniform_rank_crossover
-from ..tools.operators import uniform_rank_crossover_GP
-from ..tools.operators import uniform_tour_crossover
-from ..tools.operators import uniform_tour_crossover_GP
-from ..tools.random import binary_string_population
-from ..tools.transformations import rank_data
-from ..tools.transformations import scale_data
+from ..utils import donothing
+from ..utils.operators import empty_crossover
+from ..utils.operators import flip_mutation
+from ..utils.operators import growing_mutation
+from ..utils.operators import one_point_crossover
+from ..utils.operators import one_point_crossoverGP
+from ..utils.operators import point_mutation
+from ..utils.operators import proportional_selection
+from ..utils.operators import rank_selection
+from ..utils.operators import shrink_mutation
+from ..utils.operators import standart_crossover
+from ..utils.operators import swap_mutation
+from ..utils.operators import tournament_selection
+from ..utils.operators import two_point_crossover
+from ..utils.operators import uniform_crossover
+from ..utils.operators import uniform_crossoverGP
+from ..utils.operators import uniform_prop_crossover
+from ..utils.operators import uniform_prop_crossover_GP
+from ..utils.operators import uniform_rank_crossover
+from ..utils.operators import uniform_rank_crossover_GP
+from ..utils.operators import uniform_tour_crossover
+from ..utils.operators import uniform_tour_crossover_GP
+from ..utils.random import binary_string_population
+from ..utils.transformations import rank_data
+from ..utils.transformations import scale_data
 
 
 class GeneticAlgorithm(EvolutionaryAlgorithm):

@@ -11,13 +11,13 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..base._ea import EvolutionaryAlgorithm
-from ..tools import donothing
-from ..tools.operators import binomialGA
-from ..tools.operators import flip_mutation
-from ..tools.operators import tournament_selection
-from ..tools.random import binary_string_population
-from ..tools.random import cauchy_distribution
-from ..tools.transformations import lehmer_mean
+from ..utils import donothing
+from ..utils.operators import binomialGA
+from ..utils.operators import flip_mutation
+from ..utils.operators import tournament_selection
+from ..utils.random import binary_string_population
+from ..utils.random import cauchy_distribution
+from ..utils.transformations import lehmer_mean
 
 
 class SHAGA(EvolutionaryAlgorithm):

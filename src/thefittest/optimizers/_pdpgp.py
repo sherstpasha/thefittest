@@ -13,7 +13,7 @@ from ._geneticprogramming import GeneticProgramming
 from ._pdpga import PDPGA
 from ..base import Tree
 from ..base import UniversalSet
-from ..tools import donothing
+from ..utils import donothing
 
 
 class PDPGP(GeneticProgramming, PDPGA):

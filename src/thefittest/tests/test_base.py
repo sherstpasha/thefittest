@@ -10,10 +10,10 @@ from ..base._tree import FunctionalNode
 from ..base._tree import TerminalNode
 from ..base._tree import Tree
 from ..base._tree import UniversalSet
-from ..tools.operators import Add
-from ..tools.operators import Mul
-from ..tools.operators import Operator
-from ..tools.operators import Sub
+from ..utils.operators import Add
+from ..utils.operators import Mul
+from ..utils.operators import Operator
+from ..utils.operators import Sub
 
 
 class PlusOne(Operator):

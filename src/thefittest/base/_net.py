@@ -15,9 +15,9 @@ from numba.typed import List as numbaList
 import numpy as np
 from numpy.typing import NDArray
 
-from thefittest.tools.transformations import scale_data
+from thefittest.utils.transformations import scale_data
 
-from ..tools.operators import forward2d
+from ..utils.operators import forward2d
 
 
 INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)

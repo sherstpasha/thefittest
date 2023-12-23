@@ -4,7 +4,7 @@ from ..classifiers import MLPEAClassifier
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticProgramming
 from ..optimizers import SelfCGA
-from ..tools.transformations import scale_data
+from ..utils.transformations import scale_data
 from ..base._net import Net
 
 

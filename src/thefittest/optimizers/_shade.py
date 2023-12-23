@@ -12,14 +12,14 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ._differentialevolution import DifferentialEvolution
-from ..tools import donothing
-from ..tools import find_pbest_id
-from ..tools.operators import binomial
-from ..tools.operators import current_to_pbest_1_archive_p_min
-from ..tools.random import randc01
-from ..tools.random import randn01
-from ..tools.transformations import bounds_control_mean
-from ..tools.transformations import lehmer_mean
+from ..utils import donothing
+from ..utils import find_pbest_id
+from ..utils.operators import binomial
+from ..utils.operators import current_to_pbest_1_archive_p_min
+from ..utils.random import randc01
+from ..utils.random import randn01
+from ..utils.transformations import bounds_control_mean
+from ..utils.transformations import lehmer_mean
 
 
 class SHADE(DifferentialEvolution):

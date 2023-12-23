@@ -23,14 +23,14 @@ from ..optimizers import SHAGA
 from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
-from ..tools.metrics import coefficient_determination
-from ..tools.operators import Add
-from ..tools.operators import Cos
-from ..tools.operators import Inv
-from ..tools.operators import Mul
-from ..tools.operators import Neg
-from ..tools.operators import Pow2
-from ..tools.operators import Sin
+from ..utils.metrics import coefficient_determination
+from ..utils.operators import Add
+from ..utils.operators import Cos
+from ..utils.operators import Inv
+from ..utils.operators import Mul
+from ..utils.operators import Neg
+from ..utils.operators import Pow2
+from ..utils.operators import Sin
 
 
 def fitness_function(trees: NDArray, y: NDArray[np.float64]) -> NDArray[np.float64]:

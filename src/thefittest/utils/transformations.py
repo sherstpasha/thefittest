@@ -11,8 +11,8 @@ from numba import njit
 import numpy as np
 from numpy.typing import NDArray
 
-from ..tools import find_end_subtree_from_i
-from ..tools import find_first_difference_between_two
+from ..utils import find_end_subtree_from_i
+from ..utils import find_first_difference_between_two
 
 
 def common_region(trees: Union[List, NDArray]) -> Tuple:

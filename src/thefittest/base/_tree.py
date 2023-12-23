@@ -15,9 +15,9 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from ..tools import find_end_subtree_from_i
-from ..tools import find_id_args_from_i
-from ..tools import get_levels_tree_from_i
+from ..utils import find_end_subtree_from_i
+from ..utils import find_id_args_from_i
+from ..utils import get_levels_tree_from_i
 
 
 FUNCTIONAL_COLOR_CODE = (1, 0.72, 0.43, 1)
@@ -161,7 +161,7 @@ class EnsembleUniversalSet(UniversalSet):
         return functional_set_proba
 
     def _random_functional(self, n_args: int = -1) -> FunctionalNode:
-        from ..tools.random import random_weighted_sample
+        from ..utils.random import random_weighted_sample
 
         n_args_functionals = self._functional_set[n_args]
         weights = self._functional_set_proba[n_args]

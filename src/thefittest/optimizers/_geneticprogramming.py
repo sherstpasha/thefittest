@@ -11,8 +11,8 @@ from numpy.typing import NDArray
 from ._geneticalgorithm import GeneticAlgorithm
 from ..base import Tree
 from ..base import UniversalSet
-from ..tools import donothing
-from ..tools.random import half_and_half
+from ..utils import donothing
+from ..utils.random import half_and_half
 
 
 class GeneticProgramming(GeneticAlgorithm):

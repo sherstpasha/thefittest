@@ -31,14 +31,14 @@ from ..optimizers import SHADE
 from ..optimizers import SHAGA
 from ..optimizers import SelfCGA
 from ..optimizers import jDE
-from ..tools.metrics import categorical_crossentropy
-from ..tools.operators import Add
-from ..tools.operators import More
+from ..utils.metrics import categorical_crossentropy
+from ..utils.operators import Add
+from ..utils.operators import More
 
-from ..tools import donothing
-from ..tools.random import half_and_half
+from ..utils import donothing
+from ..utils.random import half_and_half
 from ..classifiers._mlpeaclassifier import fitness_function as evaluate_nets
-from ..tools.random import train_test_split_stratified
+from ..utils.random import train_test_split_stratified
 
 
 weights_type_optimizer_alias = Union[

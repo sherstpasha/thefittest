@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ._differentialevolution import DifferentialEvolution
-from ..tools import donothing
+from ..utils import donothing
 
 
 class jDE(DifferentialEvolution):

@@ -18,8 +18,8 @@ from ..optimizers import GeneticProgramming
 from ..optimizers import SHADE
 from ..optimizers import SelfCGP
 from ..regressors._mlpearegressor import fitness_function as evaluate_nets
-from ..tools.metrics import root_mean_square_error2d
-from ..tools.random import train_test_split
+from ..utils.metrics import root_mean_square_error2d
+from ..utils.random import train_test_split
 
 
 def fitness_function(

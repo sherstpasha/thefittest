@@ -1,20 +1,20 @@
 import numpy as np
 
-from thefittest.tools.metrics import root_mean_square_error
-from thefittest.tools.metrics import root_mean_square_error2d
-from thefittest.tools.metrics import coefficient_determination
-from thefittest.tools.metrics import coefficient_determination2d
-from thefittest.tools.metrics import categorical_crossentropy
-from thefittest.tools.metrics import categorical_crossentropy3d
-from thefittest.tools.metrics import accuracy_score
-from thefittest.tools.metrics import accuracy_score2d
-from thefittest.tools.metrics import confusion_matrix
-from thefittest.tools.metrics import recall_score
-from thefittest.tools.metrics import recall_score2d
-from thefittest.tools.metrics import precision_score
-from thefittest.tools.metrics import precision_score2d
-from thefittest.tools.metrics import f1_score
-from thefittest.tools.metrics import f1_score2d
+from thefittest.utils.metrics import root_mean_square_error
+from thefittest.utils.metrics import root_mean_square_error2d
+from thefittest.utils.metrics import coefficient_determination
+from thefittest.utils.metrics import coefficient_determination2d
+from thefittest.utils.metrics import categorical_crossentropy
+from thefittest.utils.metrics import categorical_crossentropy3d
+from thefittest.utils.metrics import accuracy_score
+from thefittest.utils.metrics import accuracy_score2d
+from thefittest.utils.metrics import confusion_matrix
+from thefittest.utils.metrics import recall_score
+from thefittest.utils.metrics import recall_score2d
+from thefittest.utils.metrics import precision_score
+from thefittest.utils.metrics import precision_score2d
+from thefittest.utils.metrics import f1_score
+from thefittest.utils.metrics import f1_score2d
 
 
 def test_root_mean_square_error():
@@ -69,8 +69,10 @@ def test_categorical_crossentropy():
 
 def test_categorical_crossentropy2d():
     y_true = np.array([[1, 0], [0, 1]], dtype=np.float64)
-    y_predict3d = np.array([[[0.7, 0.3], [0.3, 0.7]],
-     [[0.99999999, 0.00000001], [0.00000001, 0.99999999]]], dtype=np.float64)
+    y_predict3d = np.array(
+        [[[0.7, 0.3], [0.3, 0.7]], [[0.99999999, 0.00000001], [0.00000001, 0.99999999]]],
+        dtype=np.float64,
+    )
 
     result = categorical_crossentropy3d(y_true, y_predict3d)
 
@@ -102,29 +104,25 @@ def test_confusion_matrix():
     y_true = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
     y_pred = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
 
-    expected = np.array([[2, 0, 0],
-                         [0, 2, 0],
-                         [0, 0, 2]])
+    expected = np.array([[2, 0, 0], [0, 2, 0], [0, 0, 2]])
 
     assert np.array_equal(confusion_matrix(y_true, y_pred), expected)
 
     y_true = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
     y_pred = np.array([0, 1, 0, 2, 1, 2], dtype=np.int64)
-    expected = np.array([[1, 0, 1],
-                         [0, 2, 0],
-                         [1, 0, 1]])
+    expected = np.array([[1, 0, 1], [0, 2, 0], [1, 0, 1]])
     assert np.array_equal(confusion_matrix(y_true, y_pred), expected)
 
 
 def test_recall_score():
     y_true = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
     y_predict = np.array([0, 2, 1, 0, 1, 2], dtype=np.int64)
-    expected_recall = 2/3
+    expected_recall = 2 / 3
     assert np.allclose(recall_score(y_true, y_predict), expected_recall)
 
     y_true = np.array([0, 0, 0, 1, 1, 1], dtype=np.int64)
     y_predict = np.array([1, 1, 1, 0, 0, 0], dtype=np.int64)
-    expected_recall = 0.
+    expected_recall = 0.0
     assert np.allclose(recall_score(y_true, y_predict), expected_recall)
 
 
@@ -134,7 +132,7 @@ def test_recall_score2d():
 
     result = recall_score2d(y_true, y_predict2d)
 
-    expected = np.array([0., 2/3], dtype=np.float64)
+    expected = np.array([0.0, 2 / 3], dtype=np.float64)
     assert np.allclose(result, expected)
 
 
@@ -146,7 +144,7 @@ def test_precision_score():
 
     y_true = np.array([0, 0, 0, 1, 1, 1], dtype=np.int64)
     y_predict = np.array([1, 1, 1, 0, 0, 0], dtype=np.int64)
-    expected_output = np.float64(0.)
+    expected_output = np.float64(0.0)
     assert np.allclose(precision_score(y_true, y_predict), expected_output)
 
 
@@ -156,7 +154,7 @@ def test_precision_score2d():
 
     result = precision_score2d(y_true, y_predict2d)
 
-    expected = np.array([0., 2/3], dtype=np.float64)
+    expected = np.array([0.0, 2 / 3], dtype=np.float64)
     assert np.allclose(result, expected)
 
 

@@ -16,9 +16,9 @@ from ..base import FunctionalNode
 from ..base import TerminalNode
 from ..base import Tree
 from ..base import UniversalSet
-from ..tools import binary_search_interval
-from ..tools import check_for_value
-from ..tools.transformations import numpy_group_by
+from ..utils import binary_search_interval
+from ..utils import check_for_value
+from ..utils.transformations import numpy_group_by
 
 
 def sattolo_shuffle(items: Union[List, NDArray]) -> None:

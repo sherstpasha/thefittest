@@ -11,11 +11,11 @@ from ..optimizers import SelfCGP
 from ..regressors import GeneticProgrammingNeuralNetRegressor
 from ..regressors import MLPEARegressor
 from ..regressors import SymbolicRegressionGP
-from ..tools.operators import Add
-from ..tools.operators import Div
-from ..tools.operators import Mul
-from ..tools.operators import Neg
-from ..tools.operators import uniform_crossoverGP
+from ..utils.operators import Add
+from ..utils.operators import Div
+from ..utils.operators import Mul
+from ..utils.operators import Neg
+from ..utils.operators import uniform_crossoverGP
 
 
 def test_SymbolicRegressionGP():

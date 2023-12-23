@@ -14,9 +14,9 @@ from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
 from ..optimizers import DifferentialEvolution
 from ..optimizers import SHADE
 from ..optimizers import jDE
-from ..tools.metrics import root_mean_square_error2d
-from ..tools.random import float_population
-from ..tools.transformations import GrayCode
+from ..utils.metrics import root_mean_square_error2d
+from ..utils.random import float_population
+from ..utils.transformations import GrayCode
 
 
 def fitness_function(

@@ -11,16 +11,16 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..base._ea import EvolutionaryAlgorithm
-from ..tools import donothing
-from ..tools.operators import best_1
-from ..tools.operators import best_2
-from ..tools.operators import binomial
-from ..tools.operators import current_to_best_1
-from ..tools.operators import rand_1
-from ..tools.operators import rand_2
-from ..tools.operators import rand_to_best1
-from ..tools.random import float_population
-from ..tools.transformations import bounds_control
+from ..utils import donothing
+from ..utils.operators import best_1
+from ..utils.operators import best_2
+from ..utils.operators import binomial
+from ..utils.operators import current_to_best_1
+from ..utils.operators import rand_1
+from ..utils.operators import rand_2
+from ..utils.operators import rand_to_best1
+from ..utils.random import float_population
+from ..utils.transformations import bounds_control
 
 
 class DifferentialEvolution(EvolutionaryAlgorithm):

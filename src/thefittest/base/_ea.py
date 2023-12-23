@@ -15,7 +15,7 @@ from joblib import delayed
 import numpy as np
 from numpy.typing import NDArray
 
-from ..tools import donothing
+from ..utils import donothing
 
 
 class TheFittest:

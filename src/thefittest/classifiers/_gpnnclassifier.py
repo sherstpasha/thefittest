@@ -30,12 +30,12 @@ from ..optimizers import SHAGA
 from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
-from ..tools.metrics import categorical_crossentropy3d
-from ..tools.operators import Add
-from ..tools.operators import More
-from ..tools.random import float_population
-from ..tools.random import train_test_split_stratified
-from ..tools.transformations import GrayCode
+from ..utils.metrics import categorical_crossentropy3d
+from ..utils.operators import Add
+from ..utils.operators import More
+from ..utils.random import float_population
+from ..utils.random import train_test_split_stratified
+from ..utils.transformations import GrayCode
 
 
 def fitness_function(

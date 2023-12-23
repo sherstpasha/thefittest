@@ -31,7 +31,7 @@ from ..benchmarks.symbolicregression17 import (
 from ..benchmarks.CEC2005 import problems_dict
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
-from ..tools.random import float_population
+from ..utils.random import float_population
 
 
 def test_IrisDataset():

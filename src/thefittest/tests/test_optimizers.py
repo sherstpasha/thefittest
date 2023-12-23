@@ -12,14 +12,14 @@ from ..optimizers import SHAGA
 from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
-from ..tools.metrics import coefficient_determination
-from ..tools.operators import Add
-from ..tools.operators import Div
-from ..tools.operators import Mul
-from ..tools.operators import Neg
-from ..tools.random import binary_string_population
-from ..tools.random import float_population
-from ..tools.random import half_and_half
+from ..utils.metrics import coefficient_determination
+from ..utils.operators import Add
+from ..utils.operators import Div
+from ..utils.operators import Mul
+from ..utils.operators import Neg
+from ..utils.random import binary_string_population
+from ..utils.random import float_population
+from ..utils.random import half_and_half
 
 
 def test_GeneticAlgorithm_start_settings():

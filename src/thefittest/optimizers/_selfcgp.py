@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 from ._geneticprogramming import GeneticProgramming
 from ._selfcga import SelfCGA
 from ..base import UniversalSet
-from ..tools import donothing
+from ..utils import donothing
 
 
 class SelfCGP(GeneticProgramming, SelfCGA):

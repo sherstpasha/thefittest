@@ -20,9 +20,9 @@ from ..optimizers import SHAGA
 from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
-from ..tools.metrics import categorical_crossentropy3d
-from ..tools.random import float_population
-from ..tools.transformations import GrayCode
+from ..utils.metrics import categorical_crossentropy3d
+from ..utils.random import float_population
+from ..utils.transformations import GrayCode
 
 
 weights_type_optimizer_alias = Union[

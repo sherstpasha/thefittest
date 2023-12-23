@@ -14,8 +14,8 @@ from numpy.typing import NDArray
 
 from ._selfcga import SelfCGA
 from ..base import Tree
-from ..tools import donothing
-from ..tools.transformations import numpy_group_by
+from ..utils import donothing
+from ..utils.transformations import numpy_group_by
 
 
 class PDPGA(SelfCGA):
