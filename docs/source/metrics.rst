@@ -1,4 +1,4 @@
-thefittest.utils
+metrics
 =====
 .. automodule:: thefittest.utils.metrics
    :members:

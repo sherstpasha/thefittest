@@ -13,13 +13,37 @@ def root_mean_square_error(
     """
     Calculate the root mean square error between the true and predicted values.
 
-    Parameters:
-        y_true (NDArray[np.float64]): The true values.
-        y_predict (NDArray[np.float64]): The predicted values.
+    Parameters
+    ----------
+    y_true : NDArray[np.float64]
+        1D array of the true values.
+    y_predict : NDArray[np.float64]
+        1D array of the predicted values.
 
-    Returns:
-        np.float64: The root mean square error between the true and predicted values.
+    Returns
+    -------
+    numpy.float64
+        The root mean square error between the true and predicted values.
+    References
+    ----------
+    Author Name. (Year, Month Day Published). Title of the Article. Website Name.
+    URL: [Link Text](URL)
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import root_mean_square_error
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    >>> y_predict = np.array([0.8, 2.5, 3.2, 4.3, 5.2])
+    >>>
+    >>> # Calculate root mean square error
+    >>> rmse_result = root_mean_square_error(y_true, y_predict)
+    >>>
+    >>> print("Root Mean Square Error:", rmse_result)
     """
+
     error = y_true - y_predict
     mean_squared_error = np.mean(error**2)
     rmse = np.sqrt(mean_squared_error)
@@ -32,15 +56,35 @@ def root_mean_square_error2d(
     y_true: NDArray[np.float64], y_predict2d: NDArray[np.float64]
 ) -> NDArray[np.float64]:
     """
-    Calculate the root mean square error (RMSE) between the true values and predicted values for
-    each row in a 2D array.
+    Calculate the root mean square error (RMSE) between the true values and predicted values for each row in a 2D array.
 
-    Parameters:
-        y_true (NDArray[np.float64]): The true values.
-        y_predict2d (NDArray[np.float64]): The predicted values in a 2D array.
+    Parameters
+    ----------
+    y_true : NDArray[np.float64]
+        1D array of the true values.
+    y_predict2d : NDArray[np.float64]
+        2D array of the predicted values where each row is a separate prediction.
 
-    Returns:
-        NDArray[np.float64]: An array containing the RMSE for each row in the predicted values.
+    Returns
+    -------
+    NDArray[np.float64]
+        An array containing the RMSE for each row in the predicted values.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import root_mean_square_error2d
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    >>> y_predict2d = np.array([[1.2, 2.3, 3.5, 4.2, 5.1],
+    ...                         [0.9, 1.8, 3.2, 4.1, 5.3],
+    ...                         [1.1, 2.0, 2.8, 4.3, 5.0]])
+    >>>
+    >>> # Calculate RMSE for each row
+    >>> rmse_values = root_mean_square_error2d(y_true, y_predict2d)
+    >>>
+    >>> print("RMSE for each row:", rmse_values)
     """
 
     size = len(y_predict2d)
@@ -57,20 +101,35 @@ def coefficient_determination(
     y_true: NDArray[np.float64], y_predict: NDArray[np.float64]
 ) -> np.float64:
     """
-    The `coefficient_determination` function calculates the coefficient of determination (R^2) for
-    a set of true and predicted values.
+    Calculates the coefficient of determination :math:`R^2` for a set of true and predicted values.
 
-    Parameters:
-        y_true (NDArray[np.float64]): An array of true values.
-        y_predict (NDArray[np.float64]): An array of
-          predicted values.
-        total_sum (Optional[np.float64]): An optional parameter that represents the total
-          sum of squares. If not provided, the function will calculate it based on the mean of
-            the true values.
+    Parameters
+    ----------
+    y_true : NDArray[np.float64]
+        1D array of the true values.
+    y_predict : NDArray[np.float64]
+        1D array of the predicted values.
 
-    Returns:
-        np.float64: The calculated coefficient of determination (R^2).
+    Returns
+    -------
+    numpy.float64
+        The calculated coefficient of determination :math:`R^2`.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import coefficient_determination
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    >>> y_predict = np.array([1.2, 2.3, 3.5, 4.2, 5.1])
+    >>>
+    >>> # Calculate coefficient of determination
+    >>> r2_value = coefficient_determination(y_true, y_predict)
+    >>>
+    >>> print("Coefficient of Determination (R^2):", r2_value)
     """
+
     mean_y_true = np.mean(y_true)
     total_sum = np.sum((y_true - mean_y_true) ** 2)
 
@@ -86,19 +145,37 @@ def coefficient_determination2d(
     y_true: NDArray[np.float64], y_predict2d: NDArray[np.float64]
 ) -> NDArray[np.float64]:
     """
-    The `coefficient_determination2d` function calculates the coefficient of determination (R^2)
-      for a set of true values and a 2D array of predicted values.
+    Calculates the coefficient of determination :math:`R^2` for a set of true values and a 2D array of predicted values.
 
-    Parameters:
-        y_true (NDArray[np.float64]): An array of true values.
-        y_predict2d (NDArray[np.float64]): A 2D array of predicted values, where each row
-          represents a set of predicted values.
+    Parameters
+    ----------
+    y_true : NDArray[np.float64]
+        1D array of the true values.
+    y_predict2d : NDArray[np.float64]
+        2D array of the predicted values where each row is a separate prediction.
 
-    Returns:
-        NDArray[np.float64]: An array of calculated coefficients of determination (R^2),
-          where each element corresponds to the R^2 value for the corresponding row of
-            `y_predict2d`.
+    Returns
+    -------
+    NDArray[np.float64]
+        An array containing the :math:`R^2` for each row in the predicted values.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import coefficient_determination2d
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    >>> y_predict2d = np.array([[1.2, 2.3, 3.5, 4.2, 5.1],
+    ...                         [0.9, 1.8, 3.2, 4.1, 5.3],
+    ...                         [1.1, 2.0, 2.8, 4.3, 5.0]])
+    >>>
+    >>> # Calculate coefficient of determination for each row
+    >>> r2_values = coefficient_determination2d(y_true, y_predict2d)
+    >>>
+    >>> print("Coefficient of Determination (R^2) for each row:", r2_values)
     """
+
     size = len(y_predict2d)
     r2_values = np.empty(size, dtype=np.float64)
 
@@ -115,15 +192,33 @@ def categorical_crossentropy(
     """
     Calculates cross-entropy for categorical classification.
 
-    Parameters:
-        target (NDArray[np.float64]): Array of dimension 2d, representing the true probability for
-          each class
-        output (NDArray[np.float64]): An array of dimension 2d representing the predicted
-          probability values for each class
+    Parameters
+    ----------
+    target : NDArray[np.float64]
+        2D array, representing the true probability for each class.
+    predicted : NDArray[np.float64]
+        2D array, representing the predicted probability values for each class.
 
-    Returns:
-        np.float64: the value of cross-entropy
+    Returns
+    -------
+    np.float64
+        Cross entropy value.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import categorical_crossentropy
+    >>>
+    >>> # Generate example data
+    >>> target = np.array([[0., 1., 0.], [1., 0., 0.], [0., 0., 1.]])
+    >>> predicted = np.array([[0.1, 0.9, 0.0], [0.8, 0.1, 0.1], [0.0, 0.1, 0.9]])
+    >>>
+    >>> # Calculate cross-entropy
+    >>> entropy_value = categorical_crossentropy(target, predicted)
+    >>>
+    >>> print("Cross-Entropy:", entropy_value)
     """
+
     target_clipped = np.clip(target, 1e-7, 1 - 1e-7)
     output_clipped = np.clip(output, 1e-7, 1 - 1e-7)
 
@@ -141,16 +236,34 @@ def categorical_crossentropy3d(
     """
     Calculates cross-entropy for categorical classification for a 3D array of output values.
 
-    Parameters:
-        target (NDArray[np.float64]): Array of dimension 2d, representing the true probability
-          for each class
-        output3d (NDArray[np.float64]): A 3D array of dimension 3d representing the predicted
-          probability values for each class
+    Parameters
+    ----------
+    target : NDArray[np.float64]
+        2D array, representing the true probability for each class.
+    predicted : NDArray[np.float64]
+        3D array, representing the predicted probability values for each class, where each row is a separate prediction.
 
-    Returns:
-        NDArray[np.float64]: an array of cross-entropy values, one for each 2D slice in the
-          3D output array
+    Returns
+    -------
+    np.float64
+        An array containing the cross entropy values for each row in the predicted values.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import categorical_crossentropy3d
+    >>>
+    >>> # Generate example data
+    >>> target = np.array([[0., 1., 0.], [1., 0., 0.], [0., 0., 1.]])
+    >>> predicted_3d = np.array([[[0.1, 0.9, 0.0], [0.8, 0.1, 0.1], [0.0, 0.1, 0.9]],
+    >>>                           [[0.2, 0.7, 0.1], [0.9, 0.05, 0.05], [0.3, 0.3, 0.4]]])
+    >>>
+    >>> # Calculate cross-entropy for each row
+    >>> entropy_values = categorical_crossentropy3d(target, predicted_3d)
+    >>>
+    >>> print("Cross-Entropy values for each row:", entropy_values)
     """
+
     size = len(output3d)
     cross_entropy_values = np.empty(size, dtype=np.float64)
 
@@ -165,13 +278,33 @@ def accuracy_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> n
     """
     This function calculates the accuracy of the predictions.
 
-    Parameters:
-        y_true (NDArray[np.int64]): The true values.
-        y_predict (NDArray[np.int64]): The predicted values.
+    Parameters
+    ----------
+    y_true : NDArray[np.int64]
+        1D array of the true labels.
+    y_predict : NDArray[np.int64]
+        1D array of the predicted labels.
 
-    Returns:
-        np.float64: The accuracy of the predictions.
+    Returns
+    -------
+    np.float64
+        The accuracy of the predictions.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import accuracy_score
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([1, 0, 1, 1, 0])
+    >>> y_predict = np.array([1, 0, 1, 0, 1])
+    >>>
+    >>> # Calculate accuracy
+    >>> accuracy_value = accuracy_score(y_true, y_predict)
+    >>>
+    >>> print("Accuracy:", accuracy_value)
     """
+
     comparison = y_true == y_predict
     comparison_int = comparison.astype(np.int64)
     accuracy = np.mean(comparison_int)
@@ -186,12 +319,33 @@ def accuracy_score2d(
     """
     Calculate the accuracy score for each prediction in a 2D array.
 
-    Parameters:
-        y_true (NDArray[np.int64]): The true labels.
-        y_predict2d (NDArray[np.int64]): The predicted labels in a 2D array.
+    Parameters
+    ----------
+    y_true : NDArray[np.int64]
+        1D array of the true labels.
+    y_predict2d : NDArray[np.int64]
+        2D array of the predicted labels where each row is a separate prediction.
 
-    Returns:
-        NDArray[np.float64]: An array containing the accuracy score for each prediction.
+    Returns
+    -------
+    NDArray[np.float64]
+        An array containing the accuracy score for each row in the predicted labels.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import accuracy_score2d
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([1, 0, 1, 1, 0])
+    >>> y_predict2d = np.array([[1, 0, 1, 1, 1],
+    ...                         [0, 0, 1, 1, 0],
+    ...                         [1, 1, 0, 1, 0]])
+    >>>
+    >>> # Calculate accuracy score for each row
+    >>> accuracy_values = accuracy_score2d(y_true, y_predict2d)
+    >>>
+    >>> print("Accuracy scores for each row:", accuracy_values)
     """
 
     size = len(y_predict2d)
@@ -208,13 +362,34 @@ def confusion_matrix(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) ->
     """
     Calculate the confusion matrix for a multi-class classification problem.
 
-    Parameters:
-        y_true (NDArray[np.int64]): The true labels.
-        y_predict (NDArray[np.int64]): The predicted labels.
+    Parameters
+    ----------
+    y_true : NDArray[np.int64]
+        1D array of the true labels.
+    y_predict : NDArray[np.int64]
+        1D array of the predicted labels.
 
-    Returns:
-        NDArray[np.int64]: The confusion matrix.
+    Returns
+    -------
+    NDArray[np.int64]
+        The confusion matrix.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import confusion_matrix
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
+    >>> y_predict = np.array([0, 1, 2, 0, 2, 1, 0, 1, 2])
+    >>>
+    >>> # Calculate confusion matrix
+    >>> matrix = confusion_matrix(y_true, y_predict)
+    >>>
+    >>> print("Confusion Matrix:")
+    >>> print(matrix)
     """
+
     classes = np.unique(y_true)
     n_classes = len(classes)
 
@@ -228,16 +403,35 @@ def confusion_matrix(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) ->
 @njit(float64(int64[:], int64[:]))
 def recall_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float64:
     """
-    The recall_score function calculates the average recall score of the predictions for
-      multi-class classification problems.
+    Calculate the average recall score for multi-class classification problems.
 
-    Parameters:
-        y_true (NDArray[np.int64]): The true labels.
-        y_predict (NDArray[np.int64]): The predicted labels.
+    Parameters
+    ----------
+    y_true : NDArray[np.int64]
+        1D array of the true labels.
+    y_predict : NDArray[np.int64]
+        1D array of the predicted labels.
 
-    Returns:
-        np.int64: The average recall score of the predictions.
+    Returns
+    -------
+    np.float64
+        The average recall score of the predictions.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import recall_score
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
+    >>> y_predict = np.array([0, 1, 2, 0, 2, 1, 0, 1, 2])
+    >>>
+    >>> # Calculate average recall score
+    >>> recall = recall_score(y_true, y_predict)
+    >>>
+    >>> print("Average Recall Score:", recall)
     """
+
     n_classes = len(np.unique(y_true))
     size = len(y_true)
 
@@ -266,13 +460,35 @@ def recall_score2d(
     """
     Compute the recall score for each prediction in a 2D array of predictions.
 
-    Parameters:
-        y_true (NDArray[np.int64]): The true labels.
-        y_predict2d (NDArray[np.int64]): The 2D array of predicted labels.
+    Parameters
+    ----------
+    y_true : NDArray[np.int64]
+        1D array of the true labels.
+    y_predict2d : NDArray[np.int64]
+        2D array of predicted labels where each row is a separate prediction.
 
-    Returns:
-        NDArray[np.float64]: The recall scores for each prediction.
+    Returns
+    -------
+    NDArray[np.float64]
+        The recall scores for each prediction.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import recall_score2d
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
+    >>> y_predict2d = np.array([[0, 1, 2, 0, 2],
+    ...                         [2, 1, 0, 1, 2],
+    ...                         [0, 1, 2, 2, 1]])
+    >>>
+    >>> # Compute recall scores for each prediction
+    >>> recall_values = recall_score2d(y_true, y_predict2d)
+    >>>
+    >>> print("Recall Scores for each Prediction:", recall_values)
     """
+
     size = len(y_predict2d)
     average_recall_values = np.empty(size, dtype=np.float64)
 
@@ -285,15 +501,35 @@ def recall_score2d(
 @njit(float64(int64[:], int64[:]))
 def precision_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float64:
     """
-    Compute the precision score for each class in the true labels.
+    Compute the average precision score.
 
-    Parameters:
-        y_true (NDArray[np.int64]): The true labels.
-        y_predict (NDArray[np.int64]): The predicted labels.
+    Parameters
+    ----------
+    y_true : NDArray[np.int64]
+        1D array of the true labels.
+    y_predict : NDArray[np.int64]
+        1D array of the predicted labels.
 
-    Returns:
-        np.float64: The average precision score.
+    Returns
+    -------
+    np.float64
+        The average precision score.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import precision_score
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
+    >>> y_predict = np.array([0, 1, 2, 0, 2, 2, 0, 1, 1])
+    >>>
+    >>> # Compute average precision score
+    >>> precision_value = precision_score(y_true, y_predict)
+    >>>
+    >>> print("Average Precision Score:", precision_value)
     """
+
     classes = np.unique(y_true)
     n_classes = len(classes)
     size = len(y_true)
@@ -323,13 +559,34 @@ def precision_score2d(
     """
     Compute the precision score for each prediction in a 2D array of predictions.
 
-    Parameters:
-        y_true (NDArray[np.int64]): The true labels.
-        y_predict2d (NDArray[np.int64]): The 2D array of predicted labels.
+    Parameters
+    ----------
+    y_true : NDArray[np.int64]
+        1D array of the true labels.
+    y_predict2d : NDArray[np.int64]
+        The 2D array of predicted labels where each row is a separate prediction.
 
-    Returns:
-        NDArray[np.float64]: The precision scores for each prediction.
+    Returns
+    -------
+    NDArray[np.float64]
+        The precision scores for each prediction.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import precision_score2d
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
+    >>> y_predict2d = np.array([[0, 1, 2, 0, 2, 2, 0, 1, 1],
+    ...                          [1, 0, 2, 0, 1, 2, 2, 1, 0]])
+    >>>
+    >>> # Compute precision scores for each prediction
+    >>> precision_values = precision_score2d(y_true, y_predict2d)
+    >>>
+    >>> print("Precision Scores for Each Prediction:", precision_values)
     """
+
     size = len(y_predict2d)
     average_precision_values = np.empty(size, dtype=np.float64)
 
@@ -342,24 +599,41 @@ def precision_score2d(
 @njit(float64(int64[:], int64[:]))
 def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float64:
     """
-    Function to calculate the F1-score for multi-class classification.
+    Function to calculate the F1-score for multi-class classification. F1-score is a measure that combines precision and recall into one value.
+    It is calculated as 2 * (precision * recall) / (precision + recall), where:
+    - precision is the ratio of correctly predicted positive results out of all predicted
+    positive results.
+    - recall is the ratio of correctly predicted positive results out of all actual positive
+    results.
+    F1-score is calculated for each class separately and then averaged.
 
-    Parameters:
-        y_true (NDArray[np.int64]): Array of true class labels.
-        y_predict (NDArray[np.int64]): Array of predicted class labels.
+    Parameters
+    ----------
+    y_true : NDArray[np.int64]
+        Array of true class labels.
+    y_predict : NDArray[np.int64]
+        Array of predicted class labels.
 
-    Returns:
-        np.float64: Average value of the F1-score for each class.
+    Returns
+    -------
+    np.float64
+        Average value of the F1-score.
 
-    Description:
-        F1-score is a measure that combines precision and recall into one value.
-        It is calculated as 2 * (precision * recall) / (precision + recall), where:
-        - precision is the ratio of correctly predicted positive results out of all predicted
-          positive results.
-        - recall is the ratio of correctly predicted positive results out of all actual positive
-          results.
-        F1-score is calculated for each class separately and then averaged.
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import f1_score
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
+    >>> y_predict = np.array([0, 1, 2, 0, 2, 2, 0, 1, 1])
+    >>>
+    >>> # Calculate F1-score
+    >>> f1_value = f1_score(y_true, y_predict)
+    >>>
+    >>> print("F1-score:", f1_value)
     """
+
     n_classes = len(np.unique(y_true))
     size = len(y_true)
 
@@ -390,13 +664,33 @@ def f1_score2d(y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]) -> NDA
     """
     Compute the F1 score for each prediction in a 2D array.
 
-    Parameters:
-        y_true (NDArray[np.int64]): The true labels.
-        y_predict2d (NDArray[np.int64]): A 2D array of predicted labels.
+    Parameters
+    ----------
+    y_true : NDArray[np.int64]
+        The true labels.
+    y_predict2d : NDArray[np.int64]
+        A 2D array of predicted labels where each row is a separate prediction.
 
-    Returns:
-        NDArray[np.float64]: An array of F1 scores, one for each prediction.
+    Returns
+    -------
+    NDArray[np.float64]
+        An array of F1 scores, one for each prediction.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.metrics import f1_score2d
+    >>>
+    >>> # Generate example data
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
+    >>> y_predict2d = np.array([[0, 1, 2, 0, 1, 2, 0, 1, 2], [0, 1, 2, 0, 2, 1, 2, 1, 0], [0, 1, 2, 0, 1, 2, 1, 2, 0]])
+    >>>
+    >>> # Calculate F1 score for each prediction
+    >>> f1_values = f1_score2d(y_true, y_predict2d)
+    >>>
+    >>> print("F1 scores for each prediction:", f1_values)
     """
+
     size = len(y_predict2d)
     average_f1_values = np.empty(size, dtype=np.float64)
 

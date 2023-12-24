@@ -6,14 +6,15 @@
 Welcome to Thefittest's documentation!
 ======================================
 
+Contents:
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-   ./utils.rst
-
-
-
+   modules
+   metrics
+   references
+   
 Indices and tables
 ==================
 
