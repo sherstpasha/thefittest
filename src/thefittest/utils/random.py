@@ -22,6 +22,42 @@ from ..utils.transformations import numpy_group_by
 
 
 def sattolo_shuffle(items: Union[List, NDArray]) -> None:
+    """
+    Perform an in-place Sattolo's algorithm shuffle on the input array.
+
+    Sattolo's algorithm shuffles the elements of the array in such a way that
+    no element ends up in its original position. This is achieved by iteratively
+    selecting a random element and swapping it with the element at a randomly chosen
+    position ahead of it.
+
+    Parameters
+    ----------
+    items : Union[List, NDArray]
+        The input array or list to be shuffled. The function shuffles the elements
+        in place.
+
+    Returns
+    -------
+    None
+        The function operates in-place, and the input array is shuffled without
+        returning a new array.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.random import sattolo_shuffle
+    >>>
+    >>> # Example with a list
+    >>> my_list = [1, 2, 3, 4, 5]
+    >>> sattolo_shuffle(my_list)
+    >>> print("Shuffled List:", my_list)
+    >>>
+    >>> # Example with a NumPy array
+    >>> my_array = np.array([1, 2, 3, 4, 5])
+    >>> sattolo_shuffle(my_array)
+    >>> print("Shuffled NumPy Array:", my_array)
+    """
+
     i = len(items)
     while i > 1:
         i = i - 1
@@ -30,6 +66,33 @@ def sattolo_shuffle(items: Union[List, NDArray]) -> None:
 
 
 def binary_string_population(pop_size: int, str_len: int) -> NDArray[np.byte]:
+    """
+    Generate a population of binary strings.
+
+    Parameters
+    ----------
+    pop_size : int
+        The size of the population, i.e., the number of binary strings to generate.
+    str_len : int
+        The length of each binary string.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        A 2D NumPy array representing the binary string population, where each row
+        is a binary string.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.random import binary_string_population
+    >>>
+    >>> # Generate a population of 5 binary strings, each of length 8
+    >>> binary_population = binary_string_population(5, 8)
+    >>>
+    >>> print("Binary String Population:\\n", binary_population)
+    """
+
     size = (pop_size, str_len)
     return np.random.randint(low=0, high=2, size=size, dtype=np.byte).astype(np.byte)
 
@@ -37,6 +100,36 @@ def binary_string_population(pop_size: int, str_len: int) -> NDArray[np.byte]:
 def float_population(
     pop_size: int, left: NDArray[np.float64], right: NDArray[np.float64]
 ) -> NDArray[np.float64]:
+    """
+    Generate a population of floating-point numbers.
+
+    Parameters
+    ----------
+    pop_size : int
+        The size of the population, i.e., the number of floating-point numbers to generate.
+    left : NDArray[np.float64]
+        1D array of the lower bounds for each dimension.
+    right : NDArray[np.float64]
+        1D array of the upper bounds for each dimension.
+
+    Returns
+    -------
+    NDArray[np.float64]
+        A 2D NumPy array representing the floating-point number population, where each row
+        corresponds to a set of generated numbers within the specified bounds.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.random import float_population
+    >>>
+    >>> # Generate a population of 5 sets of floating-point numbers within the specified bounds
+    >>> left_bounds = np.array([0.0, -1.0, 2.0])
+    >>> right_bounds = np.array([1.0, 1.0, 5.0])
+    >>> float_pop = float_population(5, left_bounds, right_bounds)
+    >>>
+    >>> print("Floating-Point Population:\\n", float_pop)
+    """
     return np.array(
         [np.random.uniform(left_i, right_i, pop_size) for left_i, right_i in zip(left, right)]
     ).T
@@ -44,12 +137,68 @@ def float_population(
 
 @njit(float64[:](float64, float64, int64))
 def cauchy_distribution(loc: np.float64, scale: np.float64, size: np.int64) -> NDArray[np.float64]:
+    """
+    Generate an array of random numbers from a Cauchy distribution.
+
+    Parameters
+    ----------
+    loc : np.float64
+        The location parameter of the Cauchy distribution.
+    scale : np.float64
+        The scale parameter of the Cauchy distribution.
+    size : np.int64
+        The size of the array to generate.
+
+    Returns
+    -------
+    NDArray[np.float64]
+        An array of random numbers drawn from a Cauchy distribution.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.random import cauchy_distribution
+    >>>
+    >>> # Generate an array of 10 random numbers from a Cauchy distribution
+    >>> loc_value = 0.0
+    >>> scale_value = 1.0
+    >>> size_value = 10
+    >>> cauchy_result = cauchy_distribution(loc_value, scale_value, size_value)
+    >>>
+    >>> print("Cauchy Distribution Result:\\n", cauchy_result)
+    """
+
     x_ = np.random.standard_cauchy(size=size).astype(np.float64)
     return loc + scale * x_
 
 
 @njit(float64(float64))
 def randc01(u: np.float64) -> np.float64:
+    """
+    Generate a random number from a Cauchy distribution within the range (0, 1).
+
+    Parameters
+    ----------
+    u : np.float64
+        The location parameter for the Cauchy distribution.
+
+    Returns
+    -------
+    np.float64
+        A random number from a Cauchy distribution within the range (0, 1).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.random import randc01
+    >>>
+    >>> # Generate a random number from Cauchy distribution within the range (0, 1)
+    >>> u_value = 0.0
+    >>> result = randc01(u_value)
+    >>>
+    >>> print("Random Number from Cauchy Distribution (0, 1):", result)
+    """
+
     value = cauchy_distribution(loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
     while value <= 0:
         value = cauchy_distribution(loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
@@ -60,6 +209,31 @@ def randc01(u: np.float64) -> np.float64:
 
 @njit(float64(float64))
 def randn01(u: np.float64) -> Union[float, np.float64]:
+    """
+    Generate a random number from a normal distribution within the range (0, 1).
+
+    Parameters
+    ----------
+    u : np.float64
+        The mean parameter for the normal distribution.
+
+    Returns
+    -------
+    Union[float, np.float64]
+        A random number from a normal distribution within the range (0, 1).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.random import randn01
+    >>>
+    >>> # Generate a random number from normal distribution within the range (0, 1)
+    >>> u_value = 0.0
+    >>> result = randn01(u_value)
+    >>>
+    >>> print("Random Number from Normal Distribution (0, 1):", result)
+    """
+
     value = np.random.normal(u, 0.1, size=1)[0]
     if value < 0:
         return 0.0
@@ -69,6 +243,44 @@ def randn01(u: np.float64) -> Union[float, np.float64]:
 
 
 def full_growing_method(uniset: UniversalSet, max_level: int) -> Tree:
+    """
+    Generate a tree using the full growing method.
+
+    Parameters
+    ----------
+    uniset : UniversalSet
+        The universal set of nodes to choose from.
+    max_level : int
+        The maximum depth of the tree.
+
+    Returns
+    -------
+    Tree
+        A tree generated using the full growing method.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import full_growing_method, UniversalSet
+    >>> from thefittest.utils.operators import Add, Mul
+    >>> from thefittest.base import FunctionalNode, TerminalNode
+    >>>
+    >>> # Set variable values
+    >>> x = 0.3
+    >>> y = 5.0
+    >>> max_depth = 3
+    >>>
+    >>> # Define sets of nodes
+    >>> functional_set = (FunctionalNode(Add()), FunctionalNode(Mul()))
+    >>> terminal_set = (TerminalNode(x, 'x'), TerminalNode(y, 'y'))
+    >>> uniset = UniversalSet(functional_set, terminal_set)
+    >>>
+    >>> # Generate a tree
+    >>> tree_result = full_growing_method(uniset, max_depth)
+    >>>
+    >>> # Print the result
+    >>> print("Generated Tree:", tree_result)
+    """
+
     nodes: List[Union[FunctionalNode, TerminalNode, EphemeralNode]] = []
     levels = []
     n_args = []
@@ -92,11 +304,49 @@ def full_growing_method(uniset: UniversalSet, max_level: int) -> Tree:
             n_args.append(n_i)
             possible_steps.append(n_i)
             previous_levels.append(level_i)
-    to_return = Tree(nodes, n_args)
-    return to_return
+    tree = Tree(nodes, n_args)
+    return tree
 
 
 def growing_method(uniset: UniversalSet, max_level: int) -> Tree:
+    """
+    Generate a tree using the growing method.
+
+    Parameters
+    ----------
+    uniset : UniversalSet
+        The universal set of nodes to choose from.
+    max_level : int
+        The maximum depth of the tree.
+
+    Returns
+    -------
+    Tree
+        A tree generated using the growing method.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import growing_method, UniversalSet
+    >>> from thefittest.utils.operators import Add, Mul
+    >>> from thefittest.base import FunctionalNode, TerminalNode
+    >>>
+    >>> # Set variable values
+    >>> x = 0.3
+    >>> y = 5.0
+    >>> max_depth = 3
+    >>>
+    >>> # Define sets of nodes
+    >>> functional_set = (FunctionalNode(Add()), FunctionalNode(Mul()))
+    >>> terminal_set = (TerminalNode(x, 'x'), TerminalNode(y, 'y'))
+    >>> uniset = UniversalSet(functional_set, terminal_set)
+    >>>
+    >>> # Generate a tree
+    >>> tree_result = growing_method(uniset, max_depth)
+    >>>
+    >>> # Print the result
+    >>> print("Generated Tree:", tree_result)
+    """
+
     nodes: List[Union[FunctionalNode, TerminalNode, EphemeralNode]] = []
     levels = []
     n_args = []
@@ -132,30 +382,139 @@ def growing_method(uniset: UniversalSet, max_level: int) -> Tree:
             if n_i > 0:
                 possible_steps.append(n_i)
                 previous_levels.append(level_i)
-    to_return = Tree(nodes, n_args)
-    return to_return
+    tree = Tree(nodes, n_args)
+    return tree
 
 
 def random_tree(uniset: UniversalSet, max_level: int) -> Tree:
+    """
+    Generate a random tree using either the full growing method or the growing method.
+
+    Parameters
+    ----------
+    uniset : UniversalSet
+        The universal set of nodes to choose from.
+    max_level : int
+        The maximum depth of the tree.
+
+    Returns
+    -------
+    Tree
+        A randomly generated tree.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import random_tree, UniversalSet
+    >>> from thefittest.utils.operators import Add, Mul
+    >>> from thefittest.base import FunctionalNode, TerminalNode
+    >>>
+    >>> # Set variable values
+    >>> x = 0.3
+    >>> y = 5.0
+    >>> max_depth = 3
+    >>>
+    >>> # Define sets of nodes
+    >>> functional_set = (FunctionalNode(Add()), FunctionalNode(Mul()))
+    >>> terminal_set = (TerminalNode(x, 'x'), TerminalNode(y, 'y'))
+    >>> uniset = UniversalSet(functional_set, terminal_set)
+    >>>
+    >>> # Generate a tree
+    >>> tree_result = random_tree(uniset, max_depth)
+    >>>
+    >>> # Print the result
+    >>> print("Generated Tree:", tree_result)
+    """
     if random.random() < 0.5:
-        to_return = full_growing_method(uniset, max_level)
+        tree = full_growing_method(uniset, max_level)
     else:
-        to_return = growing_method(uniset, max_level)
-    return to_return
+        tree = growing_method(uniset, max_level)
+    return tree
 
 
 def half_and_half(pop_size: int, uniset: UniversalSet, max_level: int) -> NDArray:
+    """
+    Generate a population of trees using a combination of full growing method and growing method.
+
+    Parameters
+    ----------
+    pop_size : int
+        The size of the population.
+    uniset : UniversalSet
+        The universal set of nodes to choose from.
+    max_level : int
+        The maximum depth of the trees.
+
+    Returns
+    -------
+    NDArray
+        An array representing the population of trees.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import half_and_half, UniversalSet
+    >>> from thefittest.utils.operators import Add, Mul
+    >>> from thefittest.base import FunctionalNode, TerminalNode
+    >>>
+    >>> # Set variable values
+    >>> x = 0.3
+    >>> y = 5.0
+    >>> max_depth = 3
+    >>> pop_size = 10
+    >>>
+    >>> # Define sets of nodes
+    >>> functional_set = (FunctionalNode(Add()), FunctionalNode(Mul()))
+    >>> terminal_set = (TerminalNode(x, 'x'), TerminalNode(y, 'y'))
+    >>> uniset = UniversalSet(functional_set, terminal_set)
+    >>>
+    >>> population_result = half_and_half(pop_size, uniset, max_depth)
+    >>>
+    >>> print("Generated Population of Trees:", population_result)
+    """
+
     population = [random_tree(uniset, random.randrange(2, max_level)) for _ in range(pop_size)]
-    return np.array(population, dtype=object)
+    population_numpy = np.array(population, dtype=object)
+    return population_numpy
 
 
 @njit(int64[:](float64[:], int64, boolean))
 def random_weighted_sample(
     weights: NDArray[np.float64], quantity: Union[np.int64, int] = 1, replace: bool = True
 ) -> NDArray[np.int64]:
+    """
+    Generate a random weighted sample.
+
+    Parameters
+    ----------
+    weights : NDArray[np.float64]
+        1D array of weights representing the probability of each element being selected.
+    quantity : Union[np.int64, int]
+        The number of elements to sample. Default is 1.
+    replace : bool
+        Whether sampling is done with replacement. Default is True.
+
+    Returns
+    -------
+    NDArray[np.int64]
+        An array of sampled indices.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import random_weighted_sample
+    >>> import numpy as np
+    >>>
+    >>> # Example with replacement
+    >>> weights = np.array([0.3, 0.2, 0.5])
+    >>> sampled_indices = random_weighted_sample(weights, quantity=2, replace=True)
+    >>> print("Sampled Indices:", sampled_indices)
+    >>>
+    >>> # Example without replacement
+    >>> sampled_indices_no_replace = random_weighted_sample(weights, quantity=2, replace=False)
+    >>> print("Sampled Indices (No Replace):", sampled_indices_no_replace)
+    """
+
     if not replace:
         assert len(weights) >= quantity
-    to_return = np.empty(quantity, dtype=np.int64)
+    sample = np.empty(quantity, dtype=np.int64)
 
     cumsumweights = np.cumsum(weights)
     sumweights = cumsumweights[-1]
@@ -165,36 +524,94 @@ def random_weighted_sample(
         roll = sumweights * np.random.rand()
         ind = binary_search_interval(roll, cumsumweights)
         if not replace:
-            if check_for_value(ind, to_return, i):
+            if check_for_value(ind, sample, i):
                 continue
 
-        to_return[i] = ind
+        sample[i] = ind
         i += 1
-    return to_return
+    return sample
 
 
 @njit(int64[:](int64, int64, boolean))
 def random_sample(
     range_size: np.int64, quantity: np.int64, replace: bool = True
 ) -> NDArray[np.int64]:
+    """
+    Generate a random sample from a range.
+
+    Parameters
+    ----------
+    range_size : np.int64
+        The size of the range to sample from.
+    quantity : np.int64
+        The number of elements to sample.
+    replace : bool
+        Whether sampling is done with replacement. Default is True.
+
+    Returns
+    -------
+    NDArray[np.int64]
+        An array of sampled indices.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import random_sample
+    >>>
+    >>> # Example with replacement
+    >>> sampled_indices = random_sample(range_size=10, quantity=3, replace=True)
+    >>> print("Sampled Indices:", sampled_indices)
+    >>>
+    >>> # Example without replacement
+    >>> sampled_indices_no_replace = random_sample(range_size=10, quantity=3, replace=False)
+    >>> print("Sampled Indices (No Replace):", sampled_indices_no_replace)
+    """
+
     if not replace:
         assert range_size >= quantity
-    to_return = np.empty(quantity, dtype=np.int64)
+    sample = np.empty(quantity, dtype=np.int64)
     i = 0
     while i < quantity:
         ind = random.randrange(int(range_size))
 
         if not replace:
-            if check_for_value(ind, to_return, i):
+            if check_for_value(ind, sample, i):
                 continue
 
-        to_return[i] = ind
+        sample[i] = ind
         i += 1
-    return to_return
+    return sample
 
 
 def stratified_sample(data: NDArray[np.int64], sample_ratio: float) -> NDArray[np.int64]:
-    to_return = []
+    """
+    Generate a stratified random sample.
+
+    Parameters
+    ----------
+    data : NDArray[np.int64]
+        1D array of integer values representing the strata or groups.
+    sample_ratio : float
+        The ratio of the sample size to the total data size.
+
+    Returns
+    -------
+    NDArray[np.int64]
+        An array of sampled indices.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import stratified_sample
+    >>> import numpy as np
+    >>>
+    >>> # Example
+    >>> data = np.array([1, 1, 2, 2, 2, 3, 3, 3, 3])
+    >>> sample_ratio = 0.8
+    >>> sampled_indices = stratified_sample(data, sample_ratio)
+    >>> print("Stratified Sampled Indices:", sampled_indices)
+    >>> print("Stratified Sampled Values:", data[sampled_indices])
+    """
+
+    sample = []
     data_size = len(data)
     sample_size = int(sample_ratio * data_size)
     indexes = np.arange(len(data), dtype=np.int64)
@@ -203,12 +620,13 @@ def stratified_sample(data: NDArray[np.int64], sample_ratio: float) -> NDArray[n
 
     for group in groups:
         group_size = len(group)
-        sample_size_i = int((group_size / data_size) * sample_size)
+        sample_size_i = max(1, int((group_size / data_size) * sample_size))
         sample_i_id = random_sample(group_size, sample_size_i, False)
         sample_i = group[sample_i_id]
-        to_return.extend(sample_i)
+        sample.extend(sample_i)
 
-    return np.array(to_return, dtype=np.int64)
+    sample_numpy = np.array(sample, dtype=np.int64)
+    return sample_numpy
 
 
 def train_test_split_stratified(
@@ -216,6 +634,43 @@ def train_test_split_stratified(
     y: NDArray[np.int64],
     test_size: float,
 ) -> Tuple:
+    """
+    Split the dataset into training and testing sets while preserving the class distribution.
+
+    Parameters
+    ----------
+    X : NDArray[Union[np.float64, np.int64]]
+        The input features.
+    y : NDArray[np.int64]
+        The target labels.
+    test_size : float
+        The proportion of the dataset to include in the test split.
+
+    Returns
+    -------
+    Tuple
+        A tuple containing the following four elements:
+        - X_train: Training data features.
+        - X_test: Testing data features.
+        - y_train: Training data labels.
+        - y_test: Testing data labels.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import train_test_split_stratified
+    >>> import numpy as np
+    >>>
+    >>> # Example
+    >>> X = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [1, 2], [3, 4], [5, 6], [7, 8]])
+    >>> y = np.array([0, 0, 1, 1, 0, 0, 1, 1])
+    >>> test_size = 0.25
+    >>> X_train, X_test, y_train, y_test = train_test_split_stratified(X, y, test_size)
+    >>> print("X_train:", X_train)
+    >>> print("X_test:", X_test)
+    >>> print("y_train:", y_train)
+    >>> print("y_test:", y_test)
+    """
+
     indexes = np.arange(len(y), dtype=np.int64)
     sample_id = stratified_sample(y, test_size)
     test_id = sample_id
@@ -233,6 +688,43 @@ def train_test_split(
     y: NDArray[Union[np.float64, np.int64]],
     test_size: float,
 ) -> Tuple:
+    """
+    Split the dataset into training and testing sets.
+
+    Parameters
+    ----------
+    X : NDArray[Union[np.float64, np.int64]]
+        The input features.
+    y : NDArray[Union[np.float64, np.int64]]
+        The target labels.
+    test_size : float
+        The proportion of the dataset to include in the test split.
+
+    Returns
+    -------
+    Tuple
+        A tuple containing the following four elements:
+        - X_train: Training data features.
+        - X_test: Testing data features.
+        - y_train: Training data labels.
+        - y_test: Testing data labels.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import train_test_split
+    >>> import numpy as np
+    >>>
+    >>> # Example
+    >>> X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+    >>> y = np.array([0, 0, 1, 1])
+    >>> test_size = 0.25
+    >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size)
+    >>> print("X_train:", X_train)
+    >>> print("X_test:", X_test)
+    >>> print("y_train:", y_train)
+    >>> print("y_test:", y_test)
+    """
+
     data_size = len(X)
     sample_size = int(test_size * data_size)
     indexes = np.arange(data_size, dtype=np.int64)
