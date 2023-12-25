@@ -5,5 +5,7 @@ utils
    :maxdepth: 2
 
    metrics
+   operators
+   print
    random
-   ...
+   transformations
