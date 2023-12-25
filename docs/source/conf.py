@@ -18,7 +18,7 @@ path_list = os.getcwd().split("\\")
 path = "\\".join(path_list[:-2]) + "\\src"
 sys.path.insert(0, path)
 sys.path.insert(0, os.path.abspath("."))
-
+sys.path.insert(0, os.path.abspath("../../src"))
 # -- Project information -----------------------------------------------------
 
 project = "Thefittest"
