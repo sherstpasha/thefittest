@@ -9,9 +9,8 @@ Welcome to Thefittest's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
-   modules
-   metrics
+   modules/index
    references
    
