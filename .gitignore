@@ -1,7 +1,7 @@
 # folders to ignore
 dist/
 build/
-doc/_build/
+docs/build/
 .vscode/
 .pytest_cache/
 __pycache__/
