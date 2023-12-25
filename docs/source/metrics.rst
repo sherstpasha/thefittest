@@ -1,5 +1,5 @@
 metrics
 =======
-.. automodule:: thefittest.tools.metrics
+.. automodule:: thefittest.utils.metrics
    :members:
    :undoc-members:

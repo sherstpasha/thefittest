@@ -24,10 +24,6 @@ def root_mean_square_error(
     -------
     numpy.float64
         The root mean square error between the true and predicted values.
-    References
-    ----------
-    Author Name. (Year, Month Day Published). Title of the Article. Website Name.
-    URL: [Link Text](URL)
 
     Examples
     --------
