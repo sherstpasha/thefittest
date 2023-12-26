@@ -8,18 +8,115 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
+from numba import float64
+from numba import njit
+
 import numpy as np
 from numpy.typing import NDArray
 
 from ._differentialevolution import DifferentialEvolution
-from ..utils import donothing
 from ..utils import find_pbest_id
 from ..utils.operators import binomial
 from ..utils.operators import current_to_pbest_1_archive_p_min
-from ..utils.random import randc01
-from ..utils.random import randn01
-from ..utils.transformations import bounds_control_mean
-from ..utils.transformations import lehmer_mean
+from ..utils.random import cauchy_distribution
+
+
+@njit(float64[:](float64[:], float64[:], float64[:]))
+def bounds_control_mean(
+    array: NDArray[np.float64], left: NDArray[np.float64], right: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    to_return = array.copy()
+    size = len(array)
+    for i in range(size):
+        if array[i] < left[i]:
+            to_return[i] = (left[i] + array[i]) / 2
+        elif array[i] > right[i]:
+            to_return[i] = (right[i] + array[i]) / 2
+    return to_return
+
+
+def lehmer_mean(
+    x: NDArray[np.float64], power: int = 2, weight: Optional[NDArray[np.float64]] = None
+) -> float:
+    weight_arg: Union[NDArray[np.float64], int]
+    if weight is None:
+        weight_arg = 1
+    else:
+        weight_arg = weight
+
+    x_up = weight_arg * np.power(x, power)
+    x_down = weight_arg * np.power(x, power - 1)
+    return np.sum(x_up) / np.sum(x_down)
+
+
+@njit(float64(float64))
+def randc01(u: np.float64) -> np.float64:
+    """
+    Generate a random number from a Cauchy distribution within the range (0, 1).
+
+    Parameters
+    ----------
+    u : np.float64
+        The location parameter for the Cauchy distribution.
+
+    Returns
+    -------
+    np.float64
+        A random number from a Cauchy distribution within the range (0, 1).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.random import randc01
+    >>>
+    >>> # Generate a random number from Cauchy distribution within the range (0, 1)
+    >>> u_value = 0.0
+    >>> result = randc01(u_value)
+    >>>
+    >>> print("Random Number from Cauchy Distribution (0, 1):", result)
+    """
+
+    value = cauchy_distribution(loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
+    while value <= 0:
+        value = cauchy_distribution(loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
+    if value > 1:
+        value = 1
+    return value
+
+
+@njit(float64(float64))
+def randn01(u: np.float64) -> Union[float, np.float64]:
+    """
+    Generate a random number from a normal distribution within the range (0, 1).
+
+    Parameters
+    ----------
+    u : np.float64
+        The mean parameter for the normal distribution.
+
+    Returns
+    -------
+    Union[float, np.float64]
+        A random number from a normal distribution within the range (0, 1).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.random import randn01
+    >>>
+    >>> # Generate a random number from normal distribution within the range (0, 1)
+    >>> u_value = 0.0
+    >>> result = randn01(u_value)
+    >>>
+    >>> print("Random Number from Normal Distribution (0, 1):", result)
+    """
+
+    value = np.random.normal(u, 0.1, size=1)[0]
+    if value < 0:
+        return 0.0
+    elif value > 1:
+        return 1.0
+    return value
 
 
 class SHADE(DifferentialEvolution):
@@ -36,7 +133,7 @@ class SHADE(DifferentialEvolution):
         right: NDArray[np.float64],
         elitism: bool = True,
         init_population: Optional[NDArray[np.float64]] = None,
-        genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray[np.float64]], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,

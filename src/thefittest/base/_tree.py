@@ -15,27 +15,16 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from ._net import HiddenBlock
 from ..utils import find_end_subtree_from_i
 from ..utils import find_id_args_from_i
 from ..utils import get_levels_tree_from_i
+from ..utils.random import random_weighted_sample
 
-
+MIN_VALUE = np.finfo(np.float64).min
+MAX_VALUE = np.finfo(np.float64).max
 FUNCTIONAL_COLOR_CODE = (1, 0.72, 0.43, 1)
 TERMINAL_COLOR_CODE = (0.21, 0.76, 0.56, 1)
-
-
-class Operator:
-    def __init__(self, formula: str, name: str, sign: str) -> None:
-        self._formula = formula
-        self.__name__ = name
-        self._sign = sign
-
-    def _write(self, *args: Any) -> str:
-        formula = self._formula.format(*args)
-        return formula
-
-    def __call__(self, *args: Any) -> None:
-        pass
 
 
 class Node:
@@ -90,6 +79,20 @@ class EphemeralNode(Node):
         value = self._generator()
         node = EphemeralConstantNode(value=value, name=str(value))
         return node
+
+
+class Operator:
+    def __init__(self, formula: str, name: str, sign: str) -> None:
+        self._formula = formula
+        self.__name__ = name
+        self._sign = sign
+
+    def _write(self, *args: Any) -> str:
+        formula = self._formula.format(*args)
+        return formula
+
+    def __call__(self, *args: Any) -> None:
+        pass
 
 
 class DualNode(Operator):
@@ -161,8 +164,6 @@ class EnsembleUniversalSet(UniversalSet):
         return functional_set_proba
 
     def _random_functional(self, n_args: int = -1) -> FunctionalNode:
-        from ..utils.random import random_weighted_sample
-
         n_args_functionals = self._functional_set[n_args]
         weights = self._functional_set_proba[n_args]
         index = random_weighted_sample(weights=weights, quantity=1, replace=True)[0]
@@ -316,3 +317,329 @@ class Tree:
 
         to_return = {"edges": edges, "labels": labels, "nodes": nodes, "pos": pos, "colors": colors}
         return to_return
+
+    def plot(self, ax: Any = None) -> None:
+        import networkx as nx
+
+        graph = self.get_graph(True)
+
+        G = nx.Graph()
+        G.add_nodes_from(graph["nodes"])
+        G.add_edges_from(graph["edges"])
+
+        nx.draw_networkx_nodes(
+            G, graph["pos"], node_color=graph["colors"], edgecolors="black", linewidths=0.5, ax=ax
+        )
+        nx.draw_networkx_edges(G, graph["pos"], style="-", ax=ax)
+        nx.draw_networkx_labels(G, graph["pos"], graph["labels"], font_size=10, ax=ax)
+
+    @classmethod
+    def full_growing_method(cls, uniset: UniversalSet, max_level: int) -> Tree:
+        nodes: List[Union[FunctionalNode, TerminalNode, EphemeralNode]] = []
+        levels = []
+        n_args = []
+        possible_steps = [1]
+        previous_levels = [-1]
+        level_i = -1
+        while len(possible_steps):
+            possible_steps[-1] = possible_steps[-1] - 1
+            if possible_steps[-1] == 0:
+                possible_steps.pop()
+                level_i = previous_levels.pop() + 1
+            else:
+                level_i = previous_levels[-1] + 1
+            levels.append(level_i)
+            if level_i == max_level:
+                nodes.append(uniset._random_terminal_or_ephemeral())
+                n_args.append(0)
+            else:
+                nodes.append(uniset._random_functional())
+                n_i = nodes[-1]._n_args
+                n_args.append(n_i)
+                possible_steps.append(n_i)
+                previous_levels.append(level_i)
+        tree = cls(nodes, n_args)
+        return tree
+
+    @classmethod
+    def growing_method(cls, uniset: UniversalSet, max_level: int) -> Tree:
+        nodes: List[Union[FunctionalNode, TerminalNode, EphemeralNode]] = []
+        levels = []
+        n_args = []
+        possible_steps = [1]
+        previous_levels = [-1]
+        level_i = -1
+        while len(possible_steps):
+            possible_steps[-1] = possible_steps[-1] - 1
+            if possible_steps[-1] == 0:
+                possible_steps.pop()
+                level_i = previous_levels.pop() + 1
+            else:
+                level_i = previous_levels[-1] + 1
+            levels.append(level_i)
+
+            if level_i == max_level:
+                nodes.append(uniset._random_terminal_or_ephemeral())
+                n_args.append(0)
+            elif level_i == 0:
+                nodes.append(uniset._random_functional())
+                n_i = nodes[-1]._n_args
+                n_args.append(n_i)
+                possible_steps.append(n_i)
+                previous_levels.append(level_i)
+            else:
+                if np.random.random() < 0.5:
+                    nodes.append(uniset._random_terminal_or_ephemeral())
+                else:
+                    nodes.append(uniset._random_functional())
+                n_i = nodes[-1]._n_args
+                n_args.append(n_i)
+
+                if n_i > 0:
+                    possible_steps.append(n_i)
+                    previous_levels.append(level_i)
+        tree = cls(nodes, n_args)
+        return tree
+
+    @classmethod
+    def random_tree(cls, uniset: UniversalSet, max_level: int) -> Tree:
+        if random.random() < 0.5:
+            tree = cls.full_growing_method(uniset, max_level)
+        else:
+            tree = cls.growing_method(uniset, max_level)
+        return tree
+
+
+class Cos(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="cos({})", name="cos", sign="cos")
+
+    def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.cos(x)
+        return result
+
+
+class Sin(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="sin({})", name="sin", sign="sin")
+
+    def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.sin(x)
+        return result
+
+
+class Add(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="({} + {})", name="add", sign="+")
+
+    def __call__(
+        self, x: Union[float, NDArray[np.float64]], y: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
+        result = x + y
+        return result
+
+
+class Sub(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="({} - {})", name="sub", sign="-")
+
+    def __call__(
+        self, x: Union[float, np.ndarray], y: Union[float, np.ndarray]
+    ) -> Union[float, np.ndarray]:
+        result = x - y
+        return result
+
+
+class Neg(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="-{}", name="neg", sign="-")
+
+    def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = -x
+        return result
+
+
+class Mul(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="({} * {})", name="mul", sign="*")
+
+    def __call__(
+        self, x: Union[float, np.ndarray], y: Union[float, np.ndarray]
+    ) -> Union[float, np.ndarray]:
+        result = x * y
+        return result
+
+
+class Pow2(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="({}**2)", name="pow2", sign="**2")
+
+    def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.clip(x**2, MIN_VALUE, MAX_VALUE)
+        return result
+
+
+class Div(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="({}/{})", name="div", sign="/")
+
+    def __call__(
+        self, x: Union[float, np.ndarray], y: Union[float, np.ndarray]
+    ) -> Union[float, np.ndarray]:
+        result: Union[float, np.ndarray]
+        if isinstance(y, np.ndarray):
+            result = np.divide(x, y, out=np.ones_like(y, dtype=np.float64), where=y != 0)
+        else:
+            if y == 0:
+                result = 0.0
+            else:
+                result = x / y
+        result = np.clip(result, MIN_VALUE, MAX_VALUE)
+        return result
+
+
+class Inv(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="(1/{})", name="Inv", sign="1/")
+
+    def __call__(self, y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result: Union[float, np.ndarray]
+
+        if isinstance(y, np.ndarray):
+            result = np.divide(1, y, out=np.ones_like(y, dtype=np.float64), where=y != 0)
+        else:
+            if y == 0:
+                result = 1
+            else:
+                result = 1 / y
+        result = np.clip(result, MIN_VALUE, MAX_VALUE)
+        return result
+
+
+class LogAbs(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="log(abs({}))", name="log(abs)", sign="log(abs)")
+
+    def __call__(self, y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        y_ = np.abs(y)
+        if isinstance(y_, np.ndarray):
+            result = np.log(y_, out=np.ones_like(y_, dtype=np.float64), where=y_ != 0)
+        else:
+            if y_ == 0:
+                result = 1
+            else:
+                result = np.log(y_)
+        return result
+
+
+class Exp(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="exp({})", name="exp", sign="exp")
+
+    def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.clip(np.exp(x), MIN_VALUE, MAX_VALUE)
+        return result
+
+
+class SqrtAbs(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="sqrt(abs({}))", name="sqrt(abs)", sign="sqrt(abs)")
+
+    def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.sqrt(np.abs(x))
+        return result
+
+
+class Abs(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="abs({})", name="abs()", sign="abs()")
+
+    def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        result = np.abs(x)
+        return result
+
+
+class More(Operator):
+    def __init__(self) -> None:
+        Operator.__init__(self, formula="({} > {})", name="more", sign=">")
+
+    def __call__(
+        self, x: Union[float, NDArray[np.float64]], y: Union[float, NDArray[np.float64]]
+    ) -> Union[bool, NDArray[np.bool_]]:
+        result = x > y
+        return result
+
+
+NET_FUNCTION_NAME = {"add": Add, "more": More}
+
+
+def init_symbolic_regression_uniset(
+    X: NDArray[np.float64],
+    functional_set_names: Tuple[str] = ("cos", "sin", "add", "inv", "neg", "mul"),
+    ephemeral_node_generators: Optional[Tuple[Callable, ...]] = None,
+):
+    SYMBOLIC_FUNCTION_NAME = {
+        "cos": Cos,
+        "sin": Sin,
+        "add": Add,
+        "sub": Sub,
+        "neg": Neg,
+        "mul": Mul,
+        "div": Div,
+        "inv": Inv,
+    }
+    uniset: UniversalSet
+    terminal_set: Union[
+        List[Union[TerminalNode, EphemeralNode]], Tuple[Union[TerminalNode, EphemeralNode]]
+    ]
+    functional_set: Union[
+        List[Union[TerminalNode, EphemeralNode]], Tuple[Union[TerminalNode, EphemeralNode]]
+    ] = []
+    n_dimension: int = X.shape[1]
+
+    for functional_name in functional_set_names:
+        function = SYMBOLIC_FUNCTION_NAME[functional_name]
+        functional_set.append(FunctionalNode(function()))
+
+    terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
+    if ephemeral_node_generators is not None:
+        for generator in ephemeral_node_generators:
+            terminal_set.append(EphemeralNode(generator))
+
+    uniset = UniversalSet(tuple(functional_set), tuple(terminal_set))
+    return uniset
+
+
+def init_net_uniset(
+    n_variables: int, input_block_size: int, max_hidden_block_size: int, offset: bool = True
+):
+    if offset:
+        n_dimension = n_variables - 1
+    else:
+        n_dimension = n_variables
+
+    cut_id: NDArray[np.int64] = np.arange(
+        input_block_size, n_dimension, input_block_size, dtype=np.int64
+    )
+
+    variables_pool: List = np.split(np.arange(n_dimension), cut_id)
+    functional_set = (
+        FunctionalNode(NET_FUNCTION_NAME["add"]()),
+        FunctionalNode(NET_FUNCTION_NAME["more"]()),
+    )
+
+    def random_hidden_block() -> HiddenBlock:
+        return HiddenBlock(max_hidden_block_size)
+
+    terminal_set: List[Union[TerminalNode, EphemeralNode]] = [
+        TerminalNode(set(variables), "in{}".format(i)) for i, variables in enumerate(variables_pool)
+    ]
+
+    if offset:
+        terminal_set.append(
+            TerminalNode(value={(n_dimension)}, name="in{}".format(len(variables_pool)))
+        )
+    terminal_set.append(EphemeralNode(random_hidden_block))
+
+    uniset = UniversalSet(functional_set, tuple(terminal_set))
+    return uniset

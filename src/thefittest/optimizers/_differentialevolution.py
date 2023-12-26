@@ -7,11 +7,13 @@ from typing import Dict
 from typing import Optional
 from typing import Union
 
+from numba import float64
+from numba import njit
+
 import numpy as np
 from numpy.typing import NDArray
 
 from ..base._ea import EvolutionaryAlgorithm
-from ..utils import donothing
 from ..utils.operators import best_1
 from ..utils.operators import best_2
 from ..utils.operators import binomial
@@ -19,8 +21,21 @@ from ..utils.operators import current_to_best_1
 from ..utils.operators import rand_1
 from ..utils.operators import rand_2
 from ..utils.operators import rand_to_best1
-from ..utils.random import float_population
-from ..utils.transformations import bounds_control
+
+
+@njit(float64[:](float64[:], float64[:], float64[:]))
+def bounds_control(
+    array: NDArray[np.float64], left: NDArray[np.float64], right: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    to_return = array.copy()
+
+    size = len(array)
+    for i in range(size):
+        if array[i] < left[i]:
+            to_return[i] = left[i]
+        elif array[i] > right[i]:
+            to_return[i] = right[i]
+    return to_return
 
 
 class DifferentialEvolution(EvolutionaryAlgorithm):
@@ -40,7 +55,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         CR: float = 0.5,
         elitism: bool = True,
         init_population: Optional[NDArray[np.float64]] = None,
-        genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray[np.float64]], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -85,9 +100,19 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             "rand_2": rand_2,
         }
 
+    @staticmethod
+    def float_population(
+        pop_size: int,
+        left: NDArray[np.float64],
+        right: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
+        return np.array(
+            [np.random.uniform(left_i, right_i, pop_size) for left_i, right_i in zip(left, right)]
+        ).T
+
     def _first_generation(self: DifferentialEvolution) -> None:
         if self._init_population is None:
-            self._population_g_i = float_population(
+            self._population_g_i = self.float_population(
                 pop_size=self._pop_size, left=self._left, right=self._right
             )
         else:

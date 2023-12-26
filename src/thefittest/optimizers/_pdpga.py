@@ -14,8 +14,7 @@ from numpy.typing import NDArray
 
 from ._selfcga import SelfCGA
 from ..base import Tree
-from ..utils import donothing
-from ..utils.transformations import numpy_group_by
+from ..utils import numpy_group_by
 
 
 class PDPGA(SelfCGA):
@@ -58,7 +57,7 @@ class PDPGA(SelfCGA):
         ),
         mutations: Tuple[str, ...] = ("weak", "average", "strong"),
         init_population: Optional[NDArray[np.byte]] = None,
-        genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray[np.byte]], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,

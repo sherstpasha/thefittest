@@ -13,7 +13,6 @@ from numpy.typing import NDArray
 
 from ..base import Tree
 from ..base._ea import EvolutionaryAlgorithm
-from ..utils import donothing
 from ..utils.operators import empty_crossover
 from ..utils.operators import flip_mutation
 from ..utils.operators import growing_mutation
@@ -35,7 +34,6 @@ from ..utils.operators import uniform_rank_crossover
 from ..utils.operators import uniform_rank_crossover_GP
 from ..utils.operators import uniform_tour_crossover
 from ..utils.operators import uniform_tour_crossover_GP
-from ..utils.random import binary_string_population
 from ..utils.transformations import rank_data
 from ..utils.transformations import scale_data
 
@@ -57,7 +55,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         crossover: str = "uniform_2",
         mutation: str = "weak",
         init_population: Optional[NDArray[np.byte]] = None,
-        genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray[np.byte]], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -161,9 +159,14 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         self._fitness_scale_i: NDArray[np.float64]
         self._fitness_rank_i: NDArray[np.float64]
 
+    @staticmethod
+    def binary_string_population(pop_size: int, str_len: int) -> NDArray[np.byte]:
+        size = (pop_size, str_len)
+        return np.random.randint(low=0, high=2, size=size, dtype=np.byte).astype(np.byte)
+
     def _first_generation(self: GeneticAlgorithm) -> None:
         if self._init_population is None:
-            self._population_g_i = binary_string_population(self._pop_size, self._str_len)
+            self._population_g_i = self.binary_string_population(self._pop_size, self._str_len)
         else:
             self._population_g_i = self._init_population.copy()
 

@@ -97,30 +97,6 @@ def common_region_(trees: Union[List, NDArray]) -> Tuple:
     return to_return
 
 
-def numpy_group_by(group: NDArray, by: NDArray) -> Tuple:
-    argsort = np.argsort(by)
-    group = group[argsort]
-    by = by[argsort]
-
-    keys, cut_index = np.unique(by, return_index=True)
-    groups = np.split(group, cut_index)[1:]
-    return keys, groups
-
-
-def lehmer_mean(
-    x: NDArray[np.float64], power: int = 2, weight: Optional[NDArray[np.float64]] = None
-) -> float:
-    weight_arg: Union[NDArray[np.float64], int]
-    if weight is None:
-        weight_arg = 1
-    else:
-        weight_arg = weight
-
-    x_up = weight_arg * np.power(x, power)
-    x_down = weight_arg * np.power(x, power - 1)
-    return np.sum(x_up) / np.sum(x_down)
-
-
 def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
     arange = np.arange(len(arr), dtype=np.int64)
 
@@ -278,32 +254,3 @@ class GrayCode(SamplingGrid):
         bit_array = numpy_int_to_bit(int_array)
         gray_array = numpy_bit_to_gray(bit_array)
         return gray_array
-
-
-@njit(float64[:](float64[:], float64[:], float64[:]))
-def bounds_control(
-    array: NDArray[np.float64], left: NDArray[np.float64], right: NDArray[np.float64]
-) -> NDArray[np.float64]:
-    to_return = array.copy()
-
-    size = len(array)
-    for i in range(size):
-        if array[i] < left[i]:
-            to_return[i] = left[i]
-        elif array[i] > right[i]:
-            to_return[i] = right[i]
-    return to_return
-
-
-@njit(float64[:](float64[:], float64[:], float64[:]))
-def bounds_control_mean(
-    array: NDArray[np.float64], left: NDArray[np.float64], right: NDArray[np.float64]
-) -> NDArray[np.float64]:
-    to_return = array.copy()
-    size = len(array)
-    for i in range(size):
-        if array[i] < left[i]:
-            to_return[i] = (left[i] + array[i]) / 2
-        elif array[i] > right[i]:
-            to_return[i] = (right[i] + array[i]) / 2
-    return to_return

@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 class Model:
     def _fit(
         self,
-        X: NDArray[np.float64],
+        X: np.typing.NDArray[np.float64],
         y: NDArray[Union[np.float64, np.int64]],
     ) -> Any:
         pass

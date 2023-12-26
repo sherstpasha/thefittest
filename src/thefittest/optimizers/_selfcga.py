@@ -11,8 +11,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ._geneticalgorithm import GeneticAlgorithm
-from ..utils import donothing
-from ..utils.transformations import numpy_group_by
+from ..utils import numpy_group_by
 
 
 class SelfCGA(GeneticAlgorithm):
@@ -56,7 +55,7 @@ class SelfCGA(GeneticAlgorithm):
         selection_threshold_proba: float = 0.05,
         crossover_threshold_proba: float = 0.05,
         mutation_threshold_proba: float = 0.05,
-        genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray[np.byte]], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,

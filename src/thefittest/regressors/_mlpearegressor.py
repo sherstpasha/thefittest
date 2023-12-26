@@ -15,7 +15,6 @@ from ..optimizers import DifferentialEvolution
 from ..optimizers import SHADE
 from ..optimizers import jDE
 from ..utils.metrics import root_mean_square_error2d
-from ..utils.random import float_population
 from ..utils.transformations import GrayCode
 
 
@@ -90,9 +89,9 @@ class MLPEARegressor(MLPEAClassifier):
         right: NDArray[np.float64] = np.full(
             shape=len(net._weights), fill_value=10, dtype=np.float64
         )
-        initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = float_population(
-            weights_optimizer_args["pop_size"], left, right
-        )
+        initial_population: Union[
+            NDArray[np.float64], NDArray[np.byte]
+        ] = DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
         initial_population[0] = net._weights.copy()
 
         weights_optimizer_args["fitness_function"] = fitness_function

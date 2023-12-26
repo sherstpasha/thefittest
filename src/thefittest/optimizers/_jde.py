@@ -10,7 +10,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ._differentialevolution import DifferentialEvolution
-from ..utils import donothing
 
 
 class jDE(DifferentialEvolution):
@@ -33,7 +32,7 @@ class jDE(DifferentialEvolution):
         t_CR: float = 0.1,
         elitism: bool = True,
         init_population: Optional[NDArray[np.float64]] = None,
-        genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray[np.float64]], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,

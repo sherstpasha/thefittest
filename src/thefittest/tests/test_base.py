@@ -2,18 +2,18 @@ import numpy as np
 
 from ..base._ea import Statistics
 from ..base._ea import TheFittest
-from ..base._net import Net
 from ..base._net import HiddenBlock
+from ..base._net import Net
+from ..base._tree import Add
 from ..base._tree import EphemeralConstantNode
 from ..base._tree import EphemeralNode
 from ..base._tree import FunctionalNode
+from ..base._tree import Mul
+from ..base._tree import Operator
+from ..base._tree import Sub
 from ..base._tree import TerminalNode
 from ..base._tree import Tree
 from ..base._tree import UniversalSet
-from ..utils.operators import Add
-from ..utils.operators import Mul
-from ..utils.operators import Operator
-from ..utils.operators import Sub
 
 
 class PlusOne(Operator):

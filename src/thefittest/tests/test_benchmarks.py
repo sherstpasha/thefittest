@@ -8,6 +8,7 @@ from ..benchmarks import IrisDataset
 from ..benchmarks import OneMax
 from ..benchmarks import UserKnowladgeDataset
 from ..benchmarks import WineDataset
+from ..benchmarks.CEC2005 import problems_dict
 from ..benchmarks.symbolicregression17 import (
     F1,
     F2,
@@ -28,10 +29,8 @@ from ..benchmarks.symbolicregression17 import (
     F17,
 )
 
-from ..benchmarks.CEC2005 import problems_dict
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
-from ..utils.random import float_population
 
 
 def test_IrisDataset():
@@ -225,7 +224,7 @@ def test_CEC2005():
                 init_right_scalar = problem["init_bounds"][1]
                 init_right = np.full(shape=dim, fill_value=init_right_scalar, dtype=np.float64)
 
-                initial_population = float_population(
+                initial_population = DifferentialEvolution.float_population(
                     pop_size=pop_size, left=init_left, right=init_right
                 )
 

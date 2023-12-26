@@ -9,9 +9,9 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from ..base import Net
 from ..base._model import Model
 from ..base._net import ACTIV_NAME_INV
-from ..base._net import Net
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 from ..optimizers import GeneticProgramming
@@ -21,7 +21,6 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..utils.metrics import categorical_crossentropy3d
-from ..utils.random import float_population
 from ..utils.transformations import GrayCode
 
 
@@ -144,9 +143,9 @@ class MLPEAClassifier(Model):
         right: NDArray[np.float64] = np.full(
             shape=len(net._weights), fill_value=10, dtype=np.float64
         )
-        initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = float_population(
-            weights_optimizer_args["pop_size"], left, right
-        )
+        initial_population: Union[
+            NDArray[np.float64], NDArray[np.byte]
+        ] = DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
         initial_population[0] = net._weights.copy()
 
         weights_optimizer_args["fitness_function"] = fitness_function

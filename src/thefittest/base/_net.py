@@ -15,14 +15,10 @@ from numba.typed import List as numbaList
 import numpy as np
 from numpy.typing import NDArray
 
-from thefittest.utils.transformations import scale_data
+from ..utils import forward2d
+from ..utils.transformations import scale_data
 
-from ..utils.operators import forward2d
 
-
-INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
-HIDDEN_COLOR_CODE = (0.0, 0.74, 0.99, 1)
-OUTPUT_COLOR_CODE = (0.94, 0.50, 0.50, 1)
 ACTIVATION_NAME = {0: "sg", 1: "rl", 2: "gs", 3: "th", 4: "ln", 5: "sm"}
 ACTIV_NAME_INV = {"sigma": 0, "relu": 1, "gauss": 2, "tanh": 3, "ln": 4, "softmax": 5}
 
@@ -54,6 +50,9 @@ class Net:
         self._numba_weights_id: numbaList[NDArray[np.int64]]
         self._numba_activs_code: numbaList[NDArray[np.int64]]
         self._numba_activs_nodes: numbaList[numbaList[NDArray[np.int64]]]
+
+        self._activation_name = {0: "sg", 1: "rl", 2: "gs", 3: "th", 4: "ln", 5: "sm"}
+        self._activ_name_inv = {"sigma": 0, "relu": 1, "gauss": 2, "tanh": 3, "ln": 4, "softmax": 5}
 
     def __len__(self) -> int:
         return len(self._weights)
@@ -289,6 +288,10 @@ class Net:
         return outputs
 
     def get_graph(self) -> Dict:
+        input_color_code = (0.11, 0.67, 0.47, 1)
+        hidden_color_code = (0.0, 0.74, 0.99, 1)
+        output_color_code = (0.94, 0.50, 0.50, 1)
+
         weights_scale = scale_data(self._weights)
         nodes = list(self._inputs)
 
@@ -310,20 +313,20 @@ class Net:
         w_colors[:, 2] = weights_scale
         w_colors[:, 3] = 0.8
         positions[:len_i][:, 1] = np.arange(len_i) - (len_i) / 2
-        colors[:len_i] = INPUT_COLOR_CODE
+        colors[:len_i] = input_color_code
 
         n = len_i
         for i, layer in enumerate(self._hidden_layers):
             nodes.extend(list(layer))
             positions[n : n + len(layer)][:, 0] = i + 1
             positions[n : n + len(layer)][:, 1] = np.arange(len(layer)) - len(layer) / 2
-            colors[n : n + len(layer)] = HIDDEN_COLOR_CODE
+            colors[n : n + len(layer)] = hidden_color_code
             n += len(layer)
 
         nodes.extend(list(self._outputs))
         positions[n : n + len_o][:, 0] = len(self._hidden_layers) + 1
         positions[n : n + len_o][:, 1] = np.arange(len_o) - len_o / 2
-        colors[n : n + len_o] = OUTPUT_COLOR_CODE
+        colors[n : n + len_o] = output_color_code
 
         positions_dict = dict(zip(nodes, positions))
 
@@ -337,6 +340,37 @@ class Net:
         }
 
         return to_return
+
+    def plot(self, ax=None) -> None:
+        import networkx as nx
+
+        graph = self.get_graph()
+        G = nx.Graph()
+        G.add_nodes_from(graph["nodes"])
+        G.add_edges_from(graph["connects"])
+
+        connects_label = {}
+        for i, connects_i in enumerate(graph["connects"]):
+            connects_label[tuple(connects_i)] = i
+
+        nx.draw_networkx_nodes(
+            G,
+            pos=graph["positions"],
+            node_color=graph["colors"],
+            edgecolors="black",
+            linewidths=0.5,
+            ax=ax,
+        )
+        nx.draw_networkx_edges(
+            G,
+            pos=graph["positions"],
+            style="-",
+            edge_color=graph["weights_colors"],
+            ax=ax,
+            alpha=0.5,
+        )
+
+        nx.draw_networkx_labels(G, graph["positions"], graph["labels"], font_size=10, ax=ax)
 
 
 class HiddenBlock:

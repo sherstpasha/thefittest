@@ -22,3 +22,5 @@ scikit-learn
 sphinx
 sphinx-rtd-theme
 numpydoc
+pydeps
+Graphviz

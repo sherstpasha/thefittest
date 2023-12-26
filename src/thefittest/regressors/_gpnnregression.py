@@ -10,6 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..base import UniversalSet
+from ..base._tree import init_net_uniset
 from ..classifiers import GeneticProgrammingNeuralNetClassifier
 from ..classifiers._gpnnclassifier import genotype_to_phenotype_tree
 from ..classifiers._gpnnclassifier import train_net
@@ -107,11 +108,17 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
         if self._offset:
             X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])
 
+        n_inputs: int = X.shape[1]
         n_outputs: int = 1
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, self._test_sample_ratio)
 
-        uniset: UniversalSet = self._get_uniset(X)
+        uniset: UniversalSet = init_net_uniset(
+            n_variables=n_inputs,
+            input_block_size=self._input_block_size,
+            max_hidden_block_size=self._max_hidden_block_size,
+            offset=self._offset,
+        )
 
         self._optimizer = self._define_optimizer(
             uniset=uniset,

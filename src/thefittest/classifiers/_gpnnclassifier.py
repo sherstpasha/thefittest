@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from typing import Any
-from typing import Dict
 from typing import Callable
-from typing import List
+from typing import Dict
 from typing import Optional
 from typing import Type
 from typing import Union
@@ -11,15 +10,14 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from ..base import EphemeralNode
 from ..base import FunctionalNode
 from ..base import TerminalNode
 from ..base import Tree
 from ..base import UniversalSet
 from ..base._model import Model
 from ..base._net import ACTIV_NAME_INV
-from ..base._net import HiddenBlock
 from ..base._net import Net
+from ..base._tree import init_net_uniset
 from ..classifiers._mlpeaclassifier import fitness_function as evaluate_nets
 from ..classifiers._mlpeaclassifier import weights_type_optimizer_alias
 from ..optimizers import DifferentialEvolution
@@ -31,9 +29,6 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..utils.metrics import categorical_crossentropy3d
-from ..utils.operators import Add
-from ..utils.operators import More
-from ..utils.random import float_population
 from ..utils.random import train_test_split_stratified
 from ..utils.transformations import GrayCode
 
@@ -143,9 +138,9 @@ def train_net(
 
     left: NDArray[np.float64] = np.full(shape=len(net._weights), fill_value=-10, dtype=np.float64)
     right: NDArray[np.float64] = np.full(shape=len(net._weights), fill_value=10, dtype=np.float64)
-    initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = float_population(
-        weights_optimizer_args["pop_size"], left, right
-    )
+    initial_population: Union[
+        NDArray[np.float64], NDArray[np.byte]
+    ] = DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
     initial_population[0] = net._weights.copy()
     weights_optimizer_args["fitness_function"] = fitness_function
     weights_optimizer_args["fitness_function_args"] = {
@@ -207,38 +202,6 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
         self._optimizer: Union[SelfCGP, GeneticProgramming]
         self._net_size_penalty: float = net_size_penalty
-
-    def _get_uniset(
-        self: GeneticProgrammingNeuralNetClassifier, X: NDArray[np.float64]
-    ) -> UniversalSet:
-        uniset: UniversalSet
-        if self._offset:
-            n_dimension = X.shape[1] - 1
-        else:
-            n_dimension = X.shape[1]
-
-        cut_id: NDArray[np.int64] = np.arange(
-            self._input_block_size, n_dimension, self._input_block_size, dtype=np.int64
-        )
-        variables_pool: List = np.split(np.arange(n_dimension), cut_id)
-
-        functional_set = (FunctionalNode(Add()), FunctionalNode(More()))
-
-        def random_hidden_block() -> HiddenBlock:
-            return HiddenBlock(self._max_hidden_block_size)
-
-        terminal_set: List[Union[TerminalNode, EphemeralNode]] = [
-            TerminalNode(set(variables), "in{}".format(i))
-            for i, variables in enumerate(variables_pool)
-        ]
-        if self._offset:
-            terminal_set.append(
-                TerminalNode(value={(n_dimension)}, name="in{}".format(len(variables_pool)))
-            )
-        terminal_set.append(EphemeralNode(random_hidden_block))
-
-        uniset = UniversalSet(functional_set, tuple(terminal_set))
-        return uniset
 
     def _define_optimizer(
         self: GeneticProgrammingNeuralNetClassifier,
@@ -326,6 +289,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         if self._offset:
             X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])
 
+        n_inputs: int = X.shape[1]
         n_outputs: int = len(set(y))
         eye: NDArray[np.float64] = np.eye(n_outputs, dtype=np.float64)
 
@@ -336,7 +300,12 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         proba_test: NDArray[np.float64] = eye[y_test]
         proba_train: NDArray[np.float64] = eye[y_train]
 
-        uniset: UniversalSet = self._get_uniset(X)
+        uniset: UniversalSet = init_net_uniset(
+            n_variables=n_inputs,
+            input_block_size=self._input_block_size,
+            max_hidden_block_size=self._max_hidden_block_size,
+            offset=self._offset,
+        )
 
         self._optimizer = self._define_optimizer(
             uniset=uniset,

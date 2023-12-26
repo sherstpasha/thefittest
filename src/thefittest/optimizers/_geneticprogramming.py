@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -11,8 +12,6 @@ from numpy.typing import NDArray
 from ._geneticalgorithm import GeneticAlgorithm
 from ..base import Tree
 from ..base import UniversalSet
-from ..utils import donothing
-from ..utils.random import half_and_half
 
 
 class GeneticProgramming(GeneticAlgorithm):
@@ -35,7 +34,7 @@ class GeneticProgramming(GeneticAlgorithm):
         max_level: int = 16,
         init_level: int = 5,
         init_population: Optional[NDArray] = None,
-        genotype_to_phenotype: Callable[[NDArray[Any]], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray[Any]], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -76,9 +75,17 @@ class GeneticProgramming(GeneticAlgorithm):
         self._max_level: int = max_level
         self._init_level: int = init_level
 
+    @staticmethod
+    def half_and_half(pop_size: int, uniset: UniversalSet, max_level: int) -> NDArray:
+        population = [
+            Tree.random_tree(uniset, random.randrange(2, max_level)) for _ in range(pop_size)
+        ]
+        population_numpy = np.array(population, dtype=object)
+        return population_numpy
+
     def _first_generation(self: GeneticProgramming) -> None:
         if self._init_population is None:
-            self._population_g_i = self._population_g_i = half_and_half(
+            self._population_g_i = self._population_g_i = self.half_and_half(
                 pop_size=self._pop_size, uniset=self._uniset, max_level=self._init_level
             )
         else:

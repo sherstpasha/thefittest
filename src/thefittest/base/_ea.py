@@ -15,8 +15,6 @@ from joblib import delayed
 import numpy as np
 from numpy.typing import NDArray
 
-from ..utils import donothing
-
 
 class TheFittest:
     def __init__(self) -> None:
@@ -79,7 +77,7 @@ class EvolutionaryAlgorithm:
         init_population: Optional[
             Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
         ] = None,
-        genotype_to_phenotype: Callable[[NDArray[Any]], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray[Any]], NDArray[Any]]] = None,
         optimal_value: Optional[Union[float, int]] = None,
         termination_error_value: Union[float, int] = 0.0,
         no_increase_num: Optional[int] = None,
@@ -97,7 +95,7 @@ class EvolutionaryAlgorithm:
         self._init_population: Optional[
             Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
         ] = init_population
-        self._genotype_to_phenotype: Callable = genotype_to_phenotype
+        self._genotype_to_phenotype: Optional[Callable] = genotype_to_phenotype
         self._no_increase_num: Optional[int] = no_increase_num
         self._show_progress_each: Optional[int] = show_progress_each
         self._keep_history: bool = keep_history
@@ -169,14 +167,17 @@ class EvolutionaryAlgorithm:
             self._stats._update(kwargs)
 
     def _get_phenotype(self, population_g: NDArray[Any]) -> NDArray[Any]:
-        populations_g = self._split_population(population_g)
-        populations_ph = self._parallel(
-            delayed(self._genotype_to_phenotype)(
-                populations_g_i, **self._genotype_to_phenotype_args
+        if self._genotype_to_phenotype is not None:
+            populations_g = self._split_population(population_g)
+            populations_ph = self._parallel(
+                delayed(self._genotype_to_phenotype)(
+                    populations_g_i, **self._genotype_to_phenotype_args
+                )
+                for populations_g_i in populations_g
             )
-            for populations_g_i in populations_g
-        )
-        population_ph = np.concatenate(populations_ph, axis=0)
+            population_ph = np.concatenate(populations_ph, axis=0)
+        else:
+            population_ph = population_g
         return population_ph
 
     def _get_fitness(
@@ -289,7 +290,7 @@ class MutliGenomeEA(EvolutionaryAlgorithm):
         init_population: Optional[
             Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
         ] = None,
-        genotype_to_phenotype: Callable[[NDArray[Any]], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray[Any]], NDArray[Any]]] = None,
         optimal_value: Optional[Union[float, int]] = None,
         termination_error_value: Union[float, int] = 0.0,
         no_increase_num: Optional[int] = None,

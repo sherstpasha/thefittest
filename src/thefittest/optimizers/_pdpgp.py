@@ -13,7 +13,6 @@ from ._geneticprogramming import GeneticProgramming
 from ._pdpga import PDPGA
 from ..base import Tree
 from ..base import UniversalSet
-from ..utils import donothing
 
 
 class PDPGP(GeneticProgramming, PDPGA):
@@ -53,7 +52,7 @@ class PDPGP(GeneticProgramming, PDPGA):
         max_level: int = 16,
         init_level: int = 4,
         init_population: Optional[NDArray] = None,
-        genotype_to_phenotype: Callable[[NDArray], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,

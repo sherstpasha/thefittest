@@ -13,13 +13,10 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..utils.metrics import coefficient_determination
-from ..utils.operators import Add
-from ..utils.operators import Div
-from ..utils.operators import Mul
-from ..utils.operators import Neg
-from ..utils.random import binary_string_population
-from ..utils.random import float_population
-from ..utils.random import half_and_half
+from ..base._tree import Add
+from ..base._tree import Div
+from ..base._tree import Mul
+from ..base._tree import Neg
 
 
 def test_GeneticAlgorithm_start_settings():
@@ -104,7 +101,9 @@ def test_GeneticAlgorithm_set_strategy():
     pop_size = 8
     str_len = 5
 
-    initial_population = binary_string_population(pop_size=pop_size, str_len=str_len)
+    initial_population = GeneticAlgorithm.binary_string_population(
+        pop_size=pop_size, str_len=str_len
+    )
     selections = (
         "proportional",
         "rank",
@@ -274,7 +273,7 @@ def test_SelfCGA_set_strategy():
     iters = 10
     pop_size = 10
     str_len = 5
-    initial_population = binary_string_population(pop_size=pop_size, str_len=str_len)
+    initial_population = SelfCGA.binary_string_population(pop_size=pop_size, str_len=str_len)
     tour_size = 8
     parents_num = 8
     mutation_rate = 0.5
@@ -472,7 +471,9 @@ def test_GeneticProgramming_set_strategy():
             fitness.append(-coefficient_determination(y, y_pred))
         return np.array(fitness)
 
-    initial_population = half_and_half(pop_size=pop_size, uniset=uniset, max_level=14)
+    initial_population = GeneticProgramming.half_and_half(
+        pop_size=pop_size, uniset=uniset, max_level=14
+    )
     selections = (
         "proportional",
         "rank",
@@ -698,7 +699,7 @@ def test_SelfCGP_set_strategy():
 
     iters = 10
     pop_size = 10
-    initial_population = half_and_half(pop_size=pop_size, uniset=uniset, max_level=14)
+    initial_population = SelfCGP.half_and_half(pop_size=pop_size, uniset=uniset, max_level=14)
     tour_size = 8
     parents_num = 8
     mutation_rate = 0.5
@@ -856,7 +857,9 @@ def test_DifferentialEvolution_set_strategy():
     n_vars = 10
     left = np.full(n_vars, -1, dtype=np.float64)
     right = np.full(n_vars, 1, dtype=np.float64)
-    initial_population = float_population(pop_size=pop_size, left=left, right=right)
+    initial_population = DifferentialEvolution.float_population(
+        pop_size=pop_size, left=left, right=right
+    )
 
     mutations = ("best_1", "rand_1", "current_to_best_1", "rand_to_best1", "best_2", "rand_2")
     F = (0.5, 0.3)
@@ -980,7 +983,7 @@ def test_jDE_set_strategy():
     n_vars = 10
     left = np.full(n_vars, -1, dtype=np.float64)
     right = np.full(n_vars, 1, dtype=np.float64)
-    initial_population = float_population(pop_size=pop_size, left=left, right=right)
+    initial_population = jDE.float_population(pop_size=pop_size, left=left, right=right)
 
     mutations = ("best_1", "rand_1", "current_to_best_1", "rand_to_best1", "best_2", "rand_2")
     F_min = (0.05, 0.1)

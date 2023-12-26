@@ -12,7 +12,6 @@ from numpy.typing import NDArray
 from ._geneticprogramming import GeneticProgramming
 from ._selfcga import SelfCGA
 from ..base import UniversalSet
-from ..utils import donothing
 
 
 class SelfCGP(GeneticProgramming, SelfCGA):
@@ -52,7 +51,7 @@ class SelfCGP(GeneticProgramming, SelfCGA):
         selection_threshold_proba: float = 0.05,
         crossover_threshold_proba: float = 0.05,
         mutation_threshold_proba: float = 0.05,
-        genotype_to_phenotype: Callable[[NDArray], NDArray[Any]] = donothing,
+        genotype_to_phenotype: Optional[Callable[[NDArray], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,

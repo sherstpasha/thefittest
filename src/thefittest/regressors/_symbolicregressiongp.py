@@ -1,20 +1,16 @@
 from __future__ import annotations
 
 from typing import Any
-from typing import List
 from typing import Optional
-from typing import Tuple
 from typing import Type
 from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
-from ..base import EphemeralNode
-from ..base import FunctionalNode
-from ..base import TerminalNode
 from ..base import UniversalSet
 from ..base._model import Model
+from ..base._tree import init_symbolic_regression_uniset
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 from ..optimizers import GeneticProgramming
@@ -24,13 +20,6 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..utils.metrics import coefficient_determination
-from ..utils.operators import Add
-from ..utils.operators import Cos
-from ..utils.operators import Inv
-from ..utils.operators import Mul
-from ..utils.operators import Neg
-from ..utils.operators import Pow2
-from ..utils.operators import Sin
 
 
 def fitness_function(trees: NDArray, y: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -69,27 +58,6 @@ class SymbolicRegressionGP(Model):
         self._optimizer_class: Union[Type[SelfCGP], Type[GeneticProgramming]] = optimizer
         self._optimizer: Union[SelfCGP, GeneticProgramming]
 
-    def _get_uniset(self: SymbolicRegressionGP, X: NDArray[np.float64]) -> UniversalSet:
-        uniset: UniversalSet
-        terminal_set: Union[
-            List[Union[TerminalNode, EphemeralNode]], Tuple[Union[TerminalNode, EphemeralNode]]
-        ]
-        n_dimension: int = X.shape[1]
-
-        functional_set = (
-            FunctionalNode(Add()),
-            FunctionalNode(Mul()),
-            FunctionalNode(Neg()),
-            FunctionalNode(Inv()),
-            FunctionalNode(Pow2()),
-            FunctionalNode(Cos()),
-            FunctionalNode(Sin()),
-        )
-        terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
-        terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
-        uniset = UniversalSet(functional_set, tuple(terminal_set))
-        return uniset
-
     def get_optimizer(
         self: SymbolicRegressionGP,
     ) -> Union[
@@ -111,7 +79,9 @@ class SymbolicRegressionGP(Model):
         uniset: UniversalSet
 
         if self._uniset is None:
-            uniset = self._get_uniset(X)
+            uniset = init_symbolic_regression_uniset(
+                X, ephemeral_node_generators=(generator1, generator2)
+            )
         else:
             uniset = self._uniset
 
