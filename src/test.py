@@ -6,80 +6,64 @@ from numba import njit
 
 
 
-bit_array = np.random.randint(0, 2, size = (150, 100), dtype = np.int8)
+int_array = np.random.randint(0, 256, size = (1000, 1000), dtype = np.int64)
 
 
 
-def numpy_bit_to_int(
-    bit_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
-) -> NDArray[np.int64]:
-    if powers is None:
-        powers = 2 ** np.arange(bit_array.shape[1], dtype=np.int64)
-    arange_ = powers[: bit_array.shape[1]][::-1]
-    int_array = np.sum(bit_array * arange_, axis=1)
-    return int_array
+def numpy_int_to_bit(int_array: NDArray[np.int64]) -> NDArray[np.byte]:
+    result = []
+    bit = int_array % 2
+    remains = int_array // 2
+    result.append(bit)
+    while np.sum(remains) > 0:
+        bit = remains % 2
+        remains = remains // 2
+        result.append(bit)
+    # bit_array = np.array(result, dtype=np.int8)[::-1].T
+    return result
 
 @njit
-def numpy_bit_to_int2(
-    bit_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
-) -> NDArray[np.int64]:
-    if powers is None:
-        powers = 2 ** np.arange(bit_array.shape[1], dtype=np.int64)
-    arange_ = powers[: bit_array.shape[1]][::-1]
-    int_array = np.sum(bit_array * arange_, axis=1)
-    return int_array
+def numpy_int_to_bit2(int_array: NDArray[np.int64]) -> NDArray[np.byte]:
+    result = []
+    bit = int_array % 2
+    remains = int_array // 2
+    result.append(bit)
+    while np.sum(remains) > 0:
+        bit = remains % 2
+        remains = remains // 2
+        result.append(bit)
+    # bit_array = np.asarray(result, dtype=np.int8)[::-1].T
+    return result
 
-def numpy_bit_to_int3(
-    bit_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
-) -> NDArray[np.int64]:
-    if powers is None:
-        powers = 2 ** np.arange(bit_array.shape[1], dtype=np.int64)
-    arange_ = powers[: bit_array.shape[1]][::-1]
 
-    int_array = np.dot(bit_array, arange_)
-    return int_array
+numpy_int_to_bit2(int_array)
 
-def numpy_bit_to_int4(
-    bit_array: NDArray[np.int64], reversed_powers: Optional[NDArray[np.int64]] = None
-) -> NDArray[np.int64]:
-
-    if reversed_powers is None:
-        powers = 2 ** np.arange(bit_array.shape[1], dtype=np.int64)
-        reversed_powers = np.flip(powers)
-
-    int_array = np.dot(bit_array, reversed_powers)
-    return int_array
-
-powers = 2 ** np.arange(bit_array.shape[1], dtype=np.int64)
-reversed_powers = np.flip(powers)
-numpy_bit_to_int2(bit_array)
-
-n = 100000
+n = 100
 
 t1 = time.time()
 for i in range(n):
-    res1 = numpy_bit_to_int(bit_array)
+    res1 = numpy_int_to_bit(int_array)
 t2 = time.time()
 print(t2 - t1)
 
 
 t1 = time.time()
 for i in range(n):
-    numpy_bit_to_int2(bit_array)
+    numpy_int_to_bit2(int_array)
 t2 = time.time()
 print(t2 - t1)
 
-t1 = time.time()
-for i in range(n):
-    res2 = numpy_bit_to_int3(bit_array)
-t2 = time.time()
-print(t2 - t1)
+# t1 = time.time()
+# for i in range(n):
+#     res2 = numpy_bit_to_int3(bit_array)
+# t2 = time.time()
+# print(t2 - t1)
 
-t1 = time.time()
-for i in range(n):
-    res3 = numpy_bit_to_int4(bit_array)
-t2 = time.time()
-print(t2 - t1)
+# t1 = time.time()
+# for i in range(n):
+#     res3 = numpy_bit_to_int4(bit_array)
+# t2 = time.time()
+# print(t2 - t1)
 
-print(np.allclose(res1, res2))
-print(np.allclose(res1, res3))
+# print(np.allclose(res1, res2))
+# print(np.allclose(res1, res3))
