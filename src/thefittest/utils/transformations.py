@@ -113,20 +113,6 @@ def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
     return results
 
 
-@njit(float64[:](float64[:]))
-def protect_norm(input_array: NDArray[np.float64]) -> NDArray[np.float64]:
-    normalized_array = np.empty(len(input_array), dtype=np.float64)
-    total_sum = np.sum(input_array, dtype=np.float64)
-    if total_sum > 0:
-        for i in range(normalized_array.size):
-            normalized_array[i] = input_array[i] / total_sum
-    else:
-        uniform_value = 1 / len(input_array)
-        for i in range(normalized_array.size):
-            normalized_array[i] = uniform_value
-    return normalized_array
-
-
 def scale_data(data: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
     data_copy = data.copy()
     max_value = data_copy.max()
@@ -139,12 +125,15 @@ def scale_data(data: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64
 
 
 def numpy_bit_to_int(
-    bit_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
+    bit_array: NDArray[np.int64], reversed_powers: Optional[NDArray[np.int64]] = None
 ) -> NDArray[np.int64]:
-    if powers is None:
-        powers = 2 ** np.arange(bit_array.shape[1], dtype=np.byte)
-    arange_ = powers[: bit_array.shape[1]][::-1]
-    int_array = np.sum(bit_array * arange_, axis=1)
+
+    if reversed_powers is None:
+        num_bits = bit_array.shape[1]
+        powers = 2 ** np.arange(num_bits, dtype=np.int64)
+        reversed_powers = np.flip(powers)
+
+    int_array = np.dot(bit_array, reversed_powers)
     return int_array
 
 
@@ -179,7 +168,7 @@ class SamplingGrid:
         self.right: NDArray[np.float64]
         self.parts: NDArray[np.int64]
         self.h: NDArray[np.float64]
-        self._power_arange: NDArray[np.int64]
+        self._reversed_powers : NDArray[np.int64]
 
     def _culc_h_from_parts(
         self, left: NDArray[np.float64], right: NDArray[np.float64], parts: NDArray[np.int64]
@@ -194,7 +183,7 @@ class SamplingGrid:
         return parts
 
     def _decode(self, bit_array_i: NDArray[np.byte]) -> NDArray[np.int64]:
-        int_convert = numpy_bit_to_int(bit_array_i, self._power_arange)
+        int_convert = numpy_bit_to_int(bit_array_i, self._reversed_powers)
         return int_convert
 
     def fit(
@@ -216,7 +205,8 @@ class SamplingGrid:
             self.parts = arg
             self.h = self._culc_h_from_parts(left, right, self.parts)
 
-        self._power_arange = 2 ** np.arange(self.parts.max(), dtype=np.int64)
+        powers = 2 ** np.arange(self.parts.max(), dtype=np.int64)
+        self._reversed_powers  = np.flip(powers)
         return self
 
     def transform(self, population: np.ndarray) -> np.ndarray:
@@ -245,7 +235,7 @@ class GrayCode(SamplingGrid):
 
     def _decode(self, gray_array_i: np.ndarray) -> np.ndarray:
         bit_array_i = numpy_gray_to_bit(gray_array_i)
-        int_convert = numpy_bit_to_int(bit_array_i, self._power_arange)
+        int_convert = numpy_bit_to_int(bit_array_i, self._reversed_powers )
         return int_convert
 
     def _float_to_bit(self, float_array: np.ndarray, left: np.ndarray, h: np.ndarray) -> np.ndarray:
