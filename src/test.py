@@ -3,7 +3,7 @@ from typing import Optional
 from typing import Union
 from numpy.typing import NDArray
 
-from thefittest.optimizers import GeneticAlgorithm
+# from thefittest.optimizers import GeneticAlgorithm
 
 
 def numpy_bit_to_int(
@@ -143,8 +143,7 @@ class SamplingGrid:
             self._bits_per_variable = self._if_single_or_array_to_int_array(bits_per_variable)
             self._culc_h_from_num_bits()
 
-        powers = 2 ** np.arange(self._bits_per_variable.max(), dtype=np.int64)
-        self._reversed_powers = np.flip(powers)
+        self._powers = 2 ** np.arange(self._bits_per_variable.max(), dtype=np.int64)
 
         return self
 
@@ -182,12 +181,42 @@ class SamplingGrid:
 
     @staticmethod
     def bit_to_int(
-        bit_array: NDArray[np.int64], reversed_powers: Optional[NDArray[np.int64]] = None
+        bit_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
     ) -> NDArray[np.int64]:
-        if reversed_powers is None:
-            num_bits = bit_array.shape[1]
+        """
+        Convert a binary array to an integer array using specified powers.
+
+        Parameters
+        ----------
+        bit_array : NDArray[np.int64]
+            Binary array where each row represents a binary number.
+        powers : Optional[NDArray[np.int64]], optional
+            Powers of 2 corresponding to the binary places. If provided, avoids recalculation.
+
+        Returns
+        -------
+        NDArray[np.int64]
+            Integer array converted from binary.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from your_module import BinaryConverter
+        >>>
+        >>> # Example 1: Convert binary array to integer array
+        >>> binary_array = np.array([[1, 0, 1], [0, 1, 1]], dtype=np.int64)
+        >>> result = bit_to_int(binary_array)
+        >>> print("Converted Integer Array:", result)
+        >>>
+        >>> # Example 2: Convert binary array to integer array with  powers
+        >>> custom_powers = np.array([1, 2, 4], dtype=np.int64)
+        >>> result_custom_powers = bit_to_int(binary_array, powers=custom_powers)
+        >>> print("Converted Integer Array (Define Powers):", result_custom_powers)
+        """
+        num_bits = bit_array.shape[1]
+        if powers is None:
             powers = 2 ** np.arange(num_bits, dtype=np.int64)
-            reversed_powers = np.flip(powers)
+        reversed_powers = np.flip(powers[:num_bits])
         int_array = np.dot(bit_array, reversed_powers)
         return int_array
 
@@ -217,7 +246,7 @@ class SamplingGrid:
         return bit_array
 
     def _decode(self, bit_array_i: NDArray[np.byte]) -> NDArray[np.int64]:
-        int_convert = self.bit_to_int(bit_array_i, self._reversed_powers)
+        int_convert = self.bit_to_int(bit_array_i, self._powers)
         return int_convert
 
     def transform(self, population: NDArray[np.int8]) -> NDArray[np.float64]:
@@ -236,104 +265,78 @@ class SamplingGrid:
         return bit_array
 
 
-bit_array = np.random.randint(0, 2, size=(100, 63), dtype=np.int8)
 
 
-def bit_to_int(
-    bit_array: NDArray[np.int64], reversed_powers: Optional[NDArray[np.int64]] = None
-) -> NDArray[np.int64]:
-    if reversed_powers is None:
-        num_bits = bit_array.shape[1]
-        powers = 2 ** np.arange(num_bits, dtype=np.int64)
-        reversed_powers = np.flip(powers)
+binary_array = np.array([[1, 0, 1], [0, 1, 1]], dtype=np.int64)
+result = SamplingGrid.bit_to_int(binary_array)
+print("Converted Integer Array:", result)
 
-    int_array = np.dot(bit_array, reversed_powers)
-    return int_array
-
-
-# res1 = numpy_bit_to_int(bit_array)
-# res2 = bit_to_int(bit_array)
-
-# # print(res1)
-
-# # print(res2)
-
-# print(np.allclose(res1, res2))
+# Example 2: Convert binary array to integer array with  powers
+custom_powers = np.array([1, 2, 4], dtype=np.int64)
+result_custom_powers = SamplingGrid.bit_to_int(binary_array, powers=custom_powers)
+print("Converted Integer Array (Define Powers):", result_custom_powers)
 
 # тестирование
 # 1 каждая переменная равна и задана вручную и количество бит
 # 2 каждая переменная равна и задана вручную и погрешность
 # 3 каждая переменная равна и задана коротко и количество бит
 # 4 каждая переменная равна и задана коротко и погрешность
-# каждая переменная разная и задана вручную
+# 5 каждая переменная разная и задана вручную
 
 
 # 1
-n_dimension = 5
-left_border_array = np.array([-5, -5, -5, -5, -5])
-right_border_array = np.array([10, 10, 10, 10, 10])
-parts_array = np.array([8, 8, 8, 8, 8])
+# n_dimension = 10
+# left_border_array = np.array([-5]*n_dimension)
+# right_border_array = np.array([10]*n_dimension)
+# parts_array = np.array([16]*n_dimension)
 
-sg_old = SamplingGrid_old(fit_by="parts").fit(
-    left=left_border_array,
-    right=right_border_array,
-    arg=parts_array,
-)
+# sg_old = SamplingGrid_old(fit_by="parts").fit(
+#     left=left_border_array,
+#     right=right_border_array,
+#     arg=parts_array,
+# )
 
-sg_new = SamplingGrid().fit(
-    left_border=left_border_array,
-    right_border=right_border_array,
-    num_variables=n_dimension,
-    bits_per_variable=parts_array,
-)
+# sg_new = SamplingGrid().fit(
+#     left_border=left_border_array,
+#     right_border=right_border_array,
+#     num_variables=n_dimension,
+#     bits_per_variable=parts_array,
+# )
 
-print("left", np.allclose(sg_old.left, sg_new._left_border))
-print("right", np.allclose(sg_old.right, sg_new._right_border))
-print("parts", np.allclose(sg_old.parts, sg_new._bits_per_variable))
-print("h", np.allclose(sg_old.h, sg_new._h_per_variable))
+# print("left", np.allclose(sg_old.left, sg_new._left_border))
+# print("right", np.allclose(sg_old.right, sg_new._right_border))
+# print("parts", np.allclose(sg_old.parts, sg_new._bits_per_variable))
+# print("h", np.allclose(sg_old.h, sg_new._h_per_variable))
 
-population = GeneticAlgorithm.binary_string_population(10, np.sum(parts_array))
+# population = GeneticAlgorithm.binary_string_population(1000, np.sum(parts_array))
 
-population_float_old = sg_old.transform(population)
-population_float_new = sg_new.transform(population)
+# import time
 
-population_bit_old = sg_old.inverse_transform(population_float_old)
-population_bit_new = sg_new.inverse_transform(population_float_new)
+# n = 100
+# t1 = time.time()
+# for i in range(n):
+#     population_float_old = sg_old.transform(population)
+# t2 = time.time()
+# print(t2 - t1)
 
-print(np.allclose(population_float_old, population_float_new))
-print(np.allclose(population_bit_old, population_bit_new))
+# t1 = time.time()
+# for i in range(n):
+#     population_float_new = sg_new.transform(population)
+# t2 = time.time()
+# print(t2 - t1)
 
-# 2
-n_dimension = 5
-left_border_array = np.array([-5, -5, -5, -5, -5])
-right_border_array = np.array([10, 10, 10, 10, 10])
-h_array = np.array([0.1, 0.1, 0.1, 0.1, 0.1])
+# t1 = time.time()
+# for i in range(n):
+#     population_bit_old = sg_old.inverse_transform(population_float_old)
+# t2 = time.time()
+# print(t2 - t1)
 
-sg_old = SamplingGrid_old(fit_by="h").fit(
-    left=left_border_array,
-    right=right_border_array,
-    arg=h_array,
-)
+# t1 = time.time()
+# for i in range(n):
+#     population_bit_new = sg_new.inverse_transform(population_float_new)
+# t2 = time.time()
+# print(t2 - t1)
 
-sg_new = SamplingGrid().fit(
-    left_border=left_border_array,
-    right_border=right_border_array,
-    num_variables=n_dimension,
-    h_per_variable=h_array,
-)
+# print(np.allclose(population_float_old, population_float_new))
+# print(np.allclose(population_bit_old, population_bit_new))
 
-print("left", np.allclose(sg_old.left, sg_new._left_border))
-print("right", np.allclose(sg_old.right, sg_new._right_border))
-print("parts", np.allclose(sg_old.parts, sg_new._bits_per_variable))
-print("h", np.allclose(sg_old.h, sg_new._h_per_variable))
-
-population = GeneticAlgorithm.binary_string_population(10, np.sum(parts_array))
-
-population_float_old = sg_old.transform(population)
-population_float_new = sg_new.transform(population)
-
-population_bit_old = sg_old.inverse_transform(population_float_old)
-population_bit_new = sg_new.inverse_transform(population_float_new)
-
-print(np.allclose(population_float_old, population_float_new))
-print(np.allclose(population_bit_old, population_bit_new))
