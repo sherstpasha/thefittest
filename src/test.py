@@ -3,7 +3,7 @@ from typing import Optional
 from typing import Union
 from numpy.typing import NDArray
 
-# from thefittest.optimizers import GeneticAlgorithm
+from thefittest.optimizers import GeneticAlgorithm
 
 
 def numpy_bit_to_int(
@@ -201,16 +201,16 @@ class SamplingGrid:
         Examples
         --------
         >>> import numpy as np
-        >>> from your_module import BinaryConverter
+        >>> from thefittest.utils.transformations import SamplingGrid
         >>>
         >>> # Example 1: Convert binary array to integer array
         >>> binary_array = np.array([[1, 0, 1], [0, 1, 1]], dtype=np.int64)
-        >>> result = bit_to_int(binary_array)
+        >>> result = SamplingGrid.bit_to_int(binary_array)
         >>> print("Converted Integer Array:", result)
         >>>
         >>> # Example 2: Convert binary array to integer array with  powers
         >>> custom_powers = np.array([1, 2, 4], dtype=np.int64)
-        >>> result_custom_powers = bit_to_int(binary_array, powers=custom_powers)
+        >>> result_custom_powers = SamplingGrid.bit_to_int(binary_array, powers=custom_powers)
         >>> print("Converted Integer Array (Define Powers):", result_custom_powers)
         """
         num_bits = bit_array.shape[1]
@@ -222,14 +222,45 @@ class SamplingGrid:
 
     @staticmethod
     def int_to_bit(
-        int_array: NDArray[np.int64], reversed_powers: Optional[NDArray[np.int64]] = None
+        int_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
     ) -> NDArray[np.byte]:
+        """
+        Convert an integer array to a binary array.
+
+        Parameters
+        ----------
+        int_array : NDArray[np.int64]
+            Integer array to be converted to binary. Each row represents an integer.
+        powers : Optional[NDArray[np.int64]], optional
+            Powers of 2 corresponding to the binary places. If provided, avoids recalculation.
+
+        Returns
+        -------
+        NDArray[np.byte]
+            Binary array converted from the integer array.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>>
+        >>> # Example 1: Convert integer array to binary array
+        >>> integer_array = np.array([5, 3], dtype=np.int64)
+        >>> result = SamplingGrid.int_to_bit(integer_array)
+        >>> print("Converted Binary Array:", result)
+        >>>
+        >>> # Example 2: Convert integer array to binary array with powers
+        >>> custom_powers = np.array([1, 2, 4], dtype=np.int64)
+        >>> result_custom_powers = SamplingGrid.int_to_bit(integer_array, powers=custom_powers)
+        >>> print("Converted Binary Array (Define Powers):", result_custom_powers)
+        """
         num_bits = int(np.ceil(np.log2(np.max(int_array) + 1)))
         bit_array = np.empty(shape=(int_array.shape[0], num_bits), dtype=np.int8)
 
-        if reversed_powers is None:
+        if powers is None:
             powers = 2 ** np.arange(num_bits, dtype=np.int64)
-            reversed_powers = np.flip(powers)
+
+        reversed_powers = np.flip(powers)
 
         int_array = int_array.astype(np.int64)
 
@@ -242,7 +273,7 @@ class SamplingGrid:
     ) -> np.int8:
         grid_number = (float_array - left) / h
         int_array = np.rint(grid_number)
-        bit_array = self.int_to_bit(int_array)
+        bit_array = self.int_to_bit(int_array, self._powers)
         return bit_array
 
     def _decode(self, bit_array_i: NDArray[np.byte]) -> NDArray[np.int64]:
@@ -265,17 +296,6 @@ class SamplingGrid:
         return bit_array
 
 
-
-
-binary_array = np.array([[1, 0, 1], [0, 1, 1]], dtype=np.int64)
-result = SamplingGrid.bit_to_int(binary_array)
-print("Converted Integer Array:", result)
-
-# Example 2: Convert binary array to integer array with  powers
-custom_powers = np.array([1, 2, 4], dtype=np.int64)
-result_custom_powers = SamplingGrid.bit_to_int(binary_array, powers=custom_powers)
-print("Converted Integer Array (Define Powers):", result_custom_powers)
-
 # тестирование
 # 1 каждая переменная равна и задана вручную и количество бит
 # 2 каждая переменная равна и задана вручную и погрешность
@@ -286,9 +306,9 @@ print("Converted Integer Array (Define Powers):", result_custom_powers)
 
 # 1
 # n_dimension = 10
-# left_border_array = np.array([-5]*n_dimension)
-# right_border_array = np.array([10]*n_dimension)
-# parts_array = np.array([16]*n_dimension)
+# left_border_array = np.array([-5] * n_dimension)
+# right_border_array = np.array([10] * n_dimension)
+# parts_array = np.array([16] * n_dimension)
 
 # sg_old = SamplingGrid_old(fit_by="parts").fit(
 #     left=left_border_array,
@@ -339,4 +359,3 @@ print("Converted Integer Array (Define Powers):", result_custom_powers)
 
 # print(np.allclose(population_float_old, population_float_new))
 # print(np.allclose(population_bit_old, population_bit_new))
-
