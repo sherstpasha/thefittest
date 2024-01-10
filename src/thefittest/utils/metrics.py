@@ -38,6 +38,7 @@ def root_mean_square_error(
     >>> rmse_result = root_mean_square_error(y_true, y_predict)
     >>>
     >>> print("Root Mean Square Error:", rmse_result)
+    Root Mean Square Error: ...
     """
 
     error = y_true - y_predict
@@ -81,6 +82,7 @@ def root_mean_square_error2d(
     >>> rmse_values = root_mean_square_error2d(y_true, y_predict2d)
     >>>
     >>> print("RMSE for each row:", rmse_values)
+    RMSE for each row: ...
     """
 
     size = len(y_predict2d)
@@ -124,6 +126,7 @@ def coefficient_determination(
     >>> r2_value = coefficient_determination(y_true, y_predict)
     >>>
     >>> print("Coefficient of Determination (R^2):", r2_value)
+    Coefficient of Determination (R^2): ...
     """
 
     mean_y_true = np.mean(y_true)
@@ -170,6 +173,7 @@ def coefficient_determination2d(
     >>> r2_values = coefficient_determination2d(y_true, y_predict2d)
     >>>
     >>> print("Coefficient of Determination (R^2) for each row:", r2_values)
+    Coefficient of Determination (R^2) for each row: ...
     """
 
     size = len(y_predict2d)
@@ -213,6 +217,7 @@ def categorical_crossentropy(
     >>> entropy_value = categorical_crossentropy(target, predicted)
     >>>
     >>> print("Cross-Entropy:", entropy_value)
+    Cross-Entropy: ...
     """
 
     target_clipped = np.clip(target, 1e-7, 1 - 1e-7)
@@ -258,6 +263,7 @@ def categorical_crossentropy3d(
     >>> entropy_values = categorical_crossentropy3d(target, predicted_3d)
     >>>
     >>> print("Cross-Entropy values for each row:", entropy_values)
+    Cross-Entropy values for each row: ...
     """
 
     size = len(output3d)
@@ -290,15 +296,13 @@ def accuracy_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> n
     --------
     >>> import numpy as np
     >>> from thefittest.utils.metrics import accuracy_score
-    >>>
     >>> # Generate example data
-    >>> y_true = np.array([1, 0, 1, 1, 0])
-    >>> y_predict = np.array([1, 0, 1, 0, 1])
-    >>>
+    >>> y_true = np.array([1, 0, 1, 1, 0], dtype = np.float64)
+    >>> y_predict = np.array([1, 0, 1, 0, 1], dtype = np.float64)
     >>> # Calculate accuracy
     >>> accuracy_value = accuracy_score(y_true, y_predict)
-    >>>
     >>> print("Accuracy:", accuracy_value)
+    Accuracy: ...
     """
 
     comparison = y_true == y_predict
@@ -342,6 +346,7 @@ def accuracy_score2d(
     >>> accuracy_values = accuracy_score2d(y_true, y_predict2d)
     >>>
     >>> print("Accuracy scores for each row:", accuracy_values)
+    Accuracy scores for each row: ...
     """
 
     size = len(y_predict2d)
@@ -384,6 +389,7 @@ def confusion_matrix(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) ->
     >>>
     >>> print("Confusion Matrix:")
     >>> print(matrix)
+    ...
     """
 
     classes = np.unique(y_true)
@@ -426,6 +432,7 @@ def recall_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.
     >>> recall = recall_score(y_true, y_predict)
     >>>
     >>> print("Average Recall Score:", recall)
+    Average Recall Score: ...
     """
 
     n_classes = len(np.unique(y_true))
@@ -483,6 +490,7 @@ def recall_score2d(
     >>> recall_values = recall_score2d(y_true, y_predict2d)
     >>>
     >>> print("Recall Scores for each Prediction:", recall_values)
+    Recall Scores for each Prediction: ...
     """
 
     size = len(y_predict2d)
@@ -524,6 +532,7 @@ def precision_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> 
     >>> precision_value = precision_score(y_true, y_predict)
     >>>
     >>> print("Average Precision Score:", precision_value)
+    Average Precision Score: ...
     """
 
     classes = np.unique(y_true)
@@ -581,6 +590,7 @@ def precision_score2d(
     >>> precision_values = precision_score2d(y_true, y_predict2d)
     >>>
     >>> print("Precision Scores for Each Prediction:", precision_values)
+    Precision Scores for Each Prediction: ...
     """
 
     size = len(y_predict2d)
@@ -628,6 +638,7 @@ def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.floa
     >>> f1_value = f1_score(y_true, y_predict)
     >>>
     >>> print("F1-score:", f1_value)
+    F1-score: ...
     """
 
     n_classes = len(np.unique(y_true))
@@ -685,6 +696,7 @@ def f1_score2d(y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]) -> NDA
     >>> f1_values = f1_score2d(y_true, y_predict2d)
     >>>
     >>> print("F1 scores for each prediction:", f1_values)
+    F1 scores for each prediction: ...
     """
 
     size = len(y_predict2d)

@@ -51,6 +51,7 @@ def sattolo_shuffle(items: Union[List, NDArray]) -> None:
     >>> my_array = np.array([1, 2, 3, 4, 5])
     >>> sattolo_shuffle(my_array)
     >>> print("Shuffled NumPy Array:", my_array)
+    Shuffled NumPy Array: ...
     """
 
     i = len(items)
@@ -91,6 +92,7 @@ def cauchy_distribution(loc: np.float64, scale: np.float64, size: np.int64) -> N
     >>> cauchy_result = cauchy_distribution(loc_value, scale_value, size_value)
     >>>
     >>> print("Cauchy Distribution Result:\\n", cauchy_result)
+    Cauchy Distribution Result:\\n ...
     """
 
     x_ = np.random.standard_cauchy(size=size).astype(np.float64)

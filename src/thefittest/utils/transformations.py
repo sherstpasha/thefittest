@@ -5,14 +5,20 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
-from numba import float64
-from numba import njit
-
 import numpy as np
 from numpy.typing import NDArray
 
 from ..utils import find_end_subtree_from_i
 from ..utils import find_first_difference_between_two
+
+"""в этом модуле:
+1. Заменить самплинг грид и грей код (готово). 
+1.1 Добавть им тесты 
+1.2 адаптировать остальной код под новые модули
+2. спрятать common_region оставив только один (может вообще отдать классу?)
+3. Использовать rank_data из scipy вместо своей реализации
+4. удалить висящие методы кодирования
+5. scale data пока не трогать потом вместо него будет аналог из sklearn  """
 
 
 def common_region(trees: Union[List, NDArray]) -> Tuple:
@@ -124,120 +130,738 @@ def scale_data(data: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64
     return scaled_data
 
 
-def numpy_bit_to_int(
-    bit_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
-) -> NDArray[np.int64]:
-    if powers is None:
-        powers = 2 ** np.arange(bit_array.shape[1], dtype=np.byte)
-    arange_ = powers[: bit_array.shape[1]][::-1]
-    int_array = np.sum(bit_array * arange_, axis=1)
-    return int_array
-
-
-def numpy_int_to_bit(int_array: NDArray[np.int64]) -> NDArray[np.byte]:
-    result = []
-    bit = int_array % 2
-    remains = int_array // 2
-    result.append(bit)
-    while np.sum(remains) > 0:
-        bit = remains % 2
-        remains = remains // 2
-        result.append(bit)
-    bit_array = np.array(result, dtype=np.int8)[::-1].T
-    return bit_array
-
-
-def numpy_gray_to_bit(gray_array: NDArray[np.byte]) -> NDArray[np.byte]:
-    bit_array = np.logical_xor.accumulate(gray_array, axis=-1).astype(np.byte)
-    return bit_array
-
-
-def numpy_bit_to_gray(bit_array: NDArray[np.byte]) -> NDArray[np.byte]:
-    cut_gray = np.logical_xor(bit_array[:, :-1], bit_array[:, 1:])
-    gray_array = np.hstack([bit_array[:, 0].reshape(-1, 1), cut_gray])
-    return gray_array
-
-
 class SamplingGrid:
-    def __init__(self, fit_by: str = "h") -> None:
-        self._fit_by = fit_by
-        self.left: NDArray[np.float64]
-        self.right: NDArray[np.float64]
-        self.parts: NDArray[np.int64]
-        self.h: NDArray[np.float64]
+    """
+    SamplingGrid class for transforming populations between binary and floating-point representations.
+
+    This class provides functionality to fit, transform, and inverse transform populations using a specified
+    sampling grid. The grid is defined by the left and right borders for each variable, and either the step size (h)
+    or the number of bits for each variable.
+
+    Attributes
+    ----------
+    _left_border : NDArray[np.float64]
+        Left border values for each variable in the sampling grid.
+    _right_border : NDArray[np.float64]
+        Right border values for each variable in the sampling grid.
+    _num_variables : int
+        Number of variables in the sampling grid.
+    _h_per_variable : NDArray[np.float64]
+        Step size for each variable in the sampling grid.
+    _bits_per_variable : NDArray[np.int64]
+        Number of bits for each variable in the sampling grid.
+    _reversed_powers : NDArray[np.int64]
+        Reversed powers of 2 used for converting binary representations to integers.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.transformations import SamplingGrid
+    >>>
+    >>> # Fit the sampling grid
+    >>> grid = SamplingGrid()
+    >>> grid.fit(left_border=-5.0, right_border=5.0, num_variables=3, h_per_variable=0.1)
+    >>>
+    >>> # Generate a binary population
+    >>> string_length = grid.get_bits_per_variable().sum()
+    >>> binary_population = np.random.randint(2, size=(5, string_length), dtype=np.int8)
+    >>> print("Binary Population:", binary_population)
+    >>>
+    >>> # Transform the binary population to a floating-point array
+    >>> transformed_population = grid.transform(binary_population)
+    >>> print("Transformed Population:", transformed_population)
+
+    >>> import numpy as np
+    >>> from thefittest.utils.transformations import SamplingGrid
+    >>>
+    >>> # Fit the sampling grid
+    >>> grid = SamplingGrid()
+    >>> grid.fit(left_border=0.0, right_border=1.0, num_variables=3, h_per_variable=0.1)
+    >>>
+    >>> # Generate a floating-point population
+    >>> floating_population = np.random.rand(5, 3)
+    >>> print("Floating-point Population:", floating_population)
+    >>>
+    >>> # Inverse transform the floating-point population to a binary array
+    >>> inverse_transformed_population = grid.inverse_transform(floating_population)
+    >>> print("Inverse Transformed Population:", inverse_transformed_population)
+
+    Methods
+    -------
+    fit(
+        left_border: Union[float, NDArray[np.float64]],
+        right_border: Union[float, NDArray[np.float64]],
+        num_variables: int,
+        h_per_variable: Optional[Union[float, NDArray[np.float64]]] = None,
+        bits_per_variable: Optional[Union[int, NDArray[np.int64]]] = None,
+    ) -> "SamplingGrid":
+        Fit the sampling grid using specified parameters.
+
+    get_left_border() -> NDArray[np.float64]:
+        Get the left border values for each variable.
+
+    get_right_border() -> NDArray[np.float64]:
+        Get the right border values for each variable.
+
+    get_num_variables() -> int:
+        Get the number of variables.
+
+    get_h_per_variable() -> NDArray[np.float64]:
+        Get the step size values for each variable.
+
+    get_bits_per_variable() -> NDArray[np.int64]:
+        Get the number of bits per variable.
+
+    transform(population: NDArray[np.int8]) -> NDArray[np.float64]:
+        Transform a binary population into a floating-point array based on the SamplingGrid parameters.
+
+    inverse_transform(population: NDArray[np.float64]) -> NDArray[np.int8]:
+        Inverse transform a floating-point population into a binary array based on the SamplingGrid parameters.
+    """
+
+    def __init__(
+        self,
+    ) -> None:
+        self._left_border: NDArray[np.float64]
+        self._right_border: NDArray[np.float64]
+        self._num_variables: int
+        self._h_per_variable: NDArray[np.float64]
+        self._bits_per_variable: NDArray[np.int64]
         self._reversed_powers: NDArray[np.int64]
 
-    def _culc_h_from_parts(
-        self, left: NDArray[np.float64], right: NDArray[np.float64], parts: NDArray[np.int64]
-    ) -> NDArray[np.float64]:
-        h = (right - left) / (2.0**parts - 1)
-        return h
+    def get_left_border(self) -> NDArray[np.float64]:
+        """
+        Get the left border values for each variable.
 
-    def _culc_parts_from_h(
-        self, left: NDArray[np.float64], right: NDArray[np.float64], h: NDArray[np.float64]
-    ) -> NDArray[np.int64]:
-        parts = np.ceil(np.log2((right - left) / h + 1)).astype(int)
-        return parts
+        Returns
+        -------
+        NDArray[np.float64]
+            Left border values for each variable.
+        """
+        return self._left_border
 
-    def _decode(self, bit_array_i: NDArray[np.byte]) -> NDArray[np.int64]:
-        int_convert = numpy_bit_to_int(bit_array_i, self._reversed_powers)
-        return int_convert
+    def get_right_border(self) -> NDArray[np.float64]:
+        """
+        Get the right border values for each variable.
+
+        Returns
+        -------
+        NDArray[np.float64]
+            Right border values for each variable.
+        """
+        return self._right_border
+
+    def get_num_variables(self) -> int:
+        """
+        Get the number of variables.
+
+        Returns
+        -------
+        int
+            Number of variables.
+        """
+        return self._num_variables
+
+    def get_h_per_variable(self) -> NDArray[np.float64]:
+        """
+        Get the step size values for each variable.
+
+        Returns
+        -------
+        NDArray[np.float64]
+            Step size values for each variable.
+        """
+        return self._h_per_variable
+
+    def get_bits_per_variable(self) -> NDArray[np.int64]:
+        """
+        Get the number of bits per variable.
+
+        Returns
+        -------
+        NDArray[np.int64]
+            Number of bits per variable.
+        """
+        return self._bits_per_variable
 
     def fit(
         self,
-        left: NDArray[np.float64],
-        right: NDArray[np.float64],
-        arg: Union[NDArray[np.float64], NDArray[np.int64]],
-    ) -> SamplingGrid:
-        self.left = left
-        self.right = right
+        left_border: Union[float, NDArray[np.float64]],
+        right_border: Union[float, NDArray[np.float64]],
+        num_variables: int,
+        h_per_variable: Optional[Union[float, NDArray[np.float64]]] = None,
+        bits_per_variable: Optional[Union[int, NDArray[np.int64]]] = None,
+    ):
+        """
+        Fit the sampling grid using specified parameters.
 
-        assert self._fit_by in ["h", "parts"], f"incorrect option {self._fit_by} for fit_by."
-        "The available ones are 'h' and 'parts'"
-        if self._fit_by == "h":
-            min_h = arg
-            self.parts = self._culc_parts_from_h(left, right, min_h)
-            self.h = self._culc_h_from_parts(left, right, self.parts)
+        Parameters
+        ----------
+        left_border : Union[float, NDArray[np.float64]]
+            Left border values for each variable.
+        right_border : Union[float, NDArray[np.float64]]
+            Right border values for each variable.
+        num_variables : int
+            Number of variables.
+        h_per_variable : Optional[Union[float, NDArray[np.float64]]], optional
+            Step size values for each variable. Either `h_per_variable` or `bits_per_variable` should be provided.
+        bits_per_variable : Optional[Union[int, NDArray[np.int64]]], optional
+            Number of bits per variable. Either `h_per_variable` or `bits_per_variable` should be provided.
+
+        Returns
+        -------
+        SamplingGrid
+            The fitted SamplingGrid instance.
+
+        Raises
+        ------
+        AssertionError
+            If both `h_per_variable` and `bits_per_variable` are provided or if neither is provided.
+
+        Notes
+        -----
+        This method fits the sampling grid using the specified parameters. If `h_per_variable` is provided,
+        it calculates the corresponding `bits_per_variable`. If `bits_per_variable` is provided, it calculates
+        the corresponding `h_per_variable`. The powers of 2 used for conversion are also calculated and stored.
+
+        Examples
+        --------
+        >>> grid = SamplingGrid()
+        >>> grid.fit(left_border=0.0, right_border=1.0, num_variables=3, h_per_variable=0.1)
+        >>> print("Grid Left Border:", grid.get_left_border())
+        >>> print("Grid Right Border:", grid.get_right_border())
+        >>> print("Number of Variables:", grid.get_num_variables())
+        >>> print("Step Size per Variable:", grid.get_h_per_variable())
+        >>> print("Bits per Variable:", grid.get_bits_per_variable())
+
+        >>> grid = SamplingGrid()
+        >>> grid.fit(left_border=-1.0, right_border=1.0, num_variables=2, bits_per_variable=4)
+        >>> print("Grid Left Border:", grid.get_left_border())
+        >>> print("Grid Right Border:", grid.get_right_border())
+        >>> print("Number of Variables:", grid.get_num_variables())
+        >>> print("Step Size per Variable:", grid.get_h_per_variable())
+        >>> print("Bits per Variable:", grid.get_bits_per_variable())
+
+        >>> grid = SamplingGrid()
+        >>> grid.fit(
+        ...     left_border=np.array([-1.0, 0.5, -2.0], dtype=np.float64),
+        ...     right_border=np.array([1.0, 5.0, 2.0], dtype=np.float64),
+        ...     num_variables=3,
+        ...     h_per_variable=np.array([0.05, 1.0, 0.1], dtype=np.float64),
+        ... )
+        >>> print("Grid Left Border:", grid.get_left_border())
+        >>> print("Grid Right Border:", grid.get_right_border())
+        >>> print("Number of Variables:", grid.get_num_variables())
+        >>> print("Step Size per Variable:", grid.get_h_per_variable())
+        >>> print("Bits per Variable:", grid.get_bits_per_variable())
+
+        >>> grid = SamplingGrid()
+        >>> grid.fit(
+        ...     left_border=np.array([-3.5, -2.0, 10.0, 0.9], dtype=np.float64),
+        ...     right_border=np.array([3.5, 7.0, 25.0, 1.5], dtype=np.float64),
+        ...     num_variables=4,
+        ...     bits_per_variable=np.array([8, 16, 3, 40], dtype=np.int64),
+        ... )
+        >>> print("Grid Left Border:", grid.get_left_border())
+        >>> print("Grid Right Border:", grid.get_right_border())
+        >>> print("Number of Variables:", grid.get_num_variables())
+        >>> print("Step Size per Variable:", grid.get_h_per_variable())
+        >>> print("Bits per Variable:", grid.get_bits_per_variable())
+        """
+        assert (bits_per_variable is None) != (
+            h_per_variable is None
+        ), "Either bits_per_variable or h_per_variable must be defined, but not both."
+
+        self._num_variables = num_variables
+        self._left_border = self._if_single_or_array_to_float_array(left_border)
+        self._right_border = self._if_single_or_array_to_float_array(right_border)
+
+        if bits_per_variable is None:
+            self._h_per_variable = self._if_single_or_array_to_float_array(h_per_variable)
+            self._culc_num_bits_from_h()
+            self._culc_h_from_num_bits()
         else:
-            self.parts = arg
-            self.h = self._culc_h_from_parts(left, right, self.parts)
+            self._bits_per_variable = self._if_single_or_array_to_int_array(bits_per_variable)
+            self._culc_h_from_num_bits()
 
-        powers = 2 ** np.arange(self.parts.max(), dtype=np.int64)
-        self._reversed_powers = np.flip(powers)
+        self._powers = 2 ** np.arange(self._bits_per_variable.max(), dtype=np.int64)
+
         return self
 
-    def transform(self, population: np.ndarray) -> np.ndarray:
-        splits = np.add.accumulate(self.parts)
+    def _if_single_or_array_to_float_array(
+        self, single_or_array: Union[float, int, np.number, NDArray[np.number]]
+    ) -> NDArray[np.float64]:
+        """
+        Convert a single value or an array to a 1D float array.
+
+        Parameters
+        ----------
+        single_or_array : Union[float, int, np.number, NDArray[np.number]]
+            A single numeric value or an array of numeric values.
+
+        Returns
+        -------
+        NDArray[np.float64]
+            1D float array.
+        Notes
+        -----
+        This function is used internally in the SamplingGrid class to ensure that numeric values,
+        either single or in array form, are represented as a 1D float array for further calculations.
+
+        """
+        if isinstance(single_or_array, (int, float, np.number)):
+            array = np.full(shape=self._num_variables, fill_value=single_or_array, dtype=np.float64)
+        else:
+            assert len(single_or_array) == self._num_variables
+            array = single_or_array.astype(np.float64)
+
+        return array
+
+    def _if_single_or_array_to_int_array(
+        self, single_or_array: Union[float, int, np.number, NDArray[np.number]]
+    ) -> NDArray[np.float64]:
+        """
+        Convert a single value or an array to a 1D int array.
+
+        Parameters
+        ----------
+        single_or_array : Union[float, int, np.number, NDArray[np.number]]
+            A single numeric value or an array of numeric values.
+
+        Returns
+        -------
+        NDArray[np.int64]
+            1D int array.
+        Notes
+        -----
+        This function is used internally in the SamplingGrid class to ensure that numeric values,
+        either single or in array form, are represented as a 1D int array for further calculations.
+
+        """
+        if isinstance(single_or_array, (int, float, np.number)):
+            array = np.full(shape=self._num_variables, fill_value=single_or_array, dtype=np.int64)
+        else:
+            assert len(single_or_array) == self._num_variables
+            array = single_or_array.astype(np.int64)
+
+        return array
+
+    def _culc_h_from_num_bits(self) -> None:
+        """
+        Calculate the step size (h) for each variable based on the number of bits.
+
+        This method calculates the step size (h) for each variable using the specified number of bits per variable,
+        the left and right borders of the sampling grid, and updates the internal state of the SamplingGrid.
+
+        Notes
+        -----
+        This method should be called internally during the fitting process after setting the number of bits per variable.
+        """
+        self._h_per_variable = (self._right_border - self._left_border) / (
+            2.0**self._bits_per_variable - 1
+        )
+
+    def _culc_num_bits_from_h(self) -> None:
+        """
+        Calculate the number of bits for each variable based on the step size (h).
+
+        This method calculates the number of bits required for each variable based on the specified step size (h),
+        the left and right borders of the sampling grid, and updates the internal state of the SamplingGrid.
+
+        Notes
+        -----
+        This method should be called internally during the fitting process after setting the step size (h) per variable.
+        """
+        self._bits_per_variable = np.ceil(
+            np.log2((self._right_border - self._left_border) / self._h_per_variable + 1)
+        ).astype(int)
+
+    @staticmethod
+    def bit_to_int(
+        bit_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
+    ) -> NDArray[np.int64]:
+        """
+        Convert a binary array to an integer array using specified powers.
+
+        Parameters
+        ----------
+        bit_array : NDArray[np.int64]
+            2D array where each row represents a binary number.
+        powers : Optional[NDArray[np.int64]], optional
+            1D array of powers of 2 corresponding to the binary places. If provided, avoids recalculation.
+
+        Returns
+        -------
+        NDArray[np.int64]
+            1D array representing the integer values converted from binary.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>>
+        >>> # Example 1: Convert binary array to integer array
+        >>> binary_array = np.array([[1, 0, 1], [0, 1, 1]], dtype=np.int64)
+        >>> result = SamplingGrid.bit_to_int(binary_array)
+        >>> print("Converted Integer Array:", result)
+        >>>
+        >>> # Example 2: Convert binary array to integer array with  powers
+        >>> custom_powers = np.array([1, 2, 4], dtype=np.int64)
+        >>> result_custom_powers = SamplingGrid.bit_to_int(binary_array, powers=custom_powers)
+        >>> print("Converted Integer Array (Define Powers):", result_custom_powers)
+        """
+        num_bits = bit_array.shape[1]
+        if powers is None:
+            powers = 2 ** np.arange(num_bits, dtype=np.int64)
+        reversed_powers = np.flip(powers[:num_bits])
+        int_array = np.dot(bit_array, reversed_powers)
+        return int_array
+
+    @staticmethod
+    def int_to_bit(
+        int_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
+    ) -> NDArray[np.byte]:
+        """
+        Convert a 1D integer array to a 2D binary array.
+
+        Parameters
+        ----------
+        int_array : NDArray[np.int64]
+            1D array of integers to be converted to binary.
+        powers : Optional[NDArray[np.int64]], optional
+            1D array of powers of 2 corresponding to the binary places. If provided, avoids recalculation.
+
+        Returns
+        -------
+        NDArray[np.byte]
+            2D binary array converted from the 1D integer array.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>>
+        >>> # Example 1: Convert one-dimensional integer array to binary array
+        >>> integer_array = np.array([5, 3], dtype=np.int64)
+        >>> result = SamplingGrid.int_to_bit(integer_array)
+        >>> print("Converted Binary Array:", result)
+        >>>
+        >>> # Example 2: Convert one-dimensional integer array to binary array with powers
+        >>> custom_powers = np.array([1, 2, 4], dtype=np.int64)
+        >>> result_custom_powers = SamplingGrid.int_to_bit(integer_array, powers=custom_powers)
+        >>> print("Converted Binary Array (Define Powers):", result_custom_powers)
+        """
+        num_bits = int(np.ceil(np.log2(np.max(int_array) + 1)))
+        bit_array = np.empty(shape=(int_array.shape[0], num_bits), dtype=np.int8)
+
+        if powers is None:
+            powers = 2 ** np.arange(num_bits, dtype=np.int64)
+
+        reversed_powers = np.flip(powers)
+
+        int_array = int_array.astype(np.int64)
+
+        for i, reversed_power_i in enumerate(reversed_powers):
+            bit_array[:, i] = np.int8((int_array & reversed_power_i) > 0)
+        return bit_array
+
+    def _float_to_bit(
+        self, float_array: NDArray[np.float64], left: NDArray[np.float64], h: NDArray[np.float64]
+    ) -> np.int8:
+        """
+        Convert a 1D floating-point array to a 2D binary array based on the SamplingGrid parameters.
+
+        Parameters
+        ----------
+        float_array : NDArray[np.float64]
+            1D floating-point array to be converted to binary.
+        left : NDArray[np.float64]
+            1D array representing the left boundary of the sampling grid used in the conversion process.
+        h : NDArray[np.float64]
+            1D array representing the step size of the sampling grid used in the conversion process.
+
+        Returns
+        -------
+        NDArray[np.byte]
+            2D binary array converted from the 1D floating-point array.
+
+        Notes
+        -----
+        This function internally relies on the `int_to_bit` method to convert floating-point numbers to their binary representation.
+
+        """
+        grid_number = (float_array - left) / h
+        int_array = np.rint(grid_number)
+        bit_array = self.int_to_bit(int_array, self._powers)
+        return bit_array
+
+    def _decode(self, bit_array_i: NDArray[np.byte]) -> NDArray[np.int64]:
+        """
+        Decode a 2D binary array representing a single variable into a 1D integer array.
+
+        Parameters
+        ----------
+        bit_array_i : NDArray[np.byte]
+            2D binary array representing the variable. Each row corresponds to a binary representation.
+
+        Returns
+        -------
+        NDArray[np.int64]
+            1D integer array decoded from the 2D binary representation.
+
+        Notes
+        -----
+        This function internally relies on the `bit_to_int` method for converting the binary representation
+        of a variable to its integer counterpart.
+
+        """
+        int_convert = self.bit_to_int(bit_array_i, self._powers)
+        return int_convert
+
+    def transform(self, population: NDArray[np.int8]) -> NDArray[np.float64]:
+        """
+        Transform a binary population into a floating-point array based on the SamplingGrid parameters.
+
+        Parameters
+        ----------
+        population : NDArray[np.int8]
+            Population matrix where each row represents a binary array.
+
+        Returns
+        -------
+        NDArray[np.float64]
+            Floating-point array representing the transformed population.
+
+        Notes
+        -----
+        This function divides the input population into individual variables, decodes each variable from binary to integer,
+        and then calculates the corresponding floating-point values using the SamplingGrid parameters.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>>
+        >>> # Fit the sampling grid
+        >>> grid = SamplingGrid()
+        >>> grid.fit(left_border=-5.0, right_border=5.0, num_variables=3, h_per_variable=0.1)
+        >>>
+        >>> # Generate a binary population
+        >>> string_length = grid.get_bits_per_variable().sum()
+        >>> binary_population = np.random.randint(2, size=(5, string_length), dtype=np.int8)
+        >>> print("Binary Population:", binary_population)
+        >>>
+        >>> # Transform the binary population to a floating-point array
+        >>> transformed_population = grid.transform(binary_population)
+        >>> print("Transformed Population:", transformed_population)
+        Transformed Population: ...
+        """
+        splits = np.add.accumulate(self._bits_per_variable)
         p_parts = np.split(population, splits[:-1], axis=1)
 
         int_array = np.array(list(map(self._decode, p_parts))).T
-        float_array = self.left[np.newaxis, :] + self.h[np.newaxis, :] * int_array
+        float_array = (
+            self._left_border[np.newaxis, :] + self._h_per_variable[np.newaxis, :] * int_array
+        )
         return float_array
 
-    def _float_to_bit(self, float_array: np.ndarray, left: np.ndarray, h: np.ndarray) -> np.ndarray:
-        grid_number = (float_array - left) / h
-        int_array = np.rint(grid_number)
-        bit_array = numpy_int_to_bit(int_array)
-        return bit_array
+    def inverse_transform(self, population: NDArray[np.float64]) -> NDArray[np.int8]:
+        """
+        Inverse transform a floating-point population into a binary array based on the SamplingGrid parameters.
 
-    def inverse_transform(self, population: np.ndarray) -> np.ndarray:
-        map_ = map(self._float_to_bit, population.T, self.left, self.h)
+        Parameters
+        ----------
+        population : NDArray[np.float64]
+            Population matrix where each row represents a floating-point array.
+
+        Returns
+        -------
+        NDArray[np.int8]
+            Binary array representing the inverse transformed population.
+
+        Notes
+        -----
+        This function encodes each variable from floating-point to binary, and then combines the binary representations
+        to form the binary array of the inverse transformed population.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>>
+        >>> # Fit the sampling grid
+        >>> grid = SamplingGrid()
+        >>> grid.fit(left_border=0.0, right_border=1.0, num_variables=3, h_per_variable=0.1)
+        >>>
+        >>> # Generate a floating-point population
+        >>> floating_population = np.random.rand(5, 3)
+        >>> print("Floating-point Population:", floating_population)
+        >>>
+        >>> # Inverse transform the floating-point population to a binary array
+        >>> inverse_transformed_population = grid.inverse_transform(floating_population)
+        >>> print("Inverse Transformed Population:", inverse_transformed_population)
+        Inverse Transformed Population: ...
+        """
+        map_ = map(self._float_to_bit, population.T, self._left_border, self._h_per_variable)
         bit_array = np.hstack(list(map_))
         return bit_array
 
 
 class GrayCode(SamplingGrid):
-    def __init__(self, fit_by: str = "h") -> None:
-        SamplingGrid.__init__(self, fit_by)
+    """
+    GrayCode class for transforming populations between gray code and floating-point representations.
 
-    def _decode(self, gray_array_i: np.ndarray) -> np.ndarray:
-        bit_array_i = numpy_gray_to_bit(gray_array_i)
-        int_convert = numpy_bit_to_int(bit_array_i, self._reversed_powers)
+    This class extends the functionality of the SamplingGrid for gray code transformations. Gray code is a binary numeral
+    system where two successive values differ in only one bit. GrayCode provides methods to convert between binary and gray
+    code representations, as well as transforming populations between gray code and floating-point representations using
+    the specified sampling grid.
+
+    Attributes
+    ----------
+    Inherits attributes from SamplingGrid.
+
+    Methods
+    -------
+    gray_to_bit(gray_array: NDArray[np.byte]) -> NDArray[np.byte]:
+        Convert a gray code array to a binary array.
+
+    bit_to_gray(bit_array: NDArray[np.byte]) -> NDArray[np.byte]:
+        Convert a binary array to a gray code array.
+
+    _decode(gray_array_i: NDArray[np.byte]) -> NDArray[np.int64]:
+        Decode a 2D gray code array representing a single variable into a 1D integer array.
+
+    _float_to_bit(float_array: NDArray[np.float64], left: NDArray[np.float64], h: NDArray[np.float64]) -> NDArray[np.byte]:
+        Convert a 1D floating-point array to a 2D gray code array based on the SamplingGrid parameters.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.transformations import GrayCode
+    >>>
+    >>> # Fit the sampling grid with gray code transformation
+    >>> grid = GrayCode()
+    >>> grid.fit(left_border=-5.0, right_border=5.0, num_variables=3, h_per_variable=0.1)
+    >>>
+    >>> # Generate a binary population using gray code
+    >>> string_length = grid.get_bits_per_variable().sum()
+    >>> gray_population = np.random.randint(2, size=(5, string_length), dtype=np.byte)
+    >>> print("Gray Code Population:", gray_population)
+    >>>
+    >>> # Transform the gray code population to a floating-point array
+    >>> transformed_population = grid.transform(gray_population)
+    >>> print("Transformed Population:", transformed_population)
+
+    >>> # Generate a floating-point population
+    >>> floating_population = np.random.rand(5, 3)
+    >>> print("Floating-point Population:", floating_population)
+    >>>
+    >>> # Inverse transform the floating-point population to a gray code array
+    >>> inverse_transformed_population = grid.inverse_transform(floating_population)
+    >>> print("Inverse Transformed Population (Gray Code):", inverse_transformed_population)
+    """
+
+    def __init__(self) -> None:
+        SamplingGrid.__init__(self)
+
+    @staticmethod
+    def gray_to_bit(gray_array: NDArray[np.byte]) -> NDArray[np.byte]:
+        """
+        Convert a gray code array to a binary array.
+
+        Parameters
+        ----------
+        gray_array : NDArray[np.byte]
+            2D array where each row represents a gray code number.
+
+        Returns
+        -------
+        NDArray[np.byte]
+            2D binary array converted from the gray code array.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from thefittest.utils.transformations import GrayCode
+        >>>
+        >>> # Example: Convert gray code array to binary array using GrayCode.gray_to_bit method
+        >>> gray_array = np.array([[1, 0, 1], [0, 1, 0]], dtype=np.byte)
+        >>> result = GrayCode.gray_to_bit(gray_array)
+        >>> print("Converted Binary Array:", result)
+        """
+        bit_array = np.logical_xor.accumulate(gray_array, axis=-1).astype(np.byte)
+        return bit_array
+
+    @staticmethod
+    def bit_to_gray(bit_array: NDArray[np.byte]) -> NDArray[np.byte]:
+        """
+        Convert a binary array to a gray code array.
+
+        Parameters
+        ----------
+        bit_array : NDArray[np.byte]
+            2D binary array where each row represents a binary number.
+
+        Returns
+        -------
+        NDArray[np.byte]
+            2D gray code array converted from the binary array.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from thefittest.utils.transformations import GrayCode
+        >>>
+        >>> # Example: Convert binary array to gray code array using GrayCode.bit_to_gray method
+        >>> binary_array = np.array([[1, 0, 1], [0, 1, 0]], dtype=np.byte)
+        >>> result = GrayCode.bit_to_gray(binary_array)
+        >>> print("Converted Gray Code Array:", result)
+        """
+        cut_gray = np.logical_xor(bit_array[:, :-1], bit_array[:, 1:])
+        gray_array = np.hstack([bit_array[:, 0].reshape(-1, 1), cut_gray])
+        return gray_array
+
+    def _decode(self, gray_array_i: NDArray[np.byte]) -> NDArray[np.int64]:
+        """
+        Decode a 2D gray code array representing a single variable into a 1D integer array.
+
+        Parameters
+        ----------
+        gray_array_i : NDArray[np.byte]
+            2D gray code array representing the variable. Each row corresponds to a gray code representation.
+
+        Returns
+        -------
+        NDArray[np.int64]
+            1D integer array decoded from the 2D gray code representation.
+
+        """
+        bit_array_i = self.gray_to_bit(gray_array_i)
+        int_convert = self.bit_to_int(bit_array_i, self._powers)
         return int_convert
 
-    def _float_to_bit(self, float_array: np.ndarray, left: np.ndarray, h: np.ndarray) -> np.ndarray:
+    def _float_to_bit(
+        self, float_array: NDArray[np.float64], left: NDArray[np.float64], h: NDArray[np.float64]
+    ) -> NDArray[np.byte]:
+        """
+        Convert a 1D floating-point array to a 2D gray code array based on the GrayCode parameters.
+
+        Parameters
+        ----------
+        float_array : NDArray[np.float64]
+            1D floating-point array to be converted to gray code.
+        left : NDArray[np.float64]
+            1D array representing the left boundary of the sampling grid used in the conversion process.
+        h : NDArray[np.float64]
+            1D array representing the step size of the sampling grid used in the conversion process.
+
+        Returns
+        -------
+        NDArray[np.byte]
+            2D gray code array converted from the 1D floating-point array.
+        """
         grid_number = (float_array - left) / h
         int_array = np.rint(grid_number)
-        bit_array = numpy_int_to_bit(int_array)
-        gray_array = numpy_bit_to_gray(bit_array)
+        bit_array = self.int_to_bit(int_array)
+        gray_array = self.bit_to_gray(bit_array)
         return gray_array
