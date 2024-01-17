@@ -255,14 +255,11 @@ def categorical_crossentropy3d(
     >>> from thefittest.utils.metrics import categorical_crossentropy3d
     >>>
     >>> # Generate example data
-    >>> target = np.array([[0., 1., 0.], [1., 0., 0.], [0., 0., 1.]])
+    >>> target = np.array([[0., 1., 0.], [1., 0., 0.], [0., 0., 1.]], dtype = np.float64)
     >>> predicted_3d = np.array([[[0.1, 0.9, 0.0], [0.8, 0.1, 0.1], [0.0, 0.1, 0.9]],
-    >>>                           [[0.2, 0.7, 0.1], [0.9, 0.05, 0.05], [0.3, 0.3, 0.4]]])
-    >>>
+    ...                           [[0.2, 0.7, 0.1], [0.9, 0.05, 0.05], [0.3, 0.3, 0.4]]], dtype = np.float64)
     >>> # Calculate cross-entropy for each row
-    >>> entropy_values = categorical_crossentropy3d(target, predicted_3d)
-    >>>
-    >>> print("Cross-Entropy values for each row:", entropy_values)
+    >>> print("Cross-Entropy values for each row:", categorical_crossentropy3d(target, predicted_3d))
     Cross-Entropy values for each row: ...
     """
 
@@ -297,12 +294,11 @@ def accuracy_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> n
     >>> import numpy as np
     >>> from thefittest.utils.metrics import accuracy_score
     >>> # Generate example data
-    >>> y_true = np.array([1, 0, 1, 1, 0], dtype = np.float64)
-    >>> y_predict = np.array([1, 0, 1, 0, 1], dtype = np.float64)
+    >>> y_true = np.array([1, 0, 1, 1, 0], dtype = np.int64)
+    >>> y_predict = np.array([1, 0, 1, 0, 1], dtype = np.int64)
     >>> # Calculate accuracy
-    >>> accuracy_value = accuracy_score(y_true, y_predict)
-    >>> print("Accuracy:", accuracy_value)
-    Accuracy: ...
+    >>> print("Accuracy:", accuracy_score(y_true, y_predict))
+    Accuracy: 0.6
     """
 
     comparison = y_true == y_predict
@@ -337,16 +333,13 @@ def accuracy_score2d(
     >>> from thefittest.utils.metrics import accuracy_score2d
     >>>
     >>> # Generate example data
-    >>> y_true = np.array([1, 0, 1, 1, 0])
+    >>> y_true = np.array([1, 0, 1, 1, 0], dtype = np.int64)
     >>> y_predict2d = np.array([[1, 0, 1, 1, 1],
     ...                         [0, 0, 1, 1, 0],
-    ...                         [1, 1, 0, 1, 0]])
+    ...                         [1, 1, 0, 1, 0]], dtype = np.int64)
     >>>
     >>> # Calculate accuracy score for each row
-    >>> accuracy_values = accuracy_score2d(y_true, y_predict2d)
-    >>>
-    >>> print("Accuracy scores for each row:", accuracy_values)
-    Accuracy scores for each row: ...
+    >>> print("Accuracy scores for each row:", accuracy_score2d(y_true, y_predict2d))
     """
 
     size = len(y_predict2d)
@@ -381,15 +374,16 @@ def confusion_matrix(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) ->
     >>> from thefittest.utils.metrics import confusion_matrix
     >>>
     >>> # Generate example data
-    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
-    >>> y_predict = np.array([0, 1, 2, 0, 2, 1, 0, 1, 2])
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2], dtype = np.int64)
+    >>> y_predict = np.array([0, 1, 2, 0, 2, 1, 0, 1, 2], dtype = np.int64)
     >>>
     >>> # Calculate confusion matrix
-    >>> matrix = confusion_matrix(y_true, y_predict)
-    >>>
     >>> print("Confusion Matrix:")
-    >>> print(matrix)
-    ...
+    Confusion Matrix:
+    >>> print(confusion_matrix(y_true, y_predict))
+    [[3 0 0]
+     [0 2 1]
+     [0 1 2]]
     """
 
     classes = np.unique(y_true)
@@ -425,13 +419,11 @@ def recall_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.
     >>> from thefittest.utils.metrics import recall_score
     >>>
     >>> # Generate example data
-    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
-    >>> y_predict = np.array([0, 1, 2, 0, 2, 1, 0, 1, 2])
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2], dtype = np.int64)
+    >>> y_predict = np.array([0, 1, 2, 0, 2, 1, 0, 1, 2], dtype = np.int64)
     >>>
     >>> # Calculate average recall score
-    >>> recall = recall_score(y_true, y_predict)
-    >>>
-    >>> print("Average Recall Score:", recall)
+    >>> print("Average Recall Score:", recall_score(y_true, y_predict))
     Average Recall Score: ...
     """
 
@@ -481,15 +473,12 @@ def recall_score2d(
     >>> from thefittest.utils.metrics import recall_score2d
     >>>
     >>> # Generate example data
-    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2], dtype = np.int64)
     >>> y_predict2d = np.array([[0, 1, 2, 0, 2],
     ...                         [2, 1, 0, 1, 2],
-    ...                         [0, 1, 2, 2, 1]])
-    >>>
+    ...                         [0, 1, 2, 2, 1]], dtype = np.int64)
     >>> # Compute recall scores for each prediction
-    >>> recall_values = recall_score2d(y_true, y_predict2d)
-    >>>
-    >>> print("Recall Scores for each Prediction:", recall_values)
+    >>> print("Recall Scores for each Prediction:", recall_score2d(y_true, y_predict2d))
     Recall Scores for each Prediction: ...
     """
 
@@ -525,13 +514,11 @@ def precision_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> 
     >>> from thefittest.utils.metrics import precision_score
     >>>
     >>> # Generate example data
-    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
-    >>> y_predict = np.array([0, 1, 2, 0, 2, 2, 0, 1, 1])
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2], dtype = np.int64)
+    >>> y_predict = np.array([0, 1, 2, 0, 2, 2, 0, 1, 1], dtype = np.int64)
     >>>
     >>> # Compute average precision score
-    >>> precision_value = precision_score(y_true, y_predict)
-    >>>
-    >>> print("Average Precision Score:", precision_value)
+    >>> print("Average Precision Score:", precision_score(y_true, y_predict))
     Average Precision Score: ...
     """
 
@@ -582,14 +569,12 @@ def precision_score2d(
     >>> from thefittest.utils.metrics import precision_score2d
     >>>
     >>> # Generate example data
-    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2], dtype = np.int64)
     >>> y_predict2d = np.array([[0, 1, 2, 0, 2, 2, 0, 1, 1],
-    ...                          [1, 0, 2, 0, 1, 2, 2, 1, 0]])
+    ...                          [1, 0, 2, 0, 1, 2, 2, 1, 0]], dtype = np.int64)
     >>>
     >>> # Compute precision scores for each prediction
-    >>> precision_values = precision_score2d(y_true, y_predict2d)
-    >>>
-    >>> print("Precision Scores for Each Prediction:", precision_values)
+    >>> print("Precision Scores for Each Prediction:", precision_score2d(y_true, y_predict2d))
     Precision Scores for Each Prediction: ...
     """
 
@@ -631,13 +616,11 @@ def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.floa
     >>> from thefittest.utils.metrics import f1_score
     >>>
     >>> # Generate example data
-    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
-    >>> y_predict = np.array([0, 1, 2, 0, 2, 2, 0, 1, 1])
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2], dtype = np.int64)
+    >>> y_predict = np.array([0, 1, 2, 0, 2, 2, 0, 1, 1], dtype = np.int64)
     >>>
     >>> # Calculate F1-score
-    >>> f1_value = f1_score(y_true, y_predict)
-    >>>
-    >>> print("F1-score:", f1_value)
+    >>> print("F1-score:", f1_score(y_true, y_predict))
     F1-score: ...
     """
 
@@ -689,13 +672,11 @@ def f1_score2d(y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]) -> NDA
     >>> from thefittest.utils.metrics import f1_score2d
     >>>
     >>> # Generate example data
-    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2])
-    >>> y_predict2d = np.array([[0, 1, 2, 0, 1, 2, 0, 1, 2], [0, 1, 2, 0, 2, 1, 2, 1, 0], [0, 1, 2, 0, 1, 2, 1, 2, 0]])
+    >>> y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2], dtype = np.int64)
+    >>> y_predict2d = np.array([[0, 1, 2, 0, 1, 2, 0, 1, 2], [0, 1, 2, 0, 2, 1, 2, 1, 0], [0, 1, 2, 0, 1, 2, 1, 2, 0]], dtype = np.int64)
     >>>
     >>> # Calculate F1 score for each prediction
-    >>> f1_values = f1_score2d(y_true, y_predict2d)
-    >>>
-    >>> print("F1 scores for each prediction:", f1_values)
+    >>> print("F1 scores for each prediction:", f1_score2d(y_true, y_predict2d))
     F1 scores for each prediction: ...
     """
 

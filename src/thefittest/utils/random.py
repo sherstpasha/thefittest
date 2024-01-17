@@ -46,6 +46,7 @@ def sattolo_shuffle(items: Union[List, NDArray]) -> None:
     >>> my_list = [1, 2, 3, 4, 5]
     >>> sattolo_shuffle(my_list)
     >>> print("Shuffled List:", my_list)
+    Shuffled List: ...
     >>>
     >>> # Example with a NumPy array
     >>> my_array = np.array([1, 2, 3, 4, 5])
@@ -91,8 +92,8 @@ def cauchy_distribution(loc: np.float64, scale: np.float64, size: np.int64) -> N
     >>> size_value = 10
     >>> cauchy_result = cauchy_distribution(loc_value, scale_value, size_value)
     >>>
-    >>> print("Cauchy Distribution Result:\\n", cauchy_result)
-    Cauchy Distribution Result:\\n ...
+    >>> print("Cauchy Distribution Result:", cauchy_result)
+    Cauchy Distribution Result: ...
     """
 
     x_ = np.random.standard_cauchy(size=size).astype(np.float64)
@@ -129,10 +130,12 @@ def random_weighted_sample(
     >>> weights = np.array([0.3, 0.2, 0.5])
     >>> sampled_indices = random_weighted_sample(weights, quantity=2, replace=True)
     >>> print("Sampled Indices:", sampled_indices)
+    Sampled Indices: ...
     >>>
     >>> # Example without replacement
     >>> sampled_indices_no_replace = random_weighted_sample(weights, quantity=2, replace=False)
     >>> print("Sampled Indices (No Replace):", sampled_indices_no_replace)
+    Sampled Indices (No Replace): ...
     """
 
     if not replace:
@@ -183,10 +186,12 @@ def random_sample(
     >>> # Example with replacement
     >>> sampled_indices = random_sample(range_size=10, quantity=3, replace=True)
     >>> print("Sampled Indices:", sampled_indices)
+    Sampled Indices: ...
     >>>
     >>> # Example without replacement
     >>> sampled_indices_no_replace = random_sample(range_size=10, quantity=3, replace=False)
     >>> print("Sampled Indices (No Replace):", sampled_indices_no_replace)
+    Sampled Indices (No Replace): ...
     """
 
     if not replace:
@@ -231,7 +236,9 @@ def stratified_sample(data: NDArray[np.int64], sample_ratio: float) -> NDArray[n
     >>> sample_ratio = 0.8
     >>> sampled_indices = stratified_sample(data, sample_ratio)
     >>> print("Stratified Sampled Indices:", sampled_indices)
+    Stratified Sampled Indices: ...
     >>> print("Stratified Sampled Values:", data[sampled_indices])
+    Stratified Sampled Values: ...
     """
 
     sample = []
@@ -289,9 +296,13 @@ def train_test_split_stratified(
     >>> test_size = 0.25
     >>> X_train, X_test, y_train, y_test = train_test_split_stratified(X, y, test_size)
     >>> print("X_train:", X_train)
+    X_train: ...
     >>> print("X_test:", X_test)
+    X_test: ...
     >>> print("y_train:", y_train)
+    y_train: ...
     >>> print("y_test:", y_test)
+    y_test: ...
     """
 
     indexes = np.arange(len(y), dtype=np.int64)
@@ -343,9 +354,13 @@ def train_test_split(
     >>> test_size = 0.25
     >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size)
     >>> print("X_train:", X_train)
+    X_train: ...
     >>> print("X_test:", X_test)
+    X_test: ...
     >>> print("y_train:", y_train)
+    y_train: ...
     >>> print("y_test:", y_test)
+    y_test: ...
     """
 
     data_size = len(X)

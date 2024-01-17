@@ -1,6 +1,7 @@
 import numpy as np
 
 from thefittest.utils.transformations import SamplingGrid
+from thefittest.utils.transformations import GrayCode
 
 
 def test_sampling_grid_fit():
