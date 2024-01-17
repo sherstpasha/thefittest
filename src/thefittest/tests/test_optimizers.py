@@ -12,7 +12,7 @@
 # from ..optimizers import SelfCGA
 # from ..optimizers import SelfCGP
 # from ..optimizers import jDE
-# from ..utils.metrics import coefficient_determination
+# from ..utils._metrics import coefficient_determination
 # from ..base._tree import Add
 # from ..base._tree import Div
 # from ..base._tree import Mul

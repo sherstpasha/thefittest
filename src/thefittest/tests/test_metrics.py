@@ -1,20 +1,20 @@
 # import numpy as np
 
-# from thefittest.utils.metrics import root_mean_square_error
-# from thefittest.utils.metrics import root_mean_square_error2d
-# from thefittest.utils.metrics import coefficient_determination
-# from thefittest.utils.metrics import coefficient_determination2d
-# from thefittest.utils.metrics import categorical_crossentropy
-# from thefittest.utils.metrics import categorical_crossentropy3d
-# from thefittest.utils.metrics import accuracy_score
-# from thefittest.utils.metrics import accuracy_score2d
-# from thefittest.utils.metrics import confusion_matrix
-# from thefittest.utils.metrics import recall_score
-# from thefittest.utils.metrics import recall_score2d
-# from thefittest.utils.metrics import precision_score
-# from thefittest.utils.metrics import precision_score2d
-# from thefittest.utils.metrics import f1_score
-# from thefittest.utils.metrics import f1_score2d
+# from thefittest.utils._metrics import root_mean_square_error
+# from thefittest.utils._metrics import root_mean_square_error2d
+# from thefittest.utils._metrics import coefficient_determination
+# from thefittest.utils._metrics import coefficient_determination2d
+# from thefittest.utils._metrics import categorical_crossentropy
+# from thefittest.utils._metrics import categorical_crossentropy3d
+# from thefittest.utils._metrics import accuracy_score
+# from thefittest.utils._metrics import accuracy_score2d
+# from thefittest.utils._metrics import confusion_matrix
+# from thefittest.utils._metrics import recall_score
+# from thefittest.utils._metrics import recall_score2d
+# from thefittest.utils._metrics import precision_score
+# from thefittest.utils._metrics import precision_score2d
+# from thefittest.utils._metrics import f1_score
+# from thefittest.utils._metrics import f1_score2d
 
 
 # def test_root_mean_square_error():

@@ -19,7 +19,7 @@ from ..optimizers import GeneticProgramming
 from ..optimizers import SHADE
 from ..optimizers import SelfCGP
 from ..regressors._mlpearegressor import fitness_function as evaluate_nets
-from ..utils.metrics import root_mean_square_error2d
+from ..utils._metrics import root_mean_square_error2d
 from ..utils.random import train_test_split
 
 

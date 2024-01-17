@@ -19,7 +19,7 @@ from ..optimizers import SHAGA
 from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
-from ..utils.metrics import coefficient_determination
+from ..utils._metrics import coefficient_determination
 
 
 def fitness_function(trees: NDArray, y: NDArray[np.float64]) -> NDArray[np.float64]:

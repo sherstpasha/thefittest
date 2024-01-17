@@ -14,7 +14,7 @@ from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
 from ..optimizers import DifferentialEvolution
 from ..optimizers import SHADE
 from ..optimizers import jDE
-from ..utils.metrics import root_mean_square_error2d
+from ..utils._metrics import root_mean_square_error2d
 from ..utils.transformations import GrayCode
 
 

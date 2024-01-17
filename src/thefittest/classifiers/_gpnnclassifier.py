@@ -28,7 +28,7 @@ from ..optimizers import SHAGA
 from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
-from ..utils.metrics import categorical_crossentropy3d
+from ..utils._metrics import categorical_crossentropy3d
 from ..utils.random import train_test_split_stratified
 from ..utils.transformations import GrayCode
 
