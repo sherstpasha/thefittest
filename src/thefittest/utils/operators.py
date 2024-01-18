@@ -15,7 +15,6 @@ from numpy.typing import NDArray
 from .random import random_sample
 from .random import random_weighted_sample
 from .random import sattolo_shuffle
-from .transformations import common_region
 from ..base import EphemeralNode
 from ..base import FunctionalNode
 from ..base import TerminalNode
@@ -471,7 +470,7 @@ def one_point_crossoverGP(
 ) -> Tree:
     individ_1 = individs[0]
     individ_2 = individs[1]
-    common_indexes, _ = common_region([individ_1, individ_2])
+    common_indexes, _ = individ_1.get_common_region([individ_2])
 
     point = random.randrange(len(common_indexes[0]))
     first_point = common_indexes[0][point]
@@ -492,7 +491,7 @@ def uniform_crossoverGP(
     Properties of Different Crossover Operators in Genetic Programming."""
     to_return = Tree([], [])
     new_n_args = []
-    common, border = common_region(individs)
+    common, border = individs[0].get_common_region(individs[1:])
     pool = random_sample(range_size=len(fitness), quantity=len(common[0]), replace=True)
     for i, common_0_i in enumerate(common[0]):
         j = pool[i]
@@ -515,7 +514,7 @@ def uniform_prop_crossover_GP(
 ) -> Tree:
     to_return = Tree([], [])
     new_n_args = []
-    common, border = common_region(individs)
+    common, border = individs[0].get_common_region(individs[1:])
     pool = random_weighted_sample(weights=fitness, quantity=len(common[0]), replace=True)
     for i, common_0_i in enumerate(common[0]):
         j = pool[i]
@@ -538,7 +537,7 @@ def uniform_rank_crossover_GP(
 ) -> Tree:
     to_return = Tree([], [])
     new_n_args = []
-    common, border = common_region(individs)
+    common, border = individs[0].get_common_region(individs[1:])
     pool = random_weighted_sample(weights=rank, quantity=len(common[0]), replace=True)
 
     for i, common_0_i in enumerate(common[0]):
@@ -562,7 +561,7 @@ def uniform_tour_crossover_GP(
 ) -> Tree:
     to_return = Tree([], [])
     new_n_args = []
-    common, border = common_region(individs)
+    common, border = individs[0].get_common_region(individs[1:])
     pool = tournament_selection(fitness, rank, 2, len(common[0]))
 
     for i, common_0_i in enumerate(common[0]):

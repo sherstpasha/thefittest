@@ -5,5 +5,6 @@ utils
    :maxdepth: 2
 
    operators
+   selections
    random
    transformations

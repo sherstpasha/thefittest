@@ -19,6 +19,8 @@ from ._net import HiddenBlock
 from ..utils import find_end_subtree_from_i
 from ..utils import find_id_args_from_i
 from ..utils import get_levels_tree_from_i
+from ..utils import common_region
+from ..utils import common_region_two_trees
 from ..utils.random import random_weighted_sample
 
 MIN_VALUE = np.finfo(np.float64).min
@@ -262,6 +264,15 @@ class Tree:
         to_return._n_args = np.r_[
             to_return._n_args[:left], other_tree._n_args.copy(), to_return._n_args[right:]
         ]
+        return to_return
+
+    def get_common_region(self, other_trees: Union[List, NDArray]) -> Tuple:
+        if len(other_trees) == 1:
+            to_return = common_region_two_trees(self._n_args, other_trees[0]._n_args)
+        else:
+            trees = [self] + other_trees
+            to_return = common_region(trees)
+
         return to_return
 
     def get_args_id(self, index: int) -> NDArray[np.int64]:

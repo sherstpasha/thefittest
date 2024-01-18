@@ -1,12 +1,12 @@
+from thefittest.utils.selections import proportional_selection
 import numpy as np
-from thefittest.utils._metrics import f1_score2d
 
-# Generate example data
-y_true = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2], dtype=np.int64)
-y_predict2d = np.array(
-    [[0, 1, 2, 0, 1, 2, 0, 1, 2], [0, 1, 2, 0, 2, 1, 2, 1, 0], [0, 1, 2, 0, 1, 2, 1, 2, 0]],
-    dtype=np.int64,
+# Example
+fitness_values = np.array([0.8, 0.5, 0.9, 0.3], dtype=np.float64)
+rank_values = np.array([3, 2, 4, 1], dtype=np.float64)
+tournament_size = 2
+num_selected = 2
+selected_individuals = proportional_selection(
+    fitness_values, rank_values, tournament_size, num_selected
 )
-
-# Calculate F1 score for each prediction
-print("F1 scores for each prediction:", f1_score2d(y_true, y_predict2d))
+print("Selected Individuals:", selected_individuals)

@@ -1,122 +1,10 @@
 from __future__ import annotations
 
-from typing import List
 from typing import Optional
-from typing import Tuple
 from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
-
-from ..utils import find_end_subtree_from_i
-from ..utils import find_first_difference_between_two
-
-"""в этом модуле:
-1. Заменить самплинг грид и грей код (готово). 
-1.1 Добавть им тесты 
-1.2 адаптировать остальной код под новые модули
-2. спрятать common_region оставив только один (может вообще отдать классу?)
-3. Использовать rank_data из scipy вместо своей реализации
-4. удалить висящие методы кодирования
-5. scale data пока не трогать потом вместо него будет аналог из sklearn  """
-
-
-def common_region(trees: Union[List, NDArray]) -> Tuple:
-    terminate = False
-    indexes = []
-    common_indexes: List[List[int]] = []
-    border_indexes: List[List[int]] = []
-    for tree in trees:
-        indexes.append(list(range(len(tree._nodes))))
-        common_indexes.append([])
-        border_indexes.append([])
-
-    while not terminate:
-        inner_break = False
-        iters = min(list(map(len, indexes)))
-
-        for i in range(iters):
-            first_n_args = trees[0]._nodes[indexes[0][i]]._n_args
-            common_indexes[0].append(indexes[0][i])
-            for j in range(1, len(indexes)):
-                common_indexes[j].append(indexes[j][i])
-                if first_n_args != trees[j]._nodes[indexes[j][i]]._n_args:
-                    inner_break = True
-
-            if inner_break:
-                for j in range(0, len(indexes)):
-                    border_indexes[j].append(indexes[j][i])
-                break
-
-        for j in range(len(indexes)):
-            _, right = trees[j].subtree_id(common_indexes[j][-1])
-            delete_to = indexes[j].index(right - 1) + 1
-            indexes[j] = indexes[j][delete_to:]
-
-            if len(indexes[j]) < 1:
-                terminate = True
-                break
-
-    return common_indexes, border_indexes
-
-
-def common_region_two_trees(
-    n_args_array_1: NDArray[np.int64], n_args_array_2: NDArray[np.int64]
-) -> Tuple:
-    index_list_1 = range(len(n_args_array_1))
-    index_list_2 = range(len(n_args_array_2))
-    index_1 = np.int64(0)
-    index_2 = np.int64(0)
-
-    common_1: List[List[int]] = []
-    common_2: List[List[int]] = []
-    border_1 = []
-    border_2 = []
-
-    while True:
-        if index_1 < len(n_args_array_1) and index_2 < len(n_args_array_2):
-            id_1 = index_1
-            id_2 = index_2
-            end = find_first_difference_between_two(n_args_array_1[id_1:], n_args_array_2[id_2:])
-            index_1 = index_1 + end
-            index_2 = index_2 + end
-            common_1.extend(index_list_1[id_1 : index_1 + 1])
-            common_2.extend(index_list_2[id_2 : index_2 + 1])
-
-        if len(n_args_array_1) - 1 > index_1 or len(n_args_array_2) - 1 > index_2:
-            border_1.append(index_1)
-            border_2.append(index_2)
-            index_1 = find_end_subtree_from_i(index_1, n_args_array_1)
-            index_2 = find_end_subtree_from_i(index_2, n_args_array_2)
-        else:
-            break
-
-    return [common_1, common_2], [border_1, border_2]
-
-
-def common_region_(trees: Union[List, NDArray]) -> Tuple:
-    if len(trees) == 2:
-        to_return = common_region_two_trees(trees[0]._n_args, trees[1]._n_args)
-    else:
-        to_return = common_region_(trees)
-
-    return to_return
-
-
-def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
-    arange = np.arange(len(arr), dtype=np.int64)
-
-    argsort = np.argsort(arr)
-    arr_sorted = arr.copy()[argsort]
-
-    cond = np.r_[True, arr_sorted[1:] != arr_sorted[:-1]]
-    raw_ranks = np.r_[arange[cond == True], len(arange)]
-    ranks = (raw_ranks[1:] + raw_ranks[:-1] + 1) / 2
-    count = raw_ranks[1:] - raw_ranks[:-1]
-
-    results = np.empty_like(arr, dtype=np.float64)
-    results[argsort] = ranks.repeat(count)
-    return results
 
 
 def scale_data(data: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
@@ -401,21 +289,21 @@ class SamplingGrid:
         >>> print("Bits per Variable:", grid.get_bits_per_variable())
         Bits per Variable: [ 8 16  3 40]
         """
-        assert (bits_per_variable is None) != (
-            h_per_variable is None
-        ), "Either bits_per_variable or h_per_variable must be defined, but not both."
-
         self._num_variables = num_variables
         self._left_border = self._if_single_or_array_to_float_array(left_border)
         self._right_border = self._if_single_or_array_to_float_array(right_border)
 
-        if bits_per_variable is None:
+        if bits_per_variable is None and h_per_variable is not None:
             self._h_per_variable = self._if_single_or_array_to_float_array(h_per_variable)
             self._culc_num_bits_from_h()
             self._culc_h_from_num_bits()
-        else:
+        elif bits_per_variable is not None and h_per_variable is None:
             self._bits_per_variable = self._if_single_or_array_to_int_array(bits_per_variable)
             self._culc_h_from_num_bits()
+        else:
+            raise ValueError(
+                "Either bits_per_variable or h_per_variable must be defined, but not both."
+            )
 
         self._powers = 2 ** np.arange(self._bits_per_variable.max(), dtype=np.int64)
 
@@ -452,7 +340,7 @@ class SamplingGrid:
 
     def _if_single_or_array_to_int_array(
         self, single_or_array: Union[float, int, np.number, NDArray[np.number]]
-    ) -> NDArray[np.float64]:
+    ) -> NDArray[np.int64]:
         """
         Convert a single value or an array to a 1D int array.
 
@@ -555,40 +443,39 @@ class SamplingGrid:
     @staticmethod
     def int_to_bit(
         int_array: NDArray[np.int64], powers: Optional[NDArray[np.int64]] = None
-    ) -> NDArray[np.byte]:
+    ) -> NDArray[np.int8]:
         """
-              Convert a 1D integer array to a 2D binary array.
+        Convert a 1D integer array to a 2D binary array.
 
-              Parameters
-              ----------
-              int_array : NDArray[np.int64]
-                  1D array of integers to be converted to binary.
-              powers : Optional[NDArray[np.int64]], optional
-                  1D array of powers of 2 corresponding to the binary places. If provided, avoids recalculation.
+        Parameters
+        ----------
+        int_array : NDArray[np.int64]
+            1D array of integers to be converted to binary.
+        powers : Optional[NDArray[np.int64]], optional
+            1D array of powers of 2 corresponding to the binary places. If provided, avoids recalculation.
 
-              Returns
-              -------
-              NDArray[np.byte]
-                  2D binary array converted from the 1D integer array.
+        Returns
+        -------
+        NDArray[np.byte]
+            2D binary array converted from the 1D integer array.
 
-              Examples
-              --------
-           >>> import numpy as np
-           >>> from thefittest.utils.transformations import SamplingGrid
-           >>>
-           >>> # Example 1: Convert one-dimensional integer array to binary array
-           >>> integer_array = np.array([5, 3], dtype=np.int64)
-           >>> result = SamplingGrid.int_to_bit(integer_array)
-           >>> print("Converted Binary Array:", result)
-           Converted Binary Array: [[1 0 1]
-        [0 1 1]]
-           >>>
-           >>> # Example 2: Convert one-dimensional integer array to binary array with powers
-           >>> custom_powers = np.array([1, 2, 4], dtype=np.int64)
-           >>> integer_array = np.array([5, 3], dtype=np.int64)
-           >>> result_custom_powers = SamplingGrid.int_to_bit(integer_array, powers=custom_powers)
-           >>> print("Converted Binary Array (Define Powers):", result_custom_powers)
-           Converted Binary Array (Define Powers): ...
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>>
+        >>> # Example 1: Convert one-dimensional integer array to binary array
+        >>> integer_array = np.array([5, 3], dtype=np.int64)
+        >>> result = SamplingGrid.int_to_bit(integer_array)
+        >>> print("Converted Binary Array:", result)
+        Converted Binary Array: ...
+        >>>
+        >>> # Example 2: Convert one-dimensional integer array to binary array with powers
+        >>> custom_powers = np.array([1, 2, 4], dtype=np.int64)
+        >>> integer_array = np.array([5, 3], dtype=np.int64)
+        >>> result_custom_powers = SamplingGrid.int_to_bit(integer_array, powers=custom_powers)
+        >>> print("Converted Binary Array (Define Powers):", result_custom_powers)
+        Converted Binary Array (Define Powers): ...
         """
         num_bits = int(np.ceil(np.log2(np.max(int_array) + 1)))
         bit_array = np.empty(shape=(int_array.shape[0], num_bits), dtype=np.int8)
@@ -596,7 +483,7 @@ class SamplingGrid:
         if powers is None:
             powers = 2 ** np.arange(num_bits, dtype=np.int64)
 
-        reversed_powers = np.flip(powers)
+        reversed_powers = np.flip(powers[:num_bits])
 
         int_array = int_array.astype(np.int64)
 
@@ -606,7 +493,7 @@ class SamplingGrid:
 
     def _float_to_bit(
         self, float_array: NDArray[np.float64], left: NDArray[np.float64], h: NDArray[np.float64]
-    ) -> np.int8:
+    ) -> NDArray[np.int8]:
         """
         Convert a 1D floating-point array to a 2D binary array based on the SamplingGrid parameters.
 
@@ -627,7 +514,6 @@ class SamplingGrid:
         Notes
         -----
         This function internally relies on the `int_to_bit` method to convert floating-point numbers to their binary representation.
-
         """
         grid_number = (float_array - left) / h
         int_array = np.rint(grid_number)
@@ -815,29 +701,28 @@ class GrayCode(SamplingGrid):
     @staticmethod
     def gray_to_bit(gray_array: NDArray[np.byte]) -> NDArray[np.byte]:
         """
-           Convert a gray code array to a binary array.
+        Convert a gray code array to a binary array.
 
-           Parameters
-           ----------
-           gray_array : NDArray[np.byte]
-               2D array where each row represents a gray code number.
+        Parameters
+        ----------
+        gray_array : NDArray[np.byte]
+            2D array where each row represents a gray code number.
 
-           Returns
-           -------
-           NDArray[np.byte]
-               2D binary array converted from the gray code array.
+        Returns
+        -------
+        NDArray[np.byte]
+            2D binary array converted from the gray code array.
 
-           Examples
-           --------
-           >>> import numpy as np
-           >>> from thefittest.utils.transformations import GrayCode
-           >>>
-           >>> # Example: Convert gray code array to binary array using GrayCode.gray_to_bit method
-           >>> gray_array = np.array([[1, 0, 1], [0, 1, 0]], dtype=np.byte)
-           >>> result = GrayCode.gray_to_bit(gray_array)
-           >>> print("Converted Binary Array:", result)
-           Converted Binary Array: [[1 1 0]
-        [0 1 1]]
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from thefittest.utils.transformations import GrayCode
+        >>>
+        >>> # Example: Convert gray code array to binary array using GrayCode.gray_to_bit method
+        >>> gray_array = np.array([[1, 0, 1], [0, 1, 0]], dtype=np.byte)
+        >>> result = GrayCode.gray_to_bit(gray_array)
+        >>> print("Converted Binary Array:", result)
+        Converted Binary Array: ...
         """
         bit_array = np.logical_xor.accumulate(gray_array, axis=-1).astype(np.byte)
         return bit_array
@@ -845,29 +730,28 @@ class GrayCode(SamplingGrid):
     @staticmethod
     def bit_to_gray(bit_array: NDArray[np.byte]) -> NDArray[np.byte]:
         """
-           Convert a binary array to a gray code array.
+        Convert a binary array to a gray code array.
 
-           Parameters
-           ----------
-           bit_array : NDArray[np.byte]
-               2D binary array where each row represents a binary number.
+        Parameters
+        ----------
+        bit_array : NDArray[np.byte]
+            2D binary array where each row represents a binary number.
 
-           Returns
-           -------
-           NDArray[np.byte]
-               2D gray code array converted from the binary array.
+        Returns
+        -------
+        NDArray[np.byte]
+            2D gray code array converted from the binary array.
 
-           Examples
-           --------
-           >>> import numpy as np
-           >>> from thefittest.utils.transformations import GrayCode
-           >>>
-           >>> # Example: Convert binary array to gray code array using GrayCode.bit_to_gray method
-           >>> binary_array = np.array([[1, 0, 1], [0, 1, 0]], dtype=np.byte)
-           >>> result = GrayCode.bit_to_gray(binary_array)
-           >>> print("Converted Gray Code Array:", result)
-           Converted Gray Code Array: [[1 1 1]
-        [0 1 1]]
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from thefittest.utils.transformations import GrayCode
+        >>>
+        >>> # Example: Convert binary array to gray code array using GrayCode.bit_to_gray method
+        >>> binary_array = np.array([[1, 0, 1], [0, 1, 0]], dtype=np.byte)
+        >>> result = GrayCode.bit_to_gray(binary_array)
+        >>> print("Converted Gray Code Array:", result)
+        Converted Gray Code Array: ...
         """
         cut_gray = np.logical_xor(bit_array[:, :-1], bit_array[:, 1:])
         gray_array = np.hstack([bit_array[:, 0].reshape(-1, 1), cut_gray])

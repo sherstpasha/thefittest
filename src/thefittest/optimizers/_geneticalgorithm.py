@@ -11,6 +11,8 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from scipy.stats import rankdata
+
 from ..base import Tree
 from ..base._ea import EvolutionaryAlgorithm
 from ..utils.operators import empty_crossover
@@ -34,7 +36,6 @@ from ..utils.operators import uniform_rank_crossover
 from ..utils.operators import uniform_rank_crossover_GP
 from ..utils.operators import uniform_tour_crossover
 from ..utils.operators import uniform_tour_crossover_GP
-from ..utils.transformations import rank_data
 from ..utils.transformations import scale_data
 
 
@@ -214,6 +215,6 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         super()._from_population_g_to_fitness()
 
         self._fitness_scale_i = scale_data(self._fitness_i)
-        self._fitness_rank_i = rank_data(self._fitness_i)
+        self._fitness_rank_i = rankdata(self._fitness_i)
 
         self._adapt()

@@ -1,4 +1,6 @@
 from typing import Tuple
+from typing import List
+from typing import Union
 
 from numba import boolean
 from numba import float64
@@ -9,6 +11,79 @@ from numba.types import List as numbaListType
 
 import numpy as np
 from numpy.typing import NDArray
+
+
+def common_region(trees: Union[List, NDArray]) -> Tuple:
+    terminate = False
+    indexes = []
+    common_indexes: List[List[int]] = []
+    border_indexes: List[List[int]] = []
+    for tree in trees:
+        indexes.append(list(range(len(tree._nodes))))
+        common_indexes.append([])
+        border_indexes.append([])
+
+    while not terminate:
+        inner_break = False
+        iters = min(list(map(len, indexes)))
+
+        for i in range(iters):
+            first_n_args = trees[0]._nodes[indexes[0][i]]._n_args
+            common_indexes[0].append(indexes[0][i])
+            for j in range(1, len(indexes)):
+                common_indexes[j].append(indexes[j][i])
+                if first_n_args != trees[j]._nodes[indexes[j][i]]._n_args:
+                    inner_break = True
+
+            if inner_break:
+                for j in range(0, len(indexes)):
+                    border_indexes[j].append(indexes[j][i])
+                break
+
+        for j in range(len(indexes)):
+            _, right = trees[j].subtree_id(common_indexes[j][-1])
+            delete_to = indexes[j].index(right - 1) + 1
+            indexes[j] = indexes[j][delete_to:]
+
+            if len(indexes[j]) < 1:
+                terminate = True
+                break
+
+    return common_indexes, border_indexes
+
+
+def common_region_two_trees(
+    n_args_array_1: NDArray[np.int64], n_args_array_2: NDArray[np.int64]
+) -> Tuple:
+    index_list_1 = range(len(n_args_array_1))
+    index_list_2 = range(len(n_args_array_2))
+    index_1 = np.int64(0)
+    index_2 = np.int64(0)
+
+    common_1: List[List[int]] = []
+    common_2: List[List[int]] = []
+    border_1 = []
+    border_2 = []
+
+    while True:
+        if index_1 < len(n_args_array_1) and index_2 < len(n_args_array_2):
+            id_1 = index_1
+            id_2 = index_2
+            end = find_first_difference_between_two(n_args_array_1[id_1:], n_args_array_2[id_2:])
+            index_1 = index_1 + end
+            index_2 = index_2 + end
+            common_1.extend(index_list_1[id_1 : index_1 + 1])
+            common_2.extend(index_list_2[id_2 : index_2 + 1])
+
+        if len(n_args_array_1) - 1 > index_1 or len(n_args_array_2) - 1 > index_2:
+            border_1.append(index_1)
+            border_2.append(index_2)
+            index_1 = find_end_subtree_from_i(index_1, n_args_array_1)
+            index_2 = find_end_subtree_from_i(index_2, n_args_array_2)
+        else:
+            break
+
+    return [common_1, common_2], [border_1, border_2]
 
 
 @njit(int64(int64, int64[:]))
