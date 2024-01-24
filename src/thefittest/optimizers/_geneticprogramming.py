@@ -29,7 +29,7 @@ class GeneticProgramming(GeneticAlgorithm):
         parents_num: int = 7,
         elitism: bool = True,
         selection: str = "rank",
-        crossover: str = "gp_standart",
+        crossover: str = "gp_standard",
         mutation: str = "gp_weak_grow",
         max_level: int = 16,
         init_level: int = 5,

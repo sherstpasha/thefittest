@@ -14,13 +14,13 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..base._ea import EvolutionaryAlgorithm
-from ..utils.operators import best_1
-from ..utils.operators import best_2
-from ..utils.operators import binomial
-from ..utils.operators import current_to_best_1
-from ..utils.operators import rand_1
-from ..utils.operators import rand_2
-from ..utils.operators import rand_to_best1
+from ..utils.mutations import best_1
+from ..utils.mutations import best_2
+from ..utils.crossovers import binomial
+from ..utils.mutations import current_to_best_1
+from ..utils.mutations import rand_1
+from ..utils.mutations import rand_2
+from ..utils.mutations import rand_to_best1
 
 
 @njit(float64[:](float64[:], float64[:], float64[:]))

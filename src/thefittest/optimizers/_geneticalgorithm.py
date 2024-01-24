@@ -15,27 +15,28 @@ from scipy.stats import rankdata
 
 from ..base import Tree
 from ..base._ea import EvolutionaryAlgorithm
-from ..utils.operators import empty_crossover
-from ..utils.operators import flip_mutation
-from ..utils.operators import growing_mutation
-from ..utils.operators import one_point_crossover
-from ..utils.operators import one_point_crossoverGP
-from ..utils.operators import point_mutation
-from ..utils.operators import proportional_selection
-from ..utils.operators import rank_selection
-from ..utils.operators import shrink_mutation
-from ..utils.operators import standart_crossover
-from ..utils.operators import swap_mutation
-from ..utils.operators import tournament_selection
-from ..utils.operators import two_point_crossover
-from ..utils.operators import uniform_crossover
-from ..utils.operators import uniform_crossoverGP
-from ..utils.operators import uniform_prop_crossover
-from ..utils.operators import uniform_prop_crossover_GP
-from ..utils.operators import uniform_rank_crossover
-from ..utils.operators import uniform_rank_crossover_GP
-from ..utils.operators import uniform_tour_crossover
-from ..utils.operators import uniform_tour_crossover_GP
+from ..utils.crossovers import empty_crossover
+from ..utils.crossovers import empty_crossoverGP
+from ..utils.mutations import flip_mutation
+from ..utils.mutations import growing_mutation
+from ..utils.crossovers import one_point_crossover
+from ..utils.crossovers import one_point_crossoverGP
+from ..utils.mutations import point_mutation
+from ..utils.selections import proportional_selection
+from ..utils.selections import rank_selection
+from ..utils.mutations import shrink_mutation
+from ..utils.crossovers import standard_crossover
+from ..utils.mutations import swap_mutation
+from ..utils.selections import tournament_selection
+from ..utils.crossovers import two_point_crossover
+from ..utils.crossovers import uniform_crossover
+from ..utils.crossovers import uniform_crossoverGP
+from ..utils.crossovers import uniform_proportional_crossover
+from ..utils.crossovers import uniform_proportional_crossover_GP
+from ..utils.crossovers import uniform_rank_crossover
+from ..utils.crossovers import uniform_rank_crossover_GP
+from ..utils.crossovers import uniform_tournament_crossover
+from ..utils.crossovers import uniform_tournament_crossover_GP
 from ..utils.transformations import scale_data
 
 
@@ -109,29 +110,30 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             "uniform_2": (uniform_crossover, 2),
             "uniform_7": (uniform_crossover, 7),
             "uniform_k": (uniform_crossover, self._parents_num),
-            "uniform_prop_2": (uniform_prop_crossover, 2),
-            "uniform_prop_7": (uniform_prop_crossover, 7),
-            "uniform_prop_k": (uniform_prop_crossover, self._parents_num),
+            "uniform_prop_2": (uniform_proportional_crossover, 2),
+            "uniform_prop_7": (uniform_proportional_crossover, 7),
+            "uniform_prop_k": (uniform_proportional_crossover, self._parents_num),
             "uniform_rank_2": (uniform_rank_crossover, 2),
             "uniform_rank_7": (uniform_rank_crossover, 7),
             "uniform_rank_k": (uniform_rank_crossover, self._parents_num),
-            "uniform_tour_3": (uniform_tour_crossover, 3),
-            "uniform_tour_7": (uniform_tour_crossover, 7),
-            "uniform_tour_k": (uniform_tour_crossover, self._parents_num),
-            "gp_standart": (standart_crossover, 2),
+            "uniform_tour_3": (uniform_tournament_crossover, 3),
+            "uniform_tour_7": (uniform_tournament_crossover, 7),
+            "uniform_tour_k": (uniform_tournament_crossover, self._parents_num),
+            "gp_empty": (empty_crossoverGP, 1),
+            "gp_standard": (standard_crossover, 2),
             "gp_one_point": (one_point_crossoverGP, 2),
             "gp_uniform_2": (uniform_crossoverGP, 2),
             "gp_uniform_7": (uniform_crossoverGP, 7),
             "gp_uniform_k": (uniform_crossoverGP, self._parents_num),
-            "gp_uniform_prop_2": (uniform_prop_crossover_GP, 2),
-            "gp_uniform_prop_7": (uniform_prop_crossover_GP, 7),
-            "gp_uniform_prop_k": (uniform_prop_crossover_GP, self._parents_num),
+            "gp_uniform_prop_2": (uniform_proportional_crossover_GP, 2),
+            "gp_uniform_prop_7": (uniform_proportional_crossover_GP, 7),
+            "gp_uniform_prop_k": (uniform_proportional_crossover_GP, self._parents_num),
             "gp_uniform_rank_2": (uniform_rank_crossover_GP, 2),
             "gp_uniform_rank_7": (uniform_rank_crossover_GP, 7),
             "gp_uniform_rank_k": (uniform_rank_crossover_GP, self._parents_num),
-            "gp_uniform_tour_3": (uniform_tour_crossover_GP, 3),
-            "gp_uniform_tour_7": (uniform_tour_crossover_GP, 7),
-            "gp_uniform_tour_k": (uniform_tour_crossover_GP, self._parents_num),
+            "gp_uniform_tour_3": (uniform_tournament_crossover_GP, 3),
+            "gp_uniform_tour_7": (uniform_tournament_crossover_GP, 7),
+            "gp_uniform_tour_k": (uniform_tournament_crossover_GP, self._parents_num),
         }
 
         self._mutation_pool: Dict[str, Tuple[Callable, Union[float, int], bool]] = {

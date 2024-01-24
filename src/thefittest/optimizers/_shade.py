@@ -16,8 +16,8 @@ from numpy.typing import NDArray
 
 from ._differentialevolution import DifferentialEvolution
 from ..utils import find_pbest_id
-from ..utils.operators import binomial
-from ..utils.operators import current_to_pbest_1_archive_p_min
+from ..utils.crossovers import binomial
+from ..utils.mutations import current_to_pbest_1_archive_p_min
 from ..utils.random import cauchy_distribution
 
 

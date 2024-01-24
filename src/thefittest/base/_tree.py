@@ -270,7 +270,7 @@ class Tree:
         if len(other_trees) == 1:
             to_return = common_region_two_trees(self._n_args, other_trees[0]._n_args)
         else:
-            trees = [self] + other_trees
+            trees = [self] + list(other_trees)
             to_return = common_region(trees)
 
         return to_return
@@ -586,7 +586,7 @@ NET_FUNCTION_NAME = {"add": Add, "more": More}
 
 def init_symbolic_regression_uniset(
     X: NDArray[np.float64],
-    functional_set_names: Tuple[str] = ("cos", "sin", "add", "inv", "neg", "mul"),
+    functional_set_names: Tuple[str, ...] = ("cos", "sin", "add", "inv", "neg", "mul"),
     ephemeral_node_generators: Optional[Tuple[Callable, ...]] = None,
 ):
     SYMBOLIC_FUNCTION_NAME = {

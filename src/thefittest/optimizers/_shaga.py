@@ -12,9 +12,9 @@ from numpy.typing import NDArray
 
 from ..base._ea import EvolutionaryAlgorithm
 from ..optimizers._shade import lehmer_mean
-from ..utils.operators import binomialGA
-from ..utils.operators import flip_mutation
-from ..utils.operators import tournament_selection
+from ..utils.crossovers import binomialGA
+from ..utils.mutations import flip_mutation
+from ..utils.selections import tournament_selection
 from ..utils.random import cauchy_distribution
 
 

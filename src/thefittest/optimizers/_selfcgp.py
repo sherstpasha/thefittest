@@ -35,7 +35,7 @@ class SelfCGP(GeneticProgramming, SelfCGA):
             "tournament_5",
             "tournament_7",
         ),
-        crossovers: Tuple[str, ...] = ("gp_standart", "gp_one_point", "gp_uniform_rank_2"),
+        crossovers: Tuple[str, ...] = ("gp_standard", "gp_one_point", "gp_uniform_rank_2"),
         mutations: Tuple[str, ...] = (
             "gp_weak_point",
             "gp_average_point",

@@ -4,7 +4,8 @@ utils
 .. toctree::
    :maxdepth: 2
 
-   operators
    selections
+   crossovers
+   mutations
    random
    transformations
