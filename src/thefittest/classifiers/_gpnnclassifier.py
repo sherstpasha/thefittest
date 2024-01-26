@@ -153,9 +153,9 @@ def train_net(
         weights_optimizer_args["left"] = left
         weights_optimizer_args["right"] = right
     else:
-        parts: NDArray[np.int64] = np.full(shape=len(net._weights), fill_value=16, dtype=np.int64)
-        genotype_to_phenotype = GrayCode(fit_by="parts").fit(left, right, parts)
-        weights_optimizer_args["str_len"] = np.sum(parts)
+        genotype_to_phenotype = GrayCode().fit(left_border=-10., right_border=10.0,
+         num_variables=len(net._weights), bits_per_variable=16)
+        weights_optimizer_args["str_len"] = np.sum(genotype_to_phenotype._bits_per_variable)
         weights_optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype.transform
 
     weights_optimizer_args["minimization"] = True
