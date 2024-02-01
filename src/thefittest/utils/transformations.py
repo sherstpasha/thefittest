@@ -7,7 +7,42 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-def scale_data(data: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
+def minmax_scale(data: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
+    """
+    Scale the values of a NumPy array between 0 and 1.
+
+    Parameters
+    ----------
+    data : NDArray[Union[np.int64, np.float64]]
+        Input array containing numerical values to be scaled.
+
+    Returns
+    -------
+    NDArray[np.float64]
+        Scaled array with values between 0 and 1.
+
+    Notes
+    -----
+    This function scales the values of the input array between 0 and 1 using min-max scaling.
+    If the minimum and maximum values in the array are equal, the function returns an array of ones.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.transformations import minmax_scale
+    >>>
+    >>> # Example data
+    >>> example_data = np.array([2, 5, 10, 8, 3], dtype=np.int64)
+    >>>
+    >>> # Scale the data using the minmax_scale function
+    >>> scaled_data = minmax_scale(example_data)
+    >>>
+    >>> # Display original and scaled data
+    >>> print("Original Data:", example_data)
+    Original Data: [ 2  5 10  8  3]
+    >>> print("Scaled Data:", scaled_data)
+    Scaled Data: [0.   0.375 1.   0.75 0.125]
+    """
     data_copy = data.copy()
     max_value = data_copy.max()
     min_value = data_copy.min()

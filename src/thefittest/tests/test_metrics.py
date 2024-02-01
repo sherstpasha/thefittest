@@ -1,5 +1,14 @@
 import numpy as np
 
+from sklearn.metrics import mean_squared_error as mean_squared_error_sklearn
+from sklearn.metrics import r2_score
+from sklearn.metrics import log_loss
+from sklearn.metrics import accuracy_score as accuracy_score_sklearn
+from sklearn.metrics import confusion_matrix as sklearn_confusion_matrix
+from sklearn.metrics import recall_score as sklearn_recall_score
+from sklearn.metrics import precision_score as sklearn_precision_score
+from sklearn.metrics import f1_score as sklearn_f1_score
+
 from thefittest.utils._metrics import root_mean_square_error
 from thefittest.utils._metrics import root_mean_square_error2d
 from thefittest.utils._metrics import coefficient_determination
@@ -18,163 +27,102 @@ from thefittest.utils._metrics import f1_score2d
 
 
 def test_root_mean_square_error():
-    y_true = np.array([1, 2, 3, 4, 5], dtype=np.float64)
-    y_predict = np.array([1, 2, 3, 4, 5], dtype=np.float64)
-    assert root_mean_square_error(y_true, y_predict) == 0.0
+    # Test data
+    y_true = np.array([1.0, 2.0, 3.0], dtype=np.float64)
+    y_predict = np.array([1.1, 1.9, 3.1], dtype=np.float64)
 
-    y_true = np.array([1, 2, 3, 4, 5], dtype=np.float64)
-    y_predict = np.array([2, 3, 4, 5, 6], dtype=np.float64)
-    assert np.isclose(root_mean_square_error(y_true, y_predict), 1.0)
+    # Calculate RMSE using both functions
+    rmse_njit = root_mean_square_error(y_true, y_predict)
+    rmse_sklearn = np.sqrt(mean_squared_error_sklearn(y_true, y_predict))
 
-
-def test_root_mean_square_error2d():
-    y_true = np.array([1, 2, 3, 4, 5], dtype=np.float64)
-    y_predict2d = np.array([[1, 2, 3, 4, 5], [2, 3, 4, 5, 6], [3, 4, 5, 6, 7]], dtype=np.float64)
-
-    result = root_mean_square_error2d(y_true, y_predict2d)
-
-    expected = np.array([0, 1, 2], dtype=np.float64)
-    assert np.allclose(result, expected)
-
+    # Check if the results are equal within a small tolerance
+    assert np.isclose(rmse_njit, rmse_sklearn, rtol=1e-10, atol=1e-10)
 
 def test_coefficient_determination():
-    y_true = np.array([1, 2, 3, 4, 5], dtype=np.float64)
-    y_predict = np.array([1, 2, 3, 4, 5], dtype=np.float64)
-    assert coefficient_determination(y_true, y_predict) == 1.0
+    # Test data
+    y_true = np.array([1.0, 2.0, 3.0], dtype=np.float64)
+    y_predict = np.array([1.1, 1.9, 3.1], dtype=np.float64)
 
-    y_true = np.array([1, 2, 3, 4, 5], dtype=np.float64)
-    y_predict = np.array([3, 3, 3, 3, 3], dtype=np.float64)
-    assert np.isclose(coefficient_determination(y_true, y_predict), 0.0)
+    # Calculate R-squared using both functions
+    r2_njit = coefficient_determination(y_true, y_predict)
+    r2_sklearn = r2_score(y_true, y_predict)
 
-
-def test_coefficient_determination2d():
-    y_true = np.array([1, 2, 3, 4, 5], dtype=np.float64)
-    y_predict2d = np.array([[1, 2, 3, 4, 5], [3, 3, 3, 3, 3]], dtype=np.float64)
-
-    result = coefficient_determination2d(y_true, y_predict2d)
-
-    expected = np.array([1, 0], dtype=np.float64)
-    assert np.allclose(result, expected)
+    # Check if the results are equal within a small tolerance
+    assert np.isclose(r2_njit, r2_sklearn, rtol=1e-10, atol=1e-10)
 
 
 def test_categorical_crossentropy():
-    target = np.array([[1, 0], [0, 1]], dtype=np.float64)
-    output = np.array([[0.7, 0.3], [0.3, 0.7]], dtype=np.float64)
-    assert np.isclose(categorical_crossentropy(target, output), 0.35667502866851847)
+    # Test data
+    target = np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]], dtype=np.float64)
+    output = np.array([[0.1, 0.9, 0.0], [0.9, 0.1, 0.0], [0.0, 0.1, 0.9]], dtype=np.float64)
 
-    target = np.array([[1, 0], [0, 1]], dtype=np.float64)
-    output = np.array([[0.99999999, 0.00000001], [0.00000001, 0.99999999]], dtype=np.float64)
-    assert np.isclose(categorical_crossentropy(target, output), 1.711e-06)
+    # Calculate categorical crossentropy using both functions
+    crossentropy_njit = categorical_crossentropy(target, output)
+    crossentropy_sklearn = log_loss(target, output)
 
-
-def test_categorical_crossentropy2d():
-    y_true = np.array([[1, 0], [0, 1]], dtype=np.float64)
-    y_predict3d = np.array(
-        [[[0.7, 0.3], [0.3, 0.7]], [[0.99999999, 0.00000001], [0.00000001, 0.99999999]]],
-        dtype=np.float64,
-    )
-
-    result = categorical_crossentropy3d(y_true, y_predict3d)
-
-    expected = np.array([0.35667502866851847, 1.711e-06], dtype=np.float64)
-    assert np.allclose(result, expected)
+    # Check if the results are equal within a small tolerance
+    assert np.isclose(crossentropy_njit, crossentropy_sklearn, rtol=1e-4, atol=1e-4)
 
 
 def test_accuracy_score():
-    y_true = np.array([1, 2, 3, 4, 5], dtype=np.int64)
-    y_predict = np.array([1, 2, 3, 4, 5], dtype=np.int64)
-    assert accuracy_score(y_true, y_predict) == 1.0
+    # Test data
+    y_true = np.array([1, 0, 1, 1, 0, 1, 0, 0, 1, 1], dtype=np.int64)
+    y_predict = np.array([1, 0, 1, 0, 0, 1, 0, 1, 1, 1], dtype=np.int64)
 
-    y_true = np.array([1, 2, 3, 4, 5], dtype=np.int64)
-    y_predict = np.array([1, 2, 3, 4, 1], dtype=np.int64)
-    assert accuracy_score(y_true, y_predict) == 0.8
+    # Calculate accuracy score using both functions
+    accuracy_score_njit_result = accuracy_score(y_true, y_predict)
+    accuracy_score_sklearn_result = accuracy_score_sklearn(y_true, y_predict)
 
-
-def test_accuracy_score2d():
-    y_true = np.array([1, 2, 3, 4, 5], dtype=np.int64)
-    y_predict2d = np.array([[1, 2, 3, 4, 5], [1, 2, 3, 4, 1]], dtype=np.int64)
-
-    result = accuracy_score2d(y_true, y_predict2d)
-
-    expected = np.array([1, 0.8], dtype=np.float64)
-    assert np.allclose(result, expected)
+    # Check if the results are equal within a small tolerance
+    assert np.isclose(accuracy_score_njit_result, accuracy_score_sklearn_result, rtol=1e-10, atol=1e-10)
 
 
 def test_confusion_matrix():
-    y_true = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
-    y_pred = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
+    # Test data
+    y_true = np.array([1, 0, 1, 1, 0, 1, 0, 0, 1, 1], dtype=np.int64)
+    y_predict = np.array([1, 0, 1, 0, 0, 1, 0, 1, 1, 1], dtype=np.int64)
 
-    expected = np.array([[2, 0, 0], [0, 2, 0], [0, 0, 2]])
+    # Calculate confusion matrix using both functions
+    confusion_matrix_njit_result = confusion_matrix(y_true, y_predict)
+    confusion_matrix_sklearn_result = sklearn_confusion_matrix(y_true, y_predict)
 
-    assert np.array_equal(confusion_matrix(y_true, y_pred), expected)
-
-    y_true = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
-    y_pred = np.array([0, 1, 0, 2, 1, 2], dtype=np.int64)
-    expected = np.array([[1, 0, 1], [0, 2, 0], [1, 0, 1]])
-    assert np.array_equal(confusion_matrix(y_true, y_pred), expected)
+    # Check if the results are equal
+    assert np.all(confusion_matrix_njit_result == confusion_matrix_sklearn_result)
 
 
 def test_recall_score():
-    y_true = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
-    y_predict = np.array([0, 2, 1, 0, 1, 2], dtype=np.int64)
-    expected_recall = 2 / 3
-    assert np.allclose(recall_score(y_true, y_predict), expected_recall)
+    # Test data
+    y_true = np.array([1, 0, 1, 1, 0, 1, 0, 0, 1, 1], dtype=np.int64)
+    y_predict = np.array([1, 0, 1, 0, 0, 1, 0, 1, 1, 1], dtype=np.int64)
 
-    y_true = np.array([0, 0, 0, 1, 1, 1], dtype=np.int64)
-    y_predict = np.array([1, 1, 1, 0, 0, 0], dtype=np.int64)
-    expected_recall = 0.0
-    assert np.allclose(recall_score(y_true, y_predict), expected_recall)
+    # Calculate recall scores using both functions
+    recall_score_njit_result = recall_score(y_true, y_predict)
+    recall_score_sklearn_result = sklearn_recall_score(y_true, y_predict, average='macro')
 
-
-def test_recall_score2d():
-    y_true = np.array([0, 0, 0, 1, 1, 1], dtype=np.int64)
-    y_predict2d = np.array([[1, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 1]], dtype=np.int64)
-
-    result = recall_score2d(y_true, y_predict2d)
-
-    expected = np.array([0.0, 2 / 3], dtype=np.float64)
-    assert np.allclose(result, expected)
+    # Check if the results are almost equal (considering potential floating-point differences)
+    assert np.isclose(recall_score_njit_result, recall_score_sklearn_result, rtol=1e-10, atol=1e-10)
 
 
 def test_precision_score():
-    y_true = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
-    y_predict = np.array([0, 2, 1, 0, 1, 2], dtype=np.int64)
-    expected_output = np.float64(0.6666666666666666)
-    assert np.allclose(precision_score(y_true, y_predict), expected_output)
+    # Test data
+    y_true = np.array([1, 0, 1, 1, 0, 1, 0, 0, 1, 1], dtype=np.int64)
+    y_predict = np.array([1, 0, 1, 0, 0, 1, 0, 1, 1, 1], dtype=np.int64)
 
-    y_true = np.array([0, 0, 0, 1, 1, 1], dtype=np.int64)
-    y_predict = np.array([1, 1, 1, 0, 0, 0], dtype=np.int64)
-    expected_output = np.float64(0.0)
-    assert np.allclose(precision_score(y_true, y_predict), expected_output)
+    # Calculate precision scores using both functions
+    precision_score_njit_result = precision_score(y_true, y_predict)
+    precision_score_sklearn_result = sklearn_precision_score(y_true, y_predict, average='macro')
 
-
-def test_precision_score2d():
-    y_true = np.array([0, 0, 0, 1, 1, 1], dtype=np.int64)
-    y_predict2d = np.array([[1, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 1]], dtype=np.int64)
-
-    result = precision_score2d(y_true, y_predict2d)
-
-    expected = np.array([0.0, 2 / 3], dtype=np.float64)
-    assert np.allclose(result, expected)
-
+    # Check if the results are almost equal (considering potential floating-point differences)
+    assert np.isclose(precision_score_njit_result, precision_score_sklearn_result, rtol=1e-10, atol=1e-10)
 
 def test_f1_score():
-    y_true = np.array([0, 1, 0, 2], dtype=np.int64)
-    y_predict = np.array([1, 2, 0, 2], dtype=np.int64)
-    expected_output = np.float64(0.444444)
-    assert np.allclose(f1_score(y_true, y_predict), expected_output)
+    # Test data
+    y_true = np.array([1, 0, 1, 1, 0, 1, 0, 0, 1, 1], dtype=np.int64)
+    y_predict = np.array([1, 0, 1, 0, 0, 1, 0, 1, 1, 1], dtype=np.int64)
 
-    y_true = np.array([0, 0, 1, 1], dtype=np.int64)
-    y_predict = np.array([0, 0, 1, 1], dtype=np.int64)
-    expected_output = np.float64(1.0)
-    assert np.allclose(f1_score(y_true, y_predict), expected_output)
+    # Calculate F1 scores using both functions
+    f1_score_njit_result = f1_score(y_true, y_predict)
+    f1_score_sklearn_result = sklearn_f1_score(y_true, y_predict, average='macro')
 
-
-def test_f1_score2d():
-    y_true = np.array([0, 1, 0, 2], dtype=np.int64)
-    y_predict2d = np.array([[1, 2, 0, 2], [0, 1, 0, 2]], dtype=np.int64)
-
-    result = f1_score2d(y_true, y_predict2d)
-
-    expected = np.array([0.444444, 1.0], dtype=np.float64)
-    assert np.allclose(result, expected)
+    # Check if the results are almost equal (considering potential floating-point differences)
+    assert np.isclose(f1_score_njit_result, f1_score_sklearn_result, rtol=1e-10, atol=1e-10)

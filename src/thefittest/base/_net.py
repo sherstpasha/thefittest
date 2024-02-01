@@ -16,7 +16,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..utils import forward2d
-from ..utils.transformations import scale_data
+from ..utils.transformations import minmax_scale
 
 
 ACTIVATION_NAME = {0: "sg", 1: "rl", 2: "gs", 3: "th", 4: "ln", 5: "sm"}
@@ -292,7 +292,7 @@ class Net:
         hidden_color_code = (0.0, 0.74, 0.99, 1)
         output_color_code = (0.94, 0.50, 0.50, 1)
 
-        weights_scale = scale_data(self._weights)
+        weights_scale = minmax_scale(self._weights)
         nodes = list(self._inputs)
 
         len_i = len(self._inputs)

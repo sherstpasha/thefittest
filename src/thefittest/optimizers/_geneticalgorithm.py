@@ -37,7 +37,7 @@ from ..utils.crossovers import uniform_rank_crossover
 from ..utils.crossovers import uniform_rank_crossover_GP
 from ..utils.crossovers import uniform_tournament_crossover
 from ..utils.crossovers import uniform_tournament_crossover_GP
-from ..utils.transformations import scale_data
+from ..utils.transformations import minmax_scale
 
 
 class GeneticAlgorithm(EvolutionaryAlgorithm):
@@ -216,7 +216,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
     def _from_population_g_to_fitness(self: GeneticAlgorithm) -> None:
         super()._from_population_g_to_fitness()
 
-        self._fitness_scale_i = scale_data(self._fitness_i)
+        self._fitness_scale_i = minmax_scale(self._fitness_i)
         self._fitness_rank_i = rankdata(self._fitness_i)
 
         self._adapt()

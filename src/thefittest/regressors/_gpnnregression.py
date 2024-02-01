@@ -9,6 +9,8 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from sklearn.model_selection import train_test_split
+
 from ..base import UniversalSet
 from ..base._tree import init_net_uniset
 from ..classifiers import GeneticProgrammingNeuralNetClassifier
@@ -20,7 +22,6 @@ from ..optimizers import SHADE
 from ..optimizers import SelfCGP
 from ..regressors._mlpearegressor import fitness_function as evaluate_nets
 from ..utils._metrics import root_mean_square_error2d
-from ..utils.random import train_test_split
 
 
 def fitness_function(
@@ -111,7 +112,8 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
         n_inputs: int = X.shape[1]
         n_outputs: int = 1
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, self._test_sample_ratio)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self._test_sample_ratio)
+
 
         uniset: UniversalSet = init_net_uniset(
             n_variables=n_inputs,

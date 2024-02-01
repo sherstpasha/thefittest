@@ -10,6 +10,8 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from sklearn.model_selection import train_test_split
+
 from ..base import FunctionalNode
 from ..base import TerminalNode
 from ..base import Tree
@@ -29,7 +31,6 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..utils._metrics import categorical_crossentropy3d
-from ..utils.random import train_test_split_stratified
 from ..utils.transformations import GrayCode
 
 
@@ -293,8 +294,8 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         n_outputs: int = len(set(y))
         eye: NDArray[np.float64] = np.eye(n_outputs, dtype=np.float64)
 
-        X_train, X_test, y_train, y_test = train_test_split_stratified(
-            X, y.astype(np.int64), self._test_sample_ratio
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y.astype(np.int64), test_size = self._test_sample_ratio
         )
 
         proba_test: NDArray[np.float64] = eye[y_test]

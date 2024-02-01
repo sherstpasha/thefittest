@@ -4,7 +4,7 @@ from ..classifiers import MLPEAClassifier
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticProgramming
 from ..optimizers import SelfCGA
-from ..utils.transformations import scale_data
+from ..utils.transformations import minmax_scale
 from ..base._net import Net
 
 
@@ -14,7 +14,7 @@ def test_GeneticProgrammingNeuralNetClassifier():
     y = data.get_y()
 
     data = IrisDataset()
-    X = scale_data(data.get_X())
+    X = minmax_scale(data.get_X())
     y = data.get_y()
 
     optimizer = GeneticProgramming
@@ -79,7 +79,7 @@ def test_MLPEAClassifier():
     y = data.get_y()
 
     data = IrisDataset()
-    X = scale_data(data.get_X())
+    X = minmax_scale(data.get_X())
     y = data.get_y()
 
     iters = 3

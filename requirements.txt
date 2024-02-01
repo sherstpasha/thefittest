@@ -1,6 +1,7 @@
 numpy
 numba
 scipy
+scikit-learn
 pytest
 pytest-cov
 flake8
