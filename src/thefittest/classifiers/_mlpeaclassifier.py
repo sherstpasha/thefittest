@@ -146,9 +146,9 @@ class MLPEAClassifier(Model):
         right: NDArray[np.float64] = np.full(
             shape=len(net._weights), fill_value=10, dtype=np.float64
         )
-        initial_population: Union[
-            NDArray[np.float64], NDArray[np.byte]
-        ] = DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
+        initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = (
+            DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
+        )
         initial_population[0] = net._weights.copy()
 
         weights_optimizer_args["fitness_function"] = fitness_function
@@ -204,7 +204,6 @@ class MLPEAClassifier(Model):
     def _fit(
         self: MLPEAClassifier, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
     ) -> MLPEAClassifier:
-        
 
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
@@ -274,4 +273,14 @@ class MLPClassifierEA2(ClassifierMixin, BaseMLPEA):
 
         self.net = self._defitne_net(n_inputs, n_outputs)
         self.net._weights = self._train_net(self.net, X, proba)
-        return self 
+        return self
+
+    # def predict(
+    #     self: MLPEAClassifier, X: NDArray[np.float64]
+    # ) -> NDArray[Union[np.float64, np.int64]]:
+    #     if self._offset:
+    #         X = np.hstack([X, np.ones((X.shape[0], 1))])
+
+    #     output = self.net.forward(X)[0]
+    #     y_pred = np.argmax(output, axis=1)
+    #     return y_pred

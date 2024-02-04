@@ -4,6 +4,9 @@ from abc import ABCMeta, abstractmethod
 
 from typing import Any
 from typing import Union
+from typing import Optional
+from typing import Tuple
+from typing import Type
 
 from sklearn.base import BaseEstimator
 
@@ -20,6 +23,20 @@ from ..optimizers import SHAGA
 from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
+from ..utils._metrics import categorical_crossentropy3d
+from ..utils.transformations import GrayCode
+
+
+weights_type_optimizer_alias = Union[
+    Type[DifferentialEvolution],
+    Type[jDE],
+    Type[SHADE],
+    Type[GeneticAlgorithm],
+    Type[SelfCGA],
+    Type[SHAGA],
+]
+weights_optimizer_alias = Union[DifferentialEvolution, jDE, SHADE, GeneticAlgorithm, SelfCGA, SHAGA]
+
 
 class Model:
     def _fit(
@@ -50,6 +67,17 @@ class Model:
         return self._predict(X)
 
 
+def fitness_function(
+    weights: NDArray[np.float64],
+    net: Net,
+    X: NDArray[np.float64],
+    targets: NDArray[Union[np.float64, np.int64]],
+) -> NDArray[np.float64]:
+    output3d = net.forward(X, weights)
+    error = categorical_crossentropy3d(targets, output3d)
+    return error
+
+
 class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
 
     @abstractmethod
@@ -63,13 +91,13 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         offset: bool = True,
         weights_optimizer: weights_type_optimizer_alias = SHADE,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
-        ):
+    ):
         self.iters = iters
         self.pop_size = pop_size
         self.hidden_layers = hidden_layers
         self.activation = activation
         self.offset = offset
-        self.weights_optimizer = weights_optimizer
+        self.weights_optimizer_class = weights_optimizer
         self.weights_optimizer_args = weights_optimizer_args
 
     def _defitne_net(self: BaseEstimator, n_inputs: int, n_outputs: int) -> Net:
@@ -109,7 +137,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         return net
 
     def _train_net(
-        self: MLPEAClassifier,
+        self,
         net: Net,
         X_train: NDArray[np.float64],
         y_train: NDArray[np.float64],
@@ -136,7 +164,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         else:
             weights_optimizer_args = {}
 
-        weights_optimizer_args["iters"] = self_iters
+        weights_optimizer_args["iters"] = self.iters
         weights_optimizer_args["pop_size"] = self.pop_size
         left: NDArray[np.float64] = np.full(
             shape=len(net._weights), fill_value=-10, dtype=np.float64
@@ -144,9 +172,9 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         right: NDArray[np.float64] = np.full(
             shape=len(net._weights), fill_value=10, dtype=np.float64
         )
-        initial_population: Union[
-            NDArray[np.float64], NDArray[np.byte]
-        ] = DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
+        initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = (
+            DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
+        )
         initial_population[0] = net._weights.copy()
 
         weights_optimizer_args["fitness_function"] = fitness_function
@@ -163,31 +191,33 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
             parts: NDArray[np.int64] = np.full(
                 shape=len(net._weights), fill_value=16, dtype=np.int64
             )
-            genotype_to_phenotype = GrayCode().fit(left_border=-10., right_border=10.0,
-         num_variables=len(net._weights), bits_per_variable=16)
+            genotype_to_phenotype = GrayCode().fit(
+                left_border=-10.0,
+                right_border=10.0,
+                num_variables=len(net._weights),
+                bits_per_variable=16,
+            )
             weights_optimizer_args["str_len"] = np.sum(genotype_to_phenotype._bits_per_variable)
             weights_optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype.transform
 
         weights_optimizer_args["minimization"] = True
-        optimizer = self.weights_optimizer_class(**weights_optimizer_args)
-        optimizer.fit()
+        self.optimizer = self.weights_optimizer_class(**weights_optimizer_args)
+        self.optimizer.fit()
 
-        self.weights_optimizer = optimizer
-
-        phenotype = optimizer.get_fittest()["phenotype"]
+        phenotype = self.optimizer.get_fittest()["phenotype"]
 
         return phenotype
 
     def get_optimizer(
-            self: MLPEAClassifier,
-        ) -> Union[
-            DifferentialEvolution,
-            GeneticAlgorithm,
-            GeneticProgramming,
-            jDE,
-            SelfCGA,
-            SelfCGP,
-            SHADE,
-            SHAGA,
-        ]:
-        return self.weights_optimizer
+        self,
+    ) -> Union[
+        DifferentialEvolution,
+        GeneticAlgorithm,
+        GeneticProgramming,
+        jDE,
+        SelfCGA,
+        SelfCGP,
+        SHADE,
+        SHAGA,
+    ]:
+        return self.optimizer
