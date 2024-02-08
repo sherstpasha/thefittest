@@ -1,15 +1,33 @@
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 import numpy as np
+from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.utils.multiclass import unique_labels
+from sklearn.metrics import euclidean_distances
+from sklearn.utils.estimator_checks import check_estimator
 
-# Ваш массив меток
-labels = [1, 2, 1, 1, 2, 1]
 
-# Преобразование меток в числовой формат
-label_encoder = LabelEncoder()
-numeric_labels = label_encoder.fit_transform(labels)
+class TemplateClassifier(BaseEstimator, ClassifierMixin):
+    def __init__(self, demo_param="demo"):
+        self.demo_param = demo_param
 
-# Преобразование числовых меток в one-hot encoding
-onehot_encoder = OneHotEncoder(sparse=False, categories="auto")
-onehot_labels = onehot_encoder.fit_transform(np.array(numeric_labels).reshape(-1, 1))
+    def fit(self, X, y):
+        # Check that X and y have correct shape
+        X, y = check_X_y(X, y)
+        # Store the classes seen during fit
+        self.classes_ = unique_labels(y)
+        self.X_ = X
+        self.y_ = y
+        # Return the classifier
+        return self
 
-print(onehot_labels)
+    def predict(self, X):
+        # Check if fit has been called
+        check_is_fitted(self)
+        # Input validation
+        X = check_array(X)
+        closest = np.argmin(euclidean_distances(X, self.X_), axis=1)
+        return self.y_[closest]
+
+
+model = TemplateClassifier()
+print(check_estimator(model))

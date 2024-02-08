@@ -16,6 +16,7 @@ from sklearn.metrics import f1_score
 data = BanknoteDataset()
 X = data.get_X()
 y = data.get_y()
+y = np.ones(len(y))
 
 X_scaled = minmax_scale(X)
 
@@ -30,11 +31,15 @@ model = MLPClassifierEA2(
     weights_optimizer_args={"show_progress_each": 50},
 )
 
-model.fit(X_train, y_train)
+# model.fit(X_train, y_train)
 
-y_pred = model.predict(X_test)
+# y_pred = model.predict(X_test)
 
-print(f1_score(y_test, y_pred, average="macro"))
+# print(f1_score(y_test, y_pred, average="macro"))
+
+
+# print(y_test)
+# print(y_pred)
 
 # import pickle
 

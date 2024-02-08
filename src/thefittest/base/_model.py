@@ -97,6 +97,13 @@ def fitness_function_regressor(
 
 
 class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
+    """
+    Attributes that have been estimated from the data must always have a name ending with trailing underscore,
+    for example the coefficients of some regression estimator would be stored in a coef_ attribute after fit has been called.
+    The estimated attributes are expected to be overridden when you call fit a second time.
+
+    In iterative algorithms, the number of iterations should be specified by an integer called n_iter.
+    """
 
     @abstractmethod
     def __init__(
@@ -258,7 +265,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
     def fit(self, X: ArrayLike, y: ArrayLike):
 
         if isinstance(self, ClassifierMixin):
-            X, y = self._validate_data(X, y, y_numeric=False)
+            X, y = self._validate_data(X, y, y_numeric=False, reset=True)
             check_classification_targets(y)
             self._label_encoder = LabelEncoder()
             self._one_hot_encoder = OneHotEncoder(
@@ -267,29 +274,41 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
 
             numeric_labels = self._label_encoder.fit_transform(y)
             y = self._one_hot_encoder.fit_transform(np.array(numeric_labels).reshape(-1, 1))
-            self._classes = self._label_encoder.classes_
+            self.classes_ = self._label_encoder.classes_
+            self.n_classes_ = len(self.classes_)
         else:
-            X, y = self._validate_data(X, y, y_numeric=True)
+            X, y = self._validate_data(X, y, y_numeric=True, reset=True)
 
         X, y = self.array_like_to_numpy_X_y(X, y)
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        self.net = self._defitne_net(X.shape[1], len(self._classes))
+        self.net = self._defitne_net(X.shape[1], len(self.classes_))
         self.net._weights = self._train_net(self.net, X, y)
 
         return self
 
     def predict(self, X: NDArray[np.float64]):
         X = check_array(X)
+        self._validate_data
+        n_features = X.shape[1]
+        if self.n_features_in_ != n_features:
+            raise ValueError(
+                f"Number of features of the model must match the "
+                "input. Model n_features is {self.n_features_in_} and input "
+                "n_features is {n_features}."
+            )
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        y = self.net.forward(X)[0]
+        output = self.net.forward(X)[0]
 
         if isinstance(self, ClassifierMixin):
-            y = np.argmax(y, axis=1)
+            indeces = np.argmax(output, axis=1)
+            y = self._label_encoder.inverse_transform(indeces)
+        else:
+            y = output
 
         return y
