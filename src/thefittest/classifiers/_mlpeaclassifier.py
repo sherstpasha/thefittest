@@ -7,10 +7,12 @@ from typing import Type
 from typing import Union
 
 import numpy as np
+from numpy.typing import ArrayLike
 from numpy.typing import NDArray
 
 from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from sklearn.utils.multiclass import check_classification_targets
+from sklearn.preprocessing import LabelEncoder
 
 from ..base import Net
 from ..base._model import Model
@@ -256,31 +258,3 @@ class MLPClassifierEA2(ClassifierMixin, BaseMLPEA):
             weights_optimizer=weights_optimizer,
             weights_optimizer_args=weights_optimizer_args,
         )
-
-    def fit(
-        self: MLPClassifierEA2, X: NDArray[np.float64], y: NDArray[np.int64]
-    ) -> MLPEAClassifier:
-        X, y = check_X_y(X, y)
-        check_classification_targets(y)
-
-        if self.offset:
-            X = np.hstack([X, np.ones((X.shape[0], 1))])
-
-        n_inputs: int = X.shape[1]
-        n_outputs: int = len(set(y))
-        eye: NDArray[np.float64] = np.eye(n_outputs, dtype=np.float64)
-        proba: NDArray[np.float64] = eye[y]
-
-        self.net = self._defitne_net(n_inputs, n_outputs)
-        self.net._weights = self._train_net(self.net, X, proba)
-        return self
-
-    # def predict(
-    #     self: MLPEAClassifier, X: NDArray[np.float64]
-    # ) -> NDArray[Union[np.float64, np.int64]]:
-    #     if self._offset:
-    #         X = np.hstack([X, np.ones((X.shape[0], 1))])
-
-    #     output = self.net.forward(X)[0]
-    #     y_pred = np.argmax(output, axis=1)
-    #     return y_pred

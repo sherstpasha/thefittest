@@ -263,6 +263,16 @@ class Net:
         self._numba_activs_code = activ_code
         self._numba_activs_nodes = active_nodes
 
+    def _clear_order(self):
+        del self._numpy_inputs
+        del self._numpy_outputs
+        del self._n_hiddens
+        del self._numba_from
+        del self._numba_to
+        del self._numba_weights_id
+        del self._numba_activs_code
+        del self._numba_activs_nodes
+
     def forward(
         self, X: NDArray[np.float64], weights: Optional[NDArray[np.float64]] = None
     ) -> NDArray[np.float64]:

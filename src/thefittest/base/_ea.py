@@ -122,7 +122,8 @@ class EvolutionaryAlgorithm:
         self._population_ph_i: NDArray
         self._fitness_i: NDArray[np.float64]
 
-        self._parallel = Parallel(self._n_jobs)
+        if self._n_jobs > 1:
+            self._parallel = Parallel(self._n_jobs)
 
     def _first_generation(self: EvolutionaryAlgorithm) -> None:
         return None
@@ -169,13 +170,16 @@ class EvolutionaryAlgorithm:
     def _get_phenotype(self, population_g: NDArray[Any]) -> NDArray[Any]:
         if self._genotype_to_phenotype is not None:
             populations_g = self._split_population(population_g)
-            populations_ph = self._parallel(
-                delayed(self._genotype_to_phenotype)(
-                    populations_g_i, **self._genotype_to_phenotype_args
+            if self._n_jobs > 1:
+                populations_ph = self._parallel(
+                    delayed(self._genotype_to_phenotype)(
+                        populations_g_i, **self._genotype_to_phenotype_args
+                    )
+                    for populations_g_i in populations_g
                 )
-                for populations_g_i in populations_g
-            )
-            population_ph = np.concatenate(populations_ph, axis=0)
+                population_ph = np.concatenate(populations_ph, axis=0)
+            else:
+                population_ph = self._genotype_to_phenotype(populations_g)
         else:
             population_ph = population_g
         return population_ph
@@ -183,15 +187,20 @@ class EvolutionaryAlgorithm:
     def _get_fitness(
         self: EvolutionaryAlgorithm, population_ph: NDArray[Any]
     ) -> NDArray[np.float64]:
-        populations_ph = self._split_population(population_ph)
-        values = self._parallel(
-            delayed(self._fitness_function)(populations_ph_i, **self._fitness_function_args)
-            for populations_ph_i in populations_ph
-        )
-        value = np.concatenate(values, axis=0)
+        if self._n_jobs > 1:
+            populations_ph = self._split_population(population_ph)
+            values = self._parallel(
+                delayed(self._fitness_function)(populations_ph_i, **self._fitness_function_args)
+                for populations_ph_i in populations_ph
+            )
+            value = np.concatenate(values, axis=0)
 
-        self._calls += len(value)
-        return self._sign * value
+            self._calls += len(value)
+        else:
+            value = self._fitness_function(population_ph, **self._fitness_function_args)
+
+        fitness = self._sign * value
+        return fitness
 
     def get_remains_calls(self: EvolutionaryAlgorithm) -> int:
         return (self._pop_size * self._iters) - self._calls

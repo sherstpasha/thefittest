@@ -9,8 +9,14 @@ from typing import Tuple
 from typing import Type
 
 from sklearn.base import BaseEstimator
+from sklearn.base import ClassifierMixin
+from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
+from sklearn.utils.multiclass import check_classification_targets
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
 
 import numpy as np
+from numpy.typing import ArrayLike
 from numpy.typing import NDArray
 
 from ..base import Net
@@ -24,6 +30,7 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..utils._metrics import categorical_crossentropy3d
+from ..utils._metrics import root_mean_square_error2d
 from ..utils.transformations import GrayCode
 
 
@@ -67,7 +74,7 @@ class Model:
         return self._predict(X)
 
 
-def fitness_function(
+def fitness_function_classifier(
     weights: NDArray[np.float64],
     net: Net,
     X: NDArray[np.float64],
@@ -75,6 +82,17 @@ def fitness_function(
 ) -> NDArray[np.float64]:
     output3d = net.forward(X, weights)
     error = categorical_crossentropy3d(targets, output3d)
+    return error
+
+
+def fitness_function_regressor(
+    weights: NDArray[np.float64],
+    net: Net,
+    X: NDArray[np.float64],
+    targets: NDArray[Union[np.float64, np.int64]],
+) -> NDArray[np.float64]:
+    output2d = net.forward(X, weights)[:, :, 0]
+    error = root_mean_square_error2d(targets, output2d)
     return error
 
 
@@ -97,7 +115,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         self.hidden_layers = hidden_layers
         self.activation = activation
         self.offset = offset
-        self.weights_optimizer_class = weights_optimizer
+        self.weights_optimizer = weights_optimizer
         self.weights_optimizer_args = weights_optimizer_args
 
     def _defitne_net(self: BaseEstimator, n_inputs: int, n_outputs: int) -> Net:
@@ -142,6 +160,8 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         X_train: NDArray[np.float64],
         y_train: NDArray[np.float64],
     ) -> NDArray[np.float64]:
+        net = net.copy()
+
         if self.weights_optimizer_args is not None:
             for arg in (
                 "fitness_function",
@@ -177,20 +197,25 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         )
         initial_population[0] = net._weights.copy()
 
-        weights_optimizer_args["fitness_function"] = fitness_function
-        weights_optimizer_args["fitness_function_args"] = {
-            "net": net,
-            "X": X_train,
-            "targets": y_train,
-        }
+        if isinstance(self, ClassifierMixin):
+            weights_optimizer_args["fitness_function"] = fitness_function_classifier
+            weights_optimizer_args["fitness_function_args"] = {
+                "net": net,
+                "X": X_train,
+                "targets": y_train,
+            }
+        else:
+            weights_optimizer_args["fitness_function"] = fitness_function_regressor
+            weights_optimizer_args["fitness_function_args"] = {
+                "net": net,
+                "X": X_train,
+                "targets": y_train,
+            }
 
-        if self.weights_optimizer_class in (SHADE, DifferentialEvolution, jDE):
+        if self.weights_optimizer in (SHADE, DifferentialEvolution, jDE):
             weights_optimizer_args["left"] = left
             weights_optimizer_args["right"] = right
         else:
-            parts: NDArray[np.int64] = np.full(
-                shape=len(net._weights), fill_value=16, dtype=np.int64
-            )
             genotype_to_phenotype = GrayCode().fit(
                 left_border=-10.0,
                 right_border=10.0,
@@ -201,12 +226,20 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
             weights_optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype.transform
 
         weights_optimizer_args["minimization"] = True
-        self.optimizer = self.weights_optimizer_class(**weights_optimizer_args)
-        self.optimizer.fit()
 
-        phenotype = self.optimizer.get_fittest()["phenotype"]
+        optimizer = self.weights_optimizer(**weights_optimizer_args).fit()
+        phenotype = optimizer.get_fittest()["phenotype"]
+        optimizer._fitness_function_args["net"] = optimizer._fitness_function_args["net"].copy()
+        self.optimizer = optimizer
 
         return phenotype
+
+    def array_like_to_numpy_X_y(
+        self, X: ArrayLike, y: ArrayLike
+    ) -> Tuple[NDArray[np.float64], NDArray[np.int64]]:
+        X = np.array(X, dtype=np.float64)
+        y = np.array(y)
+        return X, y
 
     def get_optimizer(
         self,
@@ -221,3 +254,42 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         SHAGA,
     ]:
         return self.optimizer
+
+    def fit(self, X: ArrayLike, y: ArrayLike):
+
+        if isinstance(self, ClassifierMixin):
+            X, y = self._validate_data(X, y, y_numeric=False)
+            check_classification_targets(y)
+            self._label_encoder = LabelEncoder()
+            self._one_hot_encoder = OneHotEncoder(
+                sparse_output=False, categories="auto", dtype=np.float64
+            )
+
+            numeric_labels = self._label_encoder.fit_transform(y)
+            y = self._one_hot_encoder.fit_transform(np.array(numeric_labels).reshape(-1, 1))
+            self._classes = self._label_encoder.classes_
+        else:
+            X, y = self._validate_data(X, y, y_numeric=True)
+
+        X, y = self.array_like_to_numpy_X_y(X, y)
+
+        if self.offset:
+            X = np.hstack([X, np.ones((X.shape[0], 1))])
+
+        self.net = self._defitne_net(X.shape[1], len(self._classes))
+        self.net._weights = self._train_net(self.net, X, y)
+
+        return self
+
+    def predict(self, X: NDArray[np.float64]):
+        X = check_array(X)
+
+        if self.offset:
+            X = np.hstack([X, np.ones((X.shape[0], 1))])
+
+        y = self.net.forward(X)[0]
+
+        if isinstance(self, ClassifierMixin):
+            y = np.argmax(y, axis=1)
+
+        return y
