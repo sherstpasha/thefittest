@@ -2,6 +2,8 @@ import random
 from typing import List
 from typing import Tuple
 from typing import Union
+from typing import Optional
+import numbers
 
 from numba import boolean
 from numba import float64
@@ -61,6 +63,10 @@ def sattolo_shuffle(items: Union[List, NDArray]) -> None:
         j = random.randrange(i)
         items[j], items[i] = items[i], items[j]
 
+@njit
+def numba_seed(seed_value):
+    random.seed(seed_value)
+    np.random.seed(seed_value)
 
 @njit(float64[:](float64, float64, int64))
 def cauchy_distribution(loc: np.float64, scale: np.float64, size: np.int64) -> NDArray[np.float64]:
@@ -147,7 +153,7 @@ def random_weighted_sample(
 
     i = 0
     while i < quantity:
-        roll = sumweights * np.random.rand()
+        roll = sumweights * random.random()
         ind = binary_search_interval(roll, cumsumweights)
         if not replace:
             if check_for_value(ind, sample, i):
@@ -208,3 +214,30 @@ def random_sample(
         sample[i] = ind
         i += 1
     return sample
+
+
+def check_random_state(seed: Optional[Union[int, np.random.RandomState]] = None):
+    """Turn seed into a np.random.RandomState instance
+
+    Parameters
+    ----------
+    seed : None | int | instance of RandomState
+        If seed is None, return the RandomState singleton used by np.random.
+        If seed is an int, return a new RandomState instance seeded with seed.
+        If seed is already a RandomState instance, return it.
+        Otherwise raise ValueError.
+
+    """
+    if seed is None:
+        random_state = np.random.mtrand._rand
+    elif isinstance(seed, (numbers.Integral, np.integer)):
+        random_state = np.random.RandomState(seed)
+    elif isinstance(seed, np.random.RandomState):
+        random_state = seed
+    else:
+        raise ValueError('%r cannot be used to seed a numpy.random.RandomState'
+                        ' instance' % seed)
+
+    seed = random_state.get_state()[1][0]
+    numba_seed(seed)
+    return random_state

@@ -67,6 +67,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         EvolutionaryAlgorithm.__init__(
             self,
@@ -85,6 +86,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            random_state=random_state
         )
         self._str_len: int = str_len
         self._tour_size: int = tour_size
@@ -162,10 +164,11 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         self._fitness_scale_i: NDArray[np.float64]
         self._fitness_rank_i: NDArray[np.float64]
 
-    @staticmethod
-    def binary_string_population(pop_size: int, str_len: int) -> NDArray[np.byte]:
+    def binary_string_population(self, pop_size: int, str_len: int) -> NDArray[np.byte]:
         size = (pop_size, str_len)
-        return np.random.randint(low=0, high=2, size=size, dtype=np.byte).astype(np.byte)
+        population = self._random_state.randint(
+            low=0, high=2, size=size, dtype=np.byte).astype(np.byte)
+        return population
 
     def _first_generation(self: GeneticAlgorithm) -> None:
         if self._init_population is None:

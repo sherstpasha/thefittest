@@ -15,6 +15,8 @@ from joblib import delayed
 import numpy as np
 from numpy.typing import NDArray
 
+from ..utils.random import check_random_state
+
 
 class TheFittest:
     def __init__(self) -> None:
@@ -87,6 +89,7 @@ class EvolutionaryAlgorithm:
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]] = fitness_function
         self._iters: int = iters
@@ -124,6 +127,8 @@ class EvolutionaryAlgorithm:
 
         if self._n_jobs > 1:
             self._parallel = Parallel(self._n_jobs)
+
+        self._random_state = random_state
 
     def _first_generation(self: EvolutionaryAlgorithm) -> None:
         return None
@@ -260,6 +265,8 @@ class EvolutionaryAlgorithm:
         return population_split
 
     def fit(self: EvolutionaryAlgorithm) -> EvolutionaryAlgorithm:
+        self._random_state = check_random_state(self._random_state)
+
         self._get_init_population()
         self._from_population_g_to_fitness()
 

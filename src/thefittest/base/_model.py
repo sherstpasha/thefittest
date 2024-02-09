@@ -32,6 +32,7 @@ from ..optimizers import jDE
 from ..utils._metrics import categorical_crossentropy3d
 from ..utils._metrics import root_mean_square_error2d
 from ..utils.transformations import GrayCode
+# from ..utils.random import seed
 
 
 weights_type_optimizer_alias = Union[
@@ -116,6 +117,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         offset: bool = True,
         weights_optimizer: weights_type_optimizer_alias = SHADE,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
+        random_state: Optional[int] = None,
     ):
         self.iters = iters
         self.pop_size = pop_size
@@ -124,6 +126,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         self.offset = offset
         self.weights_optimizer = weights_optimizer
         self.weights_optimizer_args = weights_optimizer_args
+        self.random_state = random_state
 
     def _defitne_net(self: BaseEstimator, n_inputs: int, n_outputs: int) -> Net:
         start = 0
@@ -264,6 +267,10 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
 
     def fit(self, X: ArrayLike, y: ArrayLike):
 
+        # if self.random_state is not None:
+        #     check_random_state()
+        #     seed(self.random_state)
+
         if isinstance(self, ClassifierMixin):
             X, y = self._validate_data(X, y, y_numeric=False, reset=True)
             check_classification_targets(y)
@@ -290,9 +297,12 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         return self
 
     def predict(self, X: NDArray[np.float64]):
+        check_is_fitted(self)
+
         X = check_array(X)
         self._validate_data
         n_features = X.shape[1]
+
         if self.n_features_in_ != n_features:
             raise ValueError(
                 f"Number of features of the model must match the "
