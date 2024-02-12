@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import random
 from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -44,6 +44,7 @@ class GeneticProgramming(GeneticAlgorithm):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         GeneticAlgorithm.__init__(
             self,
@@ -69,17 +70,16 @@ class GeneticProgramming(GeneticAlgorithm):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            random_state=random_state,
         )
 
         self._uniset: UniversalSet = uniset
         self._max_level: int = max_level
         self._init_level: int = init_level
 
-    @staticmethod
-    def half_and_half(pop_size: int, uniset: UniversalSet, max_level: int) -> NDArray:
-        population = [
-            Tree.random_tree(uniset, random.randrange(2, max_level)) for _ in range(pop_size)
-        ]
+    def half_and_half(self, pop_size: int, uniset: UniversalSet, max_level: int) -> NDArray:
+        level = self._random_state.randint(2, max_level)
+        population = [Tree.random_tree(uniset, level) for _ in range(pop_size)]
         population_numpy = np.array(population, dtype=object)
         return population_numpy
 

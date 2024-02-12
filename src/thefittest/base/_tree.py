@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import random
 from collections import Counter
 from collections import defaultdict
 from inspect import signature
@@ -21,7 +20,10 @@ from ..utils import find_id_args_from_i
 from ..utils import get_levels_tree_from_i
 from ..utils import common_region
 from ..utils import common_region_two_trees
+from ..utils.random import random_sample
 from ..utils.random import random_weighted_sample
+from ..utils.random import flip_coin
+
 
 MIN_VALUE = np.finfo(np.float64).min
 MAX_VALUE = np.finfo(np.float64).max
@@ -131,7 +133,8 @@ class UniversalSet:
         return _functional_set_tuple
 
     def _random_terminal_or_ephemeral(self) -> Union[EphemeralConstantNode, TerminalNode]:
-        choosen = random.choice(self._terminal_set)
+        index = random_sample(len(self._terminal_set), 1, True)[0]
+        choosen = self._terminal_set[index]
         if isinstance(choosen, EphemeralNode):
             return choosen()
         else:
@@ -139,8 +142,9 @@ class UniversalSet:
 
     def _random_functional(self, n_args: int = -1) -> FunctionalNode:
         n_args_functionals = self._functional_set[n_args]
-        node = random.choice(n_args_functionals)
-        return node
+        index = random_sample(len(n_args_functionals), 1, True)[0]
+        choosen = n_args_functionals[index]
+        return choosen
 
 
 class EnsembleUniversalSet(UniversalSet):
@@ -399,7 +403,7 @@ class Tree:
                 possible_steps.append(n_i)
                 previous_levels.append(level_i)
             else:
-                if np.random.random() < 0.5:
+                if flip_coin():
                     nodes.append(uniset._random_terminal_or_ephemeral())
                 else:
                     nodes.append(uniset._random_functional())
@@ -414,7 +418,7 @@ class Tree:
 
     @classmethod
     def random_tree(cls, uniset: UniversalSet, max_level: int) -> Tree:
-        if random.random() < 0.5:
+        if flip_coin():
             tree = cls.full_growing_method(uniset, max_level)
         else:
             tree = cls.growing_method(uniset, max_level)

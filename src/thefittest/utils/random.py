@@ -18,6 +18,46 @@ from ..utils import check_for_value
 from ..utils import numpy_group_by
 
 
+# @njit(int64[:](int64[:]))
+# def sattolo_shuffle(arr):
+#     """
+#     Perform Sattolo's algorithm for in-place array shuffling.
+
+#     Parameters
+#     ----------
+#     arr : int64[:]
+#         Input array to be shuffled.
+
+#     Returns
+#     -------
+#     int64[:]
+#         Shuffled array.
+
+#     Examples
+#     --------
+#     >>> from numba import jit
+#     >>> import numpy as np
+#     >>>
+#     >>> # Example of using Sattolo's shuffle
+#     >>> arr = np.array([1, 2, 3, 4, 5])
+#     >>> shuffled_arr = sattolo_shuffle(arr)
+#     >>> print("Shuffled Array:", shuffled_arr)
+#     Shuffled Array: ...
+
+#     Notes
+#     -----
+#     Sattolo's algorithm generates a random cyclic permutation of a given array.
+#     """
+#     n = len(arr)
+#     shuffled_arr = arr.copy()
+
+#     for i in range(n - 1, 0, -1):
+#         j = np.int64(np.floor(random.random() * i))
+#         shuffled_arr[i], shuffled_arr[j] = shuffled_arr[j], shuffled_arr[i]
+
+#     return shuffled_arr
+
+
 def sattolo_shuffle(items: Union[List, NDArray]) -> None:
     """
     Perform an in-place Sattolo's algorithm shuffle on the input array.
@@ -63,10 +103,12 @@ def sattolo_shuffle(items: Union[List, NDArray]) -> None:
         j = random.randrange(i)
         items[j], items[i] = items[i], items[j]
 
+
 @njit
 def numba_seed(seed_value):
     random.seed(seed_value)
     np.random.seed(seed_value)
+
 
 @njit(float64[:](float64, float64, int64))
 def cauchy_distribution(loc: np.float64, scale: np.float64, size: np.int64) -> NDArray[np.float64]:
@@ -216,6 +258,108 @@ def random_sample(
     return sample
 
 
+@njit(boolean())
+def flip_coin():
+    """
+    Simulate a coin flip.
+
+    Returns
+    -------
+    boolean
+        Returns True with a 50% probability and False with a 50% probability.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import flip_coin
+    >>>
+    >>> # Example of a coin flip
+    >>> result = flip_coin()
+    >>> print("Coin Flip Result:", result)
+    Coin Flip Result: ...
+    """
+    return random.random() < 0.5
+
+
+@njit(float64[:](float64, float64, int64))
+def uniform(low: np.float64, high: np.float64, size: np.int64):
+    """
+    Generate an array of random samples from a uniform distribution.
+
+    Parameters
+    ----------
+    low : np.float64
+        The lower boundary of the output interval. All values generated will be
+        greater than or equal to `low`.
+    high : np.float64
+        The upper boundary of the output interval. All values generated will be
+        less or equal to `high`.
+    size : np.int64
+        The number of elements to generate.
+
+    Returns
+    -------
+    NDArray[np.float64]
+        An 1D array of random samples drawn from the uniform distribution.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import uniform
+    >>>
+    >>> # Example of generating random samples
+    >>> result = uniform(low=0.0, high=1.0, size=5)
+    >>> print("Random Samples:", result)
+    Random Samples: ...
+
+    Notes
+    -----
+    The generated samples follow a uniform distribution, where each value within
+    the specified range has an equal probability of being selected.
+
+    """
+    return np.random.uniform(low=low, high=high, size=size)
+
+
+@njit(int64[:](int64, int64, int64))
+def randint(low, high, size):
+    """
+    Generate an array of random integers from a discrete uniform distribution.
+
+    Parameters
+    ----------
+    low : int
+        The lowest integer to be drawn from the distribution.
+    high : int
+        The highest integer to be drawn from the distribution.
+    size : int
+        The number of integers to generate.
+
+    Returns
+    -------
+    NDArray[int64]
+        An array of random integers.
+
+    Examples
+    --------
+    >>> from numba import jit
+    >>> import numpy as np
+    >>>
+    >>> # Example of generating random integers
+    >>> result = numba_randint(low=1, high=10, size=5)
+    >>> print("Random Integers:", result)
+    Random Integers: ...
+
+    Notes
+    -----
+    The generated integers follow a discrete uniform distribution.
+    """
+    result = np.empty(size, dtype=np.int64)
+
+    for i in range(size):
+        result[i] = low + np.int64(np.floor((high - low) * random.random()))
+
+    return result
+
+
 def check_random_state(seed: Optional[Union[int, np.random.RandomState]] = None):
     """Turn seed into a np.random.RandomState instance
 
@@ -232,12 +376,13 @@ def check_random_state(seed: Optional[Union[int, np.random.RandomState]] = None)
         random_state = np.random.mtrand._rand
     elif isinstance(seed, (numbers.Integral, np.integer)):
         random_state = np.random.RandomState(seed)
+        seed = random_state.get_state()[1][0]
+        numba_seed(seed)
     elif isinstance(seed, np.random.RandomState):
         random_state = seed
+        seed = random_state.get_state()[1][0]
+        numba_seed(seed)
     else:
-        raise ValueError('%r cannot be used to seed a numpy.random.RandomState'
-                        ' instance' % seed)
+        raise ValueError("%r cannot be used to seed a numpy.random.RandomState" " instance" % seed)
 
-    seed = random_state.get_state()[1][0]
-    numba_seed(seed)
     return random_state

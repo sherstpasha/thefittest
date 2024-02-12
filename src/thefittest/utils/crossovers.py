@@ -462,7 +462,7 @@ def uniform_tournament_crossover(
     range_ = np.arange(len(individs))
     diag = np.arange(len(individs[0]))
 
-    tournament = np.random.choice(range_, 2 * len(individs[0]))
+    tournament = random_sample(len(individs), 2 * len(individs[0]), True)
     tournament = tournament.reshape(-1, 2)
     choosen = np.argmax(fitness[tournament], axis=1)
     offspring = individs[choosen, diag].copy()

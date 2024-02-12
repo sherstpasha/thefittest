@@ -67,6 +67,7 @@ class PDPGA(SelfCGA):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         SelfCGA.__init__(
             self,
@@ -95,13 +96,14 @@ class PDPGA(SelfCGA):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            random_state=random_state,
         )
 
         self._previous_fitness_i: List = []
         self._success_i: NDArray[np.bool_]
 
     def _choice_parent(self: PDPGA, fitness_i_selected: NDArray[np.float64]) -> np.float64:
-        choosen = random.choice(fitness_i_selected)
+        choosen = self._random_state.choice(fitness_i_selected, 1)[0]
         return choosen
 
     def _get_new_proba_pdp(

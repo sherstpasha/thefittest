@@ -128,7 +128,7 @@ class EvolutionaryAlgorithm:
         if self._n_jobs > 1:
             self._parallel = Parallel(self._n_jobs)
 
-        self._random_state = random_state
+        self._random_state = check_random_state(random_state)
 
     def _first_generation(self: EvolutionaryAlgorithm) -> None:
         return None
@@ -265,7 +265,6 @@ class EvolutionaryAlgorithm:
         return population_split
 
     def fit(self: EvolutionaryAlgorithm) -> EvolutionaryAlgorithm:
-        self._random_state = check_random_state(self._random_state)
 
         self._get_init_population()
         self._from_population_g_to_fitness()

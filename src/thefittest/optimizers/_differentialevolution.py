@@ -21,6 +21,7 @@ from ..utils.mutations import current_to_best_1
 from ..utils.mutations import rand_1
 from ..utils.mutations import rand_2
 from ..utils.mutations import rand_to_best1
+from ..utils.random import uniform
 
 
 @njit(float64[:](float64[:], float64[:], float64[:]))
@@ -65,6 +66,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         EvolutionaryAlgorithm.__init__(
             self,
@@ -83,6 +85,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            random_state=random_state,
         )
 
         self._left: NDArray[np.float64] = left
@@ -100,15 +103,16 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             "rand_2": rand_2,
         }
 
-    @staticmethod
     def float_population(
+        self,
         pop_size: int,
         left: NDArray[np.float64],
         right: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        return np.array(
-            [np.random.uniform(left_i, right_i, pop_size) for left_i, right_i in zip(left, right)]
-        ).T
+        points_along_axis = [
+            uniform(left_i, right_i, pop_size) for left_i, right_i in zip(left, right)
+        ]
+        return np.array(points_along_axis, dtype=np.float64).T
 
     def _first_generation(self: DifferentialEvolution) -> None:
         if self._init_population is None:

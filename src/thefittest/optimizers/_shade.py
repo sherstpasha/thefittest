@@ -19,6 +19,7 @@ from ..utils import find_pbest_id
 from ..utils.crossovers import binomial
 from ..utils.mutations import current_to_pbest_1_archive_p_min
 from ..utils.random import cauchy_distribution
+from ..utils.random import randint
 
 
 @njit(float64[:](float64[:], float64[:], float64[:]))
@@ -143,6 +144,7 @@ class SHADE(DifferentialEvolution):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         DifferentialEvolution.__init__(
             self,
@@ -163,6 +165,7 @@ class SHADE(DifferentialEvolution):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            random_state=random_state,
         )
 
         self._F: NDArray[np.float64]
@@ -180,7 +183,7 @@ class SHADE(DifferentialEvolution):
         F_i = np.zeros(self._pop_size, dtype=np.float64)
         CR_i = np.zeros(self._pop_size, dtype=np.float64)
         for i in range(self._pop_size):
-            r_i = np.random.randint(0, self._H_size)
+            r_i = randint(0, self._H_size, size=1)[0]
             u_F = self._H_F[r_i]
             u_CR = self._H_CR[r_i]
             F_i[i] = randc01(np.float64(u_F))
@@ -194,7 +197,7 @@ class SHADE(DifferentialEvolution):
     ) -> Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]:
         archive = np.append(archive, worse_g, axis=0)
         if len(archive) > self._pop_size:
-            np.random.shuffle(archive)
+            self._random_state.shuffle(archive)
             archive = archive[: self._pop_size]
         return archive
 

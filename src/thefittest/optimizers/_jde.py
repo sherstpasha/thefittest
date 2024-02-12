@@ -5,11 +5,13 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
 from ._differentialevolution import DifferentialEvolution
+from ..utils.random import uniform
 
 
 class jDE(DifferentialEvolution):
@@ -42,6 +44,7 @@ class jDE(DifferentialEvolution):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         DifferentialEvolution.__init__(
             self,
@@ -63,6 +66,7 @@ class jDE(DifferentialEvolution):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            random_state=random_state,
         )
 
         self._F_min: float = F_min
@@ -75,17 +79,17 @@ class jDE(DifferentialEvolution):
 
     def _get_mutate_F(self: jDE) -> NDArray[np.float64]:
         mutate_F = self._F.copy()
-        mask = np.random.random(size=self._pop_size) < self._t_F
+        mask = uniform(0.0, 1.0, size=self._pop_size) < self._t_F
 
-        random_values = np.random.random(size=np.sum(mask))
+        random_values = uniform(0.0, 1.0, size=np.sum(mask))
         mutate_F[mask] = self._F_min + random_values * self._F_max
         return mutate_F
 
     def _get_mutate_CR(self: jDE) -> NDArray[np.float64]:
         mutate_CR = self._CR.copy()
-        mask = np.random.random(size=self._pop_size) < self._t_CR
+        mask = uniform(0.0, 1.0, size=self._pop_size) < self._t_CR
 
-        random_values = np.random.random(size=np.sum(mask))
+        random_values = uniform(0.0, 1.0, size=np.sum(mask))
         mutate_CR[mask] = random_values
         return mutate_CR
 

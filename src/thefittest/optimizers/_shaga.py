@@ -6,6 +6,7 @@ from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -73,8 +74,9 @@ class SHAGA(EvolutionaryAlgorithm):
 
     def binary_string_population(self, pop_size: int, str_len: int) -> NDArray[np.byte]:
         size = (pop_size, str_len)
-        population = self._random_state.randint(
-            low=0, high=2, size=size, dtype=np.byte).astype(np.byte)
+        population = self._random_state.randint(low=0, high=2, size=size, dtype=np.byte).astype(
+            np.byte
+        )
         return population
 
     def _first_generation(self: SHAGA) -> None:
@@ -95,7 +97,7 @@ class SHAGA(EvolutionaryAlgorithm):
         return value
 
     def _randn(self: SHAGA, u: float, scale: float) -> float:
-        value = np.random.normal(u, scale)
+        value = self._random_state.normal(u, scale)
         if value < 0:
             value = 0
         elif value > 1:
@@ -106,7 +108,7 @@ class SHAGA(EvolutionaryAlgorithm):
         MR_i = np.zeros(self._pop_size)
         CR_i = np.zeros(self._pop_size)
         for i in range(self._pop_size):
-            r_i = np.random.randint(0, self._H_size)
+            r_i = self._random_state.randint(0, self._H_size)
             u_MR = self._H_MR[r_i]
             u_CR = self._H_CR[r_i]
             MR_i[i] = self._randc(u_MR, 0.1 / self._str_len)

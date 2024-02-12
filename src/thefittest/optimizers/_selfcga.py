@@ -65,6 +65,7 @@ class SelfCGA(GeneticAlgorithm):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         GeneticAlgorithm.__init__(
             self,
@@ -87,6 +88,7 @@ class SelfCGA(GeneticAlgorithm):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            random_state=random_state,
         )
 
         self._K: float = K
@@ -153,7 +155,7 @@ class SelfCGA(GeneticAlgorithm):
     def _choice_operators(self: SelfCGA, proba_dict: Dict["str", float]) -> NDArray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
-        chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
+        chosen_operator = self._random_state.choice(operators, self._pop_size, p=proba)
         return chosen_operator
 
     def _get_new_proba(
