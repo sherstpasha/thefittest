@@ -17,6 +17,7 @@ from ..utils.crossovers import binomialGA
 from ..utils.mutations import flip_mutation
 from ..utils.selections import tournament_selection
 from ..utils.random import cauchy_distribution
+from ..utils.random import randint
 
 
 class SHAGA(EvolutionaryAlgorithm):
@@ -72,11 +73,14 @@ class SHAGA(EvolutionaryAlgorithm):
         self._H_CR = np.full(self._H_size, 0.5, dtype=np.float64)
         self._k: int = 0
 
-    def binary_string_population(self, pop_size: int, str_len: int) -> NDArray[np.byte]:
-        size = (pop_size, str_len)
-        population = self._random_state.randint(low=0, high=2, size=size, dtype=np.byte).astype(
-            np.byte
+    @staticmethod
+    def binary_string_population(pop_size: int, str_len: int) -> NDArray[np.byte]:
+
+        population = np.array(
+            [randint(low=0, high=2, size=str_len) for _ in range(pop_size)],
+            dtype=np.byte,
         )
+
         return population
 
     def _first_generation(self: SHAGA) -> None:
@@ -97,7 +101,7 @@ class SHAGA(EvolutionaryAlgorithm):
         return value
 
     def _randn(self: SHAGA, u: float, scale: float) -> float:
-        value = self._random_state.normal(u, scale)
+        value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
         if value < 0:
             value = 0
         elif value > 1:
@@ -108,7 +112,7 @@ class SHAGA(EvolutionaryAlgorithm):
         MR_i = np.zeros(self._pop_size)
         CR_i = np.zeros(self._pop_size)
         for i in range(self._pop_size):
-            r_i = self._random_state.randint(0, self._H_size)
+            r_i = randint(0, self._H_size, 1)[0]
             u_MR = self._H_MR[r_i]
             u_CR = self._H_CR[r_i]
             MR_i[i] = self._randc(u_MR, 0.1 / self._str_len)

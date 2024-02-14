@@ -199,11 +199,10 @@ class EvolutionaryAlgorithm:
                 for populations_ph_i in populations_ph
             )
             value = np.concatenate(values, axis=0)
-
-            self._calls += len(value)
         else:
             value = self._fitness_function(population_ph, **self._fitness_function_args)
 
+        self._calls += len(value)
         fitness = self._sign * value
         return fitness
 

@@ -5,6 +5,7 @@ from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -62,6 +63,7 @@ class PDPGP(GeneticProgramming, PDPGA):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         PDPGA.__init__(
             self,
@@ -87,6 +89,7 @@ class PDPGP(GeneticProgramming, PDPGA):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            random_state=random_state,
         )
 
         GeneticProgramming.__init__(
@@ -112,6 +115,7 @@ class PDPGP(GeneticProgramming, PDPGA):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            random_state=random_state,
         )
 
     def _get_new_individ_g(

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import random
 from typing import Union
 
 from numba import float64
@@ -13,6 +12,9 @@ from numpy.typing import NDArray
 
 from .random import random_sample
 from .random import sattolo_shuffle
+from .random import flip_coin
+from .random import randint
+from .random import uniform
 from ..base import EphemeralNode
 from ..base import FunctionalNode
 from ..base import TerminalNode
@@ -57,7 +59,7 @@ def flip_mutation(individual: NDArray[np.byte], proba: float) -> NDArray[np.byte
     """
     offspring = individual.copy()
     for i in range(offspring.size):
-        if random.random() < proba:
+        if flip_coin(proba):
             offspring[i] = 1 - offspring[i]
     return offspring
 
@@ -505,7 +507,7 @@ def current_to_pbest_1_archive(
     >>> print("Mutated Individual:", mutated_individual)
     Mutated Individual: ...
     """
-    p_best_ind = random.randrange(len(pbest))
+    p_best_ind = randint(0, len(pbest), 1)[0]
     best = population[pbest[p_best_ind]]
     r1 = random_sample(range_size=len(population), quantity=np.int64(1), replace=True)[0]
     r2 = random_sample(range_size=len(pop_archive), quantity=np.int64(1), replace=True)[0]
@@ -569,11 +571,11 @@ def current_to_pbest_1_archive_p_min(
     """
     size = len(population)
     p_min = 2 / size
-    p_i = np.random.uniform(p_min, 0.2)
+    p_i = uniform(p_min, 0.2, 1)[0]
     value = np.int64(max(1, p_i * size))
     pbest_cut = pbest[:value]
 
-    p_best_ind = random.randrange(len(pbest_cut))
+    p_best_ind = randint(0, len(pbest_cut), 1)[0]
     best = population[pbest_cut[p_best_ind]]
     r1 = random_sample(range_size=size, quantity=np.int64(1), replace=True)[0]
     r2 = random_sample(range_size=len(pop_archive), quantity=np.int64(1), replace=True)[0]
@@ -636,8 +638,8 @@ def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: in
     new_node: Union[FunctionalNode, TerminalNode, EphemeralNode]
 
     mutated_tree = tree.copy()
-    if random.random() < proba:
-        i = random.randrange(len(mutated_tree))
+    if flip_coin(proba):
+        i = randint(0, len(mutated_tree), 1)[0]
         if isinstance(mutated_tree._nodes[i], FunctionalNode):
             n_args = mutated_tree._nodes[i]._n_args
             new_node = uniset._random_functional(n_args)
@@ -699,8 +701,8 @@ def growing_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: 
     Mutated Tree: ...
     """
     mutated_tree = tree.copy()
-    if random.random() < proba:
-        i = random.randrange(len(mutated_tree))
+    if flip_coin(proba):
+        i = randint(0, len(mutated_tree), 1)[0]
         grown_tree = Tree.growing_method(uniset, max(mutated_tree.get_levels(i)))
         mutated_tree = mutated_tree.concat(i, grown_tree)
     return mutated_tree
@@ -758,14 +760,15 @@ def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_leve: int)
     Mutated Tree: ...
     """
     mutated_tree = tree.copy()
-    if random.random() < proba:
+    if flip_coin(proba):
         more_one_args_cond = mutated_tree._n_args > 1
         indexes = np.arange(len(tree), dtype=int)[more_one_args_cond]
         if len(indexes) > 0:
-            i = random.choice(indexes.tolist())
+            index = random_sample(range_size=len(indexes), quantity=1, replace=True)[0]
+            i = indexes[index]
             args_id = mutated_tree.get_args_id(i)
             new_arg_id = args_id.copy()
-            sattolo_shuffle(new_arg_id)
+            new_arg_id = sattolo_shuffle(new_arg_id)
             for old_j, new_j in zip(args_id, new_arg_id):
                 subtree = tree.subtree(old_j)
                 mutated_tree = mutated_tree.concat(new_j, subtree)
@@ -825,12 +828,17 @@ def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: i
     """
     mutated_tree = tree.copy()
     if len(mutated_tree) > 2:
-        if random.random() < proba:
+        if flip_coin(proba):
             no_terminal_cond = mutated_tree._n_args > 0
             indexes = np.arange(len(tree), dtype=np.int64)[no_terminal_cond]
             if len(indexes) > 0:
-                i = random.choice(indexes.tolist())
+                index = random_sample(range_size=len(indexes), quantity=1, replace=True)[0]
+                i = indexes[index]
+
                 args_id = mutated_tree.get_args_id(i)
-                choosen_id = random.choice(args_id.tolist())
+
+                index = random_sample(range_size=len(indexes), quantity=1, replace=True)[0]
+                choosen_id = args_id[index]
+
                 mutated_tree = mutated_tree.concat(i, tree.subtree(choosen_id))
     return mutated_tree

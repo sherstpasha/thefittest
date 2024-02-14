@@ -12,6 +12,7 @@ from numpy.typing import NDArray
 from ._geneticalgorithm import GeneticAlgorithm
 from ..base import Tree
 from ..base import UniversalSet
+from ..utils.random import randint
 
 
 class GeneticProgramming(GeneticAlgorithm):
@@ -77,8 +78,9 @@ class GeneticProgramming(GeneticAlgorithm):
         self._max_level: int = max_level
         self._init_level: int = init_level
 
-    def half_and_half(self, pop_size: int, uniset: UniversalSet, max_level: int) -> NDArray:
-        level = self._random_state.randint(2, max_level)
+    @staticmethod
+    def half_and_half(pop_size: int, uniset: UniversalSet, max_level: int) -> NDArray:
+        level = randint(2, max_level, 1)[0]
         population = [Tree.random_tree(uniset, level) for _ in range(pop_size)]
         population_numpy = np.array(population, dtype=object)
         return population_numpy

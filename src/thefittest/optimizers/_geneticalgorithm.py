@@ -38,6 +38,7 @@ from ..utils.crossovers import uniform_rank_crossover_GP
 from ..utils.crossovers import uniform_tournament_crossover
 from ..utils.crossovers import uniform_tournament_crossover_GP
 from ..utils.transformations import minmax_scale
+from ..utils.random import randint
 
 
 class GeneticAlgorithm(EvolutionaryAlgorithm):
@@ -164,11 +165,14 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         self._fitness_scale_i: NDArray[np.float64]
         self._fitness_rank_i: NDArray[np.float64]
 
-    def binary_string_population(self, pop_size: int, str_len: int) -> NDArray[np.byte]:
-        size = (pop_size, str_len)
-        population = self._random_state.randint(low=0, high=2, size=size, dtype=np.byte).astype(
-            np.byte
+    @staticmethod
+    def binary_string_population(pop_size: int, str_len: int) -> NDArray[np.byte]:
+
+        population = np.array(
+            [randint(low=0, high=2, size=str_len) for _ in range(pop_size)],
+            dtype=np.byte,
         )
+
         return population
 
     def _first_generation(self: GeneticAlgorithm) -> None:

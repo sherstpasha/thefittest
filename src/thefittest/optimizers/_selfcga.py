@@ -12,6 +12,7 @@ from numpy.typing import NDArray
 
 from ._geneticalgorithm import GeneticAlgorithm
 from ..utils import numpy_group_by
+from ..utils.random import random_weighted_sample
 
 
 class SelfCGA(GeneticAlgorithm):
@@ -153,9 +154,11 @@ class SelfCGA(GeneticAlgorithm):
         self._mutation_operators: NDArray = self._choice_operators(proba_dict=self._mutation_proba)
 
     def _choice_operators(self: SelfCGA, proba_dict: Dict["str", float]) -> NDArray:
-        operators = list(proba_dict.keys())
-        proba = list(proba_dict.values())
-        chosen_operator = self._random_state.choice(operators, self._pop_size, p=proba)
+        operators = np.array(list(proba_dict.keys()))
+        proba = np.array(list(proba_dict.values()), dtype=np.float64)
+
+        index = random_weighted_sample(weights=proba, quantity=self._pop_size, replace=True)
+        chosen_operator = operators[index]
         return chosen_operator
 
     def _get_new_proba(

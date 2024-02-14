@@ -15,6 +15,7 @@ from numpy.typing import NDArray
 from ._selfcga import SelfCGA
 from ..base import Tree
 from ..utils import numpy_group_by
+from ..utils.random import random_sample
 
 
 class PDPGA(SelfCGA):
@@ -103,7 +104,8 @@ class PDPGA(SelfCGA):
         self._success_i: NDArray[np.bool_]
 
     def _choice_parent(self: PDPGA, fitness_i_selected: NDArray[np.float64]) -> np.float64:
-        choosen = self._random_state.choice(fitness_i_selected, 1)[0]
+        index = random_sample(len(fitness_i_selected), 1, True)[0]
+        choosen = fitness_i_selected[index]
         return choosen
 
     def _get_new_proba_pdp(

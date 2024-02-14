@@ -103,8 +103,8 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             "rand_2": rand_2,
         }
 
+    @staticmethod
     def float_population(
-        self,
         pop_size: int,
         left: NDArray[np.float64],
         right: NDArray[np.float64],

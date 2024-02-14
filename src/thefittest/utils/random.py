@@ -15,93 +15,86 @@ from numpy.typing import NDArray
 
 from ..utils import binary_search_interval
 from ..utils import check_for_value
-from ..utils import numpy_group_by
 
 
-# @njit(int64[:](int64[:]))
-# def sattolo_shuffle(arr):
-#     """
-#     Perform Sattolo's algorithm for in-place array shuffling.
-
-#     Parameters
-#     ----------
-#     arr : int64[:]
-#         Input array to be shuffled.
-
-#     Returns
-#     -------
-#     int64[:]
-#         Shuffled array.
-
-#     Examples
-#     --------
-#     >>> from numba import jit
-#     >>> import numpy as np
-#     >>>
-#     >>> # Example of using Sattolo's shuffle
-#     >>> arr = np.array([1, 2, 3, 4, 5])
-#     >>> shuffled_arr = sattolo_shuffle(arr)
-#     >>> print("Shuffled Array:", shuffled_arr)
-#     Shuffled Array: ...
-
-#     Notes
-#     -----
-#     Sattolo's algorithm generates a random cyclic permutation of a given array.
-#     """
-#     n = len(arr)
-#     shuffled_arr = arr.copy()
-
-#     for i in range(n - 1, 0, -1):
-#         j = np.int64(np.floor(random.random() * i))
-#         shuffled_arr[i], shuffled_arr[j] = shuffled_arr[j], shuffled_arr[i]
-
-#     return shuffled_arr
-
-
-def sattolo_shuffle(items: Union[List, NDArray]) -> None:
+@njit(int64[:](int64[:]))
+def sattolo_shuffle(arr):
     """
-    Perform an in-place Sattolo's algorithm shuffle on the input array.
-
-    Sattolo's algorithm shuffles the elements of the array in such a way that
-    no element ends up in its original position. This is achieved by iteratively
-    selecting a random element and swapping it with the element at a randomly chosen
-    position ahead of it.
+    Perform Sattolo's algorithm for in-place array shuffling.
 
     Parameters
     ----------
-    items : Union[List, NDArray]
-        The input array or list to be shuffled. The function shuffles the elements
-        in place.
+    arr : int64[:]
+        Input array to be shuffled.
 
     Returns
     -------
-    None
-        The function operates in-place, and the input array is shuffled without
-        returning a new array.
+    int64[:]
+        Shuffled array.
 
     Examples
     --------
+    >>> from numba import jit
     >>> import numpy as np
-    >>> from thefittest.utils.random import sattolo_shuffle
     >>>
-    >>> # Example with a list
-    >>> my_list = [1, 2, 3, 4, 5]
-    >>> sattolo_shuffle(my_list)
-    >>> print("Shuffled List:", my_list)
-    Shuffled List: ...
-    >>>
-    >>> # Example with a NumPy array
-    >>> my_array = np.array([1, 2, 3, 4, 5])
-    >>> sattolo_shuffle(my_array)
-    >>> print("Shuffled NumPy Array:", my_array)
-    Shuffled NumPy Array: ...
-    """
+    >>> # Example of using Sattolo's shuffle
+    >>> arr = np.array([1, 2, 3, 4, 5])
+    >>> shuffled_arr = sattolo_shuffle(arr)
+    >>> print("Shuffled Array:", shuffled_arr)
+    Shuffled Array: ...
 
-    i = len(items)
-    while i > 1:
-        i = i - 1
-        j = random.randrange(i)
-        items[j], items[i] = items[i], items[j]
+    Notes
+    -----
+    Sattolo's algorithm generates a random cyclic permutation of a given array.
+    """
+    n = len(arr)
+    shuffled_arr = arr.copy()
+
+    for i in range(n - 1, 0, -1):
+        j = np.int64(np.floor(random.random() * i))
+        shuffled_arr[i], shuffled_arr[j] = shuffled_arr[j], shuffled_arr[i]
+
+    return shuffled_arr
+
+
+@njit
+def sattolo_shuffle_2d(arr):
+    """
+    Perform Sattolo's algorithm for in-place shuffling of rows in a 2D array.
+
+    Parameters
+    ----------
+    arr : int64[:, :]
+        Input 2D array to be shuffled.
+
+    Returns
+    -------
+    int64[:, :]
+        Shuffled 2D array.
+
+    Examples
+    --------
+    >>> from numba import jit
+    >>> import numpy as np
+    >>>
+    >>> # Example of using Sattolo's shuffle for a 2D array
+    >>> arr_2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    >>> shuffled_arr_2d = sattolo_shuffle_2d(arr_2d)
+    >>> print("Shuffled 2D Array:", shuffled_arr_2d)
+    Shuffled 2D Array: ...
+
+    Notes
+    -----
+    Sattolo's algorithm generates a random cyclic permutation of rows in a 2D array.
+    """
+    n_rows, _ = arr.shape
+    shuffled_arr = arr.copy()
+
+    for i in range(n_rows - 1, 0, -1):
+        j = np.int64(np.floor(random.random() * i))
+        shuffled_arr[i], shuffled_arr[j] = shuffled_arr[j].copy(), shuffled_arr[i].copy()
+
+    return shuffled_arr
 
 
 @njit
@@ -258,26 +251,39 @@ def random_sample(
     return sample
 
 
-@njit(boolean())
-def flip_coin():
+@njit(boolean(int64))
+def flip_coin(threshold):
     """
-    Simulate a coin flip.
+    Simulate a biased coin flip.
+
+    Parameters
+    ----------
+    threshold : int64
+        The threshold for the biased coin flip. Should be in the range [0, 1].
 
     Returns
     -------
     boolean
-        Returns True with a 50% probability and False with a 50% probability.
+        Returns True with a probability equal to the given threshold and
+        False with a complementary probability.
 
     Examples
     --------
     >>> from thefittest.utils.random import flip_coin
     >>>
-    >>> # Example of a coin flip
-    >>> result = flip_coin()
+    >>> # Example of a biased coin flip with a threshold of 0.5
+    >>> result = flip_coin(0.5)
     >>> print("Coin Flip Result:", result)
     Coin Flip Result: ...
+
+    Notes
+    -----
+    The function simulates a biased coin flip with a specified threshold.
+    If the threshold is 0.5, it behaves like a fair coin flip.
+    A threshold greater than 0.5 biases the result towards True,
+    while a threshold less than 0.5 biases the result towards False.
     """
-    return random.random() < 0.5
+    return random.random() < threshold
 
 
 @njit(float64[:](float64, float64, int64))

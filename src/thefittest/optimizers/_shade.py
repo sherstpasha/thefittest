@@ -20,6 +20,7 @@ from ..utils.crossovers import binomial
 from ..utils.mutations import current_to_pbest_1_archive_p_min
 from ..utils.random import cauchy_distribution
 from ..utils.random import randint
+from ..utils.random import sattolo_shuffle_2d
 
 
 @njit(float64[:](float64[:], float64[:], float64[:]))
@@ -197,7 +198,8 @@ class SHADE(DifferentialEvolution):
     ) -> Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]:
         archive = np.append(archive, worse_g, axis=0)
         if len(archive) > self._pop_size:
-            self._random_state.shuffle(archive)
+            archive = sattolo_shuffle_2d(archive)
+
             archive = archive[: self._pop_size]
         return archive
 

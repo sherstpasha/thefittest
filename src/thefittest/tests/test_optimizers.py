@@ -97,13 +97,10 @@ def test_GeneticAlgorithm_set_strategy():
     def fitness_function(x):
         return np.sum(x, axis=1, dtype=np.float64)
 
-    iters = 3
+    iters = 10
     pop_size = 8
-    str_len = 5
+    str_len = 30
 
-    initial_population = GeneticAlgorithm.binary_string_population(
-        pop_size=pop_size, str_len=str_len
-    )
     selections = (
         "proportional",
         "rank",
@@ -137,11 +134,15 @@ def test_GeneticAlgorithm_set_strategy():
     mutation_rate = (0.11, 0.22)
 
     for selections_i in selections:
-        for crossover_i in crossover:
-            for mutation_i in mutation:
-                for tour_size_i in tour_size:
-                    for parents_num_i in parents_num:
-                        for mutation_rate_i in mutation_rate:
+        for mutation_rate_i in mutation_rate:
+            for crossover_i in crossover:
+                for mutation_i in mutation:
+                    for tour_size_i in tour_size:
+                        for parents_num_i in parents_num:
+                            random_state = np.random.randint(0, 100)
+                            initial_population = GeneticAlgorithm.binary_string_population(
+                                pop_size=pop_size, str_len=str_len
+                            )
                             optimizer = GeneticAlgorithm(
                                 fitness_function,
                                 iters=iters,
@@ -161,6 +162,7 @@ def test_GeneticAlgorithm_set_strategy():
                                 elitism=True,
                                 parents_num=parents_num_i,
                                 mutation_rate=mutation_rate_i,
+                                random_state=random_state,
                             )
 
                             assert optimizer._specified_selection == selections_i
@@ -190,6 +192,36 @@ def test_GeneticAlgorithm_set_strategy():
 
                             stats = optimizer.get_stats()
                             assert np.all(stats["population_g"][0] == initial_population)
+
+                            genotype_1 = optimizer.get_fittest()["genotype"]
+
+                            optimizer = GeneticAlgorithm(
+                                fitness_function,
+                                iters=iters,
+                                pop_size=pop_size,
+                                str_len=str_len,
+                                optimal_value=None,
+                                termination_error_value=0,
+                                no_increase_num=None,
+                                minimization=False,
+                                show_progress_each=None,
+                                keep_history=True,
+                                init_population=initial_population,
+                                selection=selections_i,
+                                crossover=crossover_i,
+                                mutation=mutation_i,
+                                tour_size=tour_size_i,
+                                elitism=True,
+                                parents_num=parents_num_i,
+                                mutation_rate=mutation_rate_i,
+                                random_state=random_state,
+                            )
+
+                            optimizer.fit()
+
+                            genotype_2 = optimizer.get_fittest()["genotype"]
+
+                            assert np.all(genotype_1 == genotype_2)
 
 
 def test_SelfCGA_start_settings():
@@ -314,10 +346,58 @@ def test_SelfCGA_set_strategy():
         elitism=True,
         parents_num=parents_num,
         mutation_rate=mutation_rate,
+        random_state=42,
     )
     optimizer.fit()
     stats = optimizer.get_stats()
     assert np.all(stats["population_g"][0] == initial_population)
+
+    genotype_1 = optimizer.get_fittest()["genotype"]
+
+    optimizer = SelfCGA(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        str_len=str_len,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=False,
+        show_progress_each=None,
+        keep_history=True,
+        init_population=initial_population,
+        selections=(
+            "proportional",
+            "rank",
+            "tournament_k",
+            "tournament_3",
+        ),
+        crossovers=(
+            "empty",
+            "one_point",
+            "two_point",
+            "uniform_2",
+            "uniform_k",
+            "uniform_prop_2",
+            "uniform_prop_k",
+            "uniform_rank_2",
+            "uniform_rank_k",
+            "uniform_tour_3",
+            "uniform_tour_k",
+        ),
+        mutations=("weak", "custom_rate"),
+        tour_size=tour_size,
+        elitism=True,
+        parents_num=parents_num,
+        mutation_rate=mutation_rate,
+        random_state=42,
+    )
+
+    optimizer.fit()
+
+    genotype_2 = optimizer.get_fittest()["genotype"]
+
+    assert np.all(genotype_1 == genotype_2)
 
 
 def test_GeneticProgramming_start_settings():
@@ -508,6 +588,10 @@ def test_GeneticProgramming_set_strategy():
     for selections_i in selections:
         for crossover_i in crossover:
             for mutation_i in mutation:
+                initial_population = GeneticProgramming.half_and_half(
+                    pop_size=pop_size, uniset=uniset, max_level=14
+                )
+                random_state = np.random.randint(0, 100)
                 optimizer = GeneticProgramming(
                     fitness_function,
                     iters=iters,
@@ -527,6 +611,7 @@ def test_GeneticProgramming_set_strategy():
                     elitism=True,
                     parents_num=3,
                     mutation_rate=0.33,
+                    random_state=random_state,
                 )
 
                 assert optimizer._specified_selection == selections_i
@@ -547,6 +632,34 @@ def test_GeneticProgramming_set_strategy():
 
                 stats = optimizer.get_stats()
                 assert np.all(stats["population_g"][0] == initial_population)
+                genotype_1 = optimizer.get_fittest()["genotype"]
+
+                optimizer = GeneticProgramming(
+                    fitness_function,
+                    iters=iters,
+                    pop_size=pop_size,
+                    uniset=uniset,
+                    optimal_value=None,
+                    termination_error_value=0,
+                    no_increase_num=None,
+                    minimization=False,
+                    show_progress_each=None,
+                    keep_history=True,
+                    init_population=initial_population,
+                    selection=selections_i,
+                    crossover=crossover_i,
+                    mutation=mutation_i,
+                    tour_size=3,
+                    elitism=True,
+                    parents_num=3,
+                    mutation_rate=0.33,
+                    random_state=random_state,
+                )
+                optimizer.fit()
+
+                genotype_2 = optimizer.get_fittest()["genotype"]
+
+                assert np.all(genotype_1 == genotype_2)
 
 
 def test_SelfCGP_start_settings():
@@ -763,10 +876,80 @@ def test_SelfCGP_set_strategy():
         elitism=True,
         parents_num=parents_num,
         mutation_rate=mutation_rate,
+        random_state=42,
     )
     optimizer.fit()
     stats = optimizer.get_stats()
     assert np.all(stats["population_g"][0] == initial_population)
+    genotype_1 = optimizer.get_fittest()["genotype"]
+
+    optimizer = SelfCGP(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        uniset=uniset,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=False,
+        show_progress_each=None,
+        keep_history=True,
+        init_population=initial_population,
+        selections=(
+            "proportional",
+            "rank",
+            "tournament_k",
+            "tournament_3",
+            "tournament_5",
+            "tournament_7",
+        ),
+        crossovers=(
+            "gp_empty",
+            "gp_standard",
+            "gp_one_point",
+            "gp_uniform_2",
+            "gp_uniform_7",
+            "gp_uniform_k",
+            "gp_uniform_prop_2",
+            "gp_uniform_prop_7",
+            "gp_uniform_prop_k",
+            "gp_uniform_rank_2",
+            "gp_uniform_rank_7",
+            "gp_uniform_rank_k",
+            "gp_uniform_tour_3",
+            "gp_uniform_tour_7",
+            "gp_uniform_tour_k",
+        ),
+        mutations=(
+            "gp_weak_point",
+            "gp_average_point",
+            "gp_strong_point",
+            "gp_custom_rate_point",
+            "gp_weak_grow",
+            "gp_average_grow",
+            "gp_strong_grow",
+            "gp_custom_rate_grow",
+            "gp_weak_swap",
+            "gp_average_swap",
+            "gp_strong_swap",
+            "gp_custom_rate_swap",
+            "gp_weak_shrink",
+            "gp_average_shrink",
+            "gp_strong_shrink",
+            "gp_custom_rate_shrink",
+        ),
+        tour_size=tour_size,
+        elitism=True,
+        parents_num=parents_num,
+        mutation_rate=mutation_rate,
+        random_state=42,
+    )
+
+    optimizer.fit()
+
+    genotype_2 = optimizer.get_fittest()["genotype"]
+
+    assert np.all(genotype_1 == genotype_2)
 
 
 def test_DifferentialEvolution_start_settings():
@@ -857,9 +1040,6 @@ def test_DifferentialEvolution_set_strategy():
     n_vars = 10
     left = np.full(n_vars, -1, dtype=np.float64)
     right = np.full(n_vars, 1, dtype=np.float64)
-    initial_population = DifferentialEvolution.float_population(
-        pop_size=pop_size, left=left, right=right
-    )
 
     mutations = ("best_1", "rand_1", "current_to_best_1", "rand_to_best1", "best_2", "rand_2")
     F = (0.5, 0.3)
@@ -868,6 +1048,10 @@ def test_DifferentialEvolution_set_strategy():
     for mutation_i in mutations:
         for F_i in F:
             for CR_i in CR:
+                initial_population = DifferentialEvolution.float_population(
+                    pop_size=pop_size, left=left, right=right
+                )
+                random_state = np.random.randint(0, 100)
                 optimizer = DifferentialEvolution(
                     fitness_function,
                     iters=iters,
@@ -884,6 +1068,7 @@ def test_DifferentialEvolution_set_strategy():
                     init_population=initial_population,
                     F=F_i,
                     CR=CR_i,
+                    random_state=random_state,
                 )
                 optimizer.fit()
                 stats = optimizer.get_stats()
@@ -891,8 +1076,35 @@ def test_DifferentialEvolution_set_strategy():
                 assert optimizer._specified_mutation == mutation_i
                 assert optimizer._F == F_i
                 assert optimizer._CR == CR_i
-                print(stats.keys())
+
                 assert np.all(stats["population_g"][0] == initial_population)
+
+                genotype_1 = optimizer.get_fittest()["genotype"]
+
+                optimizer = DifferentialEvolution(
+                    fitness_function,
+                    iters=iters,
+                    pop_size=pop_size,
+                    left=left,
+                    right=right,
+                    optimal_value=None,
+                    termination_error_value=0,
+                    no_increase_num=None,
+                    minimization=True,
+                    show_progress_each=1,
+                    keep_history=True,
+                    mutation=mutation_i,
+                    init_population=initial_population,
+                    F=F_i,
+                    CR=CR_i,
+                    random_state=random_state,
+                )
+
+                optimizer.fit()
+
+                genotype_2 = optimizer.get_fittest()["genotype"]
+
+                assert np.all(genotype_1 == genotype_2)
 
 
 def test_jDE_start_settings():
@@ -983,7 +1195,6 @@ def test_jDE_set_strategy():
     n_vars = 10
     left = np.full(n_vars, -1, dtype=np.float64)
     right = np.full(n_vars, 1, dtype=np.float64)
-    initial_population = jDE.float_population(pop_size=pop_size, left=left, right=right)
 
     mutations = ("best_1", "rand_1", "current_to_best_1", "rand_to_best1", "best_2", "rand_2")
     F_min = (0.05, 0.1)
@@ -996,6 +1207,10 @@ def test_jDE_set_strategy():
             for F_max_i in F_max:
                 for t_F_i in t_F:
                     for t_CR_i in t_CR:
+                        initial_population = jDE.float_population(
+                            pop_size=pop_size, left=left, right=right
+                        )
+                        random_state = np.random.randint(0, 100)
                         optimizer = jDE(
                             fitness_function,
                             iters=iters,
@@ -1014,6 +1229,7 @@ def test_jDE_set_strategy():
                             t_CR=t_CR_i,
                             t_F=t_F_i,
                             init_population=initial_population,
+                            random_state=random_state,
                         )
                         optimizer.fit()
                         stats = optimizer.get_stats()
@@ -1025,6 +1241,35 @@ def test_jDE_set_strategy():
                         assert optimizer._t_F == t_F_i
                         print(stats.keys())
                         assert np.all(stats["population_g"][0] == initial_population)
+
+                        genotype_1 = optimizer.get_fittest()["genotype"]
+
+                        optimizer = jDE(
+                            fitness_function,
+                            iters=iters,
+                            pop_size=pop_size,
+                            left=left,
+                            right=right,
+                            optimal_value=None,
+                            termination_error_value=0,
+                            no_increase_num=None,
+                            minimization=True,
+                            show_progress_each=1,
+                            keep_history=True,
+                            mutation=mutation_i,
+                            F_min=F_min_i,
+                            F_max=F_max_i,
+                            t_CR=t_CR_i,
+                            t_F=t_F_i,
+                            init_population=initial_population,
+                            random_state=random_state,
+                        )
+
+                        optimizer.fit()
+
+                        genotype_2 = optimizer.get_fittest()["genotype"]
+
+                        assert np.all(genotype_1 == genotype_2)
 
 
 def test_SHADE_start_settings():
@@ -1050,9 +1295,32 @@ def test_SHADE_start_settings():
         minimization=True,
         show_progress_each=1,
         keep_history=True,
+        random_state=42,
     )
 
     optimizer.fit()
+
+    genotype_1 = optimizer.get_fittest()["genotype"]
+
+    optimizer = SHADE(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        left=left,
+        right=right,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=True,
+        show_progress_each=1,
+        keep_history=True,
+        random_state=42,
+    )
+    optimizer.fit()
+
+    genotype_2 = optimizer.get_fittest()["genotype"]
+
+    assert np.all(genotype_1 == genotype_2)
 
     fittest = optimizer.get_fittest()
     assert isinstance(fittest, dict)
@@ -1126,9 +1394,32 @@ def test_SHAGA_start_settings():
         minimization=True,
         show_progress_each=1,
         keep_history=True,
+        random_state=42,
     )
 
     optimizer.fit()
+
+    genotype_1 = optimizer.get_fittest()["genotype"]
+
+    optimizer = SHAGA(
+        fitness_function,
+        iters=iters,
+        pop_size=pop_size,
+        str_len=str_len,
+        optimal_value=None,
+        termination_error_value=0,
+        no_increase_num=None,
+        minimization=True,
+        show_progress_each=1,
+        keep_history=True,
+        random_state=42,
+    )
+
+    optimizer.fit()
+
+    genotype_2 = optimizer.get_fittest()["genotype"]
+
+    assert np.all(genotype_1 == genotype_2)
 
     fittest = optimizer.get_fittest()
     assert isinstance(fittest, dict)
