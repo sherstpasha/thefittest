@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import random
 from collections import defaultdict
 from itertools import product
 from typing import Any
@@ -17,6 +16,8 @@ from numpy.typing import NDArray
 
 from ..utils import forward2d
 from ..utils.transformations import minmax_scale
+from ..utils.random import random_sample
+from ..utils.random import uniform
 
 
 ACTIVATION_NAME = {0: "sg", 1: "rl", 2: "gs", 3: "th", 4: "ln", 5: "sm"}
@@ -115,7 +116,7 @@ class Net:
     ) -> Tuple[NDArray[np.int64], NDArray[np.float64]]:
         if len(left) and len(right):
             connects = np.array(list(product(left, right)), dtype=np.int64)
-            weights = np.random.uniform(-2, 2, len(connects)).astype(np.float64)
+            weights = uniform(-2, 2, len(connects))
             return (connects, weights)
         else:
             return (np.zeros((0, 2), dtype=np.int64), np.zeros((0), dtype=np.float64))
@@ -385,8 +386,8 @@ class Net:
 
 class HiddenBlock:
     def __init__(self, max_size: int) -> None:
-        self._activ = random.sample([0, 1, 2, 3, 4], k=1)[0]
-        self._size = random.randrange(1, max_size)
+        self._activ = random_sample(5, 1, True)[0]
+        self._size = random_sample(max_size - 1, 1, True)[0] + 1
 
     def __str__(self) -> str:
         return "{}{}".format(ACTIVATION_NAME[self._activ], self._size)
