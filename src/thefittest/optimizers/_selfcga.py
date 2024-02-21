@@ -144,14 +144,9 @@ class SelfCGA(GeneticAlgorithm):
         self._mutation_proba = dict(
             zip(list(self._mutation_set.keys()), np.full(self._z_mutation, 1 / self._z_mutation))
         )
-
-        self._selection_operators: NDArray = self._choice_operators(
-            proba_dict=self._selection_proba
-        )
-        self._crossover_operators: NDArray = self._choice_operators(
-            proba_dict=self._crossover_proba
-        )
-        self._mutation_operators: NDArray = self._choice_operators(proba_dict=self._mutation_proba)
+        self._selection_operators: NDArray
+        self._crossover_operators: NDArray
+        self._mutation_operators: NDArray
 
     def _choice_operators(self: SelfCGA, proba_dict: Dict["str", float]) -> NDArray:
         operators = np.array(list(proba_dict.keys()))
@@ -223,3 +218,9 @@ class SelfCGA(GeneticAlgorithm):
             ],
             dtype=self._population_g_i.dtype,
         )
+
+    def _get_init_population(self: SelfCGA) -> None:
+        self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
+        self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
+        self._mutation_operators = self._choice_operators(proba_dict=self._mutation_proba)
+        return super()._get_init_population()

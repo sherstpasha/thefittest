@@ -20,7 +20,7 @@ from ..base._model import Model
 from ..base._net import ACTIV_NAME_INV
 from ..base._net import Net
 from ..base._tree import init_net_uniset
-from ..classifiers._mlpeaclassifier import fitness_function as evaluate_nets
+from ..base._model import fitness_function_classifier as evaluate_nets
 from ..classifiers._mlpeaclassifier import weights_type_optimizer_alias
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
@@ -139,9 +139,9 @@ def train_net(
 
     left: NDArray[np.float64] = np.full(shape=len(net._weights), fill_value=-10, dtype=np.float64)
     right: NDArray[np.float64] = np.full(shape=len(net._weights), fill_value=10, dtype=np.float64)
-    initial_population: Union[
-        NDArray[np.float64], NDArray[np.byte]
-    ] = DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
+    initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = (
+        DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
+    )
     initial_population[0] = net._weights.copy()
     weights_optimizer_args["fitness_function"] = fitness_function
     weights_optimizer_args["fitness_function_args"] = {
@@ -154,8 +154,12 @@ def train_net(
         weights_optimizer_args["left"] = left
         weights_optimizer_args["right"] = right
     else:
-        genotype_to_phenotype = GrayCode().fit(left_border=-10., right_border=10.0,
-         num_variables=len(net._weights), bits_per_variable=16)
+        genotype_to_phenotype = GrayCode().fit(
+            left_border=-10.0,
+            right_border=10.0,
+            num_variables=len(net._weights),
+            bits_per_variable=16,
+        )
         weights_optimizer_args["str_len"] = np.sum(genotype_to_phenotype._bits_per_variable)
         weights_optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype.transform
 
@@ -295,7 +299,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         eye: NDArray[np.float64] = np.eye(n_outputs, dtype=np.float64)
 
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y.astype(np.int64), test_size = self._test_sample_ratio
+            X, y.astype(np.int64), test_size=self._test_sample_ratio
         )
 
         proba_test: NDArray[np.float64] = eye[y_test]

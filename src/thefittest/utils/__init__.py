@@ -190,11 +190,11 @@ def find_pbest_id(array: NDArray[np.float64], p: np.float64) -> NDArray[np.int64
     return to_return
 
 
-@njit(float64[:](float64[:, :]))
+@njit(float64[:, :](float64[:, :]))
 def max_axis(array: NDArray[np.float64]) -> NDArray[np.float64]:
-    res = np.zeros((array.shape[1]), dtype=np.float64)
-    for i in range(array.shape[1]):
-        res[i] = np.max(array[:, i])
+    res = np.zeros((array.shape[0], 1), dtype=np.float64)
+    for i in range(array.shape[0]):
+        res[i] = np.max(array[i])
     return res
 
 
@@ -273,7 +273,7 @@ def forward(
     return nodes
 
 
-@njit
+# @njit
 def forward2d(
     X: NDArray[np.float64],
     inputs: NDArray[np.int64],

@@ -32,7 +32,7 @@ from ..optimizers import jDE
 from ..utils._metrics import categorical_crossentropy3d
 from ..utils._metrics import root_mean_square_error2d
 from ..utils.transformations import GrayCode
-# from ..utils.random import seed
+from ..utils.random import check_random_state
 
 
 weights_type_optimizer_alias = Union[
@@ -117,7 +117,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         offset: bool = True,
         weights_optimizer: weights_type_optimizer_alias = SHADE,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
-        random_state: Optional[int] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         self.iters = iters
         self.pop_size = pop_size
@@ -267,9 +267,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
 
     def fit(self, X: ArrayLike, y: ArrayLike):
 
-        # if self.random_state is not None:
-        #     check_random_state()
-        #     seed(self.random_state)
+        check_random_state(self.random_state)
 
         if isinstance(self, ClassifierMixin):
             X, y = self._validate_data(X, y, y_numeric=False, reset=True)
@@ -290,7 +288,6 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
-
         self.net = self._defitne_net(X.shape[1], len(self.classes_))
         self.net._weights = self._train_net(self.net, X, y)
 
