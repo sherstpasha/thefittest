@@ -1,28 +1,58 @@
 import numpy as np
 
-from thefittest.optimizers import SHADE, SHAGA
+from thefittest.optimizers import SHADE, SHAGA, SelfCGA
 from thefittest.benchmarks import BanknoteDataset
 from thefittest.classifiers import MLPEAClassifier
-
+from thefittest.regressors import MLPEARegressor
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import minmax_scale
+from sklearn.preprocessing import minmax_scale, scale
 from sklearn.metrics import confusion_matrix
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, r2_score
+from sklearn.neural_network import MLPRegressor
 
-data = BanknoteDataset()
-X = data.get_X()
-y = data.get_y()
+# from thefittest.utils._metrics import coefficient_determination
+from sklearn.utils.estimator_checks import check_estimator
+
+
+# data = BanknoteDataset()
+X = np.loadtxt("C:/thefittest/thefittest/src/testX.py")
+y = np.loadtxt("C:/thefittest/thefittest/src/testy.py")
 
 X_scaled = minmax_scale(X)
+# y = scale(X)
+# X = minmax_scale(X)
+# y = minmax_scale(y)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.3)
+print(X.shape)
+print(y.shape)
 
-model = MLPEAClassifier(iters=500,
-                        pop_size=250,
-                        hidden_layers=(5,),
-                        activation="relu",
-                        weights_optimizer=SHAGA,
-                        weights_optimizer_args={"show_progress_each": 50})
+# X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
 
-model.fit(X_train, y_train)
+# model = MLPEARegressor(
+#     iters=1000,
+#     pop_size=1000,
+#     hidden_layers=(0,),
+#     activation="relu",
+#     weights_optimizer=SHADE,
+#     weights_optimizer_args={"show_progress_each": 1},
+# )
+
+# model.fit(X, y)
+# print(model.score(X, y))
+
+# predict = model.predict(X)
+# print(coefficient_determination(y, predict))
+# print(r2_score(y, predict))
+
+# model = MLPRegressor()
+
+# model.fit(X, y)
+
+# print(model.score(X, y))
+
+# predict = model.predict(X)
+# print(coefficient_determination(y, predict))
+# print(r2_score(y, predict))
+
+
+# check_estimator(model)

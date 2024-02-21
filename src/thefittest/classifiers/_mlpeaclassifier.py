@@ -31,7 +31,7 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
     def __init__(
         self,
         *,
-        iters: int = 100,
+        iters: int = 200,
         pop_size: int = 500,
         hidden_layers: Tuple[int, ...] = (100,),
         activation: str = "sigma",

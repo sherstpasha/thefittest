@@ -10,10 +10,11 @@ from typing import Type
 
 from sklearn.base import BaseEstimator
 from sklearn.base import ClassifierMixin
-from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
+from sklearn.utils.validation import check_is_fitted, check_array
 from sklearn.utils.multiclass import check_classification_targets
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import MinMaxScaler
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -30,7 +31,11 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..utils._metrics import categorical_crossentropy3d
-from ..utils._metrics import root_mean_square_error2d
+from ..utils._metrics import (
+    root_mean_square_error2d,
+    coefficient_determination,
+    coefficient_determination2d,
+)
 from ..utils.transformations import GrayCode
 from ..utils.random import check_random_state
 
@@ -93,7 +98,13 @@ def fitness_function_regressor(
     targets: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     output2d = net.forward(X, weights)[:, :, 0]
+
     error = root_mean_square_error2d(targets, output2d)
+    error = -coefficient_determination2d(targets, output2d)
+
+    print("output2d best", output2d[np.argmin(error)])
+    print("targets", targets)
+    print("r2", coefficient_determination(targets, output2d[np.argmin(error)]))
     return error
 
 
@@ -157,7 +168,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         if isinstance(self, ClassifierMixin):
             outputs_activation = [ACTIV_NAME_INV["softmax"]] * len(output_id)
         else:
-            outputs_activation = [ACTIV_NAME_INV["relu"]] * len(output_id)
+            outputs_activation = [ACTIV_NAME_INV["sigma"]] * len(output_id)
 
         activs = dict(zip(output_id, outputs_activation))
 
@@ -203,10 +214,10 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         weights_optimizer_args["iters"] = self.iters
         weights_optimizer_args["pop_size"] = self.pop_size
         left: NDArray[np.float64] = np.full(
-            shape=len(net._weights), fill_value=-10, dtype=np.float64
+            shape=len(net._weights), fill_value=-2, dtype=np.float64
         )
         right: NDArray[np.float64] = np.full(
-            shape=len(net._weights), fill_value=10, dtype=np.float64
+            shape=len(net._weights), fill_value=2, dtype=np.float64
         )
         initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = (
             DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
@@ -233,8 +244,8 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
             weights_optimizer_args["right"] = right
         else:
             genotype_to_phenotype = GrayCode().fit(
-                left_border=-10.0,
-                right_border=10.0,
+                left_border=-2.0,
+                right_border=2.0,
                 num_variables=len(net._weights),
                 bits_per_variable=16,
             )
@@ -292,13 +303,15 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
             self.n_classes_ = len(self.classes_)
         else:
             X, y = self._validate_data(X, y, y_numeric=True, reset=True)
+            self._target_scaler = MinMaxScaler()
+            # y = self._target_scaler.fit_transform(y.reshape(-1, 1))[:, 0]
 
         X, y = self.array_like_to_numpy_X_y(X, y)
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        if isinstance(self, ClassifierMixin):    
+        if isinstance(self, ClassifierMixin):
             self.net_ = self._defitne_net(X.shape[1], len(self.classes_))
         else:
             self.net_ = self._defitne_net(X.shape[1], 1)
@@ -330,6 +343,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
             indeces = np.argmax(output, axis=1)
             y = self._label_encoder.inverse_transform(indeces)
         else:
-            y = output[:,0]
+            y = output[:, 0]
+            # y = self._target_scaler.inverse_transform(output)[:, 0]
 
         return y
