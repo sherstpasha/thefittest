@@ -174,8 +174,8 @@ class EvolutionaryAlgorithm:
 
     def _get_phenotype(self, population_g: NDArray[Any]) -> NDArray[Any]:
         if self._genotype_to_phenotype is not None:
-            populations_g = self._split_population(population_g)
             if self._n_jobs > 1:
+                populations_g = self._split_population(population_g)
                 populations_ph = self._parallel(
                     delayed(self._genotype_to_phenotype)(
                         populations_g_i, **self._genotype_to_phenotype_args
@@ -184,7 +184,7 @@ class EvolutionaryAlgorithm:
                 )
                 population_ph = np.concatenate(populations_ph, axis=0)
             else:
-                population_ph = self._genotype_to_phenotype(populations_g)
+                population_ph = self._genotype_to_phenotype(population_g)
         else:
             population_ph = population_g
         return population_ph

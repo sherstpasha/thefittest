@@ -1,61 +1,61 @@
-from thefittest.optimizers import SHADE
-from sklearn.utils.estimator_checks import check_estimator
+import matplotlib.pyplot as plt
+
+from thefittest.regressors import MLPEARegressor
+from thefittest.optimizers import SHAGA, SHADE
+
+from sklearn.metrics import r2_score
 
 import numpy as np
 
 from thefittest.optimizers import SHADE
-from thefittest.benchmarks import BanknoteDataset, IrisDataset, DigitsDataset
-from thefittest.classifiers import MLPEAClassifier
+from thefittest.benchmarks import BanknoteDataset
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import minmax_scale
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
 
-data = BanknoteDataset()
-X = data.get_X()
-y = data.get_y()
+from sklearn.utils.estimator_checks import check_estimator
+
+def problem(x):
+    return np.sin(x[:,0])
+
+
+function = problem
+left_border = -4.5
+right_border = 4.5
+sample_size = 200
+n_dimension = 1
+
+X = np.array([np.linspace(left_border, right_border, sample_size)
+              for _ in range(n_dimension)]).T
+y = function(X)
 
 X_scaled = minmax_scale(X)
+y_scaled = minmax_scale(y)
 
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled, test_size = 0.33)
 
-model = MLPEAClassifier(
-    iters=100,
-    pop_size=100,
-    hidden_layers=(5,),
-    activation="relu",
-    weights_optimizer=SHADE,
-    random_state=42,
-    # weights_optimizer_args={"show_progress_each": 1},
-)
+model = MLPEARegressor(weights_optimizer_args={"show_progress_each": 1})
 
-model.fit(X_train, y_train)
-y_pred = model.predict(X_test)
-# print(y_pred)
-print(f1_score(y_test, y_pred, average="macro"))
+check_estimator(model)
 
-model = MLPEAClassifier(
-    iters=100,
-    pop_size=100,
-    hidden_layers=(5,),
-    activation="relu",
-    weights_optimizer=SHADE,
-    random_state=42,
-    # weights_optimizer_args={"show_progress_each": 1},
-)
+# model.fit(X_train, y_train)
 
-model.fit(X_train, y_train)
-y_pred = model.predict(X_test)
-# print(y_pred)
-print(f1_score(y_test, y_pred, average="macro"))
+# predict = model.predict(X_test)
 
+# print(predict.shape, y_test.shape)
+# net = model.get_net()
 
-# print(y_test)
+# print("coefficient_determination: \n", r2_score(y_test, predict))
 
+# fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=1)
 
-# import pickle
+# ax[0].plot(X_scaled[:,0], y_scaled, label = "True y")
+# ax[0].scatter(X_test[:,0], predict, label = "Predict y")
+# ax[0].legend()
 
-# pickle.dumps(model)
+# net.plot(ax=ax[1])
 
-print(check_estimator(model))
+# plt.tight_layout()
+# plt.savefig("test.png")

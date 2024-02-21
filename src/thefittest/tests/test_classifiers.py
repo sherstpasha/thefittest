@@ -1,12 +1,12 @@
-# from ..benchmarks import IrisDataset
-# from ..classifiers import GeneticProgrammingNeuralNetClassifier
-# from ..classifiers import MLPEAClassifier
-# from ..optimizers import DifferentialEvolution
-# from ..optimizers import GeneticProgramming
-# from ..optimizers import SelfCGA
-# from ..utils.transformations import minmax_scale
-# from ..base._net import Net
-
+from ..benchmarks import IrisDataset
+from ..classifiers import GeneticProgrammingNeuralNetClassifier
+from ..classifiers import MLPEAClassifier
+from ..optimizers import DifferentialEvolution
+from ..optimizers import GeneticProgramming
+from ..optimizers import SelfCGA
+from ..utils.transformations import minmax_scale
+from ..base._net import Net
+from sklearn.utils.estimator_checks import check_estimator
 
 # def test_GeneticProgrammingNeuralNetClassifier():
 #     data = IrisDataset()
@@ -73,60 +73,62 @@
 #     assert isinstance(optimizer, model._optimizer_class)
 
 
-# def test_MLPEAClassifier():
-#     data = IrisDataset()
-#     X = data.get_X()
-#     y = data.get_y()
+def test_MLPEAClassifier():
+    data = IrisDataset()
+    X = data.get_X()
+    y = data.get_y()
 
-#     data = IrisDataset()
-#     X = minmax_scale(data.get_X())
-#     y = data.get_y()
+    data = IrisDataset()
+    X = minmax_scale(data.get_X())
+    y = data.get_y()
 
-#     iters = 3
-#     pop_size = 10
+    iters = 50
+    pop_size = 50
 
-#     weights_optimizer = DifferentialEvolution
-#     weights_optimizer_args = {"CR": 0.9}
+    weights_optimizer = DifferentialEvolution
+    weights_optimizer_args = {"CR": 0.9}
 
-#     model = MLPEAClassifier(
-#         iters=iters,
-#         pop_size=pop_size,
-#         hidden_layers=(10,),
-#         weights_optimizer=weights_optimizer,
-#         weights_optimizer_args=weights_optimizer_args,
-#     )
+    model = MLPEAClassifier(
+            iters=iters,
+            pop_size=pop_size,
+            hidden_layers=(0,),
+            weights_optimizer=weights_optimizer,
+            weights_optimizer_args=weights_optimizer_args,
+        )
 
-#     model.fit(X, y)
+    model.fit(X, y)
 
-#     model.predict(X)
+    model.predict(X)
 
-#     weights_optimizer = SelfCGA
-#     weights_optimizer_args = {"K": 0.33}
+    weights_optimizer = SelfCGA
+    weights_optimizer_args = {"K": 0.33}
 
-#     model = MLPEAClassifier(
-#         iters=iters,
-#         pop_size=pop_size,
-#         hidden_layers=(1, 2),
-#         weights_optimizer=weights_optimizer,
-#         weights_optimizer_args=weights_optimizer_args,
-#     )
+    model = MLPEAClassifier(
+            iters=iters,
+            pop_size=pop_size,
+            hidden_layers=(1, 2),
+            weights_optimizer=weights_optimizer,
+            weights_optimizer_args=weights_optimizer_args,
+        )
 
-#     model.fit(X, y)
+    model.fit(X, y)
 
-#     model.predict(X)
+    model.predict(X)
 
-#     model = MLPEAClassifier(
-#         iters=iters,
-#         pop_size=pop_size,
-#         hidden_layers=(0,),
-#     )
+    model = MLPEAClassifier(
+            iters=iters,
+            pop_size=pop_size,
+            hidden_layers=(10,),
+        )
 
-#     model.fit(X, y)
+    model.fit(X, y)
 
-#     model.predict(X)
+    model.predict(X)
 
-#     optimizer = model.get_optimizer()
-#     net = model.get_net()
+    optimizer = model.get_optimizer()
+    net = model.get_net()
 
-#     assert isinstance(net, Net)
-#     assert isinstance(optimizer, model._weights_optimizer_class)
+    assert isinstance(net, Net)
+    assert isinstance(optimizer, model.weights_optimizer)
+
+    check_estimator(model)

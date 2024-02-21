@@ -20,9 +20,18 @@ from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
 from ..optimizers import GeneticProgramming
 from ..optimizers import SHADE
 from ..optimizers import SelfCGP
-from ..regressors._mlpearegressor import fitness_function as evaluate_nets
 from ..utils._metrics import root_mean_square_error2d
 
+
+def evaluate_nets(
+    weights: NDArray[np.float64],
+    net: Net,
+    X: NDArray[np.float64],
+    targets: NDArray[Union[np.float64, np.int64]],
+) -> NDArray[np.float64]:
+    output2d = net.forward(X, weights)[:, :, 0]
+    error = root_mean_square_error2d(targets, output2d)
+    return error
 
 def fitness_function(
     population: NDArray,

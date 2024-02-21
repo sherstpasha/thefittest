@@ -25,3 +25,5 @@ sphinx-rtd-theme
 numpydoc
 pydeps
 Graphviz
+pandas
+pyarrow 

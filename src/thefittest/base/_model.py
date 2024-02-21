@@ -79,7 +79,7 @@ def fitness_function_classifier(
     weights: NDArray[np.float64],
     net: Net,
     X: NDArray[np.float64],
-    targets: NDArray[Union[np.float64, np.int64]],
+    targets: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     output3d = net.forward(X, weights)
     error = categorical_crossentropy3d(targets, output3d)
@@ -90,7 +90,7 @@ def fitness_function_regressor(
     weights: NDArray[np.float64],
     net: Net,
     X: NDArray[np.float64],
-    targets: NDArray[Union[np.float64, np.int64]],
+    targets: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     output2d = net.forward(X, weights)[:, :, 0]
     error = root_mean_square_error2d(targets, output2d)
@@ -153,7 +153,13 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         end = end + n_outputs
         inputs_id = {(n_inputs - 1)}
         output_id = set(range(start, end))
-        activs = dict(zip(output_id, [ACTIV_NAME_INV["softmax"]] * len(output_id)))
+
+        if isinstance(self, ClassifierMixin):
+            outputs_activation = [ACTIV_NAME_INV["softmax"]] * len(output_id)
+        else:
+            outputs_activation = [ACTIV_NAME_INV["relu"]] * len(output_id)
+
+        activs = dict(zip(output_id, outputs_activation))
 
         if self.offset:
             layer_net = Net(inputs=inputs_id) > Net(outputs=output_id, activs=activs)
@@ -240,7 +246,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         optimizer = self.weights_optimizer(**weights_optimizer_args).fit()
         phenotype = optimizer.get_fittest()["phenotype"]
         optimizer._fitness_function_args["net"] = optimizer._fitness_function_args["net"].copy()
-        self.optimizer = optimizer
+        self.optimizer_ = optimizer
 
         return phenotype
 
@@ -248,7 +254,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         self, X: ArrayLike, y: ArrayLike
     ) -> Tuple[NDArray[np.float64], NDArray[np.int64]]:
         X = np.array(X, dtype=np.float64)
-        y = np.array(y)
+        y = np.array(y, dtype=np.float64)
         return X, y
 
     def get_optimizer(
@@ -263,7 +269,10 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         SHADE,
         SHAGA,
     ]:
-        return self.optimizer
+        return self.optimizer_
+
+    def get_net(self) -> Net:
+        return self.net_
 
     def fit(self, X: ArrayLike, y: ArrayLike):
 
@@ -288,8 +297,13 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
-        self.net = self._defitne_net(X.shape[1], len(self.classes_))
-        self.net._weights = self._train_net(self.net, X, y)
+
+        if isinstance(self, ClassifierMixin):    
+            self.net_ = self._defitne_net(X.shape[1], len(self.classes_))
+        else:
+            self.net_ = self._defitne_net(X.shape[1], 1)
+
+        self.net_._weights = self._train_net(self.net_, X, y)
 
         return self
 
@@ -310,12 +324,12 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        output = self.net.forward(X)[0]
+        output = self.net_.forward(X)[0]
 
         if isinstance(self, ClassifierMixin):
             indeces = np.argmax(output, axis=1)
             y = self._label_encoder.inverse_transform(indeces)
         else:
-            y = output
+            y = output[:,0]
 
         return y
