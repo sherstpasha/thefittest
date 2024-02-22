@@ -20,7 +20,7 @@ from ..base._model import Model
 from ..base._net import ACTIV_NAME_INV
 from ..base._net import Net
 from ..base._tree import init_net_uniset
-from ..base._model import fitness_function_classifier as evaluate_nets
+from ..base._model import fitness_function_weights as evaluate_nets
 from ..classifiers._mlpeaclassifier import weights_type_optimizer_alias
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm

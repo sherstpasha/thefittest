@@ -1,21 +1,23 @@
-# import numpy as np
+import numpy as np
 
-# from ..base import EphemeralNode
-# from ..base import FunctionalNode
-# from ..base import TerminalNode
-# from ..base import UniversalSet
-# from ..optimizers import DifferentialEvolution
-# from ..optimizers import GeneticProgramming
-# from ..optimizers import SelfCGA
-# from ..optimizers import SelfCGP
-# from ..regressors import GeneticProgrammingNeuralNetRegressor
-# from ..regressors import MLPEARegressor
-# from ..regressors import SymbolicRegressionGP
-# from ..base._tree import Add
-# from ..base._tree import Div
-# from ..base._tree import Mul
-# from ..base._tree import Neg
-# from ..utils.crossovers import uniform_crossoverGP
+from ..base import EphemeralNode
+from ..base import FunctionalNode
+from ..base import TerminalNode
+from ..base import UniversalSet
+from ..optimizers import DifferentialEvolution
+from ..optimizers import GeneticProgramming
+from ..optimizers import SelfCGA
+from ..optimizers import SelfCGP
+from ..regressors import GeneticProgrammingNeuralNetRegressor
+from ..regressors import MLPEARegressor
+from ..regressors import SymbolicRegressionGP
+from ..base._tree import Add
+from ..base._tree import Div
+from ..base._tree import Mul
+from ..base._tree import Neg
+from ..utils.crossovers import uniform_crossoverGP
+
+from sklearn.utils.estimator_checks import check_estimator
 
 
 # def test_SymbolicRegressionGP():
@@ -163,63 +165,65 @@
 #     assert isinstance(optimizer, model._optimizer_class)
 
 
-# def test_MLPEARegressor():
-#     def problem(x):
-#         return np.sin(x[:, 0])
+def test_MLPEARegressor():
+    def problem(x):
+        return np.sin(x[:, 0])
 
-#     iters = 10
-#     pop_size = 50
+    iters = 10
+    pop_size = 50
 
-#     function = problem
-#     left_border = -4.5
-#     right_border = 4.5
-#     sample_size = 300
-#     n_dimension = 1
+    function = problem
+    left_border = -4.5
+    right_border = 4.5
+    sample_size = 300
+    n_dimension = 1
 
-#     X = np.array(
-#         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
-#     ).T
-#     y = function(X)
+    X = np.array(
+        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
+    ).T
+    y = function(X)
 
-#     iters = 3
-#     pop_size = 10
+    iters = 3
+    pop_size = 10
 
-#     weights_optimizer = DifferentialEvolution
-#     weights_optimizer_args = {"CR": 0.9}
+    weights_optimizer = DifferentialEvolution
+    weights_optimizer_args = {"CR": 0.9}
 
-#     model = MLPEARegressor(
-#         iters=iters,
-#         pop_size=pop_size,
-#         hidden_layers=(10, 3),
-#         weights_optimizer=weights_optimizer,
-#         weights_optimizer_args=weights_optimizer_args,
-#     )
+    model = MLPEARegressor(
+        n_iter=iters,
+        pop_size=pop_size,
+        hidden_layers=(10, 3),
+        weights_optimizer=weights_optimizer,
+        weights_optimizer_args=weights_optimizer_args,
+    )
 
-#     model.fit(X, y)
+    model.fit(X, y)
 
-#     model.predict(X)
+    model.predict(X)
 
-#     weights_optimizer = SelfCGA
-#     weights_optimizer_args = {"K": 0.33}
+    weights_optimizer = SelfCGA
+    weights_optimizer_args = {"K": 0.33}
 
-#     model = MLPEARegressor(
-#         iters=iters,
-#         pop_size=pop_size,
-#         hidden_layers=(10,),
-#         weights_optimizer=weights_optimizer,
-#         weights_optimizer_args=weights_optimizer_args,
-#     )
+    model = MLPEARegressor(
+        n_iter=iters,
+        pop_size=pop_size,
+        hidden_layers=(0,),
+        weights_optimizer=weights_optimizer,
+        weights_optimizer_args=weights_optimizer_args,
+    )
 
-#     model.fit(X, y)
+    model.fit(X, y)
 
-#     model.predict(X)
+    model.predict(X)
 
-#     model = MLPEARegressor(iters=iters, pop_size=pop_size, hidden_layers=(10,))
+    model = MLPEARegressor(hidden_layers=(0,))
 
-#     model.fit(X, y)
+    model.fit(X, y)
 
-#     model.predict(X)
+    model.predict(X)
 
-#     optimizer = model.get_optimizer()
+    optimizer = model.get_optimizer()
 
-#     assert isinstance(optimizer, model._weights_optimizer_class)
+    assert isinstance(optimizer, model.weights_optimizer)
+
+    check_estimator(model)

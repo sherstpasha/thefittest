@@ -15,10 +15,10 @@ from sklearn.utils.estimator_checks import check_estimator
 
 
 # data = BanknoteDataset()
-X = np.loadtxt("C:/thefittest/thefittest/src/testX.py")
-y = np.loadtxt("C:/thefittest/thefittest/src/testy.py")
+X = np.loadtxt("src/testX.py")
+y = np.loadtxt("src/testy.py")
 
-X_scaled = minmax_scale(X)
+#X_scaled = minmax_scale(X)
 # y = scale(X)
 # X = minmax_scale(X)
 # y = minmax_scale(y)
@@ -28,14 +28,14 @@ print(y.shape)
 
 # X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
 
-# model = MLPEARegressor(
-#     iters=1000,
-#     pop_size=1000,
-#     hidden_layers=(0,),
-#     activation="relu",
-#     weights_optimizer=SHADE,
-#     weights_optimizer_args={"show_progress_each": 1},
-# )
+model = MLPEARegressor(
+    iters=100,
+    pop_size=500,
+    hidden_layers=(0,),
+    activation="sigma",
+    weights_optimizer=SHADE,
+    # weights_optimizer_args={"show_progress_each": 1},
+)
 
 # model.fit(X, y)
 # print(model.score(X, y))
@@ -55,4 +55,4 @@ print(y.shape)
 # print(r2_score(y, predict))
 
 
-# check_estimator(model)
+check_estimator(model)

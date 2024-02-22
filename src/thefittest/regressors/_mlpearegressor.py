@@ -23,7 +23,7 @@ class MLPEARegressor(RegressorMixin, BaseMLPEA):
     def __init__(
         self,
         *,
-        iters: int = 200,
+        n_iter: int = 200,
         pop_size: int = 500,
         hidden_layers: Tuple[int, ...] = (100,),
         activation: str = "sigma",
@@ -33,7 +33,7 @@ class MLPEARegressor(RegressorMixin, BaseMLPEA):
         random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         super().__init__(
-            iters=iters,
+            n_iter=n_iter,
             pop_size=pop_size,
             hidden_layers=hidden_layers,
             activation=activation,

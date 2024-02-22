@@ -89,7 +89,7 @@ def test_MLPEAClassifier():
     weights_optimizer_args = {"CR": 0.9}
 
     model = MLPEAClassifier(
-            iters=iters,
+            n_iter=iters,
             pop_size=pop_size,
             hidden_layers=(0,),
             weights_optimizer=weights_optimizer,
@@ -104,7 +104,7 @@ def test_MLPEAClassifier():
     weights_optimizer_args = {"K": 0.33}
 
     model = MLPEAClassifier(
-            iters=iters,
+            n_iter=iters,
             pop_size=pop_size,
             hidden_layers=(1, 2),
             weights_optimizer=weights_optimizer,
@@ -116,7 +116,7 @@ def test_MLPEAClassifier():
     model.predict(X)
 
     model = MLPEAClassifier(
-            iters=iters,
+            n_iter=iters,
             pop_size=pop_size,
             hidden_layers=(10,),
         )
