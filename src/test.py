@@ -7,6 +7,7 @@ from sklearn.metrics import r2_score
 
 import numpy as np
 
+
 from thefittest.optimizers import SHADE
 from thefittest.benchmarks import BanknoteDataset
 
