@@ -125,6 +125,7 @@ def fitness_function_weights(
         error = categorical_crossentropy3d(targets, output3d)
     elif task_type == "regression":
         output2d = net.forward(X, weights)[:, :, 0]
+        print(output2d.shape, targets.shape)
         error = root_mean_square_error2d(targets, output2d)
     else:
         raise ValueError("task_type must be 'classification' or 'regression'")
@@ -222,6 +223,8 @@ def genotype_to_phenotype(
     offset: bool,
     task_type: str = "regression",
 ) -> NDArray:
+
+    print(task_type, "genotype_to_phenotype")
     n_variables: int = X_train.shape[1]
 
     population_ph = np.array(
@@ -233,7 +236,7 @@ def genotype_to_phenotype(
                 X_train=X_train,
                 y_train=y_train,
                 weights_optimizer_args=weights_optimizer_args,
-                weights_optimizer_class=weights_optimizer_class,
+                weights_optimizer=weights_optimizer_class,
                 fitness_function=fitness_function_weights,
                 task_type=task_type,
             )
@@ -255,6 +258,7 @@ def train_net_weights(
     task_type: str = "regression",
 ) -> Net:
 
+    print(task_type, "train_net_weights")
     net = net.copy()
     weights_optimizer_args = weights_optimizer_args.copy()
 
@@ -313,6 +317,7 @@ def train_net_structure(
     task_type: str = "regression",
 ):
 
+    print(task_type, "train_net_structure")
     if task_type == "regression":
         n_outputs = 1
         output_activation = "sigma"
@@ -336,6 +341,7 @@ def train_net_structure(
         "weights_optimizer_class": weights_optimizer,
         "output_activation": output_activation,
         "offset": offset,
+        "task_type": task_type,
     }
 
     optimizer_args["uniset"] = uniset
@@ -715,6 +721,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         else:
             task_type = "regression"
 
+        print(task_type)
         self.net_ = train_net_structure(
             uniset=uniset,
             X_train=X_train,
