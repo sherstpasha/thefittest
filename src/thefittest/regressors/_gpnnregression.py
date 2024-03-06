@@ -10,9 +10,11 @@ import numpy as np
 from numpy.typing import NDArray
 
 from sklearn.model_selection import train_test_split
+from sklearn.base import RegressorMixin
 
 from ..base import UniversalSet
 from ..base._tree import init_net_uniset
+from ..base._model import BaseGPNN
 from ..classifiers import GeneticProgrammingNeuralNetClassifier
 from ..classifiers._gpnnclassifier import genotype_to_phenotype_tree
 from ..classifiers._gpnnclassifier import train_net
@@ -25,13 +27,14 @@ from ..utils._metrics import root_mean_square_error2d
 
 def evaluate_nets(
     weights: NDArray[np.float64],
-    net: Net,
+    net,
     X: NDArray[np.float64],
     targets: NDArray[Union[np.float64, np.int64]],
 ) -> NDArray[np.float64]:
     output2d = net.forward(X, weights)[:, :, 0]
     error = root_mean_square_error2d(targets, output2d)
     return error
+
 
 def fitness_function(
     population: NDArray,
@@ -123,7 +126,6 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self._test_sample_ratio)
 
-
         uniset: UniversalSet = init_net_uniset(
             n_variables=n_inputs,
             input_block_size=self._input_block_size,
@@ -150,3 +152,36 @@ class GeneticProgrammingNeuralNetRegressor(GeneticProgrammingNeuralNetClassifier
         self: GeneticProgrammingNeuralNetClassifier, output: NDArray[np.float64]
     ) -> Union[NDArray[np.float64], NDArray[np.int64]]:
         return output[:, 0]
+
+
+class GeneticProgrammingNeuralNetRegressor2(RegressorMixin, BaseGPNN):
+    def __init__(
+        self,
+        *,
+        n_iter: int,
+        pop_size: int,
+        input_block_size: int = 1,
+        max_hidden_block_size: int = 9,
+        offset: bool = True,
+        test_sample_ratio: float = 0.5,
+        optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,
+        optimizer_args: Optional[dict[str, Any]] = None,
+        weights_optimizer: weights_type_optimizer_alias = SHADE,
+        weights_optimizer_args: Optional[dict[str, Any]] = None,
+        net_size_penalty: float = 0.0,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
+    ):
+        super().__init__(
+            n_iter=n_iter,
+            pop_size=pop_size,
+            input_block_size=input_block_size,
+            max_hidden_block_size=max_hidden_block_size,
+            offset=offset,
+            test_sample_ratio=test_sample_ratio,
+            optimizer=optimizer,
+            optimizer_args=optimizer_args,
+            weights_optimizer=weights_optimizer,
+            weights_optimizer_args=weights_optimizer_args,
+            net_size_penalty=net_size_penalty,
+            random_state=random_state,
+        )

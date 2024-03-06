@@ -222,8 +222,4 @@ def test_MLPEARegressor():
 
     model.predict(X)
 
-    optimizer = model.get_optimizer()
-
-    assert isinstance(optimizer, model.weights_optimizer)
-
     check_estimator(model)

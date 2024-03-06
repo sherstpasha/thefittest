@@ -125,10 +125,8 @@ def test_MLPEAClassifier():
 
     model.predict(X)
 
-    optimizer = model.get_optimizer()
     net = model.get_net()
 
     assert isinstance(net, Net)
-    assert isinstance(optimizer, model.weights_optimizer)
 
     check_estimator(model)

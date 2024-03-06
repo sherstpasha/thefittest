@@ -184,7 +184,9 @@ class EvolutionaryAlgorithm:
                 )
                 population_ph = np.concatenate(populations_ph, axis=0)
             else:
-                population_ph = self._genotype_to_phenotype(population_g)
+                population_ph = self._genotype_to_phenotype(
+                    population_g, **self._genotype_to_phenotype_args
+                )
         else:
             population_ph = population_g
         return population_ph
