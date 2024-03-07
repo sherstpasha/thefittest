@@ -93,76 +93,76 @@ from sklearn.utils.estimator_checks import check_estimator
 #     model.predict(X)
 
 
-# def test_GeneticProgrammingNeuralNetRegressor():
-#     def problem(x):
-#         return np.sin(x[:, 0])
+def test_GeneticProgrammingNeuralNetRegressor():
+    def problem(x):
+        return np.sin(x[:, 0])
 
-#     iters = 10
-#     pop_size = 50
+    iters = 10
+    pop_size = 50
 
-#     function = problem
-#     left_border = -4.5
-#     right_border = 4.5
-#     sample_size = 300
-#     n_dimension = 1
+    function = problem
+    left_border = -4.5
+    right_border = 4.5
+    sample_size = 300
+    n_dimension = 1
 
-#     X = np.array(
-#         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
-#     ).T
-#     y = function(X)
+    X = np.array(
+        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
+    ).T
+    y = function(X)
 
-#     optimizer = GeneticProgramming
+    optimizer = GeneticProgramming
 
-#     optimizer_args = {"tour_size": 15, "show_progress_each": 1}
+    optimizer_args = {"tour_size": 15, "show_progress_each": 1}
 
-#     iters = 3
-#     pop_size = 10
+    iters = 3
+    pop_size = 10
 
-#     weights_optimizer = DifferentialEvolution
-#     weights_optimizer_args = {"iters": 25, "pop_size": 25, "CR": 0.9}
+    weights_optimizer = DifferentialEvolution
+    weights_optimizer_args = {"iters": 25, "pop_size": 25, "CR": 0.9}
 
-#     model = GeneticProgrammingNeuralNetRegressor(
-#         iters=iters,
-#         pop_size=pop_size,
-#         optimizer=optimizer,
-#         optimizer_args=optimizer_args,
-#         weights_optimizer=weights_optimizer,
-#         weights_optimizer_args=weights_optimizer_args,
-#     )
+    model = GeneticProgrammingNeuralNetRegressor(
+        iters=iters,
+        pop_size=pop_size,
+        optimizer=optimizer,
+        optimizer_args=optimizer_args,
+        weights_optimizer=weights_optimizer,
+        weights_optimizer_args=weights_optimizer_args,
+    )
 
-#     model.fit(X, y)
+    model.fit(X, y)
 
-#     model.predict(X)
+    model.predict(X)
 
-#     weights_optimizer = SelfCGA
-#     optimizer = SelfCGP
-#     weights_optimizer_args = {"iters": 25, "pop_size": 25, "K": 0.33}
+    weights_optimizer = SelfCGA
+    optimizer = SelfCGP
+    weights_optimizer_args = {"iters": 25, "pop_size": 25, "K": 0.33}
 
-#     model = GeneticProgrammingNeuralNetRegressor(
-#         iters=iters,
-#         pop_size=pop_size,
-#         optimizer=optimizer,
-#         optimizer_args=optimizer_args,
-#         weights_optimizer=weights_optimizer,
-#         weights_optimizer_args=weights_optimizer_args,
-#     )
+    model = GeneticProgrammingNeuralNetRegressor(
+        iters=iters,
+        pop_size=pop_size,
+        optimizer=optimizer,
+        optimizer_args=optimizer_args,
+        weights_optimizer=weights_optimizer,
+        weights_optimizer_args=weights_optimizer_args,
+    )
 
-#     model.fit(X, y)
+    model.fit(X, y)
 
-#     model.predict(X)
+    model.predict(X)
 
-#     model = GeneticProgrammingNeuralNetRegressor(
-#         iters=iters,
-#         pop_size=pop_size,
-#     )
+    model = GeneticProgrammingNeuralNetRegressor(
+        iters=iters,
+        pop_size=pop_size,
+    )
 
-#     model.fit(X, y)
+    model.fit(X, y)
 
-#     model.predict(X)
+    model.predict(X)
 
-#     optimizer = model.get_optimizer()
+    optimizer = model.get_optimizer()
 
-#     assert isinstance(optimizer, model._optimizer_class)
+    assert isinstance(optimizer, model._optimizer_class)
 
 
 def test_MLPEARegressor():
@@ -216,7 +216,7 @@ def test_MLPEARegressor():
 
     model.predict(X)
 
-    model = MLPEARegressor(hidden_layers=(0,))
+    model = MLPEARegressor(n_iter=500, hidden_layers=(0,))
 
     model.fit(X, y)
 
