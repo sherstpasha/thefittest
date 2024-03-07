@@ -158,8 +158,8 @@ class GeneticProgrammingNeuralNetRegressor2(RegressorMixin, BaseGPNN):
     def __init__(
         self,
         *,
-        n_iter: int,
-        pop_size: int,
+        n_iter: int = 15,
+        pop_size: int = 50,
         input_block_size: int = 1,
         max_hidden_block_size: int = 9,
         offset: bool = True,

@@ -125,7 +125,6 @@ def fitness_function_weights(
         error = categorical_crossentropy3d(targets, output3d)
     elif task_type == "regression":
         output2d = net.forward(X, weights)[:, :, 0]
-        print(output2d.shape, targets.shape)
         error = root_mean_square_error2d(targets, output2d)
     else:
         raise ValueError("task_type must be 'classification' or 'regression'")
@@ -167,6 +166,7 @@ def fitness_function_structure(
     ValueError
         If `task_type` is not 'classification' or 'regression'.
     """
+
     if task_type == "classification":
         output3d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)
         lens = np.array(list(map(len, population)))
@@ -224,26 +224,26 @@ def genotype_to_phenotype(
     task_type: str = "regression",
 ) -> NDArray:
 
-    print(task_type, "genotype_to_phenotype")
     n_variables: int = X_train.shape[1]
 
     population_ph = np.array(
         [
-            train_net_weights(
-                genotype_to_phenotype_tree(
-                    individ_g, n_variables, n_outputs, output_activation, offset
-                ),
-                X_train=X_train,
-                y_train=y_train,
-                weights_optimizer_args=weights_optimizer_args,
-                weights_optimizer=weights_optimizer_class,
-                fitness_function=fitness_function_weights,
-                task_type=task_type,
-            )
+            genotype_to_phenotype_tree(individ_g, n_variables, n_outputs, output_activation, offset)
             for individ_g in population_g
         ],
         dtype=object,
     )
+
+    for i, net in enumerate(population_ph):
+        population_ph[i]._weights, _ = train_net_weights(
+            net=net,
+            X_train=X_train,
+            y_train=y_train,
+            weights_optimizer_args=weights_optimizer_args,
+            weights_optimizer=weights_optimizer_class,
+            fitness_function=fitness_function_weights,
+            task_type=task_type,
+        )
 
     return population_ph
 
@@ -258,7 +258,6 @@ def train_net_weights(
     task_type: str = "regression",
 ) -> Net:
 
-    print(task_type, "train_net_weights")
     net = net.copy()
     weights_optimizer_args = weights_optimizer_args.copy()
 
@@ -312,17 +311,13 @@ def train_net_structure(
     net_size_penalty: float,
     weights_optimizer_args: Dict,
     weights_optimizer: weights_type_optimizer_alias,
-    fitness_function_weights: Callable,
     offset: bool,
+    n_outputs: int,
     task_type: str = "regression",
 ):
-
-    print(task_type, "train_net_structure")
     if task_type == "regression":
-        n_outputs = 1
         output_activation = "sigma"
     else:
-        n_outputs = X_train.shape[1]
         output_activation = "softmax"
 
     optimizer_args["fitness_function"] = fitness_function_structure
@@ -330,6 +325,7 @@ def train_net_structure(
         "X": X_test,
         "targets": y_test,
         "net_size_penalty": net_size_penalty,
+        "task_type": task_type,
     }
 
     optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype
@@ -679,10 +675,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         optimizer_args = self.check_optimizer_args()
         weights_optimizer_args = self.check_weights_optimizer_args()
 
-        print(optimizer_args)
-        print(weights_optimizer_args)
-
-        check_random_state(self.random_state)
+        random_state = check_random_state(self.random_state)
         self._target_scaler = MinMaxScaler()
 
         if isinstance(self, ClassifierMixin):
@@ -707,7 +700,9 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self.test_sample_ratio)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=self.test_sample_ratio, random_state=random_state
+        )
 
         uniset: UniversalSet = init_net_uniset(
             n_variables=X.shape[1],
@@ -718,10 +713,11 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
 
         if isinstance(self, ClassifierMixin):
             task_type = "classification"
+            n_outputs = self.n_classes_
         else:
             task_type = "regression"
+            n_outputs = 1
 
-        print(task_type)
         self.net_ = train_net_structure(
             uniset=uniset,
             X_train=X_train,
@@ -734,68 +730,36 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             net_size_penalty=self.net_size_penalty,
             weights_optimizer_args=weights_optimizer_args,
             weights_optimizer=self.weights_optimizer,
-            fitness_function_weights=fitness_function_weights,
             offset=self.offset,
+            n_outputs=n_outputs,
             task_type=task_type,
         )
 
         return self
 
-    # def _define_optimizer(
-    #     self,
-    #     uniset: UniversalSet,
-    #     n_outputs: int,
-    #     X_train: NDArray[np.float64],
-    #     target_train: NDArray[np.float64],
-    #     X_test: NDArray[np.float64],
-    #     target_test: NDArray[np.float64],
-    #     fitness_function: Callable,
-    #     evaluate_nets: Callable,
-    # ) -> Union[SelfCGP, GeneticProgramming]:
-    #     optimizer_args: dict[str, Any]
+    def predict(self, X: NDArray[np.float64]):
+        check_is_fitted(self)
 
-    #     if self._optimizer_args is not None:
-    #         assert (
-    #             "iters" not in self._optimizer_args.keys()
-    #             and "pop_size" not in self._optimizer_args.keys()
-    #         ), """Do not set the "iters" or "pop_size" in the "optimizer_args". Instead,
-    #           use the "SymbolicRegressionGP" arguments"""
-    #         for arg in (
-    #             "fitness_function",
-    #             "uniset",
-    #             "minimization",
-    #         ):
-    #             assert (
-    #                 arg not in self._optimizer_args.keys()
-    #             ), f"""Do not set the "{arg}"
-    #             to the "optimizer_args". It is defined automatically"""
-    #         optimizer_args = self._optimizer_args.copy()
+        X = check_array(X)
+        self._validate_data
+        n_features = X.shape[1]
 
-    #     else:
-    #         optimizer_args = {}
+        if self.n_features_in_ != n_features:
+            raise ValueError(
+                f"Number of features of the model must match the "
+                "input. Model n_features is {self.n_features_in_} and input "
+                "n_features is {n_features}."
+            )
 
-    #     optimizer_args["fitness_function"] = fitness_function
-    #     optimizer_args["fitness_function_args"] = {
-    #         "X": X_test,
-    #         "targets": target_test,
-    #         "net_size_penalty": self._net_size_penalty,
-    #     }
+        if self.offset:
+            X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-    #     optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype
-    #     optimizer_args["genotype_to_phenotype_args"] = {
-    #         "n_outputs": n_outputs,
-    #         "X_train": X_train,
-    #         "proba_train": target_train,
-    #         "weights_optimizer_args": self._weights_optimizer_args,
-    #         "weights_optimizer_class": self._weights_optimizer_class,
-    #         "output_activation": self._output_activation,
-    #         "offset": self._offset,
-    #         "evaluate_nets": evaluate_nets,
-    #     }
+        output = self.net_.forward(X)[0]
 
-    #     optimizer_args["iters"] = self._iters
-    #     optimizer_args["pop_size"] = self._pop_size
-    #     optimizer_args["uniset"] = uniset
-    #     optimizer_args["minimization"] = True
+        if isinstance(self, ClassifierMixin):
+            indeces = np.argmax(output, axis=1)
+            y = self._label_encoder.inverse_transform(indeces)
+        else:
+            y = self._target_scaler.inverse_transform(output)[:, 0]
 
-    #     return self._optimizer_class(**optimizer_args)
+        return y
