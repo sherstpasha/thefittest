@@ -6,17 +6,12 @@ from typing import Tuple
 from typing import Union
 
 import numpy as np
-from numpy.typing import NDArray
 
-from ..base._net import Net
-from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
-from ..optimizers import DifferentialEvolution
-from ..optimizers import SHADE
-from ..optimizers import jDE
-from ..utils._metrics import root_mean_square_error2d
-from ..utils.transformations import GrayCode
-from thefittest.base._model import BaseMLPEA
 from sklearn.base import RegressorMixin
+
+from ..base._mlp import BaseMLPEA
+from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
+from ..optimizers import SHADE
 
 
 class MLPEARegressor(RegressorMixin, BaseMLPEA):

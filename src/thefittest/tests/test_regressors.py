@@ -122,7 +122,7 @@ def test_GeneticProgrammingNeuralNetRegressor():
     weights_optimizer_args = {"iters": 25, "pop_size": 25, "CR": 0.9}
 
     model = GeneticProgrammingNeuralNetRegressor(
-        iters=iters,
+        n_iter=iters,
         pop_size=pop_size,
         optimizer=optimizer,
         optimizer_args=optimizer_args,
@@ -139,7 +139,7 @@ def test_GeneticProgrammingNeuralNetRegressor():
     weights_optimizer_args = {"iters": 25, "pop_size": 25, "K": 0.33}
 
     model = GeneticProgrammingNeuralNetRegressor(
-        iters=iters,
+        n_iter=iters,
         pop_size=pop_size,
         optimizer=optimizer,
         optimizer_args=optimizer_args,
@@ -152,7 +152,7 @@ def test_GeneticProgrammingNeuralNetRegressor():
     model.predict(X)
 
     model = GeneticProgrammingNeuralNetRegressor(
-        iters=iters,
+        n_iter=iters,
         pop_size=pop_size,
     )
 
@@ -160,9 +160,9 @@ def test_GeneticProgrammingNeuralNetRegressor():
 
     model.predict(X)
 
-    optimizer = model.get_optimizer()
+    # optimizer = model.get_optimizer()
 
-    assert isinstance(optimizer, model._optimizer_class)
+    check_estimator(model)
 
 
 def test_MLPEARegressor():

@@ -9,7 +9,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..base import UniversalSet
-from ..base._model import Model
+from ..base._mlp import Model
 from ..base._tree import init_symbolic_regression_uniset
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm

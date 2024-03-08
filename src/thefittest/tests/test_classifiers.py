@@ -8,69 +8,71 @@ from ..utils.transformations import minmax_scale
 from ..base._net import Net
 from sklearn.utils.estimator_checks import check_estimator
 
-# def test_GeneticProgrammingNeuralNetClassifier():
-#     data = IrisDataset()
-#     X = data.get_X()
-#     y = data.get_y()
 
-#     data = IrisDataset()
-#     X = minmax_scale(data.get_X())
-#     y = data.get_y()
+def test_GeneticProgrammingNeuralNetClassifier():
+    data = IrisDataset()
+    X = data.get_X()
+    y = data.get_y()
 
-#     optimizer = GeneticProgramming
+    data = IrisDataset()
+    X = minmax_scale(data.get_X())
+    y = data.get_y()
 
-#     optimizer_args = {"tour_size": 15, "show_progress_each": 1}
+    optimizer = GeneticProgramming
 
-#     iters = 3
-#     pop_size = 10
+    optimizer_args = {"tour_size": 15, "show_progress_each": 1}
 
-#     weights_optimizer = DifferentialEvolution
-#     weights_optimizer_args = {"iters": 25, "pop_size": 25, "CR": 0.9}
+    iters = 3
+    pop_size = 10
 
-#     model = GeneticProgrammingNeuralNetClassifier(
-#         iters=iters,
-#         pop_size=pop_size,
-#         optimizer=optimizer,
-#         optimizer_args=optimizer_args,
-#         weights_optimizer=weights_optimizer,
-#         weights_optimizer_args=weights_optimizer_args,
-#     )
+    weights_optimizer = DifferentialEvolution
+    weights_optimizer_args = {"iters": 25, "pop_size": 25, "CR": 0.9}
 
-#     model.fit(X, y)
+    model = GeneticProgrammingNeuralNetClassifier(
+        n_iter=iters,
+        pop_size=pop_size,
+        optimizer=optimizer,
+        optimizer_args=optimizer_args,
+        weights_optimizer=weights_optimizer,
+        weights_optimizer_args=weights_optimizer_args,
+    )
 
-#     model.predict(X)
+    model.fit(X, y)
 
-#     weights_optimizer = SelfCGA
-#     weights_optimizer_args = {"iters": 25, "pop_size": 25, "K": 0.33}
+    model.predict(X)
 
-#     model = GeneticProgrammingNeuralNetClassifier(
-#         iters=iters,
-#         pop_size=pop_size,
-#         optimizer=optimizer,
-#         optimizer_args=optimizer_args,
-#         weights_optimizer=weights_optimizer,
-#         weights_optimizer_args=weights_optimizer_args,
-#     )
+    weights_optimizer = SelfCGA
+    weights_optimizer_args = {"iters": 25, "pop_size": 25, "K": 0.33}
 
-#     model.fit(X, y)
+    model = GeneticProgrammingNeuralNetClassifier(
+        n_iter=iters,
+        pop_size=pop_size,
+        optimizer=optimizer,
+        optimizer_args=optimizer_args,
+        weights_optimizer=weights_optimizer,
+        weights_optimizer_args=weights_optimizer_args,
+    )
 
-#     model.predict(X)
+    model.fit(X, y)
 
-#     model = GeneticProgrammingNeuralNetClassifier(
-#         iters=iters,
-#         pop_size=pop_size,
-#     )
+    model.predict(X)
 
-#     model.fit(X, y)
+    model = GeneticProgrammingNeuralNetClassifier(
+        n_iter=iters,
+        pop_size=pop_size,
+    )
 
-#     model.predict(X)
+    model.fit(X, y)
 
-#     optimizer = model.get_optimizer()
+    model.predict(X)
 
-#     net = model.get_net()
+    # optimizer = model.get_optimizer()
 
-#     assert isinstance(net, Net)
-#     assert isinstance(optimizer, model._optimizer_class)
+    net = model.get_net()
+
+    assert isinstance(net, Net)
+    # assert isinstance(optimizer, model._optimizer_class)
+    check_estimator(model)
 
 
 def test_MLPEAClassifier():

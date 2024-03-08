@@ -3,28 +3,15 @@ from __future__ import annotations
 from typing import Any
 from typing import Optional
 from typing import Tuple
-from typing import Type
 from typing import Union
 
 import numpy as np
 
-from ..optimizers import DifferentialEvolution
-from ..optimizers import GeneticAlgorithm
-from ..optimizers import SHADE
-from ..optimizers import SHAGA
-from ..optimizers import SelfCGA
-from ..optimizers import jDE
-from thefittest.base._model import BaseMLPEA
 from sklearn.base import ClassifierMixin
 
-weights_type_optimizer_alias = Union[
-    Type[DifferentialEvolution],
-    Type[jDE],
-    Type[SHADE],
-    Type[GeneticAlgorithm],
-    Type[SelfCGA],
-    Type[SHAGA],
-]
+from ..base._mlp import BaseMLPEA
+from ..base._mlp import weights_type_optimizer_alias
+from ..optimizers import SHADE
 
 
 class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
