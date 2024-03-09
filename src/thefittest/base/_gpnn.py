@@ -237,7 +237,7 @@ def train_net_structure(
 
     net = optimizer.get_fittest()["phenotype"].copy()
 
-    return net
+    return net, optimizer._stats
 
 
 class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
@@ -277,6 +277,9 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         X = np.array(X, dtype=np.float64)
         y = np.array(y, dtype=np.float64)
         return X, y
+
+    def get_net(self) -> Net:
+        return self.net_
 
     @staticmethod
     def genotype_to_phenotype_tree(
@@ -402,7 +405,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             task_type = "regression"
             n_outputs = 1
 
-        self.net_ = train_net_structure(
+        self.net_, self.optimizer_stats_ = train_net_structure(
             uniset=uniset,
             X_train=X_train,
             y_train=y_train,

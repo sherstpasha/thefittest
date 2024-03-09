@@ -160,8 +160,6 @@ def test_GeneticProgrammingNeuralNetRegressor():
 
     model.predict(X)
 
-    # optimizer = model.get_optimizer()
-
     check_estimator(model)
 
 

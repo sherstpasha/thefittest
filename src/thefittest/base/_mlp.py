@@ -170,9 +170,9 @@ def train_net_weights(
     optimizer = weights_optimizer(**weights_optimizer_args)
     optimizer.fit()
 
-    phenotype = optimizer.get_fittest()["phenotype"]
+    net = optimizer.get_fittest()["phenotype"]
 
-    return phenotype, optimizer._stats
+    return net, optimizer._stats
 
 
 class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
