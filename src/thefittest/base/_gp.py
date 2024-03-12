@@ -70,7 +70,7 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
         GeneticProgramming,
         SelfCGP,
     ]:
-        return self._optimizer
+        return self.trained_optimizer_
 
     def generator1(self) -> float:
         value = np.round(uniform(0, 10, 1)[0], 4)

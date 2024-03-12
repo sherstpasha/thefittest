@@ -19,7 +19,7 @@ class GeneticProgrammingRegressor(RegressorMixin, BaseGP):
     def __init__(
         self,
         *,
-        n_iter: int = 50,
+        n_iter: int = 200,
         pop_size: int = 500,
         uniset: Optional[UniversalSet] = None,
         optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,

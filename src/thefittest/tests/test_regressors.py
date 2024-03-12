@@ -20,77 +20,70 @@ from ..utils.crossovers import uniform_crossoverGP
 from sklearn.utils.estimator_checks import check_estimator
 
 
-# def test_SymbolicRegressionGP():
-#     def problem(x):
-#         return np.sin(x[:, 0])
+def test_SymbolicRegressionGP():
 
-#     def generator1():
-#         return np.round(np.random.uniform(0, 10), 4)
+    def problem(x):
+        return np.sin(x[:, 0])
 
-#     def generator2():
-#         return np.random.randint(0, 10)
+    iters = 10
+    pop_size = 50
 
-#     iters = 10
-#     pop_size = 50
+    function = problem
+    left_border = -4.5
+    right_border = 4.5
+    sample_size = 300
+    n_dimension = 1
 
-#     function = problem
-#     left_border = -4.5
-#     right_border = 4.5
-#     sample_size = 300
-#     n_dimension = 1
+    X = np.array(
+        [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
+    ).T
+    y = function(X)
 
-#     X = np.array(
-#         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
-#     ).T
-#     y = function(X)
+    functional_set = [
+        FunctionalNode(Add()),
+        FunctionalNode(Mul()),
+        FunctionalNode(Neg()),
+        FunctionalNode(Div()),
+    ]
 
-#     functional_set = [
-#         FunctionalNode(Add()),
-#         FunctionalNode(Mul()),
-#         FunctionalNode(Neg()),
-#         FunctionalNode(Div()),
-#     ]
+    terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
+    uniset = UniversalSet(functional_set, terminal_set)
 
-#     terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
-#     terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])
-#     uniset = UniversalSet(functional_set, terminal_set)
+    optimizer = GeneticProgramming
 
-#     optimizer = GeneticProgramming
+    optimizer_args = {
+        "tour_size": 15,
+        "show_progress_each": 10,
+        "crossover": "gp_uniform_k",
+        "parents_num": 6,
+    }
 
-#     optimizer_args = {
-#         "tour_size": 15,
-#         "show_progress_each": 10,
-#         "optimal_value": 1.1,
-#         "crossover": "gp_uniform_k",
-#         "parents_num": 6,
-#     }
+    model = GeneticProgrammingRegressor(
+        n_iter=iters,
+        pop_size=pop_size,
+        uniset=uniset,
+        optimizer=optimizer,
+        optimizer_args=optimizer_args,
+    )
 
-#     model = SymbolicRegressionGP(
-#         iters=iters,
-#         pop_size=pop_size,
-#         uniset=uniset,
-#         optimizer=optimizer,
-#         optimizer_args=optimizer_args,
-#     )
+    model.fit(X, y)
 
-#     model.fit(X, y)
+    optimizer = model.get_optimizer()
 
-#     optimizer = model.get_optimizer()
+    assert optimizer._iters == iters
+    assert optimizer._pop_size == pop_size
+    assert optimizer._show_progress_each == 10
+    assert optimizer._crossover_pool[optimizer._specified_crossover][1] == 6
+    assert optimizer._crossover_pool[optimizer._specified_crossover][0] == uniform_crossoverGP
 
-#     assert optimizer._iters == iters
-#     assert optimizer._pop_size == pop_size
-#     assert optimizer._show_progress_each == 10
-#     assert optimizer._crossover_pool[optimizer._specified_crossover][1] == 6
-#     assert optimizer._crossover_pool[optimizer._specified_crossover][0] == uniform_crossoverGP
+    model = GeneticProgrammingRegressor(
+        n_iter=iters,
+        pop_size=pop_size,
+    )
 
-#     model = SymbolicRegressionGP(
-#         iters=iters,
-#         pop_size=pop_size,
-#     )
+    model.fit(X, y)
 
-#     model.fit(X, y)
-
-#     model.predict(X)
+    model.predict(X)
 
 
 def test_GeneticProgrammingNeuralNetRegressor():
