@@ -37,6 +37,9 @@ def coefficient_determination(
     mean_y_true = np.mean(y_true)
     total_sum = np.sum((y_true - mean_y_true) ** 2)
 
+    if total_sum == 0:
+        total_sum = 1e-10
+
     error = y_true - y_predict
     residual_sum = np.sum((error) ** 2)
     r2 = 1 - residual_sum / total_sum

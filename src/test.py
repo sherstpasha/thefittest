@@ -1,90 +1,46 @@
 import numpy as np
+
+from thefittest.regressors import GeneticProgrammingRegressor
+from thefittest.optimizers import GeneticProgramming, SelfCGP
+
+from sklearn.metrics import f1_score, r2_score
+
+# from thefittest.benchmarks import BanknoteDataset
+from collections import defaultdict
+
 import matplotlib.pyplot as plt
 
-from thefittest.optimizers import SelfCGP
-from thefittest.optimizers import SHADE
-from thefittest.benchmarks import BanknoteDataset, IrisDataset
-from thefittest.classifiers._gpnnclassifier import GeneticProgrammingNeuralNetClassifier2
-from thefittest.regressors._gpnnregression import GeneticProgrammingNeuralNetRegressor2
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import minmax_scale
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import f1_score, r2_score
 from sklearn.utils.estimator_checks import check_estimator
+from sklearn.datasets import load_diabetes
 
 
-# data = IrisDataset()
-# X = data.get_X()
-# y = data.get_y()
-
-# X_scaled = minmax_scale(X)
-
-# X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
-
-# model = GeneticProgrammingNeuralNetClassifier2(
-#     n_iter=10,
-#     pop_size=50,
-#     optimizer=SelfCGP,
-#     optimizer_args={
-#         "show_progress_each": 1,
-#         #  "n_jobs": 1
-#     },
-#     weights_optimizer=SHADE,
-#     weights_optimizer_args={
-#         "iters": 100,
-#         "pop_size": 100,
-#     },
-# )
-
-# # check_estimator(model)
+def problem(x):
+    return np.sin(x[:, 0])
 
 
-# import time
+data = load_diabetes()
+
+X = data.data
+y = data.target
 
 
-# begin = time.time()
-# model.fit(X_train, y_train)
-# print(time.time() - begin)
+number_of_iterations = 200
 
+model = GeneticProgrammingRegressor(
+    n_iter=number_of_iterations,
+    pop_size=500,
+    optimizer=SelfCGP,
+    optimizer_args={
+        "keep_history": True,
+        "show_progress_each": 10,
+        "elitism": True,
+    },
+)
 
-# predict = model.predict(X_test)
+check_estimator(model)
 
+# model.fit(X, y)
 
-# print("confusion_matrix: \n", confusion_matrix(y_test, predict))
-# print("f1_score: \n", f1_score(y_test, predict, average="macro"))
+# predict = model.predict(X)
 
-
-# def problem(x):
-#     return np.sin(x[:, 0])
-
-
-# function = problem
-# left_border = -4.5
-# right_border = 4.5
-# sample_size = 300
-# n_dimension = 1
-
-# X = np.array([np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]).T
-# y = function(X)
-# X_scaled = minmax_scale(X)
-# y_scaled = minmax_scale(y)
-
-# X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled, test_size=0.33)
-
-# model = GeneticProgrammingNeuralNetRegressor2(
-#     n_iter=5,
-#     pop_size=15,
-#     optimizer=SelfCGP,
-#     optimizer_args={"show_progress_each": 1, "n_jobs": 2},
-#     weights_optimizer=SHADE,
-#     weights_optimizer_args={"iters": 100, "pop_size": 100},
-# )
-
-
-# # check_estimator(model)
-
-# model.fit(X_train, y_train)
-
-# predict = model.predict(X_test)
-
-# print("coefficient_determination: \n", r2_score(y_test, predict))
+# print(r2_score(y, predict))

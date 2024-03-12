@@ -10,7 +10,7 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..regressors import GeneticProgrammingNeuralNetRegressor
 from ..regressors import MLPEARegressor
-from ..regressors import SymbolicRegressionGP
+from ..regressors import GeneticProgrammingRegressor
 from ..base._tree import Add
 from ..base._tree import Div
 from ..base._tree import Mul

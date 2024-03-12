@@ -36,6 +36,7 @@ from ..utils._metrics import categorical_crossentropy3d
 from ..utils._metrics import root_mean_square_error2d
 from ..utils.random import check_random_state
 from ..utils.transformations import GrayCode
+from ..utils import array_like_to_numpy_X_y
 
 
 weights_type_optimizer_alias = Union[
@@ -47,35 +48,6 @@ weights_type_optimizer_alias = Union[
     Type[SHAGA],
 ]
 weights_optimizer_alias = Union[DifferentialEvolution, jDE, SHADE, GeneticAlgorithm, SelfCGA, SHAGA]
-
-
-class Model:
-    def _fit(
-        self,
-        X: np.typing.NDArray[np.float64],
-        y: NDArray[Union[np.float64, np.int64]],
-    ) -> Any:
-        pass
-
-    def _predict(self, X: NDArray[np.float64]) -> Any:
-        pass
-
-    def get_optimizer(
-        self: Model,
-    ) -> Any:
-        pass
-
-    def fit(
-        self,
-        X: NDArray[np.float64],
-        y: NDArray[Union[np.float64, np.int64]],
-    ) -> Any:
-        assert np.all(np.isfinite(X))
-        assert np.all(np.isfinite(y))
-        return self._fit(X, y)
-
-    def predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
-        return self._predict(X)
 
 
 def fitness_function_weights(
@@ -248,13 +220,6 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         net._offset = self.offset
         return net
 
-    def array_like_to_numpy_X_y(
-        self, X: ArrayLike, y: ArrayLike
-    ) -> Tuple[NDArray[np.float64], NDArray[np.int64]]:
-        X = np.array(X, dtype=np.float64)
-        y = np.array(y, dtype=np.float64)
-        return X, y
-
     def get_optimizer(
         self,
     ) -> Union[
@@ -321,7 +286,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
 
             y = self._target_scaler.fit_transform(y.reshape(-1, 1))[:, 0]
 
-        X, y = self.array_like_to_numpy_X_y(X, y)
+        X, y = array_like_to_numpy_X_y(X, y)
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
@@ -356,7 +321,6 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         check_is_fitted(self)
 
         X = check_array(X)
-        self._validate_data
         n_features = X.shape[1]
 
         if self.n_features_in_ != n_features:

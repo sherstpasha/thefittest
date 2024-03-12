@@ -10,6 +10,7 @@ from numba.typed import Dict as numbaDict
 from numba.types import List as numbaListType
 
 import numpy as np
+from numpy.typing import ArrayLike
 from numpy.typing import NDArray
 
 
@@ -273,7 +274,7 @@ def forward(
     return nodes
 
 
-# @njit
+@njit
 def forward2d(
     X: NDArray[np.float64],
     inputs: NDArray[np.int64],
@@ -307,3 +308,11 @@ def numpy_group_by(group: NDArray, by: NDArray) -> Tuple:
     keys, cut_index = np.unique(by, return_index=True)
     groups = np.split(group, cut_index)[1:]
     return keys, groups
+
+
+def array_like_to_numpy_X_y(
+    X: ArrayLike, y: ArrayLike
+) -> Tuple[NDArray[np.float64], NDArray[np.int64]]:
+    X = np.array(X, dtype=np.float64)
+    y = np.array(y, dtype=np.float64)
+    return X, y

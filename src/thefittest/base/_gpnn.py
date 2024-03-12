@@ -39,35 +39,7 @@ from ..optimizers import SelfCGP
 from ..utils._metrics import categorical_crossentropy3d
 from ..utils._metrics import root_mean_square_error2d
 from ..utils.random import check_random_state
-
-
-class Model:
-    def _fit(
-        self,
-        X: np.typing.NDArray[np.float64],
-        y: NDArray[Union[np.float64, np.int64]],
-    ) -> Any:
-        pass
-
-    def _predict(self, X: NDArray[np.float64]) -> Any:
-        pass
-
-    def get_optimizer(
-        self: Model,
-    ) -> Any:
-        pass
-
-    def fit(
-        self,
-        X: NDArray[np.float64],
-        y: NDArray[Union[np.float64, np.int64]],
-    ) -> Any:
-        assert np.all(np.isfinite(X))
-        assert np.all(np.isfinite(y))
-        return self._fit(X, y)
-
-    def predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
-        return self._predict(X)
+from ..utils import array_like_to_numpy_X_y
 
 
 def fitness_function_structure(
@@ -271,13 +243,6 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         self.net_size_penalty = net_size_penalty
         self.random_state = random_state
 
-    def array_like_to_numpy_X_y(
-        self, X: ArrayLike, y: ArrayLike
-    ) -> Tuple[NDArray[np.float64], NDArray[np.int64]]:
-        X = np.array(X, dtype=np.float64)
-        y = np.array(y, dtype=np.float64)
-        return X, y
-
     def get_net(self) -> Net:
         return self.net_
 
@@ -382,7 +347,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
 
             y = self._target_scaler.fit_transform(y.reshape(-1, 1))[:, 0]
 
-        X, y = self.array_like_to_numpy_X_y(X, y)
+        X, y = array_like_to_numpy_X_y(X, y)
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
@@ -428,7 +393,6 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         check_is_fitted(self)
 
         X = check_array(X)
-        self._validate_data
         n_features = X.shape[1]
 
         if self.n_features_in_ != n_features:
