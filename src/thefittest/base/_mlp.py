@@ -294,10 +294,9 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
             self.classes_ = self._label_encoder.classes_
             self.n_classes_ = len(self.classes_)
         else:
-            pass
-            # X, y = self._validate_data(X, y, y_numeric=True, reset=True)
+            X, y = self._validate_data(X, y, y_numeric=True, reset=True)
 
-        # X, y = array_like_to_numpy_X_y(X, y)
+        X, y = array_like_to_numpy_X_y(X, y)
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])

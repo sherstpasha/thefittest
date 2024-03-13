@@ -12,7 +12,7 @@ from sklearn.preprocessing import minmax_scale
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
 from thefittest.regressors import MLPEARegressor
-from thefittest.optimizers import SHAGA
+from thefittest.optimizers import SHAGA, SHADE
 
 from sklearn.metrics import r2_score
 
@@ -40,7 +40,7 @@ model = MLPEARegressor(
     pop_size=250,
     hidden_layers=(5, 5),
     activation="sigma",
-    weights_optimizer=SHAGA,
+    weights_optimizer=SHADE,
     weights_optimizer_args={"show_progress_each": 50},
 )
 
