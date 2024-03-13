@@ -13,10 +13,11 @@ from numpy.typing import NDArray
 from .random import random_sample
 from .random import random_weighted_sample
 from .random import randint
-from .random import flip_coin
+from .random import uniform
 from ..base import Tree
 
 from .selections import tournament_selection
+import random
 
 
 def empty_crossover(
@@ -123,7 +124,7 @@ def binomialGA(
     j = randint(0, size, 1)[0]
 
     for i in range(size):
-        if flip_coin(CR) or i == j:
+        if random.random() <= CR or i == j:
             offspring[i] = mutant[i]
     return offspring
 
@@ -176,7 +177,7 @@ def one_point_crossover(
     Offspring After Empty Crossover: ...
     """
     cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
-    if flip_coin(0.5):
+    if uniform(low=0, high=1, size=1)[0] < 0.5:
         offspring = individs[0].copy()
         for i in range(individs.shape[1]):
             if i > cross_point:
@@ -240,7 +241,7 @@ def two_point_crossover(
     c_points = random_sample(range_size=len(individs[0]), quantity=2, replace=False)
     c_points = sorted(c_points)
 
-    if flip_coin(0.5):
+    if random.random() > 0.5:
         offspring = individs[0].copy()
         other_individ = individs[1]
     else:
@@ -525,7 +526,7 @@ def binomial(
     j = randint(0, size, 1)[0]
 
     for i in range(size):
-        if flip_coin(CR) or i == j:
+        if random.random() <= CR or i == j:
             offspring[i] = mutant[i]
     return offspring
 
@@ -634,7 +635,7 @@ def standard_crossover(
     first_point = randint(0, len(individ_1), 1)[0]
     second_point = randint(0, len(individ_2), 1)[0]
 
-    if flip_coin(0.5):
+    if uniform(low=0, high=1, size=1)[0] < 0.5:
         first_subtree = individ_1.subtree(first_point)
         offspring = individ_2.concat(second_point, first_subtree)
         if offspring.get_max_level() > max_level:
@@ -716,7 +717,7 @@ def one_point_crossoverGP(
     point = randint(0, len(common_indexes[0]), 1)[0]
     first_point = common_indexes[0][point]
     second_point = common_indexes[1][point]
-    if flip_coin(0.5):
+    if uniform(low=0, high=1, size=1)[0] < 0.5:
         first_subtree = individ_1.subtree(first_point)
         offspring = individ_2.concat(second_point, first_subtree)
     else:

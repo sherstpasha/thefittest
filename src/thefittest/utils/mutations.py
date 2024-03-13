@@ -12,7 +12,6 @@ from numpy.typing import NDArray
 
 from .random import random_sample
 from .random import sattolo_shuffle
-from .random import flip_coin
 from .random import randint
 from .random import uniform
 from ..base import EphemeralNode
@@ -59,7 +58,7 @@ def flip_mutation(individual: NDArray[np.byte], proba: float) -> NDArray[np.byte
     """
     offspring = individual.copy()
     for i in range(offspring.size):
-        if flip_coin(proba):
+        if uniform(low=0, high=1, size=1)[0] < proba:
             offspring[i] = 1 - offspring[i]
     return offspring
 
@@ -638,7 +637,7 @@ def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: in
     new_node: Union[FunctionalNode, TerminalNode, EphemeralNode]
 
     mutated_tree = tree.copy()
-    if flip_coin(proba):
+    if uniform(low=0, high=1, size=1)[0] < proba:
         i = randint(0, len(mutated_tree), 1)[0]
         if isinstance(mutated_tree._nodes[i], FunctionalNode):
             n_args = mutated_tree._nodes[i]._n_args
@@ -701,7 +700,7 @@ def growing_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: 
     Mutated Tree: ...
     """
     mutated_tree = tree.copy()
-    if flip_coin(proba):
+    if uniform(low=0, high=1, size=1)[0] < proba:
         i = randint(0, len(mutated_tree), 1)[0]
         grown_tree = Tree.growing_method(uniset, max(mutated_tree.get_levels(i)))
         mutated_tree = mutated_tree.concat(i, grown_tree)
@@ -760,7 +759,7 @@ def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_leve: int)
     Mutated Tree: ...
     """
     mutated_tree = tree.copy()
-    if flip_coin(proba):
+    if uniform(low=0, high=1, size=1)[0] < proba:
         more_one_args_cond = mutated_tree._n_args > 1
         indexes = np.arange(len(tree), dtype=int)[more_one_args_cond]
         if len(indexes) > 0:
@@ -828,7 +827,7 @@ def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: i
     """
     mutated_tree = tree.copy()
     if len(mutated_tree) > 2:
-        if flip_coin(proba):
+        if uniform(low=0, high=1, size=1)[0] < proba:
             no_terminal_cond = mutated_tree._n_args > 0
             indexes = np.arange(len(tree), dtype=np.int64)[no_terminal_cond]
             if len(indexes) > 0:

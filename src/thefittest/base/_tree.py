@@ -22,7 +22,7 @@ from ..utils import common_region
 from ..utils import common_region_two_trees
 from ..utils.random import random_sample
 from ..utils.random import random_weighted_sample
-from ..utils.random import flip_coin
+from ..utils.random import uniform
 
 
 MIN_VALUE = np.finfo(np.float64).min
@@ -403,7 +403,7 @@ class Tree:
                 possible_steps.append(n_i)
                 previous_levels.append(level_i)
             else:
-                if flip_coin(0.5):
+                if uniform(low=0, high=1, size=1)[0] < 0.5:
                     nodes.append(uniset._random_terminal_or_ephemeral())
                 else:
                     nodes.append(uniset._random_functional())
@@ -418,7 +418,7 @@ class Tree:
 
     @classmethod
     def random_tree(cls, uniset: UniversalSet, max_level: int) -> Tree:
-        if flip_coin(0.5):
+        if uniform(low=0, high=1, size=1)[0] < 0.5:
             tree = cls.full_growing_method(uniset, max_level)
         else:
             tree = cls.growing_method(uniset, max_level)

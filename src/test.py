@@ -40,7 +40,7 @@ model = MLPEARegressor(
     pop_size=250,
     hidden_layers=(5, 5),
     activation="sigma",
-    weights_optimizer=SHADE,
+    weights_optimizer=SHAGA,
     weights_optimizer_args={"show_progress_each": 50},
 )
 

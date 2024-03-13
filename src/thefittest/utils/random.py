@@ -251,41 +251,6 @@ def random_sample(
     return sample
 
 
-@njit(boolean(int64))
-def flip_coin(threshold):
-    """
-    Simulate a biased coin flip.
-
-    Parameters
-    ----------
-    threshold : int64
-        The threshold for the biased coin flip. Should be in the range [0, 1].
-
-    Returns
-    -------
-    boolean
-        Returns True with a probability equal to the given threshold and
-        False with a complementary probability.
-
-    Examples
-    --------
-    >>> from thefittest.utils.random import flip_coin
-    >>>
-    >>> # Example of a biased coin flip with a threshold of 0.5
-    >>> result = flip_coin(0.5)
-    >>> print("Coin Flip Result:", result)
-    Coin Flip Result: ...
-
-    Notes
-    -----
-    The function simulates a biased coin flip with a specified threshold.
-    If the threshold is 0.5, it behaves like a fair coin flip.
-    A threshold greater than 0.5 biases the result towards True,
-    while a threshold less than 0.5 biases the result towards False.
-    """
-    return random.random() < threshold
-
-
 @njit(float64[:](float64, float64, int64))
 def uniform(low: np.float64, high: np.float64, size: np.int64):
     """
