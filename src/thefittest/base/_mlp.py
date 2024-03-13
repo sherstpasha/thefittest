@@ -50,6 +50,23 @@ weights_type_optimizer_alias = Union[
 weights_optimizer_alias = Union[DifferentialEvolution, jDE, SHADE, GeneticAlgorithm, SelfCGA, SHAGA]
 
 
+def check_optimizer_args(
+    optimizer_args, args_auto_defined: Optional[list] = None, args_in_class: Optional[list] = None
+) -> None:
+    if args_auto_defined is not None:
+        for arg in args_auto_defined:
+            assert (
+                arg not in optimizer_args.keys()
+            ), f"""Do not set the "{arg}"
+            to the "weights_optimizer_args". It is defined automatically"""
+
+    if args_in_class is not None:
+        for arg in args_in_class:
+            assert (
+                arg not in optimizer_args.keys()
+            ), f"Do not set '{arg}' in 'optimizer_args'. Instead, use the arguments of the class."
+
+
 def fitness_function_weights(
     weights: NDArray[np.float64],
     net: "Net",
@@ -237,37 +254,32 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
     def get_net(self) -> Net:
         return self.net_
 
-    def check_weights_optimizer_args(self) -> dict:
+    def fit(self, X: ArrayLike, y: ArrayLike):
 
-        if self.weights_optimizer_args is None:
-            weights_optimizer_args = {"iters": 100, "pop_size": 100}
-        else:
+        if self.weights_optimizer_args is not None:
             weights_optimizer_args = self.weights_optimizer_args.copy()
-            for arg in (
-                "fitness_function",
-                "iters",
-                "pop_size",
-                "left",
-                "right",
-                "str_len",
-                "genotype_to_phenotype",
-                "minimization",
-            ):
-                assert (
-                    arg not in weights_optimizer_args.keys()
-                ), f"""Do not set the "{arg}"
-                to the "weights_optimizer_args". It is defined automatically"""
+            check_optimizer_args(
+                weights_optimizer_args,
+                args_auto_defined=[
+                    "fitness_function",
+                    "fitness_function_args",
+                    "left",
+                    "right",
+                    "str_len",
+                    "genotype_to_phenotype",
+                    "genotype_to_phenotype_args",
+                    "minimization",
+                    "init_population",
+                ],
+                args_in_class=["iters", "pop_size"],
+            )
+        else:
+            weights_optimizer_args = {}
+
         weights_optimizer_args["iters"] = self.n_iter
         weights_optimizer_args["pop_size"] = self.pop_size
 
-        return weights_optimizer_args
-
-    def fit(self, X: ArrayLike, y: ArrayLike):
-
-        weights_optimizer_args = self.check_weights_optimizer_args()
-
         check_random_state(self.random_state)
-        self._target_scaler = MinMaxScaler()
 
         if isinstance(self, ClassifierMixin):
             X, y = self._validate_data(X, y, y_numeric=False, reset=True)
@@ -282,11 +294,10 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
             self.classes_ = self._label_encoder.classes_
             self.n_classes_ = len(self.classes_)
         else:
-            X, y = self._validate_data(X, y, y_numeric=True, reset=True)
+            pass
+            # X, y = self._validate_data(X, y, y_numeric=True, reset=True)
 
-            y = self._target_scaler.fit_transform(y.reshape(-1, 1))[:, 0]
-
-        X, y = array_like_to_numpy_X_y(X, y)
+        # X, y = array_like_to_numpy_X_y(X, y)
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
@@ -339,6 +350,6 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
             indeces = np.argmax(output, axis=1)
             y = self._label_encoder.inverse_transform(indeces)
         else:
-            y = self._target_scaler.inverse_transform(output)[:, 0]
+            y = output[:, 0]
 
         return y
