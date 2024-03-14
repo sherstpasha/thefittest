@@ -4,6 +4,10 @@ from ..base import EphemeralNode
 from ..base import FunctionalNode
 from ..base import TerminalNode
 from ..base import UniversalSet
+from ..base._tree import Add
+from ..base._tree import Div
+from ..base._tree import Mul
+from ..base._tree import Neg
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 from ..optimizers import GeneticProgramming
@@ -13,10 +17,6 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..utils._metrics import coefficient_determination
-from ..base._tree import Add
-from ..base._tree import Div
-from ..base._tree import Mul
-from ..base._tree import Neg
 
 
 def test_GeneticAlgorithm_start_settings():

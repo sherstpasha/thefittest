@@ -311,8 +311,11 @@ def numpy_group_by(group: NDArray, by: NDArray) -> Tuple:
 
 
 def array_like_to_numpy_X_y(
-    X: ArrayLike, y: ArrayLike
-) -> Tuple[NDArray[np.float64], NDArray[np.int64]]:
+    X: ArrayLike, y: ArrayLike, y_numeric=True
+) -> Tuple[NDArray[np.float64]]:
     X = np.array(X, dtype=np.float64)
-    y = np.array(y, dtype=np.float64)
+    if y_numeric:
+        y = np.array(y, dtype=np.float64)
+    else:
+        y = np.array(y, dtype=np.int64)
     return X, y

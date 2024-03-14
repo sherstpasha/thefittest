@@ -16,27 +16,25 @@ from numpy.typing import NDArray
 from sklearn.base import BaseEstimator
 from sklearn.base import ClassifierMixin
 from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.validation import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from ..base import Net
+from ..base._ea import Statistics
 from ..base._net import ACTIV_NAME_INV
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
-from ..optimizers import GeneticProgramming
 from ..optimizers import SHADE
 from ..optimizers import SHAGA
 from ..optimizers import SelfCGA
-from ..optimizers import SelfCGP
 from ..optimizers import jDE
+from ..utils import array_like_to_numpy_X_y
 from ..utils._metrics import categorical_crossentropy3d
 from ..utils._metrics import root_mean_square_error2d
 from ..utils.random import check_random_state
 from ..utils.transformations import GrayCode
-from ..utils import array_like_to_numpy_X_y
 
 
 weights_type_optimizer_alias = Union[
@@ -224,7 +222,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         if isinstance(self, ClassifierMixin):
             outputs_activation = [ACTIV_NAME_INV["softmax"]] * len(output_id)
         else:
-            outputs_activation = [ACTIV_NAME_INV["sigma"]] * len(output_id)
+            outputs_activation = [ACTIV_NAME_INV["ln"]] * len(output_id)
 
         activs = dict(zip(output_id, outputs_activation))
 
@@ -237,19 +235,8 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         net._offset = self.offset
         return net
 
-    def get_optimizer(
-        self,
-    ) -> Union[
-        DifferentialEvolution,
-        GeneticAlgorithm,
-        GeneticProgramming,
-        jDE,
-        SelfCGA,
-        SelfCGP,
-        SHADE,
-        SHAGA,
-    ]:
-        return self.optimizer_
+    def get_stats(self) -> Statistics:
+        return self.optimizer_stats_
 
     def get_net(self) -> Net:
         return self.net_
@@ -347,8 +334,8 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
 
         if isinstance(self, ClassifierMixin):
             indeces = np.argmax(output, axis=1)
-            y = self._label_encoder.inverse_transform(indeces)
+            y_predict = self._label_encoder.inverse_transform(indeces)
         else:
-            y = output[:, 0]
+            y_predict = output[:, 0]
 
-        return y
+        return y_predict

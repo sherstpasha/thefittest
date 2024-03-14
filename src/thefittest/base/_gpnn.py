@@ -5,7 +5,6 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
-from typing import Tuple
 from typing import Type
 from typing import Union
 
@@ -28,6 +27,8 @@ from ..base import Net
 from ..base import TerminalNode
 from ..base import Tree
 from ..base import UniversalSet
+from ..base._ea import Statistics
+from ..base._mlp import check_optimizer_args
 from ..base._mlp import fitness_function_weights
 from ..base._mlp import train_net_weights
 from ..base._mlp import weights_type_optimizer_alias
@@ -36,10 +37,10 @@ from ..base._tree import init_net_uniset
 from ..optimizers import GeneticProgramming
 from ..optimizers import SHADE
 from ..optimizers import SelfCGP
+from ..utils import array_like_to_numpy_X_y
 from ..utils._metrics import categorical_crossentropy3d
 from ..utils._metrics import root_mean_square_error2d
 from ..utils.random import check_random_state
-from ..utils import array_like_to_numpy_X_y
 
 
 def fitness_function_structure(
@@ -176,7 +177,7 @@ def train_net_structure(
     task_type: str = "regression",
 ):
     if task_type == "regression":
-        output_activation = "sigma"
+        output_activation = "ln"
     else:
         output_activation = "softmax"
 
@@ -208,8 +209,9 @@ def train_net_structure(
     optimizer.fit()
 
     net = optimizer.get_fittest()["phenotype"].copy()
+    tree = optimizer.get_fittest()["genotype"].copy()
 
-    return net, optimizer._stats
+    return net, tree, optimizer._stats
 
 
 class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
@@ -246,6 +248,12 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
     def get_net(self) -> Net:
         return self.net_
 
+    def get_tree(self) -> Tree:
+        return self.tree_
+
+    def get_stats(self) -> Statistics:
+        return self.optimizer_stats_
+
     @staticmethod
     def genotype_to_phenotype_tree(
         tree: Tree, n_variables: int, n_outputs: int, output_activation: str, offset: bool
@@ -278,54 +286,51 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
 
         return to_return
 
-    def check_optimizer_args(self) -> dict:
+    def fit(self, X: ArrayLike, y: ArrayLike):
 
-        if self.optimizer_args is None:
-            optimizer_args = {"iters": 30, "pop_size": 100}
-        else:
+        if self.optimizer_args is not None:
             optimizer_args = self.optimizer_args.copy()
-            for arg in (
-                "fitness_function",
-                "iters",
-                "pop_size",
-                "uniset",
-                "genotype_to_phenotype",
-                "minimization",
-            ):
-                assert (
-                    arg not in optimizer_args.keys()
-                ), f"""Do not set the "{arg}"
-                to the "optimizer_args". It is defined automatically"""
+            check_optimizer_args(
+                optimizer_args,
+                args_auto_defined=[
+                    "fitness_function",
+                    "fitness_function_args",
+                    "uniset",
+                    "genotype_to_phenotype",
+                    "genotype_to_phenotype_args",
+                    "init_population",
+                    "minimization",
+                ],
+                args_in_class=["iters", "pop_size"],
+            )
+        else:
+            optimizer_args = {}
         optimizer_args["iters"] = self.n_iter
         optimizer_args["pop_size"] = self.pop_size
 
-        return optimizer_args
-
-    def check_weights_optimizer_args(self) -> dict:
-
-        if self.weights_optimizer_args is None:
-            weights_optimizer_args = {"iters": 100, "pop_size": 100}
-        else:
+        if self.weights_optimizer_args is not None:
             weights_optimizer_args = self.weights_optimizer_args.copy()
-            for arg in (
-                "fitness_function",
-                "left",
-                "right",
-                "str_len",
-                "genotype_to_phenotype",
-                "minimization",
-            ):
-                assert (
-                    arg not in weights_optimizer_args.keys()
-                ), f"""Do not set the "{arg}"
-                to the "weights_optimizer_args". It is defined automatically"""
+            check_optimizer_args(
+                weights_optimizer_args,
+                args_auto_defined=[
+                    "fitness_function",
+                    "fitness_function_args",
+                    "left",
+                    "right",
+                    "str_len",
+                    "genotype_to_phenotype",
+                    "genotype_to_phenotype_args",
+                    "minimization",
+                    "init_population",
+                ],
+            )
+        else:
+            weights_optimizer_args = {}
 
-        return weights_optimizer_args
-
-    def fit(self, X: ArrayLike, y: ArrayLike):
-
-        optimizer_args = self.check_optimizer_args()
-        weights_optimizer_args = self.check_weights_optimizer_args()
+        if "iters" not in weights_optimizer_args:
+            weights_optimizer_args["iters"] = 100
+        if "pop_size" not in weights_optimizer_args:
+            weights_optimizer_args["pop_size"] = 300
 
         random_state = check_random_state(self.random_state)
         self._target_scaler = MinMaxScaler()
@@ -370,7 +375,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             task_type = "regression"
             n_outputs = 1
 
-        self.net_, self.optimizer_stats_ = train_net_structure(
+        self.net_, self.tree_, self.optimizer_stats_ = train_net_structure(
             uniset=uniset,
             X_train=X_train,
             y_train=y_train,
@@ -409,8 +414,8 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
 
         if isinstance(self, ClassifierMixin):
             indeces = np.argmax(output, axis=1)
-            y = self._label_encoder.inverse_transform(indeces)
+            y_predict = self._label_encoder.inverse_transform(indeces)
         else:
-            y = self._target_scaler.inverse_transform(output)[:, 0]
+            y_predict = self._target_scaler.inverse_transform(output)[:, 0]
 
-        return y
+        return y_predict

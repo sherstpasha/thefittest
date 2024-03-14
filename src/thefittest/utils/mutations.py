@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Union
 
+import random
+
 from numba import float64
 from numba import int64
 from numba import int8
@@ -58,7 +60,7 @@ def flip_mutation(individual: NDArray[np.byte], proba: float) -> NDArray[np.byte
     """
     offspring = individual.copy()
     for i in range(offspring.size):
-        if uniform(low=0, high=1, size=1)[0] < proba:
+        if random.random() < proba:
             offspring[i] = 1 - offspring[i]
     return offspring
 

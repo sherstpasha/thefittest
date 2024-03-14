@@ -177,7 +177,7 @@ def one_point_crossover(
     Offspring After Empty Crossover: ...
     """
     cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
-    if uniform(low=0, high=1, size=1)[0] < 0.5:
+    if random.random() < 0.5:
         offspring = individs[0].copy()
         for i in range(individs.shape[1]):
             if i > cross_point:

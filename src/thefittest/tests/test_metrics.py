@@ -1,22 +1,22 @@
 import numpy as np
 
-from sklearn.metrics import mean_squared_error as mean_squared_error_sklearn
-from sklearn.metrics import r2_score
-from sklearn.metrics import log_loss
 from sklearn.metrics import accuracy_score as accuracy_score_sklearn
 from sklearn.metrics import confusion_matrix as sklearn_confusion_matrix
-from sklearn.metrics import recall_score as sklearn_recall_score
-from sklearn.metrics import precision_score as sklearn_precision_score
 from sklearn.metrics import f1_score as sklearn_f1_score
+from sklearn.metrics import log_loss
+from sklearn.metrics import mean_squared_error as mean_squared_error_sklearn
+from sklearn.metrics import precision_score as sklearn_precision_score
+from sklearn.metrics import r2_score
+from sklearn.metrics import recall_score as sklearn_recall_score
 
-from thefittest.utils._metrics import root_mean_square_error
-from thefittest.utils._metrics import coefficient_determination
-from thefittest.utils._metrics import categorical_crossentropy
 from thefittest.utils._metrics import accuracy_score
+from thefittest.utils._metrics import categorical_crossentropy
+from thefittest.utils._metrics import coefficient_determination
 from thefittest.utils._metrics import confusion_matrix
-from thefittest.utils._metrics import recall_score
-from thefittest.utils._metrics import precision_score
 from thefittest.utils._metrics import f1_score
+from thefittest.utils._metrics import precision_score
+from thefittest.utils._metrics import recall_score
+from thefittest.utils._metrics import root_mean_square_error
 
 
 def test_root_mean_square_error():

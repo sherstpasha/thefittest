@@ -336,7 +336,7 @@ class Tree:
     def plot(self, ax: Any = None) -> None:
         import networkx as nx
 
-        graph = self.get_graph(True)
+        graph = self.get_graph(keep_id=False)
 
         G = nx.Graph()
         G.add_nodes_from(graph["nodes"])
@@ -603,6 +603,13 @@ def init_symbolic_regression_uniset(
         "div": Div,
         "inv": Inv,
     }
+
+    for func_name in functional_set_names:
+        if func_name not in SYMBOLIC_FUNCTION_NAME:
+            raise ValueError(
+                f"Invalid function name '{func_name}'. Available values are: {', '.join(SYMBOLIC_FUNCTION_NAME.keys())}"
+            )
+
     uniset: UniversalSet
     terminal_set: Union[
         List[Union[TerminalNode, EphemeralNode]], Tuple[Union[TerminalNode, EphemeralNode]]

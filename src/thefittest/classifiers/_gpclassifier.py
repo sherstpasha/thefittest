@@ -8,14 +8,14 @@ from typing import Union
 
 import numpy as np
 
-from sklearn.base import RegressorMixin
+from sklearn.base import ClassifierMixin
 
 from ..base._gp import BaseGP
 from ..optimizers import GeneticProgramming
 from ..optimizers import SelfCGP
 
 
-class GeneticProgrammingRegressor(RegressorMixin, BaseGP):
+class GeneticProgrammingClassifier(ClassifierMixin, BaseGP):
     def __init__(
         self,
         *,
@@ -34,3 +34,6 @@ class GeneticProgrammingRegressor(RegressorMixin, BaseGP):
             optimizer_args=optimizer_args,
             random_state=random_state,
         )
+
+    def _more_tags(self):
+        return {"binary_only": True}
