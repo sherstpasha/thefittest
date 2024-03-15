@@ -225,6 +225,7 @@ class Tree:
             return False
         for node_1, node_2 in zip(self._nodes, other._nodes):
             if node_1 != node_2:
+                print(node_1, node_2)
                 return False
         return True
 

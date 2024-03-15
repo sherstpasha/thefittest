@@ -220,7 +220,6 @@ def test_GeneticAlgorithm_set_strategy():
                             optimizer.fit()
 
                             genotype_2 = optimizer.get_fittest()["genotype"]
-
                             assert np.all(genotype_1 == genotype_2)
 
 
@@ -658,7 +657,7 @@ def test_GeneticProgramming_set_strategy():
                 optimizer.fit()
 
                 genotype_2 = optimizer.get_fittest()["genotype"]
-
+                print(mutation_i, crossover_i, selections_i)
                 assert np.all(genotype_1 == genotype_2)
 
 
