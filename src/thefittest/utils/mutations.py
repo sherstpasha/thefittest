@@ -640,13 +640,15 @@ def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: in
     mutated_tree = tree.copy()
     if flip_coin(proba):
         i = randint(0, len(mutated_tree), 1)[0]
+        print(i)
+        print(mutated_tree._nodes[i], "до")
         if isinstance(mutated_tree._nodes[i], FunctionalNode):
             n_args = mutated_tree._nodes[i]._n_args
             new_node = uniset._random_functional(n_args)
         else:
-            new_node = mutated_tree._nodes[i]
-            # new_node = uniset._random_terminal_or_ephemeral()
+            new_node = uniset._random_terminal_or_ephemeral()
         mutated_tree._nodes[i] = new_node
+        print(mutated_tree._nodes[i], "после")
     return mutated_tree
 
 

@@ -119,5 +119,11 @@ class GeneticProgramming(GeneticAlgorithm):
         else:
             proba = proba / len(offspring_no_mutated)
 
+        # print(offspring_no_mutated, 1)
+        # print([[value_i._value for value_i in value] for key, value in self._uniset._functional_set.items()])
+        # print([value._value for value in self._uniset._terminal_set])
+        # print(proba, self._max_level)
+
         offspring = mutation_func(offspring_no_mutated, self._uniset, proba, self._max_level)
+        # print(offspring, 2)
         return offspring
