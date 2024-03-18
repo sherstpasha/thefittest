@@ -16,11 +16,8 @@ from sklearn.base import BaseEstimator
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.multiclass import check_classification_targets
-from sklearn.utils.validation import check_array
-from sklearn.utils.validation import check_is_fitted
 
 from ..base import FunctionalNode
 from ..base import Net
@@ -328,12 +325,11 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             weights_optimizer_args = {}
 
         if "iters" not in weights_optimizer_args:
-            weights_optimizer_args["iters"] = 100
+            weights_optimizer_args["iters"] = 300
         if "pop_size" not in weights_optimizer_args:
             weights_optimizer_args["pop_size"] = 300
 
         random_state = check_random_state(self.random_state)
-        self._target_scaler = MinMaxScaler()
 
         if isinstance(self, ClassifierMixin):
             X, y = self._validate_data(X, y, y_numeric=False, reset=True)
@@ -349,8 +345,6 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             self.n_classes_ = len(self.classes_)
         else:
             X, y = self._validate_data(X, y, y_numeric=True, reset=True)
-
-            y = self._target_scaler.fit_transform(y.reshape(-1, 1))[:, 0]
 
         X, y = array_like_to_numpy_X_y(X, y)
 
@@ -393,29 +387,3 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         )
 
         return self
-
-    def predict(self, X: NDArray[np.float64]):
-        check_is_fitted(self)
-
-        X = check_array(X)
-        n_features = X.shape[1]
-
-        if self.n_features_in_ != n_features:
-            raise ValueError(
-                "Number of features of the model must match the "
-                f"input. Model n_features is {self.n_features_in_} and input "
-                f"n_features is {n_features}."
-            )
-
-        if self.offset:
-            X = np.hstack([X, np.ones((X.shape[0], 1))])
-
-        output = self.net_.forward(X)[0]
-
-        if isinstance(self, ClassifierMixin):
-            indeces = np.argmax(output, axis=1)
-            y_predict = self._label_encoder.inverse_transform(indeces)
-        else:
-            y_predict = self._target_scaler.inverse_transform(output)[:, 0]
-
-        return y_predict

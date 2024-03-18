@@ -17,6 +17,8 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..utils._metrics import coefficient_determination
+from thefittest.utils.random import generator1
+from thefittest.utils.random import generator2
 
 
 def test_GeneticAlgorithm_start_settings():
@@ -400,11 +402,6 @@ def test_SelfCGA_set_strategy():
 
 
 def test_GeneticProgramming_start_settings():
-    def generator1():
-        return np.round(np.random.uniform(0, 10), 4)
-
-    def generator2():
-        return np.random.randint(0, 10)
 
     def problem(x):
         return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
@@ -509,11 +506,6 @@ def test_GeneticProgramming_start_settings():
 
 
 def test_GeneticProgramming_set_strategy():
-    def generator1():
-        return np.round(np.random.uniform(0, 10), 4)
-
-    def generator2():
-        return np.random.randint(0, 10)
 
     def problem(x):
         return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
@@ -662,11 +654,6 @@ def test_GeneticProgramming_set_strategy():
 
 
 def test_SelfCGP_start_settings():
-    def generator1():
-        return np.round(np.random.uniform(0, 10), 4)
-
-    def generator2():
-        return np.random.randint(0, 10)
 
     def problem(x):
         return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
@@ -771,11 +758,6 @@ def test_SelfCGP_start_settings():
 
 
 def test_SelfCGP_set_strategy():
-    def generator1():
-        return np.round(np.random.uniform(0, 10), 4)
-
-    def generator2():
-        return np.random.randint(0, 10)
 
     def problem(x):
         return 3 * x[:, 0] ** 2 + 2 * x[:, 0] + 5
@@ -1031,6 +1013,7 @@ def test_DifferentialEvolution_start_settings():
 
 
 def test_DifferentialEvolution_set_strategy():
+
     def fitness_function(x):
         return np.sum(x, axis=1, dtype=np.float64)
 

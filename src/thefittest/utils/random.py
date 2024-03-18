@@ -393,3 +393,13 @@ def check_random_state(seed: Optional[Union[int, np.random.RandomState]] = None)
         raise ValueError("%r cannot be used to seed a numpy.random.RandomState" " instance" % seed)
 
     return random_state
+
+
+def generator1() -> float:
+    value = np.round(uniform(0, 10, 1)[0], 4)
+    return value
+
+
+def generator2() -> int:
+    value = randint(0, 10, 1)[0]
+    return value

@@ -6,8 +6,11 @@ from typing import Type
 from typing import Union
 
 import numpy as np
+from numpy.typing import NDArray
 
 from sklearn.base import RegressorMixin
+from sklearn.utils.validation import check_array
+from sklearn.utils.validation import check_is_fitted
 
 from ..base._gpnn import BaseGPNN
 from ..base._mlp import weights_type_optimizer_alias
@@ -47,3 +50,25 @@ class GeneticProgrammingNeuralNetRegressor(RegressorMixin, BaseGPNN):
             net_size_penalty=net_size_penalty,
             random_state=random_state,
         )
+
+    def predict(self, X: NDArray[np.float64]):
+
+        check_is_fitted(self)
+
+        X = check_array(X)
+        n_features = X.shape[1]
+
+        if self.n_features_in_ != n_features:
+            raise ValueError(
+                "Number of features of the model must match the "
+                f"input. Model n_features is {self.n_features_in_} and input "
+                f"n_features is {n_features}."
+            )
+
+        if self.offset:
+            X = np.hstack([X, np.ones((X.shape[0], 1))])
+
+        output = self.net_.forward(X)[0]
+        y_predict = output[:, 0]
+
+        return y_predict

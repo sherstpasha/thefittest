@@ -17,9 +17,6 @@ from sklearn.base import ClassifierMixin
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.multiclass import check_classification_targets
-from sklearn.utils.validation import check_array
-from sklearn.utils.validation import check_is_fitted
-
 
 from ..base import Tree
 from ..base._ea import Statistics
@@ -29,10 +26,16 @@ from ..optimizers import GeneticProgramming
 from ..optimizers import SelfCGP
 from ..utils import array_like_to_numpy_X_y
 from ..utils._metrics import coefficient_determination
-from ..utils._metrics import f1_score
+from ..utils._metrics import categorical_crossentropy
+from ..utils._metrics import root_mean_square_error
 from ..utils.random import check_random_state
-from ..utils.random import randint
-from ..utils.random import uniform
+from ..utils.random import generator1
+from ..utils.random import generator2
+
+
+def safe_sigmoid(x):
+    x = np.clip(x, -500, 500)
+    return 1 / (1 + np.exp(-x))
 
 
 def fitness_function_gp(
@@ -44,12 +47,13 @@ def fitness_function_gp(
     if task_type == "classification":
         for tree in trees:
             tree_output = tree() * np.ones(len(y))
-            y_pred = (tree_output > 0).astype(np.int64)
-            fitness.append(f1_score(y, y_pred))
+            proba = safe_sigmoid(tree_output)
+            proba_predict = np.vstack([1 - proba, proba]).T
+            fitness.append(categorical_crossentropy(y, proba_predict))
     elif task_type == "regression":
         for tree in trees:
             y_pred = tree() * np.ones(len(y))
-            fitness.append(coefficient_determination(y, y_pred))
+            fitness.append(root_mean_square_error(y, y_pred))
     else:
         raise ValueError("task_type must be 'classification' or 'regression'")
     return np.array(fitness, dtype=np.float64)
@@ -61,8 +65,8 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
     def __init__(
         self,
         *,
-        n_iter: int = 50,
-        pop_size: int = 500,
+        n_iter: int = 500,
+        pop_size: int = 1000,
         functional_set_names: Tuple[str, ...] = ("cos", "sin", "add", "inv", "neg", "mul"),
         optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,
         optimizer_args: Optional[dict[str, Any]] = None,
@@ -80,14 +84,6 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
 
     def get_stats(self) -> Statistics:
         return self.optimizer_stats_
-
-    def generator1(self) -> float:
-        value = np.round(uniform(0, 10, 1)[0], 4)
-        return value
-
-    def generator2(self) -> int:
-        value = randint(0, 10, 1)[0]
-        return value
 
     def fit(self, X: ArrayLike, y: ArrayLike):
 
@@ -117,14 +113,17 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
             self._one_hot_encoder = OneHotEncoder(
                 sparse_output=False, categories="auto", dtype=np.float64
             )
-            y = self._label_encoder.fit_transform(y)
+
+            numeric_labels = self._label_encoder.fit_transform(y)
+            y = self._one_hot_encoder.fit_transform(np.array(numeric_labels).reshape(-1, 1))
             self.classes_ = self._label_encoder.classes_
             self.n_classes_ = len(self.classes_)
+
             if self.n_classes_ != 2:
                 raise ValueError(
                     f"This classifier is intended for binary classification. Expected 2 classes, but found {self.n_classes_} classes."
                 )
-            X, y = array_like_to_numpy_X_y(X, y, y_numeric=False)
+            X, y = array_like_to_numpy_X_y(X, y, y_numeric=True)
         else:
             X, y = self._validate_data(X, y, y_numeric=True, reset=True)
             X, y = array_like_to_numpy_X_y(X, y, y_numeric=True)
@@ -133,18 +132,19 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
             uniset = init_symbolic_regression_uniset(
                 X=X,
                 functional_set_names=self.functional_set_names,
-                ephemeral_node_generators=(self.generator1, self.generator2),
+                ephemeral_node_generators=(generator1, generator2),
             )
         else:
             uniset = init_symbolic_regression_uniset(
                 X=X,
-                ephemeral_node_generators=(self.generator1, self.generator2),
+                ephemeral_node_generators=(generator1, generator2),
             )
 
         optimizer_args["fitness_function"] = fitness_function_gp
         optimizer_args["iters"] = self.n_iter
         optimizer_args["pop_size"] = self.pop_size
         optimizer_args["uniset"] = uniset
+        optimizer_args["minimization"] = True
 
         if isinstance(self, ClassifierMixin):
             optimizer_args["fitness_function_args"] = {"y": y, "task_type": "classification"}
@@ -158,28 +158,3 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
         self.optimizer_stats_ = optimizer_.get_stats()
 
         return self
-
-    def predict(self, X: NDArray[np.float64]):
-
-        check_is_fitted(self)
-
-        X = check_array(X)
-        n_features = X.shape[1]
-
-        if self.n_features_in_ != n_features:
-            raise ValueError(
-                "Number of features of the model must match the "
-                f"input. Model n_features is {self.n_features_in_} and input "
-                f"n_features is {n_features}."
-            )
-
-        tree_for_predict = self.tree_.set_terminals(**{f"x{i}": X[:, i] for i in range(n_features)})
-        tree_output = tree_for_predict() * np.ones(len(X))
-
-        if isinstance(self, ClassifierMixin):
-            indeces = (tree_output > 0).astype(np.int64)
-            y_predict = self._label_encoder.inverse_transform(indeces)
-        else:
-            y_predict = tree_output
-
-        return y_predict

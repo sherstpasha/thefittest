@@ -640,15 +640,12 @@ def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: in
     mutated_tree = tree.copy()
     if flip_coin(proba):
         i = randint(0, len(mutated_tree), 1)[0]
-        print(i)
-        print(mutated_tree._nodes[i], "до")
         if isinstance(mutated_tree._nodes[i], FunctionalNode):
             n_args = mutated_tree._nodes[i]._n_args
             new_node = uniset._random_functional(n_args)
         else:
             new_node = uniset._random_terminal_or_ephemeral()
         mutated_tree._nodes[i] = new_node
-        print(mutated_tree._nodes[i], "после")
     return mutated_tree
 
 
@@ -840,8 +837,11 @@ def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: i
 
                 args_id = mutated_tree.get_args_id(i)
 
-                index = random_sample(range_size=len(indexes), quantity=1, replace=True)[0]
-                choosen_id = args_id[index]
+                if len(args_id) > 1:
+                    index = random_sample(range_size=len(args_id), quantity=1, replace=True)[0]
+                    choosen_id = args_id[index]
+                else:
+                    choosen_id = args_id[0]
 
                 mutated_tree = mutated_tree.concat(i, tree.subtree(choosen_id))
     return mutated_tree
