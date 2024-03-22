@@ -403,7 +403,7 @@ class TwoTreeSelfCGP(TwoTreeGeneticProgramming, SelfCGA):
             mutations=mutations,
             init_population=init_population,
             K=K,
-            threshold=threshold,
+            # threshold=threshold,
             genotype_to_phenotype=genotype_to_phenotype,
             optimal_value=optimal_value,
             termination_error_value=termination_error_value,
