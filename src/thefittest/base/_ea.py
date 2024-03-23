@@ -90,6 +90,7 @@ class EvolutionaryAlgorithm:
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
+        on_generation: Optional[Callable] = None,
     ):
         self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]] = fitness_function
         self._iters: int = iters
@@ -129,6 +130,7 @@ class EvolutionaryAlgorithm:
             self._parallel = Parallel(self._n_jobs)
 
         self._random_state = random_state
+        self._on_generation = on_generation
 
     def _first_generation(self: EvolutionaryAlgorithm) -> None:
         return None
@@ -278,75 +280,7 @@ class EvolutionaryAlgorithm:
             else:
                 self._get_new_population()
                 self._from_population_g_to_fitness()
+                if self._on_generation is not None:
+                    self._on_generation(self)
 
         return self
-
-
-class MultiGenome:
-    def __init__(
-        self, genotypes: Tuple[Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]], ...]
-    ) -> None:
-        self._genotypes = genotypes
-
-    def __getitem__(self, index: int) -> Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]:
-        return self._genotypes[index]
-
-    def copy(self) -> MultiGenome:
-        return MultiGenome(genotypes=tuple([genotype.copy() for genotype in self._genotypes]))
-
-
-class MutliGenomeEA(EvolutionaryAlgorithm):
-    def __init__(
-        self,
-        optimizers: Tuple,
-        optimizers_args: Tuple[Dict],
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
-        iters: int,
-        pop_size: int,
-        elitism: bool = True,
-        init_population: Optional[
-            Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
-        ] = None,
-        genotype_to_phenotype: Optional[Callable[[NDArray[Any]], NDArray[Any]]] = None,
-        optimal_value: Optional[Union[float, int]] = None,
-        termination_error_value: Union[float, int] = 0.0,
-        no_increase_num: Optional[int] = None,
-        minimization: bool = False,
-        show_progress_each: Optional[int] = None,
-        keep_history: bool = False,
-    ):
-        EvolutionaryAlgorithm.__init__(
-            self,
-            fitness_function=fitness_function,
-            iters=iters,
-            pop_size=pop_size,
-            elitism=elitism,
-            init_population=init_population,
-            genotype_to_phenotype=genotype_to_phenotype,
-            optimal_value=optimal_value,
-            termination_error_value=termination_error_value,
-            no_increase_num=no_increase_num,
-            minimization=minimization,
-            show_progress_each=show_progress_each,
-            keep_history=keep_history,
-        )
-        self._optimizers = [
-            optimizer(
-                fitness_function=fitness_function, iters=iters, pop_size=pop_size, **optimizer_args
-            )
-            for optimizer, optimizer_args in zip(optimizers, optimizers_args)
-        ]
-
-    def _first_generation(self: MutliGenomeEA) -> None:
-        populations = []
-        for optimizer in self._optimizers:
-            optimizer._first_generation()
-            populations.append(optimizer._population_g_i)
-
-        population = np.empty(shape=self._pop_size, dtype=object)
-        for i in range(len(population)):
-            population[i] = MultiGenome(
-                genotypes=tuple([populations_j[i] for populations_j in populations])
-            )
-
-        self._population_g_i = population

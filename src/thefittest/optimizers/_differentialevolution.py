@@ -67,6 +67,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
+        on_generation: Optional[Callable] = None,
     ):
         EvolutionaryAlgorithm.__init__(
             self,
@@ -86,6 +87,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
             random_state=random_state,
+            on_generation=on_generation,
         )
 
         self._left: NDArray[np.float64] = left

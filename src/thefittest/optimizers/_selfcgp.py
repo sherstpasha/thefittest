@@ -63,6 +63,7 @@ class SelfCGP(GeneticProgramming, SelfCGA):
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
+        on_generation: Optional[Callable] = None,
     ):
         SelfCGA.__init__(
             self,
@@ -93,6 +94,7 @@ class SelfCGP(GeneticProgramming, SelfCGA):
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
             random_state=random_state,
+            on_generation=on_generation,
         )
 
         GeneticProgramming.__init__(
@@ -119,4 +121,5 @@ class SelfCGP(GeneticProgramming, SelfCGA):
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
             random_state=random_state,
+            on_generation=on_generation,
         )
