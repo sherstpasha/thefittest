@@ -20,22 +20,22 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
 
 
-
 data = BanknoteDataset()
 X = data.get_X()
 y = data.get_y()
 
 X_scaled = minmax_scale(X)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.3)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
 
-model = GeneticProgrammingNeuralNetStackingClassifier(iters=1,
-                                              pop_size=10,
-                                              optimizer=TwoTreeSelfCGP,
-                                              optimizer_args={"show_progress_each": 1},
-                                              weights_optimizer=SHADE,
-                                              weights_optimizer_args={"iters": 100, "pop_size": 100})
+model = GeneticProgrammingNeuralNetStackingClassifier(
+    iters=3,
+    pop_size=10,
+    optimizer=TwoTreeSelfCGP,
+    optimizer_args={"show_progress_each": 1},
+    weights_optimizer=SHADE,
+    weights_optimizer_args={"iters": 100, "pop_size": 100},
+)
 
 model.fit(X_train, y_train)
 
@@ -48,13 +48,17 @@ nets = optimizer.get_fittest()["phenotype"]
 print(nets._nets)
 # print(trees._genotypes)
 print("confusion_matrix: \n", confusion_matrix(y_test, predict))
-print("f1_score: \n", f1_score(y_test, predict, average = "macro"))
+print("f1_score: \n", f1_score(y_test, predict, average="macro"))
 
 # fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=1)
 print_nets(nets._nets)
 
+plt.savefig("print_nets.png")
+plt.close()
 print_ens(nets)
 # print_trees(trees._genotypes)
+plt.savefig("print_ens.png")
+plt.close()
 
 
 # # После создания всех рисунков из print_nets, скомбинируем их с текущими ax
