@@ -67,7 +67,7 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
         *,
         n_iter: int = 500,
         pop_size: int = 1000,
-        functional_set_names: Tuple[str, ...] = ("cos", "sin", "add", "inv", "neg", "mul"),
+        functional_set_names: Tuple[str, ...] = ("cos", "sin", "add", "sub", "mul", "div"),
         optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,
         optimizer_args: Optional[dict[str, Any]] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,

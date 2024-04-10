@@ -1,13 +1,15 @@
+from operator import add
+from operator import mul
+from operator import sub
+
 import numpy as np
 
 from ..base import EphemeralNode
 from ..base import FunctionalNode
 from ..base import TerminalNode
 from ..base import UniversalSet
-from ..base._tree import Add
-from ..base._tree import Div
-from ..base._tree import Mul
-from ..base._tree import Neg
+from ..base import create_operator
+from ..base._tree import save_div
 from ..optimizers import DifferentialEvolution
 from ..optimizers import GeneticAlgorithm
 from ..optimizers import GeneticProgramming
@@ -421,10 +423,10 @@ def test_GeneticProgramming_start_settings():
     y = function(X)
 
     functional_set = (
-        FunctionalNode(Add()),
-        FunctionalNode(Mul()),
-        FunctionalNode(Neg()),
-        FunctionalNode(Div()),
+        FunctionalNode(create_operator("({} + {})", "add", "+", add)),
+        FunctionalNode(create_operator("({} * {})", "mul", "*", mul)),
+        FunctionalNode(create_operator("({} - {})", "sub", "-", sub)),
+        FunctionalNode(create_operator("({} / {})", "div", "/", save_div)),
     )
 
     terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
@@ -525,10 +527,10 @@ def test_GeneticProgramming_set_strategy():
     y = function(X)
 
     functional_set = (
-        FunctionalNode(Add()),
-        FunctionalNode(Mul()),
-        FunctionalNode(Neg()),
-        FunctionalNode(Div()),
+        FunctionalNode(create_operator("({} + {})", "add", "+", add)),
+        FunctionalNode(create_operator("({} * {})", "mul", "*", mul)),
+        FunctionalNode(create_operator("({} - {})", "sub", "-", sub)),
+        FunctionalNode(create_operator("({} / {})", "div", "/", save_div)),
     )
 
     terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
@@ -673,10 +675,10 @@ def test_SelfCGP_start_settings():
     y = function(X)
 
     functional_set = (
-        FunctionalNode(Add()),
-        FunctionalNode(Mul()),
-        FunctionalNode(Neg()),
-        FunctionalNode(Div()),
+        FunctionalNode(create_operator("({} + {})", "add", "+", add)),
+        FunctionalNode(create_operator("({} * {})", "mul", "*", mul)),
+        FunctionalNode(create_operator("({} - {})", "sub", "-", sub)),
+        FunctionalNode(create_operator("({} / {})", "div", "/", save_div)),
     )
 
     terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
@@ -774,10 +776,10 @@ def test_SelfCGP_set_strategy():
     y = function(X)
 
     functional_set = (
-        FunctionalNode(Add()),
-        FunctionalNode(Mul()),
-        FunctionalNode(Neg()),
-        FunctionalNode(Div()),
+        FunctionalNode(create_operator("({} + {})", "add", "+", add)),
+        FunctionalNode(create_operator("({} * {})", "mul", "*", mul)),
+        FunctionalNode(create_operator("({} - {})", "sub", "-", sub)),
+        FunctionalNode(create_operator("({} / {})", "div", "/", save_div)),
     )
 
     terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]

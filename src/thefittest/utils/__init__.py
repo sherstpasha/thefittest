@@ -1,3 +1,5 @@
+from typing import Any
+from typing import Callable
 from typing import Tuple
 from typing import List
 from typing import Union
@@ -12,6 +14,10 @@ from numba.types import List as numbaListType
 import numpy as np
 from numpy.typing import ArrayLike
 from numpy.typing import NDArray
+
+
+MIN_VALUE = np.finfo(np.float64).min
+MAX_VALUE = np.finfo(np.float64).max
 
 
 def common_region(trees: Union[List, NDArray]) -> Tuple:
@@ -319,3 +325,110 @@ def array_like_to_numpy_X_y(
     else:
         y = np.array(y, dtype=np.int64)
     return X, y
+
+
+def save_div(x: Union[float, np.ndarray], y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    result: Union[float, np.ndarray]
+    if isinstance(y, np.ndarray):
+        result = np.divide(x, y, out=np.ones_like(y, dtype=np.float64), where=y != 0)
+    else:
+        if y == 0:
+            result = 0.0
+        else:
+            result = x / y
+    result = np.clip(result, MIN_VALUE, MAX_VALUE)
+    return result
+
+
+def logabs(y: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    y_ = np.abs(y)
+    if isinstance(y_, np.ndarray):
+        result = np.log(y_, out=np.ones_like(y_, dtype=np.float64), where=y_ != 0)
+    else:
+        if y_ == 0:
+            result = 1
+        else:
+            result = np.log(y_)
+    return result
+
+
+def save_exp(x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    result = np.clip(np.exp(x), MIN_VALUE, MAX_VALUE)
+    return result
+
+
+def sqrtabs(x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    result = np.sqrt(np.abs(x))
+    return result
+
+
+def cos(x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    return np.cos(x)
+
+
+def sin(x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    return np.sin(x)
+
+
+class Operator:
+    def __init__(self, formula: str, name: str, sign: str, operation: Callable) -> None:
+        self._formula = formula
+        self.__name__ = name
+        self._sign = sign
+        self._operation = operation
+
+    def _write(self, *args: Any) -> str:
+        formula = self._formula.format(*args)
+        return formula
+
+    def __call__(self, *args: Any) -> Any:
+        return self._operation(*args)
+
+
+def create_operator(formula: str, name: str, sign: str, operation: Callable) -> Operator:
+    """
+    Creates a new mathematical operator for performing a given operation.
+
+    This factory function allows defining a new operator with a custom function
+    that performs a mathematical operation. The defined operator can be used to
+    perform the operation on scalar values or arrays.
+
+    Parameters
+    ----------
+    formula : str
+        The string representation of the operator's formula, where the operation's arguments
+        are denoted by curly braces. For example, "({} + {})" for an addition operation.
+    name : str
+        The name of the operator, used for identification.
+    sign : str
+        The symbol of the operator, used for representation in formulas.
+    operation : Callable
+        The function that performs the operation. It must accept as many arguments as
+        indicated by `formula`, and return the result of the operation.
+
+    Returns
+    -------
+    Operator
+        An instance of the Operator class, representing the new mathematical operator.
+
+    Examples
+    --------
+    Creating an operator to calculate the cosine:
+
+    >>> cos = create_operator("cos({})", "cos", "cos", np.cos)
+    >>> print(cos(np.pi))
+    -1.0
+
+    Creating an operator for adding two numbers:
+
+    >>> add = create_operator("({} + {})", "add", "+", lambda x, y: x + y)
+    >>> print(add(5, 3))
+    8
+
+    Creating an operator for subtraction:
+
+    >>> sub = create_operator("({} - {})", "sub", "-", lambda x, y: x - y)
+    >>> print(sub(10, 4))
+    6
+    """
+    return Operator(formula, name, sign, operation)

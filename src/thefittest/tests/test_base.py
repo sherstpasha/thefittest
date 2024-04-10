@@ -1,28 +1,20 @@
+from operator import add
+from operator import mul
+from operator import sub
+
 import numpy as np
 
 from ..base._ea import Statistics
 from ..base._ea import TheFittest
 from ..base._net import HiddenBlock
 from ..base._net import Net
-from ..base._tree import Add
 from ..base._tree import EphemeralConstantNode
 from ..base._tree import EphemeralNode
 from ..base._tree import FunctionalNode
-from ..base._tree import Mul
-from ..base._tree import Operator
-from ..base._tree import Sub
 from ..base._tree import TerminalNode
 from ..base._tree import Tree
 from ..base._tree import UniversalSet
-
-
-class PlusOne(Operator):
-    def __init__(self) -> None:
-        Operator.__init__(self, formula="({} + 1)", name="plus_one", sign="+1")
-
-    def __call__(self, x: int) -> int:
-        result = x + 1
-        return result
+from ..base._tree import create_operator
 
 
 def test_thefittest_class():
@@ -88,17 +80,19 @@ def test_nodes_class():
     def generator():
         return 10
 
-    functional_node = FunctionalNode(value=Add(), sign="+")
+    functional_node = FunctionalNode(value=create_operator("({} + {})", "add", "+", add), sign="+")
     assert functional_node._n_args == 2
     assert functional_node._sign == "+"
     assert functional_node._value(1, 2) == 3
 
-    functional_node2 = FunctionalNode(value=PlusOne())
+    functional_node2 = FunctionalNode(
+        value=create_operator("({} + 1})", "plusone", "+1", lambda x: x + 1)
+    )
     assert functional_node2._sign == "+1"
     assert functional_node2._value(1) == 2
 
-    functional_node3 = FunctionalNode(value=Add())
-    assert functional_node3._sign == Add()._sign
+    functional_node3 = FunctionalNode(value=create_operator("({} + {})", "add", "+", add))
+    assert functional_node3._sign == "+"
 
     terminal_node = TerminalNode(value=1, name="1")
     assert str(terminal_node) == "1"
@@ -142,9 +136,9 @@ def test_tree_class():
     y = TerminalNode(value=7, name="y")
     z = TerminalNode(value=11, name="z")
 
-    functional_add = FunctionalNode(value=Add(), sign="+")
-    functional_mul = FunctionalNode(value=Mul(), sign="*")
-    functional_sub = FunctionalNode(value=Sub(), sign="-")
+    functional_add = FunctionalNode(value=create_operator("({} + {})", "add", "+", add), sign="+")
+    functional_mul = FunctionalNode(value=create_operator("({} * {})", "mul", "*", mul), sign="*")
+    functional_sub = FunctionalNode(value=create_operator("({} - {})", "sub", "-", sub), sign="-")
 
     tree = Tree(nodes=[functional_mul, z, functional_add, x, y])
 
