@@ -542,7 +542,7 @@ def empty_crossoverGP(
     >>>
     >>> # Example
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 5
     >>>
     >>> # Initialize Universal Set for Symbolic Regression
@@ -605,7 +605,7 @@ def standard_crossover(
     >>> # Example
     >>>
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 5
     >>>
     >>> # Initialize Universal Set for Symbolic Regression
@@ -685,7 +685,7 @@ def one_point_crossoverGP(
     >>> # Example
     >>>
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 5
     >>>
     >>> # Initialize Universal Set for Symbolic Regression
@@ -763,7 +763,7 @@ def uniform_crossoverGP(
     >>> # Example
     >>>
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 5
     >>>
     >>> # Initialize Universal Set for Symbolic Regression
@@ -849,7 +849,7 @@ def uniform_proportional_crossover_GP(
     >>> # Example
     >>>
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 5
     >>>
     >>> # Initialize Universal Set for Symbolic Regression
@@ -936,7 +936,7 @@ def uniform_rank_crossover_GP(
     >>> # Example
     >>>
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 5
     >>>
     >>> # Initialize Universal Set for Symbolic Regression
@@ -1024,7 +1024,7 @@ def uniform_tournament_crossover_GP(
     >>> # Example
     >>>
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 5
     >>>
     >>> # Initialize Universal Set for Symbolic Regression

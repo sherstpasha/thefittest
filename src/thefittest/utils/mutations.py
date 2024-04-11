@@ -433,7 +433,6 @@ def current_to_rand_1(
     --------
     >>> from thefittest.utils.mutations import current_to_rand_1
     >>> import numpy as np
-    >>>
     >>> # Example
     >>> current_individual = np.array([0.5, 0.3, 0.8], dtype=np.float64)
     >>> best_individual = np.array([0.6, 0.4, 0.7], dtype=np.float64)
@@ -494,7 +493,6 @@ def current_to_pbest_1_archive(
     --------
     >>> from thefittest.utils.mutations import current_to_pbest_1_archive
     >>> import numpy as np
-    >>>
     >>> # Example
     >>> current_individual = np.array([0.5, 0.3, 0.8], dtype=np.float64)
     >>> population = np.array([[0.2, 0.1, 0.5], [0.8, 0.6, 0.9], [0.3, 0.7, 0.4], [0.9, 0.5, 0.2]], dtype=np.float64)
@@ -556,7 +554,6 @@ def current_to_pbest_1_archive_p_min(
     --------
     >>> from thefittest.utils.mutations import current_to_pbest_1_archive_p_min
     >>> import numpy as np
-    >>>
     >>> # Example
     >>> current_individual = np.array([0.5, 0.3, 0.8], dtype=np.float64)
     >>> population = np.array([[0.2, 0.1, 0.5], [0.8, 0.6, 0.9], [0.3, 0.7, 0.4], [0.9, 0.5, 0.2]], dtype=np.float64)
@@ -615,19 +612,15 @@ def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: in
     >>> from thefittest.base import Tree
     >>> from thefittest.base import init_symbolic_regression_uniset
     >>> from thefittest.utils.mutations import point_mutation
-    >>>
     >>> # Example Parameters
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 4
     >>> mutation_probability = 0.5
-    >>>
     >>> # Initialize Universal Set for Symbolic Regression
     >>> universal_set = init_symbolic_regression_uniset(X, functional_set_names)
-    >>>
     >>> # Generate a Random Tree
     >>> tree = Tree.random_tree(universal_set, max_tree_level)
-    >>>
     >>> # Perform Point Mutation
     >>> mutated_tree = point_mutation(tree, universal_set, mutation_probability, max_tree_level)
     >>> print("Original Tree:", tree)
@@ -680,19 +673,15 @@ def growing_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: 
     >>> from thefittest.base import Tree
     >>> from thefittest.base import init_symbolic_regression_uniset
     >>> from thefittest.utils.mutations import growing_mutation
-    >>>
     >>> # Example Parameters
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 4
     >>> mutation_probability = 0.5
-    >>>
     >>> # Initialize Universal Set for Symbolic Regression
     >>> universal_set = init_symbolic_regression_uniset(X, functional_set_names)
-    >>>
     >>> # Generate a Random Tree
     >>> tree = Tree.random_tree(universal_set, max_tree_level)
-    >>>
     >>> # Perform Growing Mutation
     >>> mutated_tree = growing_mutation(tree, universal_set, mutation_probability, max_tree_level)
     >>> print("Original Tree:", tree)
@@ -739,19 +728,15 @@ def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_leve: int)
     >>> from thefittest.base import Tree
     >>> from thefittest.base import init_symbolic_regression_uniset
     >>> from thefittest.utils.mutations import swap_mutation
-    >>>
     >>> # Example Parameters
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 4
     >>> mutation_probability = 0.5
-    >>>
     >>> # Initialize Universal Set for Symbolic Regression
     >>> universal_set = init_symbolic_regression_uniset(X, functional_set_names)
-    >>>
     >>> # Generate a Random Tree
     >>> tree = Tree.random_tree(universal_set, max_tree_level)
-    >>>
     >>> # Perform Swap Mutation
     >>> mutated_tree = swap_mutation(tree, universal_set, mutation_probability, max_tree_level)
     >>> print("Original Tree:", tree)
@@ -806,19 +791,15 @@ def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: i
     >>> from thefittest.base import Tree
     >>> from thefittest.base import init_symbolic_regression_uniset
     >>> from thefittest.utils.mutations import shrink_mutation
-    >>>
     >>> # Example Parameters
     >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
-    >>> functional_set_names = ("add", "mul", "neg", "inv")
+    >>> functional_set_names = ("add", "mul")
     >>> max_tree_level = 4
     >>> mutation_probability = 0.5
-    >>>
     >>> # Initialize Universal Set for Symbolic Regression
     >>> universal_set = init_symbolic_regression_uniset(X, functional_set_names)
-    >>>
     >>> # Generate a Random Tree
     >>> tree = Tree.random_tree(universal_set, max_tree_level)
-    >>>
     >>> # Perform Shrink Mutation
     >>> mutated_tree = shrink_mutation(tree, universal_set, mutation_probability, max_tree_level)
     >>> print("Original Tree:", tree)

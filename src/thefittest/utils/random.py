@@ -36,11 +36,10 @@ def sattolo_shuffle(arr):
     --------
     >>> from numba import jit
     >>> import numpy as np
-    >>>
+    >>> from thefittest.utils.random import sattolo_shuffle
     >>> # Example of using Sattolo's shuffle
-    >>> arr = np.array([1, 2, 3, 4, 5])
-    >>> shuffled_arr = sattolo_shuffle(arr)
-    >>> print("Shuffled Array:", shuffled_arr)
+    >>> arr = np.array([1, 2, 3, 4, 5], dtype = np.int64)
+    >>> print("Shuffled Array:", sattolo_shuffle(arr))
     Shuffled Array: ...
 
     Notes
@@ -76,11 +75,10 @@ def sattolo_shuffle_2d(arr):
     --------
     >>> from numba import jit
     >>> import numpy as np
-    >>>
+    >>> from thefittest.utils.random import sattolo_shuffle_2d
     >>> # Example of using Sattolo's shuffle for a 2D array
     >>> arr_2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    >>> shuffled_arr_2d = sattolo_shuffle_2d(arr_2d)
-    >>> print("Shuffled 2D Array:", shuffled_arr_2d)
+    >>> print("Shuffled 2D Array:", sattolo_shuffle_2d(arr_2d))
     Shuffled 2D Array: ...
 
     Notes
@@ -349,9 +347,9 @@ def randint(low, high, size):
     --------
     >>> from numba import jit
     >>> import numpy as np
-    >>>
+    >>> from thefittest.utils.random import randint
     >>> # Example of generating random integers
-    >>> result = numba_randint(low=1, high=10, size=5)
+    >>> result = randint(low=1, high=10, size=5)
     >>> print("Random Integers:", result)
     Random Integers: ...
 

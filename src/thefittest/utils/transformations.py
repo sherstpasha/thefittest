@@ -41,7 +41,7 @@ def minmax_scale(data: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float
     >>> print("Original Data:", example_data)
     Original Data: [ 2  5 10  8  3]
     >>> print("Scaled Data:", scaled_data)
-    Scaled Data: [0.   0.375 1.   0.75 0.125]
+    Scaled Data: [0.    0.375 1.    0.75  0.125]
     """
     data_copy = data.copy()
     max_value = data_copy.max()
