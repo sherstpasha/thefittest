@@ -1,6 +1,6 @@
 # folders to ignore
 dist/
-build/
+
 
 .vscode/
 .pytest_cache/

@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crossovers &mdash; Thefittest 0.2.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=a47416a6"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="mutations" href="mutations.html" />
+    <link rel="prev" title="selections" href="selections.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Thefittest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../base.html">base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../benchmarks.html">benchmarks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../classifiers.html">classifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../optimizers.html">optimizers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../regressors.html">regressors</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="selections.html">selections</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">crossovers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.binomial"><code class="docutils literal notranslate"><span class="pre">binomial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.binomialGA"><code class="docutils literal notranslate"><span class="pre">binomialGA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.empty_crossover"><code class="docutils literal notranslate"><span class="pre">empty_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.empty_crossoverGP"><code class="docutils literal notranslate"><span class="pre">empty_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.one_point_crossover"><code class="docutils literal notranslate"><span class="pre">one_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.one_point_crossoverGP"><code class="docutils literal notranslate"><span class="pre">one_point_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.standard_crossover"><code class="docutils literal notranslate"><span class="pre">standard_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.two_point_crossover"><code class="docutils literal notranslate"><span class="pre">two_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.uniform_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.uniform_crossoverGP"><code class="docutils literal notranslate"><span class="pre">uniform_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.uniform_proportional_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.uniform_proportional_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.uniform_rank_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.uniform_rank_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.uniform_tournament_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.crossovers.uniform_tournament_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover_GP()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mutations.html">mutations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="random.html">random</a></li>
+<li class="toctree-l3"><a class="reference internal" href="transformations.html">transformations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Thefittest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+          <li class="breadcrumb-item"><a href="index.html">utils</a></li>
+      <li class="breadcrumb-item active">crossovers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/utils/crossovers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-thefittest.utils.crossovers">
+<span id="crossovers"></span><h1>crossovers<a class="headerlink" href="#module-thefittest.utils.crossovers" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.binomial">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">binomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individ</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutant</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CR</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.crossovers.binomial" title="Link to this definition"></a></dt>
+<dd><p>Perform binomial crossover operation for differential evolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individ</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the genetic material of an individual.</p>
+</dd>
+<dt><strong>mutant</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the genetic material of a mutant individual.</p>
+</dd>
+<dt><strong>CR</strong><span class="classifier">np.float64</span></dt><dd><p>Crossover probability, determines the likelihood of crossover.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>A 1D array representing offspring resulting from the binomial crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Binomial crossover is used in differential evolution. It operates on real-valued chromosomes.
+For each gene in the chromosome, the gene from the mutant individual is selected with probability CR,
+and the gene from the original individual is selected with probability 1 - CR.
+The function returns a new chromosome representing potential offspring.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">binomial</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define an individual, a mutant, and the crossover probability</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">individ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mutant</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">CR</span> <span class="o">=</span> <span class="mf">0.8</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform binomial crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">binomial</span><span class="p">(</span><span class="n">individ</span><span class="p">,</span> <span class="n">mutant</span><span class="p">,</span> <span class="n">CR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Individual:&quot;</span><span class="p">,</span> <span class="n">individ</span><span class="p">)</span>
+<span class="go">Original Individual: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mutant Individual:&quot;</span><span class="p">,</span> <span class="n">mutant</span><span class="p">)</span>
+<span class="go">Mutant Individual: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Binomial Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Binomial Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.binomialGA">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">binomialGA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individ</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutant</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CR</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.crossovers.binomialGA" title="Link to this definition"></a></dt>
+<dd><p>Perform binomial crossover operation for the Genetic Algorithm with Success History based Parameter Adaptation (SHAGA).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individ</strong><span class="classifier">NDArray[np.int8]</span></dt><dd><p>A 1D array containing the genetic material of an individual in binary form.</p>
+</dd>
+<dt><strong>mutant</strong><span class="classifier">NDArray[np.int8]</span></dt><dd><p>A 1D array containing the genetic material of a mutant individual in binary form.</p>
+</dd>
+<dt><strong>CR</strong><span class="classifier">np.float64</span></dt><dd><p>Crossover probability, determines the likelihood of crossover.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>A 1D array representing offspring resulting from the binomial crossover operation in binary form.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Binomial crossover is used in the Genetic Algorithm with Success History based Parameter Adaptation (SHAGA).
+It operates on binary chromosomes. For each gene in the chromosome, the gene from the mutant individual is selected with probability CR,
+and the gene from the original individual is selected with probability 1 - CR. The function returns a new chromosome representing
+potential offspring in binary form.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">binomialGA</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define a binary individual, a binary mutant, and the crossover probability</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">individ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mutant</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">CR</span> <span class="o">=</span> <span class="mf">0.8</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform binomial crossover for SHAGA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">binomialGA</span><span class="p">(</span><span class="n">individ</span><span class="p">,</span> <span class="n">mutant</span><span class="p">,</span> <span class="n">CR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Binary Individual:&quot;</span><span class="p">,</span> <span class="n">individ</span><span class="p">)</span>
+<span class="go">Original Binary Individual: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mutant Binary Individual:&quot;</span><span class="p">,</span> <span class="n">mutant</span><span class="p">)</span>
+<span class="go">Mutant Binary Individual: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Binomial Crossover (SHAGA):&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Binomial Crossover (SHAGA): ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.empty_crossover">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">empty_crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.crossovers.empty_crossover" title="Link to this definition"></a></dt>
+<dd><p>Perform an empty crossover operation for a genetic algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray[np.byte]</span></dt><dd><p>A 2D array containing individuals where each row represents an individual.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals. (not used)</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>Offspring resulting from the empty crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This empty crossover function simply returns a copy of the first individual without any crossover.
+It is used as part of a genetic algorithm.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">empty_crossover</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the parents, fitness values, and ranks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>  <span class="c1"># First and second parent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform empty crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">empty_crossover</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Individuals:&quot;</span><span class="p">,</span> <span class="n">parents</span><span class="p">)</span>
+<span class="go">Original Individuals: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Empty Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Empty Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.empty_crossoverGP">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">empty_crossoverGP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.utils.crossovers.empty_crossoverGP" title="Link to this definition"></a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">empty_crossoverGP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">Tree</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">init_symbolic_regression_uniset</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functional_set_names</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;mul&quot;</span><span class="p">,</span> <span class="s2">&quot;neg&quot;</span><span class="p">,</span> <span class="s2">&quot;inv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_tree_level</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize Universal Set for Symbolic Regression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">init_symbolic_regression_uniset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">functional_set_names</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the parents, fitness values, ranks, and maximum allowed depth</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_depth</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform empty crossover for genetic programming</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">empty_crossoverGP</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Individual:&quot;</span><span class="p">,</span> <span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">Original Individual: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Empty Crossover (GP):&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Empty Crossover (GP): ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.one_point_crossover">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">one_point_crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.crossovers.one_point_crossover" title="Link to this definition"></a></dt>
+<dd><p>Perform one-point crossover operation for a genetic algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray[np.byte]</span></dt><dd><p>A 2D array containing individuals where each row represents an individual.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals. (not used)</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>Offspring resulting from the one-point crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>One-point crossover randomly selects a crossover point along the chromosome. The genetic material beyond this
+point is swapped between two parents, creating two new chromosomes for potential offspring. The function returns
+one of the two resulting offspring randomly.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">one_point_crossover</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the parents, fitness values, and ranks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>  <span class="c1"># First and second parent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform one_point crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">one_point_crossover</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Individuals:&quot;</span><span class="p">,</span> <span class="n">parents</span><span class="p">)</span>
+<span class="go">Original Individuals: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Empty Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Empty Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.one_point_crossoverGP">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">one_point_crossoverGP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.utils.crossovers.one_point_crossoverGP" title="Link to this definition"></a></dt>
+<dd><p>Perform one-point crossover operation for genetic programming.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray</span></dt><dd><p>A 1D array containing two individuals represented as trees.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals. (not used)</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual. (not used)</p>
+</dd>
+<dt><strong>max_level</strong><span class="classifier">int</span></dt><dd><p>Maximum allowed depth/level of the resulting offspring. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Tree</dt><dd><p>Offspring resulting from the one-point crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>One-point crossover is used in genetic programming. It involves selecting a common region between two parents
+and exchanging genetic material at a randomly chosen point within this region. The resulting offspring represents
+a combination of genetic material from both parents.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">one_point_crossoverGP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">Tree</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">init_symbolic_regression_uniset</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functional_set_names</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;mul&quot;</span><span class="p">,</span> <span class="s2">&quot;neg&quot;</span><span class="p">,</span> <span class="s2">&quot;inv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_tree_level</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize Universal Set for Symbolic Regression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">init_symbolic_regression_uniset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">functional_set_names</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent1</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent2</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_depth</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Set the maximum allowed depth</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform one-point crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">one_point_crossoverGP</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">parent1</span><span class="p">,</span> <span class="n">parent2</span><span class="p">]),</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 1:&quot;</span><span class="p">,</span> <span class="n">parent1</span><span class="p">)</span>
+<span class="go">Parent 1: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 2:&quot;</span><span class="p">,</span> <span class="n">parent2</span><span class="p">)</span>
+<span class="go">Parent 2: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After One-Point Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After One-Point Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.standard_crossover">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">standard_crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.utils.crossovers.standard_crossover" title="Link to this definition"></a></dt>
+<dd><p>Perform standard crossover operation for genetic programming.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray</span></dt><dd><p>A 1D array containing two individuals represented as trees.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals. (not used)</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual. (not used)</p>
+</dd>
+<dt><strong>max_level</strong><span class="classifier">int</span></dt><dd><p>Maximum allowed depth/level of the resulting offspring.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Tree</dt><dd><p>Offspring resulting from the standard crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Standard crossover is used in genetic programming. It involves selecting a random subtree from one parent
+and replacing a subtree in the other parent. The resulting offspring represents a combination of genetic material
+from both parents. If the depth/level of the offspring exceeds the specified maximum level, a random parent is chosen
+as the offspring.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">standard_crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">Tree</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">init_symbolic_regression_uniset</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functional_set_names</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;mul&quot;</span><span class="p">,</span> <span class="s2">&quot;neg&quot;</span><span class="p">,</span> <span class="s2">&quot;inv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_tree_level</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize Universal Set for Symbolic Regression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">init_symbolic_regression_uniset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">functional_set_names</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent1</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent2</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_depth</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Set the maximum allowed depth</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform standard crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">standard_crossover</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">parent1</span><span class="p">,</span> <span class="n">parent2</span><span class="p">]),</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 1:&quot;</span><span class="p">,</span> <span class="n">parent1</span><span class="p">)</span>
+<span class="go">Parent 1: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 2:&quot;</span><span class="p">,</span> <span class="n">parent2</span><span class="p">)</span>
+<span class="go">Parent 2: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Standard Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Standard Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.two_point_crossover">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">two_point_crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.crossovers.two_point_crossover" title="Link to this definition"></a></dt>
+<dd><p>Perform two-point crossover operation for a genetic algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray[np.byte]</span></dt><dd><p>A 2D array containing individuals where each row represents an individual.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals. (not used)</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>Offspring resulting from the two-point crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Two-point crossover randomly selects two crossover points along the chromosome. The genetic material between
+these two points is swapped between two parents, creating two new chromosomes for potential offspring. The function
+returns one of the two resulting offspring randomly.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">two_point_crossover</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the parents, fitness values, and ranks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>  <span class="c1"># First and second parent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform two-point crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">two_point_crossover</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Individuals:&quot;</span><span class="p">,</span> <span class="n">parents</span><span class="p">)</span>
+<span class="go">Original Individuals: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Two-Point Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Two-Point Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.uniform_crossover">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">uniform_crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.crossovers.uniform_crossover" title="Link to this definition"></a></dt>
+<dd><p>Perform uniform crossover operation for a genetic algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray[np.byte]</span></dt><dd><p>A 2D array containing individuals where each row represents an individual.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals. (not used)</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>Offspring resulting from the uniform crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uniform crossover randomly selects genetic material from the parents for each gene in the chromosome.
+Each gene of the offspring is randomly chosen from one of the parents. The function returns a new chromosome
+representing potential offspring.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">uniform_crossover</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the parents, fitness values, and ranks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>  <span class="c1"># First and second parent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform uniform crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">uniform_crossover</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Individuals:&quot;</span><span class="p">,</span> <span class="n">parents</span><span class="p">)</span>
+<span class="go">Original Individuals: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Uniform Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Uniform Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.uniform_crossoverGP">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">uniform_crossoverGP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.utils.crossovers.uniform_crossoverGP" title="Link to this definition"></a></dt>
+<dd><p>Perform uniform crossover operation for genetic programming.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray</span></dt><dd><p>A 1D array containing two or more individuals represented as trees.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals. (not used)</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual. (not used)</p>
+</dd>
+<dt><strong>max_level</strong><span class="classifier">int</span></dt><dd><p>Maximum allowed depth/level of the resulting offspring. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Tree</dt><dd><p>Offspring resulting from the uniform crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uniform crossover is used in genetic programming. It involves selecting a common region between two or more parents
+and exchanging genetic material at randomly chosen points within this region. The resulting offspring represents
+a combination of genetic material from all parents.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">uniform_crossoverGP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">Tree</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">init_symbolic_regression_uniset</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functional_set_names</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;mul&quot;</span><span class="p">,</span> <span class="s2">&quot;neg&quot;</span><span class="p">,</span> <span class="s2">&quot;inv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_tree_level</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize Universal Set for Symbolic Regression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">init_symbolic_regression_uniset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">functional_set_names</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent1</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent2</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent3</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_depth</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Set the maximum allowed depth</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform uniform crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">uniform_crossoverGP</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">parent1</span><span class="p">,</span> <span class="n">parent2</span><span class="p">,</span> <span class="n">parent3</span><span class="p">]),</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Parent 1:&quot;</span><span class="p">,</span> <span class="n">parent1</span><span class="p">)</span>
+<span class="go">Parent 1: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 2:&quot;</span><span class="p">,</span> <span class="n">parent2</span><span class="p">)</span>
+<span class="go">Parent 2: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 3:&quot;</span><span class="p">,</span> <span class="n">parent3</span><span class="p">)</span>
+<span class="go">Parent 3: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Uniform Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Uniform Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.uniform_proportional_crossover">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">uniform_proportional_crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.crossovers.uniform_proportional_crossover" title="Link to this definition"></a></dt>
+<dd><p>Perform uniform proportional crossover operation for a genetic algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray[np.byte]</span></dt><dd><p>A 2D array containing individuals where each row represents an individual.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals.</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>Offspring resulting from the uniform proportional crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uniform proportional crossover randomly selects genetic material from the parents for each gene in the chromosome.
+The probability of choosing genetic material from a parent is proportional to its fitness value. The function returns
+a new chromosome representing potential offspring.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">uniform_proportional_crossover</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the parents, fitness values, and ranks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>  <span class="c1"># First and second parent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform uniform proportional crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">uniform_proportional_crossover</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Individuals:&quot;</span><span class="p">,</span> <span class="n">parents</span><span class="p">)</span>
+<span class="go">Original Individuals: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Uniform Proportional Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Uniform Proportional Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.uniform_proportional_crossover_GP">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">uniform_proportional_crossover_GP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.utils.crossovers.uniform_proportional_crossover_GP" title="Link to this definition"></a></dt>
+<dd><p>Perform uniform proportional crossover operation for genetic programming.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray</span></dt><dd><p>A 1D array containing two or more individuals represented as trees.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals.</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual. (not used)</p>
+</dd>
+<dt><strong>max_level</strong><span class="classifier">int</span></dt><dd><p>Maximum allowed depth/level of the resulting offspring. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Tree</dt><dd><p>Offspring resulting from the uniform proportional crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uniform proportional crossover is a genetic programming operator. It involves selecting a common region between two or more parents,
+and the genetic material is exchanged at randomly chosen points within this region. The probability of selecting genetic material
+from a parent is proportional to its fitness value. This means that individuals with higher fitness values have a higher chance
+of contributing genetic material to the offspring. The resulting tree represents a combination of genetic material from all parents.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">uniform_proportional_crossover_GP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">Tree</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">init_symbolic_regression_uniset</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functional_set_names</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;mul&quot;</span><span class="p">,</span> <span class="s2">&quot;neg&quot;</span><span class="p">,</span> <span class="s2">&quot;inv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_tree_level</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize Universal Set for Symbolic Regression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">init_symbolic_regression_uniset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">functional_set_names</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent1</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent2</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent3</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_depth</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Set the maximum allowed depth</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform uniform proportional crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">uniform_proportional_crossover_GP</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">parent1</span><span class="p">,</span> <span class="n">parent2</span><span class="p">,</span> <span class="n">parent3</span><span class="p">]),</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 1:&quot;</span><span class="p">,</span> <span class="n">parent1</span><span class="p">)</span>
+<span class="go">Parent 1: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 2:&quot;</span><span class="p">,</span> <span class="n">parent2</span><span class="p">)</span>
+<span class="go">Parent 2: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 3:&quot;</span><span class="p">,</span> <span class="n">parent3</span><span class="p">)</span>
+<span class="go">Parent 3: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Uniform Proportional Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Uniform Proportional Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.uniform_rank_crossover">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">uniform_rank_crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.crossovers.uniform_rank_crossover" title="Link to this definition"></a></dt>
+<dd><p>Perform uniform rank crossover operation for a genetic algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray[np.byte]</span></dt><dd><p>A 2D array containing individuals where each row represents an individual.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals. (not used)</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>Offspring resulting from the uniform rank crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uniform rank crossover randomly selects genetic material from the parents for each gene in the chromosome.
+The probability of choosing genetic material from a parent is proportional to its rank value. The function returns
+a new chromosome representing potential offspring.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">uniform_rank_crossover</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the parents, fitness values, and ranks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>  <span class="c1"># First and second parent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform uniform rank crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">uniform_rank_crossover</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Individuals:&quot;</span><span class="p">,</span> <span class="n">parents</span><span class="p">)</span>
+<span class="go">Original Individuals: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Uniform Rank Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Uniform Rank Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.uniform_rank_crossover_GP">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">uniform_rank_crossover_GP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.utils.crossovers.uniform_rank_crossover_GP" title="Link to this definition"></a></dt>
+<dd><p>Perform uniform rank crossover operation for genetic programming.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray</span></dt><dd><p>A 1D array containing two or more individuals represented as trees.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals. (not used)</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual.
+The rank values are used to determine the probability of selecting genetic material from each parent.</p>
+</dd>
+<dt><strong>max_level</strong><span class="classifier">int</span></dt><dd><p>Maximum allowed depth/level of the resulting offspring. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Tree</dt><dd><p>Offspring resulting from the uniform rank crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uniform rank crossover is a genetic programming operator. It involves selecting a common region between two or more parents,
+and the genetic material is exchanged at randomly chosen points within this region. The probability of selecting genetic material
+from a parent is proportional to its rank value. This means that individuals with higher rank values have a higher chance
+of contributing genetic material to the offspring. The resulting tree represents a combination of genetic material from all parents.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">uniform_rank_crossover_GP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">Tree</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">init_symbolic_regression_uniset</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functional_set_names</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;mul&quot;</span><span class="p">,</span> <span class="s2">&quot;neg&quot;</span><span class="p">,</span> <span class="s2">&quot;inv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_tree_level</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize Universal Set for Symbolic Regression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">init_symbolic_regression_uniset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">functional_set_names</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent1</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent2</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent3</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_depth</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Set the maximum allowed depth</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform uniform rank crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">uniform_rank_crossover_GP</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">parent1</span><span class="p">,</span> <span class="n">parent2</span><span class="p">,</span> <span class="n">parent3</span><span class="p">]),</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 1:&quot;</span><span class="p">,</span> <span class="n">parent1</span><span class="p">)</span>
+<span class="go">Parent 1: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 2:&quot;</span><span class="p">,</span> <span class="n">parent2</span><span class="p">)</span>
+<span class="go">Parent 2: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 3:&quot;</span><span class="p">,</span> <span class="n">parent3</span><span class="p">)</span>
+<span class="go">Parent 3: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Uniform Rank Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Uniform Rank Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.uniform_tournament_crossover">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">uniform_tournament_crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.crossovers.uniform_tournament_crossover" title="Link to this definition"></a></dt>
+<dd><p>Perform uniform tournament crossover operation for a genetic algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray[np.byte]</span></dt><dd><p>A 2D array containing individuals where each row represents an individual.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals.</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>Offspring resulting from the uniform tournament crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uniform tournament crossover randomly selects genetic material from the parents for each gene in the chromosome.
+The parents for each gene are chosen through tournament selection based on their fitness values.
+The function returns a new chromosome representing potential offspring.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">uniform_tournament_crossover</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Define the parents, fitness values, and ranks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>  <span class="c1"># First and second parent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform uniform tournament crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">uniform_tournament_crossover</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Individuals:&quot;</span><span class="p">,</span> <span class="n">parents</span><span class="p">)</span>
+<span class="go">Original Individuals: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Uniform Tournament Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Uniform Tournament Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.crossovers.uniform_tournament_crossover_GP">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.crossovers.</span></span><span class="sig-name descname"><span class="pre">uniform_tournament_crossover_GP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.utils.crossovers.uniform_tournament_crossover_GP" title="Link to this definition"></a></dt>
+<dd><p>Perform uniform tournament crossover operation for genetic programming.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>individs</strong><span class="classifier">NDArray</span></dt><dd><p>A 1D array containing two or more individuals represented as trees.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the fitness values of individuals.</p>
+</dd>
+<dt><strong>rank</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>A 1D array containing the rank values of individuals. The higher the rank, the better the individual.
+The rank values are used to determine the probability of selecting genetic material from each parent.</p>
+</dd>
+<dt><strong>max_level</strong><span class="classifier">int</span></dt><dd><p>Maximum allowed depth/level of the resulting offspring. (not used)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Tree</dt><dd><p>Offspring resulting from the uniform tournament crossover operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uniform tournament crossover is a genetic programming operator. It involves selecting a common region between two or more parents,
+and the genetic material is exchanged at randomly chosen points within this region. The probability of selecting genetic material
+from a parent is determined through a tournament selection process, where individuals with higher fitness or rank values have a higher chance
+of contributing genetic material to the offspring. The resulting tree represents a combination of genetic material from all parents.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.crossovers</span> <span class="kn">import</span> <span class="n">uniform_tournament_crossover_GP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">Tree</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.base</span> <span class="kn">import</span> <span class="n">init_symbolic_regression_uniset</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">11.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">functional_set_names</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;mul&quot;</span><span class="p">,</span> <span class="s2">&quot;neg&quot;</span><span class="p">,</span> <span class="s2">&quot;inv&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_tree_level</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize Universal Set for Symbolic Regression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">init_symbolic_regression_uniset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">functional_set_names</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent1</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent2</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parent3</span> <span class="o">=</span> <span class="n">Tree</span><span class="o">.</span><span class="n">random_tree</span><span class="p">(</span><span class="n">universal_set</span><span class="p">,</span> <span class="n">max_tree_level</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitness_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_depth</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># Set the maximum allowed depth</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perform uniform tournament crossover</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offspring</span> <span class="o">=</span> <span class="n">uniform_tournament_crossover_GP</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">parent1</span><span class="p">,</span> <span class="n">parent2</span><span class="p">,</span> <span class="n">parent3</span><span class="p">]),</span> <span class="n">fitness_values</span><span class="p">,</span> <span class="n">ranks</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display results</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 1:&quot;</span><span class="p">,</span> <span class="n">parent1</span><span class="p">)</span>
+<span class="go">Parent 1: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 2:&quot;</span><span class="p">,</span> <span class="n">parent2</span><span class="p">)</span>
+<span class="go">Parent 2: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent 3:&quot;</span><span class="p">,</span> <span class="n">parent3</span><span class="p">)</span>
+<span class="go">Parent 3: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Offspring After Uniform Tournament Crossover:&quot;</span><span class="p">,</span> <span class="n">offspring</span><span class="p">)</span>
+<span class="go">Offspring After Uniform Tournament Crossover: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="selections.html" class="btn btn-neutral float-left" title="selections" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mutations.html" class="btn btn-neutral float-right" title="mutations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Pavel Sherstnev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
