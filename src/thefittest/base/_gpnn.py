@@ -312,8 +312,9 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
                 args_auto_defined=[
                     "fitness_function",
                     "fitness_function_args",
-                    "left",
-                    "right",
+                    "left_border",
+                    "right_border",
+                    "num_variables",
                     "str_len",
                     "genotype_to_phenotype",
                     "genotype_to_phenotype_args",

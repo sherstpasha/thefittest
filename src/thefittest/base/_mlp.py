@@ -130,17 +130,17 @@ def train_net_weights(
         "task_type": task_type,
     }
 
-    left: NDArray[np.float64] = np.full(shape=len(net._weights), fill_value=-10, dtype=np.float64)
-    right: NDArray[np.float64] = np.full(shape=len(net._weights), fill_value=10, dtype=np.float64)
-
     initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = (
-        DifferentialEvolution.float_population(weights_optimizer_args["pop_size"], left, right)
+        DifferentialEvolution.float_population(
+            weights_optimizer_args["pop_size"], -10, 10, len(net._weights)
+        )
     )
     initial_population[0] = net._weights.copy()
 
     if weights_optimizer in (SHADE, DifferentialEvolution, jDE):
-        weights_optimizer_args["left"] = left
-        weights_optimizer_args["right"] = right
+        weights_optimizer_args["left_border"] = -10
+        weights_optimizer_args["right_border"] = 10
+        weights_optimizer_args["num_variables"] = len(net._weights)
     else:
         genotype_to_phenotype = GrayCode().fit(
             left_border=-10.0,
@@ -248,8 +248,9 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
                 args_auto_defined=[
                     "fitness_function",
                     "fitness_function_args",
-                    "left",
-                    "right",
+                    "left_border",
+                    "right_border",
+                    "num_variables",
                     "str_len",
                     "genotype_to_phenotype",
                     "genotype_to_phenotype_args",

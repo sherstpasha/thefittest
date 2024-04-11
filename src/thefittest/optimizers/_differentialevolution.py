@@ -14,6 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..base._ea import EvolutionaryAlgorithm
+from ..utils import if_single_or_array_to_float_array
 from ..utils.mutations import best_1
 from ..utils.mutations import best_2
 from ..utils.crossovers import binomial
@@ -49,8 +50,9 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
         fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
         iters: int,
         pop_size: int,
-        left: NDArray[np.float64],
-        right: NDArray[np.float64],
+        left_border: Union[float, int, np.number, NDArray[np.number]],
+        right_border: Union[float, int, np.number, NDArray[np.number]],
+        num_variables: int,
         mutation: str = "rand_1",
         F: float = 0.5,
         CR: float = 0.5,
@@ -90,8 +92,13 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             on_generation=on_generation,
         )
 
-        self._left: NDArray[np.float64] = left
-        self._right: NDArray[np.float64] = right
+        self._num_variables = num_variables
+        self._left: NDArray[np.float64] = if_single_or_array_to_float_array(
+            left_border, self._num_variables
+        )
+        self._right: NDArray[np.float64] = if_single_or_array_to_float_array(
+            right_border, self._num_variables
+        )
         self._specified_mutation: str = mutation
         self._F: Union[float, NDArray[np.float64]] = F
         self._CR: Union[float, NDArray[np.float64]] = CR
@@ -108,9 +115,12 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
     @staticmethod
     def float_population(
         pop_size: int,
-        left: NDArray[np.float64],
-        right: NDArray[np.float64],
+        left_border: Union[float, int, np.number, NDArray[np.number]],
+        right_border: Union[float, int, np.number, NDArray[np.number]],
+        num_variables: int,
     ) -> NDArray[np.float64]:
+        left = if_single_or_array_to_float_array(left_border, num_variables)
+        right = if_single_or_array_to_float_array(right_border, num_variables)
         points_along_axis = [
             uniform(left_i, right_i, pop_size) for left_i, right_i in zip(left, right)
         ]
@@ -119,7 +129,10 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
     def _first_generation(self: DifferentialEvolution) -> None:
         if self._init_population is None:
             self._population_g_i = self.float_population(
-                pop_size=self._pop_size, left=self._left, right=self._right
+                pop_size=self._pop_size,
+                left_border=self._left,
+                right_border=self._right,
+                num_variables=self._num_variables,
             )
         else:
             self._population_g_i = self._init_population.copy()

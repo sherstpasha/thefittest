@@ -206,15 +206,13 @@ def test_CEC2005():
         for dim in problem["dimentions"]:
             print(problem, dim)
 
-            left = np.full(shape=dim, fill_value=left_scalar, dtype=np.float64)
-            right = np.full(shape=dim, fill_value=right_scalar, dtype=np.float64)
-
             optimizer_args = {
                 "fitness_function": function,
                 "iters": iters,
                 "pop_size": pop_size,
-                "left": left,
-                "right": right,
+                "left_border": left_scalar,
+                "right_border": right_scalar,
+                "num_variables": dim,
                 "minimization": True,
             }
 
@@ -222,10 +220,12 @@ def test_CEC2005():
                 init_left_scalar = problem["init_bounds"][1]
                 init_left = np.full(shape=dim, fill_value=init_left_scalar, dtype=np.float64)
                 init_right_scalar = problem["init_bounds"][1]
-                init_right = np.full(shape=dim, fill_value=init_right_scalar, dtype=np.float64)
 
                 initial_population = DifferentialEvolution.float_population(
-                    pop_size=pop_size, left=init_left, right=init_right
+                    pop_size=pop_size,
+                    left_border=init_left,
+                    right_border=init_right_scalar,
+                    num_variables=dim,
                 )
 
                 optimizer_args["init_population"] = initial_population
