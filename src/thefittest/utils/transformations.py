@@ -6,6 +6,9 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from ..utils import if_single_or_array_to_float_array
+from ..utils import if_single_or_array_to_int_array
+
 
 def minmax_scale(data: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
     """
@@ -325,15 +328,17 @@ class SamplingGrid:
         Bits per Variable: [ 8 16  3 40]
         """
         self._num_variables = num_variables
-        self._left_border = self._if_single_or_array_to_float_array(left_border)
-        self._right_border = self._if_single_or_array_to_float_array(right_border)
+        self._left_border = if_single_or_array_to_float_array(left_border, self._num_variables)
+        self._right_border = if_single_or_array_to_float_array(right_border, self._num_variables)
 
         if bits_per_variable is None and h_per_variable is not None:
-            self._h_per_variable = self._if_single_or_array_to_float_array(h_per_variable)
+            self._h_per_variable = if_single_or_array_to_float_array(h_per_variable)
             self._culc_num_bits_from_h()
             self._culc_h_from_num_bits()
         elif bits_per_variable is not None and h_per_variable is None:
-            self._bits_per_variable = self._if_single_or_array_to_int_array(bits_per_variable)
+            self._bits_per_variable = if_single_or_array_to_int_array(
+                bits_per_variable, self._num_variables
+            )
             self._culc_h_from_num_bits()
         else:
             raise ValueError(
@@ -343,64 +348,6 @@ class SamplingGrid:
         self._powers = 2 ** np.arange(self._bits_per_variable.max(), dtype=np.int64)
 
         return self
-
-    def _if_single_or_array_to_float_array(
-        self, single_or_array: Union[float, int, np.number, NDArray[np.number]]
-    ) -> NDArray[np.float64]:
-        """
-        Convert a single value or an array to a 1D float array.
-
-        Parameters
-        ----------
-        single_or_array : Union[float, int, np.number, NDArray[np.number]]
-            A single numeric value or an array of numeric values.
-
-        Returns
-        -------
-        NDArray[np.float64]
-            1D float array.
-        Notes
-        -----
-        This function is used internally in the SamplingGrid class to ensure that numeric values,
-        either single or in array form, are represented as a 1D float array for further calculations.
-
-        """
-        if isinstance(single_or_array, (int, float, np.number)):
-            array = np.full(shape=self._num_variables, fill_value=single_or_array, dtype=np.float64)
-        else:
-            assert len(single_or_array) == self._num_variables
-            array = single_or_array.astype(np.float64)
-
-        return array
-
-    def _if_single_or_array_to_int_array(
-        self, single_or_array: Union[float, int, np.number, NDArray[np.number]]
-    ) -> NDArray[np.int64]:
-        """
-        Convert a single value or an array to a 1D int array.
-
-        Parameters
-        ----------
-        single_or_array : Union[float, int, np.number, NDArray[np.number]]
-            A single numeric value or an array of numeric values.
-
-        Returns
-        -------
-        NDArray[np.int64]
-            1D int array.
-        Notes
-        -----
-        This function is used internally in the SamplingGrid class to ensure that numeric values,
-        either single or in array form, are represented as a 1D int array for further calculations.
-
-        """
-        if isinstance(single_or_array, (int, float, np.number)):
-            array = np.full(shape=self._num_variables, fill_value=single_or_array, dtype=np.int64)
-        else:
-            assert len(single_or_array) == self._num_variables
-            array = single_or_array.astype(np.int64)
-
-        return array
 
     def _culc_h_from_num_bits(self) -> None:
         """

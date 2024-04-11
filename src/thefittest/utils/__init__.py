@@ -449,10 +449,6 @@ def if_single_or_array_to_float_array(
     -------
     NDArray[np.float64]
         1D float array.
-    Notes
-    -----
-    This function is used internally in the SamplingGrid class to ensure that numeric values,
-    either single or in array form, are represented as a 1D float array for further calculations.
 
     """
     if isinstance(single_or_array, (int, float, np.number)):
@@ -460,5 +456,31 @@ def if_single_or_array_to_float_array(
     else:
         assert len(single_or_array) == num_variables
         array = single_or_array.astype(np.float64)
+
+    return array
+
+
+def if_single_or_array_to_int_array(
+    single_or_array: Union[float, int, np.number, NDArray[np.number]], num_variables: int
+) -> NDArray[np.int64]:
+    """
+    Convert a single value or an array to a 1D int array.
+
+    Parameters
+    ----------
+    single_or_array : Union[float, int, np.number, NDArray[np.number]]
+        A single numeric value or an array of numeric values.
+
+    Returns
+    -------
+    NDArray[np.int64]
+        1D int array.
+
+    """
+    if isinstance(single_or_array, (int, float, np.number)):
+        array = np.full(shape=num_variables, fill_value=single_or_array, dtype=np.int64)
+    else:
+        assert len(single_or_array) == num_variables
+        array = single_or_array.astype(np.int64)
 
     return array
