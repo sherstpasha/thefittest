@@ -59,7 +59,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">transformations</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.transformations.GrayCode"><code class="docutils literal notranslate"><span class="pre">GrayCode</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.transformations.SamplingGrid"><code class="docutils literal notranslate"><span class="pre">SamplingGrid</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.transformations.scale_data"><code class="docutils literal notranslate"><span class="pre">scale_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.transformations.minmax_scale"><code class="docutils literal notranslate"><span class="pre">minmax_scale()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -670,9 +670,44 @@ and then calculates the corresponding floating-point values using the SamplingGr
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="thefittest.utils.transformations.scale_data">
-<span class="sig-prename descclassname"><span class="pre">thefittest.utils.transformations.</span></span><span class="sig-name descname"><span class="pre">scale_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.scale_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="thefittest.utils.transformations.minmax_scale">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.transformations.</span></span><span class="sig-name descname"><span class="pre">minmax_scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.minmax_scale" title="Link to this definition"></a></dt>
+<dd><p>Scale the values of a NumPy array between 0 and 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">NDArray[Union[np.int64, np.float64]]</span></dt><dd><p>Input array containing numerical values to be scaled.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Scaled array with values between 0 and 1.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function scales the values of the input array between 0 and 1 using min-max scaling.
+If the minimum and maximum values in the array are equal, the function returns an array of ones.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">minmax_scale</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">example_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Scale the data using the minmax_scale function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scaled_data</span> <span class="o">=</span> <span class="n">minmax_scale</span><span class="p">(</span><span class="n">example_data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display original and scaled data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Data:&quot;</span><span class="p">,</span> <span class="n">example_data</span><span class="p">)</span>
+<span class="go">Original Data: [ 2  5 10  8  3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scaled Data:&quot;</span><span class="p">,</span> <span class="n">scaled_data</span><span class="p">)</span>
+<span class="go">Scaled Data: [0.    0.375 1.    0.75  0.125]</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </section>
 

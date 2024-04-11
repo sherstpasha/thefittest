@@ -57,12 +57,17 @@
 <li class="toctree-l3"><a class="reference internal" href="mutations.html">mutations</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">random</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.cauchy_distribution"><code class="docutils literal notranslate"><span class="pre">cauchy_distribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.check_random_state"><code class="docutils literal notranslate"><span class="pre">check_random_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.flip_coin"><code class="docutils literal notranslate"><span class="pre">flip_coin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.generator1"><code class="docutils literal notranslate"><span class="pre">generator1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.generator2"><code class="docutils literal notranslate"><span class="pre">generator2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.numba_seed"><code class="docutils literal notranslate"><span class="pre">numba_seed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.randint"><code class="docutils literal notranslate"><span class="pre">randint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.random_sample"><code class="docutils literal notranslate"><span class="pre">random_sample()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.random_weighted_sample"><code class="docutils literal notranslate"><span class="pre">random_weighted_sample()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.sattolo_shuffle"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.stratified_sample"><code class="docutils literal notranslate"><span class="pre">stratified_sample()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.train_test_split"><code class="docutils literal notranslate"><span class="pre">train_test_split()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.train_test_split_stratified"><code class="docutils literal notranslate"><span class="pre">train_test_split_stratified()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.sattolo_shuffle_2d"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle_2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.uniform"><code class="docutils literal notranslate"><span class="pre">uniform()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="transformations.html">transformations</a></li>
@@ -135,6 +140,109 @@
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cauchy Distribution Result:&quot;</span><span class="p">,</span> <span class="n">cauchy_result</span><span class="p">)</span>
 <span class="go">Cauchy Distribution Result: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.check_random_state">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">check_random_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">RandomState</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.check_random_state" title="Link to this definition"></a></dt>
+<dd><p>Turn seed into a np.random.RandomState instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>seed</strong><span class="classifier">None | int | instance of RandomState</span></dt><dd><p>If seed is None, return the RandomState singleton used by np.random.
+If seed is an int, return a new RandomState instance seeded with seed.
+If seed is already a RandomState instance, return it.
+Otherwise raise ValueError.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.flip_coin">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">flip_coin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.flip_coin" title="Link to this definition"></a></dt>
+<dd><p>Simulate a biased coin flip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>threshold</strong><span class="classifier">float64</span></dt><dd><p>The threshold for the biased coin flip. Should be in the range [0, 1].</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>boolean</dt><dd><p>Returns True with a probability equal to the given threshold and
+False with a complementary probability.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function simulates a biased coin flip with a specified threshold.
+If the threshold is 0.5, it behaves like a fair coin flip.
+A threshold greater than 0.5 biases the result towards True,
+while a threshold less than 0.5 biases the result towards False.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.random</span> <span class="kn">import</span> <span class="n">flip_coin</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of a biased coin flip with a threshold of 0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">flip_coin</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Coin Flip Result:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="go">Coin Flip Result: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.generator1">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">generator1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#thefittest.utils.random.generator1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.generator2">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">generator2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#thefittest.utils.random.generator2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.numba_seed">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">numba_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed_value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.numba_seed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.randint">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">randint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">low</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.randint" title="Link to this definition"></a></dt>
+<dd><p>Generate an array of random integers from a discrete uniform distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>low</strong><span class="classifier">int</span></dt><dd><p>The lowest integer to be drawn from the distribution.</p>
+</dd>
+<dt><strong>high</strong><span class="classifier">int</span></dt><dd><p>The highest integer to be drawn from the distribution.</p>
+</dd>
+<dt><strong>size</strong><span class="classifier">int</span></dt><dd><p>The number of integers to generate.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[int64]</dt><dd><p>An array of random integers.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The generated integers follow a discrete uniform distribution.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.random</span> <span class="kn">import</span> <span class="n">randint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of generating random integers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Random Integers:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="go">Random Integers: ...</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -219,173 +327,102 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="thefittest.utils.random.sattolo_shuffle">
-<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">sattolo_shuffle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarType_co</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#thefittest.utils.random.sattolo_shuffle" title="Link to this definition"></a></dt>
-<dd><p>Perform an in-place Sattolo’s algorithm shuffle on the input array.</p>
-<p>Sattolo’s algorithm shuffles the elements of the array in such a way that
-no element ends up in its original position. This is achieved by iteratively
-selecting a random element and swapping it with the element at a randomly chosen
-position ahead of it.</p>
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">sattolo_shuffle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.sattolo_shuffle" title="Link to this definition"></a></dt>
+<dd><p>Perform Sattolo’s algorithm for in-place array shuffling.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>items</strong><span class="classifier">Union[List, NDArray]</span></dt><dd><p>The input array or list to be shuffled. The function shuffles the elements
-in place.</p>
+<dt><strong>arr</strong><span class="classifier">int64[:]</span></dt><dd><p>Input array to be shuffled.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>None</dt><dd><p>The function operates in-place, and the input array is shuffled without
-returning a new array.</p>
+<dt>int64[:]</dt><dd><p>Shuffled array.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>Sattolo’s algorithm generates a random cyclic permutation of a given array.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.random</span> <span class="kn">import</span> <span class="n">sattolo_shuffle</span>
-<span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example with a list</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sattolo_shuffle</span><span class="p">(</span><span class="n">my_list</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shuffled List:&quot;</span><span class="p">,</span> <span class="n">my_list</span><span class="p">)</span>
-<span class="go">Shuffled List: ...</span>
-<span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example with a NumPy array</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sattolo_shuffle</span><span class="p">(</span><span class="n">my_array</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shuffled NumPy Array:&quot;</span><span class="p">,</span> <span class="n">my_array</span><span class="p">)</span>
-<span class="go">Shuffled NumPy Array: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of using Sattolo&#39;s shuffle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shuffled Array:&quot;</span><span class="p">,</span> <span class="n">sattolo_shuffle</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
+<span class="go">Shuffled Array: ...</span>
 </pre></div>
 </div>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="thefittest.utils.random.stratified_sample">
-<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">stratified_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.random.stratified_sample" title="Link to this definition"></a></dt>
-<dd><p>Generate a stratified random sample.</p>
+<dt class="sig sig-object py" id="thefittest.utils.random.sattolo_shuffle_2d">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">sattolo_shuffle_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.sattolo_shuffle_2d" title="Link to this definition"></a></dt>
+<dd><p>Perform Sattolo’s algorithm for in-place shuffling of rows in a 2D array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>data</strong><span class="classifier">NDArray[np.int64]</span></dt><dd><p>1D array of integer values representing the strata or groups.</p>
-</dd>
-<dt><strong>sample_ratio</strong><span class="classifier">float</span></dt><dd><p>The ratio of the sample size to the total data size.</p>
+<dt><strong>arr</strong><span class="classifier">int64[:, :]</span></dt><dd><p>Input 2D array to be shuffled.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>NDArray[np.int64]</dt><dd><p>An array of sampled indices.</p>
+<dt>int64[:, :]</dt><dd><p>Shuffled 2D array.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>Sattolo’s algorithm generates a random cyclic permutation of rows in a 2D array.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.random</span> <span class="kn">import</span> <span class="n">stratified_sample</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_ratio</span> <span class="o">=</span> <span class="mf">0.8</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sampled_indices</span> <span class="o">=</span> <span class="n">stratified_sample</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sample_ratio</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stratified Sampled Indices:&quot;</span><span class="p">,</span> <span class="n">sampled_indices</span><span class="p">)</span>
-<span class="go">Stratified Sampled Indices: ...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stratified Sampled Values:&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">sampled_indices</span><span class="p">])</span>
-<span class="go">Stratified Sampled Values: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.random</span> <span class="kn">import</span> <span class="n">sattolo_shuffle_2d</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of using Sattolo&#39;s shuffle for a 2D array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr_2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shuffled 2D Array:&quot;</span><span class="p">,</span> <span class="n">sattolo_shuffle_2d</span><span class="p">(</span><span class="n">arr_2d</span><span class="p">))</span>
+<span class="go">Shuffled 2D Array: ...</span>
 </pre></div>
 </div>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="thefittest.utils.random.train_test_split">
-<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">train_test_split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span></span></span><a class="headerlink" href="#thefittest.utils.random.train_test_split" title="Link to this definition"></a></dt>
-<dd><p>Split the dataset into training and testing sets.</p>
+<dt class="sig sig-object py" id="thefittest.utils.random.uniform">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">uniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">low</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int64</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.uniform" title="Link to this definition"></a></dt>
+<dd><p>Generate an array of random samples from a uniform distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>X</strong><span class="classifier">NDArray[Union[np.float64, np.int64]]</span></dt><dd><p>The input features.</p>
+<dt><strong>low</strong><span class="classifier">np.float64</span></dt><dd><p>The lower boundary of the output interval. All values generated will be
+greater than or equal to <cite>low</cite>.</p>
 </dd>
-<dt><strong>y</strong><span class="classifier">NDArray[Union[np.float64, np.int64]]</span></dt><dd><p>The target labels.</p>
+<dt><strong>high</strong><span class="classifier">np.float64</span></dt><dd><p>The upper boundary of the output interval. All values generated will be
+less or equal to <cite>high</cite>.</p>
 </dd>
-<dt><strong>test_size</strong><span class="classifier">float</span></dt><dd><p>The proportion of the dataset to include in the test split.</p>
+<dt><strong>size</strong><span class="classifier">np.int64</span></dt><dd><p>The number of elements to generate.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>Tuple</dt><dd><p>A tuple containing the following four elements:
-- X_train: Training data features.
-- X_test: Testing data features.
-- y_train: Training data labels.
-- y_test: Testing data labels.</p>
+<dt>NDArray[np.float64]</dt><dd><p>An 1D array of random samples drawn from the uniform distribution.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The generated samples follow a uniform distribution, where each value within
+the specified range has an equal probability of being selected.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.random</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.random</span> <span class="kn">import</span> <span class="n">uniform</span>
 <span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.25</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_train:&quot;</span><span class="p">,</span> <span class="n">X_train</span><span class="p">)</span>
-<span class="go">X_train: ...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_test:&quot;</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
-<span class="go">X_test: ...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_train:&quot;</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="go">y_train: ...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_test:&quot;</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
-<span class="go">y_test: ...</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="thefittest.utils.random.train_test_split_stratified">
-<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">train_test_split_stratified</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span></span></span><a class="headerlink" href="#thefittest.utils.random.train_test_split_stratified" title="Link to this definition"></a></dt>
-<dd><p>Split the dataset into training and testing sets while preserving the class distribution.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>X</strong><span class="classifier">NDArray[Union[np.float64, np.int64]]</span></dt><dd><p>The input features.</p>
-</dd>
-<dt><strong>y</strong><span class="classifier">NDArray[np.int64]</span></dt><dd><p>The target labels.</p>
-</dd>
-<dt><strong>test_size</strong><span class="classifier">float</span></dt><dd><p>The proportion of the dataset to include in the test split.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>Tuple</dt><dd><p>A tuple containing the following four elements:
-- X_train: Training data features.
-- X_test: Testing data features.
-- y_train: Training data labels.
-- y_test: Testing data labels.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.random</span> <span class="kn">import</span> <span class="n">train_test_split_stratified</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.25</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split_stratified</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_train:&quot;</span><span class="p">,</span> <span class="n">X_train</span><span class="p">)</span>
-<span class="go">X_train: ...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_test:&quot;</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
-<span class="go">X_test: ...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_train:&quot;</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="go">y_train: ...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_test:&quot;</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
-<span class="go">y_test: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of generating random samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Random Samples:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="go">Random Samples: ...</span>
 </pre></div>
 </div>
 </dd></dl>
