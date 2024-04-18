@@ -1,0 +1,49 @@
+Results of doctest builder run on 2024-04-18 15:36:02
+=====================================================
+
+Document: modules/utils/selections
+----------------------------------
+1 items passed all tests:
+  24 tests in default
+24 tests in 1 items.
+24 passed and 0 failed.
+Test passed.
+
+Document: modules/utils/crossovers
+----------------------------------
+1 items passed all tests:
+ 199 tests in default
+199 tests in 1 items.
+199 passed and 0 failed.
+Test passed.
+
+Document: modules/utils/transformations
+---------------------------------------
+1 items passed all tests:
+ 103 tests in default
+103 tests in 1 items.
+103 passed and 0 failed.
+Test passed.
+
+Document: modules/utils/random
+------------------------------
+1 items passed all tests:
+  40 tests in default
+40 tests in 1 items.
+40 passed and 0 failed.
+Test passed.
+
+Document: modules/utils/mutations
+---------------------------------
+1 items passed all tests:
+ 142 tests in default
+142 tests in 1 items.
+142 passed and 0 failed.
+Test passed.
+
+Doctest summary
+===============
+  508 tests
+    0 failures in tests
+    0 failures in setup code
+    0 failures in cleanup code

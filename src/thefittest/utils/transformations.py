@@ -88,16 +88,11 @@ class SamplingGrid:
     >>> grid = SamplingGrid()
     >>> grid.fit(left_border=-5.0, right_border=5.0, num_variables=3, h_per_variable=0.1)
     <thefittest.utils.transformations.SamplingGrid object at ...>
-    >>>
     >>> # Generate a binary population
     >>> string_length = grid.get_bits_per_variable().sum()
     >>> binary_population = np.random.randint(2, size=(5, string_length), dtype=np.int8)
-    >>> print("Binary Population:", binary_population)
-    Binary Population: ...
-    >>>
     >>> # Transform the binary population to a floating-point array
-    >>> transformed_population = grid.transform(binary_population)
-    >>> print("Transformed Population:", transformed_population)
+    >>> print("Transformed Population:", grid.transform(binary_population))
     Transformed Population:...
 
     >>> import numpy as np
@@ -114,8 +109,7 @@ class SamplingGrid:
     Floating-point Population:...
     >>>
     >>> # Inverse transform the floating-point population to a binary array
-    >>> inverse_transformed_population = grid.inverse_transform(floating_population)
-    >>> print("Inverse Transformed Population:", inverse_transformed_population)
+    >>> print("Inverse Transformed Population:", grid.inverse_transform(floating_population))
     Inverse Transformed Population: ...
 
     Methods
@@ -332,7 +326,9 @@ class SamplingGrid:
         self._right_border = if_single_or_array_to_float_array(right_border, self._num_variables)
 
         if bits_per_variable is None and h_per_variable is not None:
-            self._h_per_variable = if_single_or_array_to_float_array(h_per_variable)
+            self._h_per_variable = if_single_or_array_to_float_array(
+                h_per_variable, self._num_variables
+            )
             self._culc_num_bits_from_h()
             self._culc_h_from_num_bits()
         elif bits_per_variable is not None and h_per_variable is None:
@@ -553,16 +549,11 @@ class SamplingGrid:
         >>> grid = SamplingGrid()
         >>> grid.fit(left_border=-5.0, right_border=5.0, num_variables=3, h_per_variable=0.1)
         <thefittest.utils.transformations.SamplingGrid object at ...>
-        >>>
         >>> # Generate a binary population
         >>> string_length = grid.get_bits_per_variable().sum()
         >>> binary_population = np.random.randint(2, size=(5, string_length), dtype=np.int8)
-        >>> print("Binary Population:", binary_population)
-        Binary Population: ...
-        >>>
         >>> # Transform the binary population to a floating-point array
-        >>> transformed_population = grid.transform(binary_population)
-        >>> print("Transformed Population:", transformed_population)
+        >>> print("Transformed Population:", grid.transform(binary_population))
         Transformed Population: ...
         """
         splits = np.add.accumulate(self._bits_per_variable)
@@ -609,8 +600,7 @@ class SamplingGrid:
         Floating-point Population: ...
         >>>
         >>> # Inverse transform the floating-point population to a binary array
-        >>> inverse_transformed_population = grid.inverse_transform(floating_population)
-        >>> print("Inverse Transformed Population:", inverse_transformed_population)
+        >>> print("Inverse Transformed Population:", grid.inverse_transform(floating_population))
         Inverse Transformed Population: ...
         """
         map_ = map(self._float_to_bit, population.T, self._left_border, self._h_per_variable)
@@ -654,16 +644,13 @@ class GrayCode(SamplingGrid):
     >>> grid = GrayCode()
     >>> grid.fit(left_border=-5.0, right_border=5.0, num_variables=3, h_per_variable=0.1)
     <thefittest.utils.transformations.GrayCode object at ...>
-    >>>
     >>> # Generate a binary population using gray code
     >>> string_length = grid.get_bits_per_variable().sum()
     >>> gray_population = np.random.randint(2, size=(5, string_length), dtype=np.byte)
     >>> print("Gray Code Population:", gray_population)
     Gray Code Population: ...
-    >>>
     >>> # Transform the gray code population to a floating-point array
-    >>> transformed_population = grid.transform(gray_population)
-    >>> print("Transformed Population:", transformed_population)
+    >>> print("Transformed Population:", grid.transform(gray_population))
     Transformed Population: ...
 
     >>> # Generate a floating-point population
