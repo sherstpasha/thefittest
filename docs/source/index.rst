@@ -7,7 +7,7 @@ Welcome to Thefittest's documentation!
 ======================================
 |
 
-.. image:: thefittes/docs/logos/logo1.png
+.. image:: docs/logos/logo1.png
    :align: center
 
 |
