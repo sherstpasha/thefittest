@@ -1,0 +1,47 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          # Fetches all history for .git directories and submodule support
+          fetch-depth: 0
+          
+      # Если ваша документация уже сгенерирована и не требует сборки на GitHub, этот шаг не нужен.
+      # Если документацию нужно генерировать, раскомментируйте и настройте следующие шаги:
+      # - name: Set up Python
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: '3.x'
+      # - name: Install dependencies
+      #   run: |
+      #     python -m pip install --upgrade pip
+      #     pip install -r requirements.txt
+      # - name: Build Documentation
+      #   run: |
+      #     make html
+      #   working-directory: docs
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        with:
+          # Set the path to the built HTML files
+          path: docs/build/html
