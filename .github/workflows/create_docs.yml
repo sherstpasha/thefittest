@@ -32,7 +32,7 @@ jobs:
       - name: Copy Sphinx HTML to docs folder
         run: |
           mkdir -p ${{ github.workspace }}/docs
-          cp -R ${{ github.workspace }}/docs/source/_build/html/* ${{ github.workspace }}/docs
+          cp -R ${{ github.workspace }}/docs/_build/html/* ${{ github.workspace }}/docs
 
       - name: Commit and Push changes
         run: |
