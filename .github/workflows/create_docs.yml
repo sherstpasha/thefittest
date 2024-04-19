@@ -12,12 +12,12 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  
+          fetch-depth: 0  # Получить всю историю для возможности коммита изменений
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.10'  # Пример использования Python 3.10
 
       - name: Install dependencies
         run: |
@@ -26,13 +26,13 @@ jobs:
 
       - name: Build Sphinx Documentation
         run: |
-          cd docs
-          sphinx-build -b html . _build/html  # Предполагается, что конфигурация Sphinx находится в docs/
+          cd docs/source  # Переход в директорию, где находится conf.py
+          sphinx-build -b html . ../_build/html  # Сборка документации
 
       - name: Copy Sphinx HTML to docs folder
         run: |
           mkdir -p ${{ github.workspace }}/docs
-          cp -R _build/html/* ${{ github.workspace }}/docs
+          cp -R ../_build/html/* ${{ github.workspace }}/docs
 
       - name: Commit and Push changes
         run: |
