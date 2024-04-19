@@ -3,42 +3,41 @@ name: Build and Deploy Sphinx Documentation
 on:
   push:
     branches:
-      - main  # Или ваша ветка, где вы хотите собирать документацию
+      - main  # Ветка, на которую нужно реагировать
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          persist-credentials: false  # Это нужно, чтобы GitHub Actions могли делать коммиты
-      
+          fetch-depth: 0  
+
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.x'  # Укажите версию Python, необходимую для вашего проекта
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Убедитесь, что у вас есть файл requirements.txt со всеми зависимостями
+          pip install -r requirements.txt
 
       - name: Build Sphinx Documentation
         run: |
-          cd docs  # Предполагается, что ваша Sphinx конфигурация находится в папке docs
-          make html
+          cd docs
+          sphinx-build -b html . _build/html  # Предполагается, что конфигурация Sphinx находится в docs/
 
-      - name: Copy Sphinx HTML to /docs folder
+      - name: Copy Sphinx HTML to docs folder
         run: |
-          # Убедитесь, что /docs уже есть в вашем репозитории
-          rm -rf /docs/*  # Очистите текущее содержимое
-          cp -R _build/html/* /docs
+          mkdir -p ${{ github.workspace }}/docs
+          cp -R _build/html/* ${{ github.workspace }}/docs
 
       - name: Commit and Push changes
         run: |
           git config --global user.name 'Your Name'
           git config --global user.email 'your-email@example.com'
-          git add /docs
-          git commit -m "Update documentation"
+          git add docs
+          git commit -m "Update documentation" || echo "No changes to commit"
           git push
