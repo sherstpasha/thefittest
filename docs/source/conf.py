@@ -62,5 +62,10 @@ html_theme = "sphinx_rtd_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
+# Path to the build directory
+html_build_dir = os.path.join(os.path.dirname(__file__), '..', 'docs')
+
+# Output directory for the build html
+html_output = os.path.join(html_build_dir, 'html')
 
 autosummary_generate = True
