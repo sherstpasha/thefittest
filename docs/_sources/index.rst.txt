@@ -5,6 +5,12 @@
 
 Welcome to Thefittest's documentation!
 ======================================
+|
+
+.. image:: logos\logo1.png
+    :align: center
+
+|
 
 Contents:
 
