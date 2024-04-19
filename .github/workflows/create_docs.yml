@@ -29,7 +29,7 @@ jobs:
           cd docs/source
           sphinx-build -b html . ../_build/html  # Компиляция документации
 
-      - name: Copy Sphinx HTML to /docs folder
+      - name: Copy Sphinx HTML to docs folder
         run: |
           mkdir -p ${{ github.workspace }}/docs
           cp -R ${{ github.workspace }}/docs/source/_build/html/* ${{ github.workspace }}/docs
