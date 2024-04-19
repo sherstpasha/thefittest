@@ -1,8 +1,0 @@
-sphinx
-sphinx-rtd-theme
-numpydoc
-numba
-numpy
-scipy
-scikit-learn
-joblib

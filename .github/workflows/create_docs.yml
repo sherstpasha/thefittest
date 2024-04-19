@@ -26,18 +26,18 @@ jobs:
 
       - name: Build Sphinx Documentation
         run: |
-          cd docs/source  # Переход в директорию, где находится conf.py
-          sphinx-build -b html . ../_build/html  # Сборка документации
+          cd docs/source
+          sphinx-build -b html . ../_build/html  # Компиляция документации
 
-      - name: Copy Sphinx HTML to docs folder
+      - name: Copy Sphinx HTML to /docs folder
         run: |
           mkdir -p ${{ github.workspace }}/docs
-          cp -R ../_build/html/* ${{ github.workspace }}/docs
+          cp -R ${{ github.workspace }}/docs/source/_build/html/* ${{ github.workspace }}/docs
 
       - name: Commit and Push changes
         run: |
           git config --global user.name 'Your Name'
           git config --global user.email 'your-email@example.com'
-          git add docs
+          git add ${{ github.workspace }}/docs
           git commit -m "Update documentation" || echo "No changes to commit"
           git push
