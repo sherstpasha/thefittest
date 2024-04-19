@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>transformations &mdash; Thefittest 0.2.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=a47416a6"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="References" href="../../references.html" />
+    <link rel="prev" title="random" href="random.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Thefittest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../base.html">base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../benchmarks.html">benchmarks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../classifiers.html">classifiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../optimizers.html">optimizers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../regressors.html">regressors</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="selections.html">selections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crossovers.html">crossovers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mutations.html">mutations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="random.html">random</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">transformations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.transformations.GrayCode"><code class="docutils literal notranslate"><span class="pre">GrayCode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.transformations.SamplingGrid"><code class="docutils literal notranslate"><span class="pre">SamplingGrid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.transformations.minmax_scale"><code class="docutils literal notranslate"><span class="pre">minmax_scale()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Thefittest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+          <li class="breadcrumb-item"><a href="index.html">utils</a></li>
+      <li class="breadcrumb-item active">transformations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/utils/transformations.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-thefittest.utils.transformations">
+<span id="transformations"></span><h1>transformations<a class="headerlink" href="#module-thefittest.utils.transformations" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.GrayCode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.utils.transformations.</span></span><span class="sig-name descname"><span class="pre">GrayCode</span></span><a class="headerlink" href="#thefittest.utils.transformations.GrayCode" title="Link to this definition"></a></dt>
+<dd><p>GrayCode class for transforming populations between gray code and floating-point representations.</p>
+<p>This class extends the functionality of the SamplingGrid for gray code transformations. Gray code is a binary numeral
+system where two successive values differ in only one bit. GrayCode provides methods to convert between binary and gray
+code representations, as well as transforming populations between gray code and floating-point representations using
+the specified sampling grid.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">GrayCode</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Fit the sampling grid with gray code transformation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">GrayCode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">left_border</span><span class="o">=-</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">right_border</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">num_variables</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">h_per_variable</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="go">&lt;thefittest.utils.transformations.GrayCode object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate a binary population using gray code</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">string_length</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_bits_per_variable</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gray_population</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">string_length</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gray Code Population:&quot;</span><span class="p">,</span> <span class="n">gray_population</span><span class="p">)</span>
+<span class="go">Gray Code Population: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Transform the gray code population to a floating-point array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transformed Population:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">gray_population</span><span class="p">))</span>
+<span class="go">Transformed Population: ...</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate a floating-point population</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">floating_population</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Floating-point Population:&quot;</span><span class="p">,</span> <span class="n">floating_population</span><span class="p">)</span>
+<span class="go">Floating-point Population: ...</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Inverse transform the floating-point population to a gray code array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inverse_transformed_population</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">floating_population</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Inverse Transformed Population (Gray Code):&quot;</span><span class="p">,</span> <span class="n">inverse_transformed_population</span><span class="p">)</span>
+<span class="go">Inverse Transformed Population (Gray Code): ...</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Inherits attributes from SamplingGrid.</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>gray_to_bit(gray_array: NDArray[np.byte]) -&gt; NDArray[np.byte]:</strong></p></td>
+<td><p>Convert a gray code array to a binary array.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>bit_to_gray(bit_array: NDArray[np.byte]) -&gt; NDArray[np.byte]:</strong></p></td>
+<td><p>Convert a binary array to a gray code array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>_decode(gray_array_i: NDArray[np.byte]) -&gt; NDArray[np.int64]:</strong></p></td>
+<td><p>Decode a 2D gray code array representing a single variable into a 1D integer array.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>_float_to_bit(float_array: NDArray[np.float64], left: NDArray[np.float64], h: NDArray[np.float64]) -&gt; NDArray[np.byte]:</strong></p></td>
+<td><p>Convert a 1D floating-point array to a 2D gray code array based on the SamplingGrid parameters.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.GrayCode.bit_to_gray">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bit_to_gray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.GrayCode.bit_to_gray" title="Link to this definition"></a></dt>
+<dd><p>Convert a binary array to a gray code array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>bit_array</strong><span class="classifier">NDArray[np.byte]</span></dt><dd><p>2D binary array where each row represents a binary number.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>2D gray code array converted from the binary array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">GrayCode</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example: Convert binary array to gray code array using GrayCode.bit_to_gray method</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">binary_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">GrayCode</span><span class="o">.</span><span class="n">bit_to_gray</span><span class="p">(</span><span class="n">binary_array</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converted Gray Code Array:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="go">Converted Gray Code Array: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.GrayCode.gray_to_bit">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gray_to_bit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.GrayCode.gray_to_bit" title="Link to this definition"></a></dt>
+<dd><p>Convert a gray code array to a binary array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gray_array</strong><span class="classifier">NDArray[np.byte]</span></dt><dd><p>2D array where each row represents a gray code number.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>2D binary array converted from the gray code array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">GrayCode</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example: Convert gray code array to binary array using GrayCode.gray_to_bit method</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gray_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">GrayCode</span><span class="o">.</span><span class="n">gray_to_bit</span><span class="p">(</span><span class="n">gray_array</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converted Binary Array:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="go">Converted Binary Array: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.utils.transformations.</span></span><span class="sig-name descname"><span class="pre">SamplingGrid</span></span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid" title="Link to this definition"></a></dt>
+<dd><p>SamplingGrid class for transforming populations between binary and floating-point representations.</p>
+<p>This class provides functionality to fit, transform, and inverse transform populations using a specified
+sampling grid. The grid is defined by the left and right borders for each variable, and either the step size (h)
+or the number of bits for each variable.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">SamplingGrid</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Fit the sampling grid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">left_border</span><span class="o">=-</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">right_border</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">num_variables</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">h_per_variable</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="go">&lt;thefittest.utils.transformations.SamplingGrid object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate a binary population</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">string_length</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_bits_per_variable</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">binary_population</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">string_length</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Transform the binary population to a floating-point array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transformed Population:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">binary_population</span><span class="p">))</span>
+<span class="go">Transformed Population:...</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">SamplingGrid</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Fit the sampling grid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">left_border</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">right_border</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">num_variables</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">h_per_variable</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="go">&lt;thefittest.utils.transformations.SamplingGrid object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate a floating-point population</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">floating_population</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Floating-point Population:&quot;</span><span class="p">,</span> <span class="n">floating_population</span><span class="p">)</span>
+<span class="go">Floating-point Population:...</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Inverse transform the floating-point population to a binary array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Inverse Transformed Population:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">floating_population</span><span class="p">))</span>
+<span class="go">Inverse Transformed Population: ...</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>_left_border</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Left border values for each variable in the sampling grid.</p>
+</dd>
+<dt><strong>_right_border</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Right border values for each variable in the sampling grid.</p>
+</dd>
+<dt><strong>_num_variables</strong><span class="classifier">int</span></dt><dd><p>Number of variables in the sampling grid.</p>
+</dd>
+<dt><strong>_h_per_variable</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Step size for each variable in the sampling grid.</p>
+</dd>
+<dt><strong>_bits_per_variable</strong><span class="classifier">NDArray[np.int64]</span></dt><dd><p>Number of bits for each variable in the sampling grid.</p>
+</dd>
+<dt><strong>_reversed_powers</strong><span class="classifier">NDArray[np.int64]</span></dt><dd><p>Reversed powers of 2 used for converting binary representations to integers.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>fit(</strong></p></td>
+<td><p>left_border: Union[float, NDArray[np.float64]], right_border: Union[float, NDArray[np.float64]], num_variables: int, h_per_variable: Optional[Union[float, NDArray[np.float64]]] = None, bits_per_variable: Optional[Union[int, NDArray[np.int64]]] = None,</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>) -&gt; “SamplingGrid”:</strong></p></td>
+<td><p>Fit the sampling grid using specified parameters.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>get_left_border() -&gt; NDArray[np.float64]:</strong></p></td>
+<td><p>Get the left border values for each variable.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>get_right_border() -&gt; NDArray[np.float64]:</strong></p></td>
+<td><p>Get the right border values for each variable.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>get_num_variables() -&gt; int:</strong></p></td>
+<td><p>Get the number of variables.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>get_h_per_variable() -&gt; NDArray[np.float64]:</strong></p></td>
+<td><p>Get the step size values for each variable.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>get_bits_per_variable() -&gt; NDArray[np.int64]:</strong></p></td>
+<td><p>Get the number of bits per variable.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>transform(population: NDArray[np.int8]) -&gt; NDArray[np.float64]:</strong></p></td>
+<td><p>Transform a binary population into a floating-point array based on the SamplingGrid parameters.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>inverse_transform(population: NDArray[np.float64]) -&gt; NDArray[np.int8]:</strong></p></td>
+<td><p>Inverse transform a floating-point population into a binary array based on the SamplingGrid parameters.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid.bit_to_int">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bit_to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">powers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid.bit_to_int" title="Link to this definition"></a></dt>
+<dd><p>Convert a binary array to an integer array using specified powers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>bit_array</strong><span class="classifier">NDArray[np.int64]</span></dt><dd><p>2D array where each row represents a binary number.</p>
+</dd>
+<dt><strong>powers</strong><span class="classifier">Optional[NDArray[np.int64]], optional</span></dt><dd><p>1D array of powers of 2 corresponding to the binary places. If provided, avoids recalculation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.int64]</dt><dd><p>1D array representing the integer values converted from binary.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">SamplingGrid</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 1: Convert binary array to integer array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">binary_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="o">.</span><span class="n">bit_to_int</span><span class="p">(</span><span class="n">binary_array</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converted Integer Array:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="go">Converted Integer Array: [5 3]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 2: Convert binary array to integer array with  powers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_powers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result_custom_powers</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="o">.</span><span class="n">bit_to_int</span><span class="p">(</span><span class="n">binary_array</span><span class="p">,</span> <span class="n">powers</span><span class="o">=</span><span class="n">custom_powers</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converted Integer Array (Define Powers):&quot;</span><span class="p">,</span> <span class="n">result_custom_powers</span><span class="p">)</span>
+<span class="go">Converted Integer Array (Define Powers): [5 3]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left_border</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_border</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_per_variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits_per_variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid.fit" title="Link to this definition"></a></dt>
+<dd><p>Fit the sampling grid using specified parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>left_border</strong><span class="classifier">Union[float, NDArray[np.float64]]</span></dt><dd><p>Left border values for each variable.</p>
+</dd>
+<dt><strong>right_border</strong><span class="classifier">Union[float, NDArray[np.float64]]</span></dt><dd><p>Right border values for each variable.</p>
+</dd>
+<dt><strong>num_variables</strong><span class="classifier">int</span></dt><dd><p>Number of variables.</p>
+</dd>
+<dt><strong>h_per_variable</strong><span class="classifier">Optional[Union[float, NDArray[np.float64]]], optional</span></dt><dd><p>Step size values for each variable. Either <cite>h_per_variable</cite> or <cite>bits_per_variable</cite> should be provided.</p>
+</dd>
+<dt><strong>bits_per_variable</strong><span class="classifier">Optional[Union[int, NDArray[np.int64]]], optional</span></dt><dd><p>Number of bits per variable. Either <cite>h_per_variable</cite> or <cite>bits_per_variable</cite> should be provided.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>SamplingGrid</dt><dd><p>The fitted SamplingGrid instance.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>AssertionError</dt><dd><p>If both <cite>h_per_variable</cite> and <cite>bits_per_variable</cite> are provided or if neither is provided.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This method fits the sampling grid using the specified parameters. If <cite>h_per_variable</cite> is provided,
+it calculates the corresponding <cite>bits_per_variable</cite>. If <cite>bits_per_variable</cite> is provided, it calculates
+the corresponding <cite>h_per_variable</cite>. The powers of 2 used for conversion are also calculated and stored.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">SamplingGrid</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">left_border</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">right_border</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">num_variables</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">h_per_variable</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="go">&lt;thefittest.utils.transformations.SamplingGrid object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Grid Left Border:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_left_border</span><span class="p">())</span>
+<span class="go">Grid Left Border: [0. 0. 0.]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Grid Right Border:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_right_border</span><span class="p">())</span>
+<span class="go">Grid Right Border: [1. 1. 1.]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of Variables:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_num_variables</span><span class="p">())</span>
+<span class="go">Number of Variables: 3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Step Size per Variable:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_h_per_variable</span><span class="p">())</span>
+<span class="go">Step Size per Variable: [0.06666667 0.06666667 0.06666667]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bits per Variable:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_bits_per_variable</span><span class="p">())</span>
+<span class="go">Bits per Variable: [4 4 4]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">left_border</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">right_border</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">num_variables</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">bits_per_variable</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="go">&lt;thefittest.utils.transformations.SamplingGrid object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Grid Left Border:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_left_border</span><span class="p">())</span>
+<span class="go">Grid Left Border: [-1. -1.]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Grid Right Border:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_right_border</span><span class="p">())</span>
+<span class="go">Grid Right Border: [1. 1.]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of Variables:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_num_variables</span><span class="p">())</span>
+<span class="go">Number of Variables: 2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Step Size per Variable:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_h_per_variable</span><span class="p">())</span>
+<span class="go">Step Size per Variable: [0.13333333 0.13333333]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bits per Variable:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_bits_per_variable</span><span class="p">())</span>
+<span class="go">Bits per Variable: [4 4]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">left_border</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">right_border</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">num_variables</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">h_per_variable</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">&lt;thefittest.utils.transformations.SamplingGrid object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Grid Left Border:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_left_border</span><span class="p">())</span>
+<span class="go">Grid Left Border: [-1.   0.5 -2. ]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Grid Right Border:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_right_border</span><span class="p">())</span>
+<span class="go">Grid Right Border: [1. 5. 2.]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of Variables:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_num_variables</span><span class="p">())</span>
+<span class="go">Number of Variables: 3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Step Size per Variable:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_h_per_variable</span><span class="p">())</span>
+<span class="go">Step Size per Variable: [0.03174603 0.64285714 0.06349206]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bits per Variable:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_bits_per_variable</span><span class="p">())</span>
+<span class="go">Bits per Variable: [6 3 6]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">left_border</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">right_border</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">num_variables</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">bits_per_variable</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">&lt;thefittest.utils.transformations.SamplingGrid object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Grid Left Border:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_left_border</span><span class="p">())</span>
+<span class="go">Grid Left Border: [-3.5 -2.  10.   0.9]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Grid Right Border:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_right_border</span><span class="p">())</span>
+<span class="go">Grid Right Border: [ 3.5  7.  25.   1.5]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of Variables:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_num_variables</span><span class="p">())</span>
+<span class="go">Number of Variables: 4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Step Size per Variable:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_h_per_variable</span><span class="p">())</span>
+<span class="go">Step Size per Variable: [2.74509804e-02 1.37331197e-04 2.14285714e+00 5.45696821e-13]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bits per Variable:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_bits_per_variable</span><span class="p">())</span>
+<span class="go">Bits per Variable: [ 8 16  3 40]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid.get_bits_per_variable">
+<span class="sig-name descname"><span class="pre">get_bits_per_variable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid.get_bits_per_variable" title="Link to this definition"></a></dt>
+<dd><p>Get the number of bits per variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.int64]</dt><dd><p>Number of bits per variable.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid.get_h_per_variable">
+<span class="sig-name descname"><span class="pre">get_h_per_variable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid.get_h_per_variable" title="Link to this definition"></a></dt>
+<dd><p>Get the step size values for each variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Step size values for each variable.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid.get_left_border">
+<span class="sig-name descname"><span class="pre">get_left_border</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid.get_left_border" title="Link to this definition"></a></dt>
+<dd><p>Get the left border values for each variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Left border values for each variable.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid.get_num_variables">
+<span class="sig-name descname"><span class="pre">get_num_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid.get_num_variables" title="Link to this definition"></a></dt>
+<dd><p>Get the number of variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>int</dt><dd><p>Number of variables.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid.get_right_border">
+<span class="sig-name descname"><span class="pre">get_right_border</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid.get_right_border" title="Link to this definition"></a></dt>
+<dd><p>Get the right border values for each variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Right border values for each variable.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid.int_to_bit">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">int_to_bit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">int_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">powers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid.int_to_bit" title="Link to this definition"></a></dt>
+<dd><p>Convert a 1D integer array to a 2D binary array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>int_array</strong><span class="classifier">NDArray[np.int64]</span></dt><dd><p>1D array of integers to be converted to binary.</p>
+</dd>
+<dt><strong>powers</strong><span class="classifier">Optional[NDArray[np.int64]], optional</span></dt><dd><p>1D array of powers of 2 corresponding to the binary places. If provided, avoids recalculation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.byte]</dt><dd><p>2D binary array converted from the 1D integer array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">SamplingGrid</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 1: Convert one-dimensional integer array to binary array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integer_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="o">.</span><span class="n">int_to_bit</span><span class="p">(</span><span class="n">integer_array</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converted Binary Array:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="go">Converted Binary Array: ...</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example 2: Convert one-dimensional integer array to binary array with powers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_powers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integer_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result_custom_powers</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="o">.</span><span class="n">int_to_bit</span><span class="p">(</span><span class="n">integer_array</span><span class="p">,</span> <span class="n">powers</span><span class="o">=</span><span class="n">custom_powers</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converted Binary Array (Define Powers):&quot;</span><span class="p">,</span> <span class="n">result_custom_powers</span><span class="p">)</span>
+<span class="go">Converted Binary Array (Define Powers): ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid.inverse_transform">
+<span class="sig-name descname"><span class="pre">inverse_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid.inverse_transform" title="Link to this definition"></a></dt>
+<dd><p>Inverse transform a floating-point population into a binary array based on the SamplingGrid parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>population</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Population matrix where each row represents a floating-point array.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.int8]</dt><dd><p>Binary array representing the inverse transformed population.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function encodes each variable from floating-point to binary, and then combines the binary representations
+to form the binary array of the inverse transformed population.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">SamplingGrid</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Fit the sampling grid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">left_border</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">right_border</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">num_variables</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">h_per_variable</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="go">&lt;thefittest.utils.transformations.SamplingGrid object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate a floating-point population</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">floating_population</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Floating-point Population:&quot;</span><span class="p">,</span> <span class="n">floating_population</span><span class="p">)</span>
+<span class="go">Floating-point Population: ...</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Inverse transform the floating-point population to a binary array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Inverse Transformed Population:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">floating_population</span><span class="p">))</span>
+<span class="go">Inverse Transformed Population: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.SamplingGrid.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int8</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.SamplingGrid.transform" title="Link to this definition"></a></dt>
+<dd><p>Transform a binary population into a floating-point array based on the SamplingGrid parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>population</strong><span class="classifier">NDArray[np.int8]</span></dt><dd><p>Population matrix where each row represents a binary array.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Floating-point array representing the transformed population.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function divides the input population into individual variables, decodes each variable from binary to integer,
+and then calculates the corresponding floating-point values using the SamplingGrid parameters.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">SamplingGrid</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Fit the sampling grid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">SamplingGrid</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">left_border</span><span class="o">=-</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">right_border</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">num_variables</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">h_per_variable</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="go">&lt;thefittest.utils.transformations.SamplingGrid object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate a binary population</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">string_length</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_bits_per_variable</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">binary_population</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">string_length</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Transform the binary population to a floating-point array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transformed Population:&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">binary_population</span><span class="p">))</span>
+<span class="go">Transformed Population: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.transformations.minmax_scale">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.transformations.</span></span><span class="sig-name descname"><span class="pre">minmax_scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.transformations.minmax_scale" title="Link to this definition"></a></dt>
+<dd><p>Scale the values of a NumPy array between 0 and 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">NDArray[Union[np.int64, np.float64]]</span></dt><dd><p>Input array containing numerical values to be scaled.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Scaled array with values between 0 and 1.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function scales the values of the input array between 0 and 1 using min-max scaling.
+If the minimum and maximum values in the array are equal, the function returns an array of ones.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">thefittest.utils.transformations</span> <span class="kn">import</span> <span class="n">minmax_scale</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">example_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Scale the data using the minmax_scale function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scaled_data</span> <span class="o">=</span> <span class="n">minmax_scale</span><span class="p">(</span><span class="n">example_data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Display original and scaled data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Data:&quot;</span><span class="p">,</span> <span class="n">example_data</span><span class="p">)</span>
+<span class="go">Original Data: [ 2  5 10  8  3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scaled Data:&quot;</span><span class="p">,</span> <span class="n">scaled_data</span><span class="p">)</span>
+<span class="go">Scaled Data: [0.    0.375 1.    0.75  0.125]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="random.html" class="btn btn-neutral float-left" title="random" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Pavel Sherstnev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
