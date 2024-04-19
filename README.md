@@ -9,6 +9,8 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Documentation Status](https://readthedocs.com/projects/sherstpasha-pavel/badge/?version=latest&token=71adf5d63b55f0def96b09e1ce4c60f8d57cbdaed7db777117f34e4718d5a1ea)](https://sherstpasha-pavel.readthedocs-hosted.com/ru/latest/?badge=latest)
 
+![logoimage](docs/logos/logo1.png)
+
 ## Installation
 ```bash
 pip install thefittest
