@@ -81,6 +81,82 @@
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">thefittest</span></code> is an open-source library designed for the efficient application of classical evolutionary algorithms and their effective modifications in optimization and machine learning. Our project aims to provide performance, accessibility, and ease of use, opening up the world of advanced evolutionary methods to you.</p>
+<section id="features-of-thefittest">
+<h2>Features of <code class="docutils literal notranslate"><span class="pre">thefittest</span></code><a class="headerlink" href="#features-of-thefittest" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Performance</strong></dt><dd><p>Our library is developed using advanced coding practices and delivers high performance through integration with <a class="reference external" href="https://numpy.org/">NumPy</a>, <a class="reference external" href="https://scipy.org/">Scipy</a>, <a class="reference external" href="https://numba.pydata.org/">Numba</a>, and <a class="reference external" href="https://scikit-learn.org/">scikit-learn</a>.</p>
+</dd>
+<dt><strong>Versatility</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">thefittest</span></code> offers a wide range of classical evolutionary algorithms and effective modifications, making it the ideal choice for a variety of optimization and machine learning tasks.</p>
+</dd>
+<dt><strong>Integration with scikit-learn</strong></dt><dd><p>Easily integrate machine learning methods from <code class="docutils literal notranslate"><span class="pre">thefittest</span></code> with <a class="reference external" href="https://scikit-learn.org/">scikit-learn</a> tools, creating comprehensive and versatile solutions for evolutionary optimization and model training tasks.</p>
+</dd>
+</dl>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>thefittest
+</pre></div>
+</div>
+</section>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h2>
+<p>thefittest requires:</p>
+<ul class="simple">
+<li><p>python (&gt;=3.7,&lt;3.12);</p></li>
+<li><p>numpy;</p></li>
+<li><p>numba;</p></li>
+<li><p>scipy.</p></li>
+</ul>
+</section>
+<section id="the-package-contains-methods">
+<h2>The package contains methods<a class="headerlink" href="#the-package-contains-methods" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Genetic algorithm</strong> (Holland, J. H. (1992). Genetic algorithms. Scientific American, 267(1), 66-72):</p>
+<ul>
+<li><p><strong>Self-configuring genetic algorithm</strong> (<a class="reference external" href="https://doi.org/10.1007/978-3-642-30976-2_50">Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform Crossover Operator. LNCS, 7331, 2012, pp. 414-421.</a>);</p></li>
+<li><p><strong>SHAGA</strong> (<a class="reference external" href="http://dx.doi.org/10.5220/0008071201800187">Stanovov, Vladimir &amp; Akhmedova, Shakhnaz &amp; Semenkin, Eugene. (2019). Genetic Algorithm with Success History based Parameter Adaptation. 180-187.</a>);</p></li>
+<li><p><strong>PDPGA</strong> (<a class="reference external" href="https://doi.org/10.1007/3-540-45355-5_26">Niehaus, J., Banzhaf, W. (2001); Adaption of Operator Probabilities in Genetic Programming. In: Miller, J., Tomassini, M., Lanzi, P.L., Ryan, C., Tettamanzi, A.G.B., Langdon, W.B. (eds) Genetic Programming. EuroGP 2001. Lecture Notes in Computer Science, vol 2038. Springer, Berlin, Heidelberg.</a>).</p></li>
+</ul>
+</li>
+<li><p><strong>Differential evolution</strong> (Storn, Rainer &amp; Price, Kenneth. (1995). Differential Evolution: A Simple and Efficient Adaptive Scheme for Global Optimization Over Continuous Spaces. Journal of Global Optimization. 23)</p>
+<ul>
+<li><p><strong>jDE</strong> (<a class="reference external" href="http://dx.doi.org/10.1109/TEVC.2009.2014613">Brest, Janez &amp; Greiner, Sao &amp; Bošković, Borko &amp; Mernik, Marjan &amp; Zumer, Viljem. (2007). Self-Adapting Control Parameters in Differential Evolution: A Comparative 13. 945 - 958.</a>);</p></li>
+<li><p><strong>SHADE</strong> (<a class="reference external" href="https://doi.org/10.1109/CEC.2013.6557555">Tanabe, Ryoji &amp; Fukunaga, Alex. (2013). Success-history based parameter adaptation for Differential Evolution. 2013 IEEE Congress on Evolutionary Computation, CEC 2013. 71-78.</a>).</p></li>
+</ul>
+</li>
+<li><p><strong>Genetic programming</strong> (Koza, John R.. “Genetic programming - on the programming of computers by means of natural selection.” Complex Adaptive Systems (1993)):</p>
+<ul>
+<li><p><strong>Self-configuring genetic programming</strong> (<a class="reference external" href="http://dx.doi.org/10.1109/CEC.2012.6256587">Semenkin, Eugene &amp; Semenkina, Maria. (2012). Self-configuring genetic programming algorithm with modified uniform crossover. 1-6.</a>).</p></li>
+<li><p><strong>PDPGP</strong> (<a class="reference external" href="https://doi.org/10.1007/3-540-45355-5_26">Niehaus, J., Banzhaf, W. (2001); Adaption of Operator Probabilities in Genetic Programming. In: Miller, J., Tomassini, M., Lanzi, P.L., Ryan, C., Tettamanzi, A.G.B., Langdon, W.B. (eds) Genetic Programming. EuroGP 2001. Lecture Notes in Computer Science, vol 2038. Springer, Berlin, Heidelberg.</a>).</p></li>
+</ul>
+</li>
+<li><p><strong>Genetic programming of neural networks (GPNN)</strong> (<a href="#id4"><span class="problematic" id="id5">`Lipinsky L., Semenkin E., Bulletin of the Siberian State Aerospace University., 3(10), 22-26 (2006). In Russian`_</span></a>);</p></li>
+<li><p><strong>Multilayer perceptron trained by evolutionary algorithms</strong> (<a class="reference external" href="http://dx.doi.org/10.1007/978-1-4615-1539-5_18">Cotta, Carlos &amp; Alba, Enrique &amp; Sagarna, R. &amp; Larranaga, Pedro. (2002). Adjusting Weights in Artificial Neural Networks using Evolutionary Algorithms.</a>);</p></li>
+</ul>
+</section>
+<section id="benchmarks">
+<h2>Benchmarks<a class="headerlink" href="#benchmarks" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>CEC2005</strong> (<a href="#id6"><span class="problematic" id="id7">`Suganthan, Ponnuthurai &amp; Hansen, Nikolaus &amp; Liang, Jing &amp; Deb, Kalyan &amp; Chen, Ying-ping &amp; Auger, Anne &amp; Tiwari, Santosh. (2005). Problem Definitions and Evaluation Criteria for the CEC 2005 Special Session on Real-Parameter Optimization. Natural Computing. 341-357`_</span></a>);</p></li>
+<li><p><strong>Symbolicregression17. 17 test regression problem from the paper</strong> (<a class="reference external" href="http://dx.doi.org/10.1109/CEC.2012.6256587">Semenkin, Eugene &amp; Semenkina, Maria. (2012). Self-configuring genetic programming algorithm with modified uniform crossover. 1-6.</a>).</p></li>
+<li><p><strong>Iris</strong> (<a class="reference external" href="https://doi.org/10.24432/C56C76">Fisher,R. A.. (1988). Iris. UCI Machine Learning Repository.</a>);</p></li>
+<li><p><strong>Wine</strong> (<a class="reference external" href="https://doi.org/10.24432/C5PC7J">Aeberhard,Stefan and Forina,M.. (1991). Wine. UCI Machine Learning Repository.</a>);</p></li>
+<li><p><strong>Breast Cancer Wisconsin (Diagnostic)</strong> (<a class="reference external" href="https://doi.org/10.24432/C5DW2B">Wolberg,William, Mangasarian,Olvi, Street,Nick, and Street,W.. (1995). Breast Cancer Wisconsin (Diagnostic). UCI Machine Learning Repository.</a>);</p></li>
+<li><p><strong>Optical Recognition of Handwritten Digits</strong> (<a class="reference external" href="https://doi.org/10.24432/C50P49">Alpaydin,E. and Kaynak,C.. (1998). Optical Recognition of Handwritten Digits. UCI Machine Learning Repository.</a>);</p></li>
+</ul>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<p>Notebooks on how to use thefittest:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb">Solving binary and real-valued optimization problems with a genetic algorithm;</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb">Solving real-valued optimization problems with a differential evolution;</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_programming_symbolic_regression_problem.ipynb">Symbolic regression problems solving using genetic programming algorithm;</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/mlpea_regression_classification_problem.ipynb">Neural network training using evolutionary algorithms for regression and classification problems;</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/gpnn_regression_classification_problems.ipynb">Optimization of neural network structure using genetic programming;</a></p></li>
+</ul>
+<p>If some notebooks are too big to display, you can use <a class="reference external" href="https://nbviewer.org/">NBviewer</a>.</p>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
@@ -96,6 +172,7 @@
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 </div>
+</section>
 </section>
 
 

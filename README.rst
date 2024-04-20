@@ -1,13 +1,31 @@
-.. Thefittest documentation master file, created by
-   sphinx-quickstart on Sun Dec 24 00:35:03 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. image:: https://img.shields.io/pypi/v/thefittest?label=PyPI%20-%20Package%20version
+    :target: https://pypi.org/project/thefittest/
+    :alt: PyPI - Package version
 
-Welcome to Thefittest's documentation!
-======================================
+.. image:: https://static.pepy.tech/badge/thefittest
+    :target: https://pepy.tech/project/thefittest
+    :alt: Downloads
+
+.. image:: https://komarev.com/ghpvc/?username=thefittest
+    :alt: Profile views
+
+.. image:: https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master
+    :alt: codecov.io
+
+.. image:: https://app.codacy.com/project/badge/Grade/4c47b6de61c4422180529bbc360262c4
+    :target: https://app.codacy.com/gh/sherstpasha/thefittest/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
+    :alt: Codacy Badge
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+    :alt: Code style: black
+
+.. image:: https://readthedocs.com/projects/sherstpasha-pavel/badge/?version=latest&token=71adf5d63b55f0def96b09e1ce4c60f8d57cbdaed7db777117f34e4718d5a1ea
+    :target: https://sherstpasha-pavel.readthedocs-hosted.com/ru/latest/?badge=latest
+    :alt: Documentation Status
+
 |
-
-.. image:: logos/logo1.png
+.. image:: docs/logos/logo1.png
    :align: center
 
 |
@@ -37,15 +55,15 @@ Installation
 Dependencies
 ------------
 
-thefittest requires:
+``thefittest`` requires:
 
-- python (>=3.7,<3.12);
-- numpy;
-- numba;
-- scipy.
+- `Python (>=3.7,<3.12) <https://www.python.org/>`_,
+- `NumPy <https://numpy.org/>`_, 
+- `Numba <https://numba.pydata.org/>`_;
+- `Scipy <https://scipy.org/>`_.
 
-The package contains methods
-----------------------------
+``thefittest`` contains methods
+-------------------------------
 
 - **Genetic algorithm** (Holland, J. H. (1992). Genetic algorithms. Scientific American, 267(1), 66-72):
 
@@ -79,7 +97,7 @@ Benchmarks
 Examples
 --------
 
-Notebooks on how to use thefittest:
+Notebooks on how to use ``thefittest``:
 
 - `Solving binary and real-valued optimization problems with a genetic algorithm; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb>`_
 - `Solving real-valued optimization problems with a differential evolution; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb>`_
@@ -88,12 +106,3 @@ Notebooks on how to use thefittest:
 - `Optimization of neural network structure using genetic programming; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/gpnn_regression_classification_problems.ipynb>`_
 
 If some notebooks are too big to display, you can use `NBviewer <https://nbviewer.org/>`_.
-
-Contents:
-
-.. toctree::
-   :maxdepth: 2
-
-   modules/index
-   references
-   
