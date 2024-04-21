@@ -32,7 +32,7 @@ from ..base._mlp import weights_type_optimizer_alias
 from ..base._net import ACTIV_NAME_INV
 from ..base._tree import init_net_uniset
 from ..optimizers import GeneticProgramming
-from ..optimizers import SHADE
+from ..optimizers import SHAGA
 from ..optimizers import SelfCGP
 from ..utils import array_like_to_numpy_X_y
 from ..utils._metrics import categorical_crossentropy3d
@@ -224,7 +224,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         test_sample_ratio: float = 0.5,
         optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,
         optimizer_args: Optional[dict[str, Any]] = None,
-        weights_optimizer: weights_type_optimizer_alias = SHADE,
+        weights_optimizer: weights_type_optimizer_alias = SHAGA,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
         net_size_penalty: float = 0.0,
         random_state: Optional[Union[int, np.random.RandomState]] = None,

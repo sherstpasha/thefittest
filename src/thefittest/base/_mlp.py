@@ -178,7 +178,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         hidden_layers: Tuple[int, ...],
         activation: str = "sigma",
         offset: bool = True,
-        weights_optimizer: weights_type_optimizer_alias = SHADE,
+        weights_optimizer: weights_type_optimizer_alias = SHAGA,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
