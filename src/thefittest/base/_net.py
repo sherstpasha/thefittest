@@ -353,6 +353,7 @@ class NetEnsemble:
         self._nets = nets
         self._meta_algorithm = meta_algorithm
         self._meta_tree = None
+        self._trees = None
 
     def __len__(self) -> int:
         return len(self._nets)
@@ -412,4 +413,8 @@ class NetEnsemble:
 
         if self._meta_tree is not None:
             copy_._meta_tree = self._meta_tree.copy()
+
+        if self._trees is not None:
+            copy_._trees = self._trees
+
         return copy_

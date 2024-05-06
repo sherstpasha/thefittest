@@ -132,11 +132,6 @@ def print_ens(ens, ax=None):
             if k in net._outputs:
                 graph_2["labels"][k] = str(v) + f"_{net_index}"
 
-        # for i in
-        graph_2["colors"][len(graph_2["colors"]) - len(net._outputs) - 1 :] = np.array(
-            [0.77, 0.53, 0.49]
-        ).reshape(-1, 1)
-
         net_index = net_index + 1
 
         outs2 = list(net._outputs)
@@ -202,19 +197,35 @@ def print_ens(ens, ax=None):
     print(len(graph_meta["colors"]))
     print(len(graph_meta["weights_colors"]))
 
-    print(graph["labels"])
-    print(new_labels)
+    # print(graph["labels"])
+    # print(new_labels)
 
-    graph["nodes"] = list(set((graph["nodes"] + new_nodes)))
-    graph["labels"] = {**graph["labels"], **new_labels}
-    graph["positions"] = {**graph["positions"], **new_positions}
-    graph["colors"] = np.concatenate(
-        (graph["colors"], graph_meta["colors"][len(meta_net._inputs) - 1 :]), axis=0
-    )
-    graph["weights_colors"] = np.concatenate(
-        (graph["weights_colors"], graph_meta["weights_colors"]), axis=0
-    )
-    graph["connects"] = np.concatenate((graph["connects"], new_connects), axis=0)
+    # print(graph["nodes"])
+    # print(new_nodes)
+
+    # print(list(set((graph["nodes"] + new_nodes))))
+
+    print(graph["positions"])
+    print(new_positions)
+
+    # for key, value in new_labels:
+    #     if key not in graph["labels"]:
+    #         graph["labels"][key] = value
+
+    # for item in new_labels:
+    #     if item not in graph["nodes"]:
+    #         graph["nodes"].append(item)
+
+    # graph["nodes"] = list(set((graph["nodes"] + new_nodes)))
+    # graph["labels"] = {**graph["labels"], **new_labels}
+    # graph["positions"] = {**graph["positions"], **new_positions}
+    # graph["colors"] = np.concatenate(
+    #     (graph["colors"], graph_meta["colors"][len(meta_net._inputs) - 1 :]), axis=0
+    # )
+    # graph["weights_colors"] = np.concatenate(
+    #     (graph["weights_colors"], graph_meta["weights_colors"]), axis=0
+    # )
+    # graph["connects"] = np.concatenate((graph["connects"], new_connects), axis=0)
 
     print("---")
     print(len(graph["nodes"]))
