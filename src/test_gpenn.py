@@ -29,7 +29,7 @@ X_scaled = minmax_scale(X)
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
 
 model = GeneticProgrammingNeuralNetStackingClassifier(
-    iters=3,
+    iters=10,
     pop_size=10,
     optimizer=TwoTreeSelfCGP,
     optimizer_args={"show_progress_each": 1},
