@@ -200,21 +200,28 @@ def print_ens(ens, ax=None):
     # print(graph["labels"])
     # print(new_labels)
 
-    # print(graph["nodes"])
-    # print(new_nodes)
+    print(graph["nodes"])
+    print(new_nodes)
 
     # print(list(set((graph["nodes"] + new_nodes))))
 
-    print(graph["positions"])
-    print(new_positions)
+    # print(graph["positions"])
+    # print(new_positions)
 
-    # for key, value in new_labels:
+    # for key, value in new_labels.items():
     #     if key not in graph["labels"]:
     #         graph["labels"][key] = value
 
     # for item in new_labels:
     #     if item not in graph["nodes"]:
     #         graph["nodes"].append(item)
+
+    # for key, value in new_positions.items():
+    #     if key not in graph["positions"]:
+    #         graph["positions"][key] = value
+
+    print(graph["connects"])
+    print(new_connects)
 
     # graph["nodes"] = list(set((graph["nodes"] + new_nodes)))
     # graph["labels"] = {**graph["labels"], **new_labels}
