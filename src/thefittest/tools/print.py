@@ -108,6 +108,11 @@ def combine_and_adjust(list1, list2):
     # Комбинирование списков
     return list2_shifted
 
+def replace_values(arr, map_dict, const):
+    for i in range(arr.shape[0]):
+        for j in range(arr.shape[1]):
+            arr[i, j] = map_dict.get(arr[i, j], arr[i, j] + const)
+    return arr
 
 def print_ens(ens, ax=None):
     import networkx as nx
@@ -119,18 +124,12 @@ def print_ens(ens, ax=None):
     outs = list(nets[0]._outputs)
     net_index = 0
 
-    for k, v in graph["labels"].items():
-        if k in nets[0]._outputs:
-            graph["labels"][k] = str(v) + f"_{net_index}"
     net_index = net_index + 1
 
     for net in nets[1:]:
         c = max(graph["nodes"]) + 1
 
         graph_2 = net.get_graph()
-        for k, v in graph_2["labels"].items():
-            if k in net._outputs:
-                graph_2["labels"][k] = str(v) + f"_{net_index}"
 
         net_index = net_index + 1
 
@@ -173,74 +172,44 @@ def print_ens(ens, ax=None):
     outs.append(max(outs) + 1)
 
     mapping = {list(meta_net._inputs)[i]: outs[i] for i in range(len(outs))}
+
     new_nodes = [mapping.get(item, item + c) for item in graph_meta["nodes"]]
     new_labels = {mapping.get(key, key + c): value for key, value in graph_meta["labels"].items()}
 
-    new_connects = graph_meta["connects"].copy()
+    new_connects = np.unique(graph_meta["connects"].copy(), axis=0)
     new_positions = {
         mapping.get(k, k + c): np.array([v[0] + max_poses + 1, v[1]])
         for (k, v) in graph_meta["positions"].items()
     }
 
-    for col in range(new_connects.shape[1]):  # Для каждого столбца
-        for i, val in enumerate(list(meta_net._inputs)):
-            new_connects[new_connects[:, col] == val, col] = outs[i]
+    new_connects = replace_values(new_connects.copy(), mapping, c)
 
-        mask = ~np.isin(new_connects[:, col], outs)
-        new_connects[:, col][mask] += c
+    second_elements = [value[1] for value in graph["positions"].values()]
+    mean_value = np.mean(second_elements)
+    
+    for key in new_positions:
+        new_positions[key][1] += mean_value
+   
+    for key, value in new_labels.items():
+        if key not in graph["labels"]:
+            graph["labels"][key] = value
 
-    print("---")
-    print(len(new_nodes))
-    print(len(new_labels))
-    print(len(new_connects))
-    print(len(new_positions))
-    print(len(graph_meta["colors"]))
-    print(len(graph_meta["weights_colors"]))
+    for item in new_nodes:
+        if item not in graph["nodes"]:
+            graph["nodes"].append(item)
 
-    # print(graph["labels"])
-    # print(new_labels)
+    for key, value in new_positions.items():
+        if key not in graph["positions"]:
+            graph["positions"][key] = value
 
-    print(graph["nodes"])
-    print(new_nodes)
 
-    # print(list(set((graph["nodes"] + new_nodes))))
-
-    # print(graph["positions"])
-    # print(new_positions)
-
-    # for key, value in new_labels.items():
-    #     if key not in graph["labels"]:
-    #         graph["labels"][key] = value
-
-    # for item in new_labels:
-    #     if item not in graph["nodes"]:
-    #         graph["nodes"].append(item)
-
-    # for key, value in new_positions.items():
-    #     if key not in graph["positions"]:
-    #         graph["positions"][key] = value
-
-    print(graph["connects"])
-    print(new_connects)
-
-    # graph["nodes"] = list(set((graph["nodes"] + new_nodes)))
-    # graph["labels"] = {**graph["labels"], **new_labels}
-    # graph["positions"] = {**graph["positions"], **new_positions}
-    # graph["colors"] = np.concatenate(
-    #     (graph["colors"], graph_meta["colors"][len(meta_net._inputs) - 1 :]), axis=0
-    # )
-    # graph["weights_colors"] = np.concatenate(
-    #     (graph["weights_colors"], graph_meta["weights_colors"]), axis=0
-    # )
-    # graph["connects"] = np.concatenate((graph["connects"], new_connects), axis=0)
-
-    print("---")
-    print(len(graph["nodes"]))
-    print(len(graph["labels"]))
-    print(len(graph["positions"]))
-    print(len(graph["colors"]))
-    print(len(graph["weights_colors"]))
-    print(len(graph["connects"]))
+    graph["colors"] = np.concatenate(
+        (graph["colors"], graph_meta["colors"][len(meta_net._inputs) - 1 :]), axis=0
+    )
+    graph["weights_colors"] = np.concatenate(
+        (graph["weights_colors"], graph_meta["weights_colors"]), axis=0
+    )
+    graph["connects"] = np.concatenate((graph["connects"], new_connects), axis=0)
 
     G = nx.Graph()
     G.add_nodes_from(graph["nodes"])
