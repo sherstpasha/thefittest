@@ -19,6 +19,8 @@ from thefittest.tools.transformations import scale_data
 
 from ..tools.operators import forward2d
 
+import cloudpickle
+
 
 INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
 HIDDEN_COLOR_CODE = (0.0, 0.74, 0.99, 1)
@@ -338,6 +340,14 @@ class Net:
 
         return to_return
 
+    def save_to_file(self, file_path: str) -> None:
+        with open(file_path, "wb") as file:
+            cloudpickle.dump(self, file)
+
+    @classmethod
+    def load_from_file(cls, file_path: str) -> Net:
+        with open(file_path, "rb") as file:
+            return cloudpickle.load(file)
 
 class HiddenBlock:
     def __init__(self, max_size: int) -> None:

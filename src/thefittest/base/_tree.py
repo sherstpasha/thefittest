@@ -323,6 +323,6 @@ class Tree:
             cloudpickle.dump(self, file)
 
     @classmethod
-    def load_from_file(cls, file_path: str) -> 'Tree':
+    def load_from_file(cls, file_path: str) -> Tree:
         with open(file_path, "rb") as file:
             return cloudpickle.load(file)

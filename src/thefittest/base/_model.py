@@ -6,6 +6,8 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+import cloudpickle
+
 
 class Model:
     def _fit(
@@ -34,3 +36,12 @@ class Model:
 
     def predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
         return self._predict(X)
+
+    def save_to_file(self, file_path: str) -> None:
+        with open(file_path, "wb") as file:
+            cloudpickle.dump(self, file)
+
+    @classmethod
+    def load_from_file(cls, file_path: str) -> Model:
+        with open(file_path, "rb") as file:
+            return cloudpickle.load(file)
