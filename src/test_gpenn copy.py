@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from thefittest.optimizers import SelfCGP
-from thefittest.optimizers import SHADE
+from thefittest.optimizers import SHADE, SelfCGA
 from thefittest.benchmarks import BanknoteDataset
 from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
 from thefittest.classifiers._gpnneclassifier_one_tree import (
@@ -34,8 +34,8 @@ model = GeneticProgrammingNeuralNetStackingClassifier(
     pop_size=10,
     optimizer=SelfCGP,
     optimizer_args={"show_progress_each": 1},
-    weights_optimizer=SHADE,
-    weights_optimizer_args={"iters": 100, "pop_size": 100},
+    weights_optimizer=SelfCGA,
+    weights_optimizer_args={"iters": 5000, "pop_size": 1000, "no_increase_num": 1000},
 )
 
 model.fit(X_train, y_train)
@@ -69,3 +69,4 @@ plt.close()
 print_ens(ens)
 plt.savefig("5_ens.png")
 plt.close()
+

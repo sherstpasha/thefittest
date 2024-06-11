@@ -24,3 +24,29 @@ __all__ = [
     "argsort_k",
     "find_pbest_id",
 ]
+
+import pandas as pd
+
+class Dataset:
+    def __init__(self, path, output_column):
+        self.path = path
+        self.data = pd.read_csv(path)
+        self.output_column = output_column
+        self.input_columns = [col for col in self.data.columns if col != self.output_column]
+        self.X = self.data[self.input_columns]
+        self.y = self.data[self.output_column]
+    
+    def get_path(self):
+        return self.path
+    
+    def get_input_columns(self):
+        return self.input_columns
+    
+    def get_output_column(self):
+        return self.output_column
+    
+    def get_X(self):
+        return self.X
+    
+    def get_y(self):
+        return self.y

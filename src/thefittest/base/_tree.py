@@ -19,6 +19,7 @@ from ..tools import find_end_subtree_from_i
 from ..tools import find_id_args_from_i
 from ..tools import get_levels_tree_from_i
 
+import cloudpickle
 
 FUNCTIONAL_COLOR_CODE = (1, 0.72, 0.43, 1)
 TERMINAL_COLOR_CODE = (0.21, 0.76, 0.56, 1)
@@ -316,3 +317,12 @@ class Tree:
 
         to_return = {"edges": edges, "labels": labels, "nodes": nodes, "pos": pos, "colors": colors}
         return to_return
+    
+    def save_to_file(self, file_path: str) -> None:
+        with open(file_path, "wb") as file:
+            cloudpickle.dump(self, file)
+
+    @classmethod
+    def load_from_file(cls, file_path: str) -> 'Tree':
+        with open(file_path, "rb") as file:
+            return cloudpickle.load(file)
