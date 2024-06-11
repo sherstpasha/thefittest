@@ -428,3 +428,12 @@ class NetEnsemble:
             copy_._trees = self._trees
 
         return copy_
+
+    def save_to_file(self, file_path: str) -> None:
+        with open(file_path, "wb") as file:
+            cloudpickle.dump(self, file)
+
+    @classmethod
+    def load_from_file(cls, file_path: str) -> Net:
+        with open(file_path, "rb") as file:
+            return cloudpickle.load(file)

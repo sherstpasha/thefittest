@@ -5,8 +5,8 @@ from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import SHADE, SelfCGA
 from thefittest.benchmarks import BanknoteDataset
 from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
-from thefittest.classifiers._gpnneclassifier_one_tree import (
-    GeneticProgrammingNeuralNetStackingClassifier,
+from thefittest.classifiers._gpnneclassifier import (
+    GeneticProgrammingNeuralNetStackingClassifier, TwoTreeGeneticProgramming
 )
 from thefittest.tools.print import print_net
 from thefittest.tools.print import print_tree
@@ -32,7 +32,7 @@ X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
 model = GeneticProgrammingNeuralNetStackingClassifier(
     iters=3,
     pop_size=10,
-    optimizer=SelfCGP,
+    optimizer=TwoTreeGeneticProgramming,
     optimizer_args={"show_progress_each": 1},
     weights_optimizer=SelfCGA,
     weights_optimizer_args={"iters": 25, "pop_size": 25, "no_increase_num": 1000},
@@ -51,6 +51,9 @@ model._optimizer = None
 
 ens.save_to_file("ens.pkl")
 
+common_tree.save_to_file("common_tree.pkl")
+
+print(common_tree)
 # print("confusion_matrix: \n", confusion_matrix(y_test, predict))
 # print("f1_score: \n", f1_score(y_test, predict, average="macro"))
 

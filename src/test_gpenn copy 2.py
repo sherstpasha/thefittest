@@ -41,12 +41,12 @@ def run_experiment(run_id, output_dir):
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
 
     model = GeneticProgrammingNeuralNetStackingClassifier(
-        iters=35,
-        pop_size=50,
+        iters=3,
+        pop_size=10,
         optimizer=SelfCGP,
         optimizer_args={"show_progress_each": 1},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 100, "pop_size": 100, "no_increase_num": 500},
+        weights_optimizer_args={"iters": 25, "pop_size": 25, "no_increase_num": 500},
     )
 
     model.fit(X_train, y_train)
@@ -86,6 +86,10 @@ def run_experiment(run_id, output_dir):
     plt.savefig(os.path.join(run_dir, "5_ens.png"))
     plt.close()
 
+    ens.save_to_file("ens.pkl")
+
+    common_tree.save_to_file("common_tree.pkl")
+
     print(run_id, "done")
     return f1
 
@@ -101,6 +105,6 @@ def run_multiple_experiments(n_runs, n_processes, output_dir):
 
 if __name__ == "__main__":
     output_dir = r"C:\Users\user\Desktop\эксперименты\banknote"  # Change this to your desired output directory
-    n_runs = 30  # Number of runs you want to perform
+    n_runs = 5  # Number of runs you want to perform
     n_processes = 15  # Number of processes to use in parallel
     run_multiple_experiments(n_runs, n_processes, output_dir)

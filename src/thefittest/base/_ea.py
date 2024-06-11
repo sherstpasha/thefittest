@@ -17,6 +17,8 @@ from numpy.typing import NDArray
 
 from ..tools import donothing
 
+import cloudpickle
+
 
 class TheFittest:
     def __init__(self) -> None:
@@ -276,6 +278,14 @@ class MultiGenome:
     def copy(self) -> MultiGenome:
         return MultiGenome(genotypes=tuple([genotype.copy() for genotype in self._genotypes]))
 
+    def save_to_file(self, file_path: str) -> None:
+        with open(file_path, "wb") as file:
+            cloudpickle.dump(self, file)
+
+    @classmethod
+    def load_from_file(cls, file_path: str) -> MultiGenome:
+        with open(file_path, "rb") as file:
+            return cloudpickle.load(file)
 
 class MutliGenomeEA(EvolutionaryAlgorithm):
     def __init__(
