@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import SHADE
-from thefittest.benchmarks import BanknoteDataset
+from thefittest.benchmarks import TwoNormDataset
 from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
 from thefittest.classifiers._gpnneclassifier import GeneticProgrammingNeuralNetStackingClassifier
 from thefittest.classifiers._gpnneclassifier import TwoTreeSelfCGP
@@ -20,7 +20,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
 
 
-data = BanknoteDataset()
+data = TwoNormDataset()
 X = data.get_X()
 y = data.get_y()
 

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import SHADE, SelfCGA
-from thefittest.benchmarks import BanknoteDataset
+from thefittest.benchmarks import TwoNormDataset
 from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
 from thefittest.classifiers._gpnneclassifier_one_tree import (
     GeneticProgrammingNeuralNetStackingClassifier,
@@ -31,8 +31,9 @@ from sklearn.metrics import f1_score
 # Assuming necessary imports for the BanknoteDataset, GeneticProgrammingNeuralNetStackingClassifier, SelfCGP, SelfCGA
 # Also, assuming you have print_tree, print_trees, print_nets, print_net, print_ens functions available
 
+
 def run_experiment(run_id, output_dir):
-    data = BanknoteDataset()
+    data = TwoNormDataset()
     X = data.get_X()
     y = data.get_y()
 
@@ -41,12 +42,12 @@ def run_experiment(run_id, output_dir):
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
 
     model = GeneticProgrammingNeuralNetStackingClassifier(
-        iters=3,
-        pop_size=10,
+        iters=50,
+        pop_size=35,
         optimizer=SelfCGP,
-        optimizer_args={"show_progress_each": 1},
+        optimizer_args={"show_progress_each": 5},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 25, "pop_size": 25, "no_increase_num": 500},
+        weights_optimizer_args={"iters": 1500, "pop_size": 100, "no_increase_num": 500},
     )
 
     model.fit(X_train, y_train)
@@ -59,13 +60,13 @@ def run_experiment(run_id, output_dir):
     trees = ens._trees
 
     f1 = f1_score(y_test, predict, average="macro")
-    
+
     run_dir = os.path.join(output_dir, f"run_{run_id}")
     os.makedirs(run_dir, exist_ok=True)
 
     with open(os.path.join(run_dir, "f1_score.txt"), "w") as f:
         f.write(f"f1_score: {f1}\n")
-    
+
     print_tree(common_tree)
     plt.savefig(os.path.join(run_dir, "1_common_tree.png"))
     plt.close()
@@ -86,25 +87,27 @@ def run_experiment(run_id, output_dir):
     plt.savefig(os.path.join(run_dir, "5_ens.png"))
     plt.close()
 
-    ens.save_to_file("ens.pkl")
+    ens.save_to_file(os.path.join(run_dir, "ens.pkl"))
 
-    common_tree.save_to_file("common_tree.pkl")
+    common_tree.save_to_file(os.path.join(run_dir, "common_tree.pkl"))
 
     print(run_id, "done")
     return f1
+
 
 def run_multiple_experiments(n_runs, n_processes, output_dir):
     with ProcessPoolExecutor(max_workers=n_processes) as executor:
         futures = [executor.submit(run_experiment, i, output_dir) for i in range(n_runs)]
         f1_scores = [future.result() for future in futures]
-        
+
     avg_f1 = np.mean(f1_scores)
-    
+
     with open(os.path.join(output_dir, "average_f1_score.txt"), "w") as f:
         f.write(f"Average F1 Score: {avg_f1}\n")
 
+
 if __name__ == "__main__":
-    output_dir = r"C:\Users\user\Desktop\эксперименты\banknote"  # Change this to your desired output directory
-    n_runs = 5  # Number of runs you want to perform
-    n_processes = 15  # Number of processes to use in parallel
+    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results\twonorm"  # Change this to your desired output directory
+    n_runs = 30  # Number of runs you want to perform
+    n_processes = 10  # Number of processes to use in parallel
     run_multiple_experiments(n_runs, n_processes, output_dir)

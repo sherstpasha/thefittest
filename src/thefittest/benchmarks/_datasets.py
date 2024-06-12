@@ -15,6 +15,8 @@ digits_data = np.loadtxt(path + "handwritten_digits_data.txt", delimiter=",")
 credit_data = np.loadtxt(path + "credit_risk_data.txt", delimiter=",")
 know_data = np.loadtxt(path + "user_knowledge_data.txt", delimiter=",")
 banknote_data = np.loadtxt(path + "banknote_dataset.txt", delimiter=",")
+twonorm_data = np.loadtxt(path + "twonorm_dataset.txt", delimiter=",")
+ringnorm_data = np.loadtxt(path + "ringnorm_dataset.txt", delimiter="\t")
 
 
 class Dataset:
@@ -201,4 +203,30 @@ class BanknoteDataset(Dataset):
                 3: "entropy of image (continuous)",
             },
             y_names={0: "not original", 1: "original"},
+        )
+
+
+class TwoNormDataset(Dataset):
+    """Dataset class for the provided twonorm data."""
+
+    def __init__(self) -> None:
+        Dataset.__init__(
+            self,
+            X=twonorm_data[:, :-1].astype(np.float64),
+            y=twonorm_data[:, -1].astype(np.int64),
+            X_names={i: f"A{i+1}" for i in range(twonorm_data.shape[1] - 1)},
+            y_names={0: "Class 1", 1: "Class 2"},
+        )
+
+
+class RingNormDataset(Dataset):
+    """Dataset class for the provided twonorm data."""
+
+    def __init__(self) -> None:
+        Dataset.__init__(
+            self,
+            X=ringnorm_data[:, :-1].astype(np.float64),
+            y=ringnorm_data[:, -1].astype(np.int64),
+            X_names={i: f"A{i+1}" for i in range(ringnorm_data.shape[1] - 1)},
+            y_names={0: "Class 1", 1: "Class 2"},
         )
