@@ -17,6 +17,7 @@ know_data = np.loadtxt(path + "user_knowledge_data.txt", delimiter=",")
 banknote_data = np.loadtxt(path + "banknote_dataset.txt", delimiter=",")
 twonorm_data = np.loadtxt(path + "twonorm_dataset.txt", delimiter=",")
 ringnorm_data = np.loadtxt(path + "ringnorm_dataset.txt", delimiter="\t")
+texture_data = np.loadtxt(path + "texture_dataset.txt", delimiter=",")
 
 
 class Dataset:
@@ -229,4 +230,21 @@ class RingNormDataset(Dataset):
             y=ringnorm_data[:, -1].astype(np.int64),
             X_names={i: f"A{i+1}" for i in range(ringnorm_data.shape[1] - 1)},
             y_names={0: "Class 1", 1: "Class 2"},
+        )
+
+
+class TextureDataset(Dataset):
+    """Dataset class for the provided texture data with adjusted class labels."""
+
+    def __init__(self) -> None:
+        original_labels = sorted(set(texture_data[:, -1].astype(int)))
+        label_map = {original_label: i for i, original_label in enumerate(original_labels)}
+        shifted_labels = np.array([label_map[label] for label in texture_data[:, -1].astype(int)])
+        super().__init__(
+            X=texture_data[:, :-1].astype(np.float64),
+            y=shifted_labels,
+            X_names={i: f"A {i+1}" for i in range(texture_data.shape[1] - 1)},
+            y_names={
+                i: f"Class {original_label}" for i, original_label in enumerate(original_labels)
+            },
         )

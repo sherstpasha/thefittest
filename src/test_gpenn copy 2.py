@@ -5,8 +5,6 @@ from sklearn.preprocessing import minmax_scale
 from sklearn.model_selection import train_test_split
 from concurrent.futures import ProcessPoolExecutor
 import numpy as np
-import numpy as np
-import matplotlib.pyplot as plt
 
 from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import SHADE, SelfCGA
@@ -22,16 +20,6 @@ from thefittest.tools.print import print_trees
 from thefittest.tools.print import print_ens
 
 
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import minmax_scale
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import f1_score
-
-
-# Assuming necessary imports for the BanknoteDataset, GeneticProgrammingNeuralNetStackingClassifier, SelfCGP, SelfCGA
-# Also, assuming you have print_tree, print_trees, print_nets, print_net, print_ens functions available
-
-
 def run_experiment(run_id, output_dir):
     data = TwoNormDataset()
     X = data.get_X()
@@ -45,9 +33,9 @@ def run_experiment(run_id, output_dir):
         iters=50,
         pop_size=35,
         optimizer=SelfCGP,
-        optimizer_args={"show_progress_each": 5},
+        optimizer_args={"show_progress_each": 1},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 1500, "pop_size": 100, "no_increase_num": 500},
+        weights_optimizer_args={"iters": 1000, "pop_size": 100, "no_increase_num": 500},
     )
 
     model.fit(X_train, y_train)
@@ -66,6 +54,16 @@ def run_experiment(run_id, output_dir):
 
     with open(os.path.join(run_dir, "f1_score.txt"), "w") as f:
         f.write(f"f1_score: {f1}\n")
+
+    # Save confusion matrix
+    cm = confusion_matrix(y_test, predict)
+    np.savetxt(os.path.join(run_dir, "confusion_matrix.txt"), cm, fmt="%d")
+
+    # Save train and test datasets
+    np.savetxt(os.path.join(run_dir, "X_train.txt"), X_train)
+    np.savetxt(os.path.join(run_dir, "X_test.txt"), X_test)
+    np.savetxt(os.path.join(run_dir, "y_train.txt"), y_train, fmt="%d")
+    np.savetxt(os.path.join(run_dir, "y_test.txt"), y_test, fmt="%d")
 
     print_tree(common_tree)
     plt.savefig(os.path.join(run_dir, "1_common_tree.png"))

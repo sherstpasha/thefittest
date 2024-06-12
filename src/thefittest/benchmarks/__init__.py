@@ -6,6 +6,8 @@ from ._datasets import IrisDataset
 from ._datasets import UserKnowladgeDataset
 from ._datasets import WineDataset
 from ._datasets import TwoNormDataset
+from ._datasets import RingNormDataset
+from ._datasets import TextureDataset
 from ._optproblems import Ackley
 from ._optproblems import Griewank
 from ._optproblems import HighConditionedElliptic
