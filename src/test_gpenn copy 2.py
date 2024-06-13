@@ -30,12 +30,13 @@ def run_experiment(run_id, output_dir):
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
 
     model = GeneticProgrammingNeuralNetStackingClassifier(
-        iters=50,
-        pop_size=35,
+        iters=30,
+        pop_size=20,
+        input_block_size=3,
         optimizer=SelfCGP,
         optimizer_args={"show_progress_each": 1},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 1000, "pop_size": 100, "no_increase_num": 500},
+        weights_optimizer_args={"iters": 1000, "pop_size": 100, "no_increase_num": 300},
     )
 
     model.fit(X_train, y_train)
