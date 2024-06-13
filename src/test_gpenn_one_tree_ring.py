@@ -8,7 +8,7 @@ import numpy as np
 
 from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import SHADE, SelfCGA
-from thefittest.benchmarks import TwoNormDataset
+from thefittest.benchmarks import RingNormDataset
 from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
 from thefittest.classifiers._gpnneclassifier_one_tree import (
     GeneticProgrammingNeuralNetStackingClassifier,
@@ -18,10 +18,11 @@ from thefittest.tools.print import print_tree
 from thefittest.tools.print import print_nets
 from thefittest.tools.print import print_trees
 from thefittest.tools.print import print_ens
+import cloudpickle
 
 
 def run_experiment(run_id, output_dir):
-    data = TwoNormDataset()
+    data = RingNormDataset()
     X = data.get_X()
     y = data.get_y()
 
@@ -34,7 +35,7 @@ def run_experiment(run_id, output_dir):
         pop_size=20,
         input_block_size=3,
         optimizer=SelfCGP,
-        optimizer_args={"show_progress_each": 1},
+        optimizer_args={"show_progress_each": 1, "keep_history": True},
         weights_optimizer=SelfCGA,
         weights_optimizer_args={"iters": 1000, "pop_size": 100, "no_increase_num": 300},
     )
@@ -43,6 +44,9 @@ def run_experiment(run_id, output_dir):
 
     predict = model.predict(X_test)
     optimizer = model.get_optimizer()
+
+    stat = optimizer.get_stats()
+    stat["population_ph"] = None
 
     common_tree = optimizer.get_fittest()["genotype"]
     ens = optimizer.get_fittest()["phenotype"]
@@ -89,6 +93,9 @@ def run_experiment(run_id, output_dir):
     ens.save_to_file(os.path.join(run_dir, "ens.pkl"))
 
     common_tree.save_to_file(os.path.join(run_dir, "common_tree.pkl"))
+
+    with open(os.path.join(run_dir, "stat.pkl"), "wb") as file:
+        cloudpickle.dump(stat, file)
 
     print(run_id, "done")
     return f1
