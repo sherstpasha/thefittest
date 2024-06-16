@@ -8,10 +8,11 @@ import numpy as np
 
 from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import SHADE, SelfCGA
-from thefittest.benchmarks import TwoNormDataset
+from thefittest.benchmarks import TextureDataset
 from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
-from thefittest.classifiers._gpnneclassifier_one_tree import (
+from thefittest.classifiers._gpnneclassifier import (
     GeneticProgrammingNeuralNetStackingClassifier,
+    TwoTreeSelfCGP,
 )
 from thefittest.tools.print import print_net
 from thefittest.tools.print import print_tree
@@ -22,7 +23,7 @@ import cloudpickle
 
 
 def run_experiment(run_id, output_dir):
-    data = TwoNormDataset()
+    data = TextureDataset()
     X = data.get_X()
     y = data.get_y()
 
@@ -34,7 +35,7 @@ def run_experiment(run_id, output_dir):
         iters=30,
         pop_size=20,
         input_block_size=3,
-        optimizer=SelfCGP,
+        optimizer=TwoTreeSelfCGP,
         optimizer_args={"show_progress_each": 1, "keep_history": True},
         weights_optimizer=SelfCGA,
         weights_optimizer_args={"iters": 1000, "pop_size": 100, "no_increase_num": 300},
@@ -70,12 +71,12 @@ def run_experiment(run_id, output_dir):
     np.savetxt(os.path.join(run_dir, "y_train.txt"), y_train, fmt="%d")
     np.savetxt(os.path.join(run_dir, "y_test.txt"), y_test, fmt="%d")
 
-    print_tree(common_tree)
-    plt.savefig(os.path.join(run_dir, "1_common_tree.png"))
+    print_tree(common_tree._genotypes[0])
+    plt.savefig(os.path.join(run_dir, "1_left_tree.png"))
     plt.close()
 
-    print_trees(trees)
-    plt.savefig(os.path.join(run_dir, "2_trees.png"))
+    print_tree(common_tree._genotypes[1])
+    plt.savefig(os.path.join(run_dir, "1_right_tree.png"))
     plt.close()
 
     print_nets(ens._nets)
@@ -113,7 +114,7 @@ def run_multiple_experiments(n_runs, n_processes, output_dir):
 
 
 if __name__ == "__main__":
-    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results\twonorm15-29"  # Change this to your desired output directory
-    n_runs = 15  # Number of runs you want to perform
+    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results\two_norm_two_trees"  # Change this to your desired output directory
+    n_runs = 30  # Number of runs you want to perform
     n_processes = 10  # Number of processes to use in parallel
     run_multiple_experiments(n_runs, n_processes, output_dir)
