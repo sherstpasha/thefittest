@@ -6,10 +6,8 @@ from sklearn.model_selection import train_test_split
 from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 
-from thefittest.optimizers import SelfCGP
-from thefittest.optimizers import SHADE, SelfCGA
+from thefittest.optimizers import SelfCGA
 from thefittest.benchmarks import TwoNormDataset
-from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
 from thefittest.classifiers._gpnneclassifier import (
     GeneticProgrammingNeuralNetStackingClassifier,
     TwoTreeSelfCGP,
@@ -29,16 +27,17 @@ def run_experiment(run_id, output_dir):
 
     X_scaled = minmax_scale(X)
 
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.1)
 
     model = GeneticProgrammingNeuralNetStackingClassifier(
-        iters=30,
-        pop_size=20,
+        iters=50,
+        pop_size=50,
         input_block_size=3,
         optimizer=TwoTreeSelfCGP,
         optimizer_args={"show_progress_each": 1, "keep_history": True},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 1000, "pop_size": 100, "no_increase_num": 300},
+        weights_optimizer_args={"iters": 300, "pop_size": 300, "no_increase_num": 100},
+        test_sample_ratio=0.25,
     )
 
     model.fit(X_train, y_train)
@@ -114,7 +113,7 @@ def run_multiple_experiments(n_runs, n_processes, output_dir):
 
 
 if __name__ == "__main__":
-    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results\two_norm_two_trees"  # Change this to your desired output directory
-    n_runs = 30  # Number of runs you want to perform
+    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\two_tree_twonorm"
+    n_runs = 20  # Number of runs you want to perform
     n_processes = 10  # Number of processes to use in parallel
     run_multiple_experiments(n_runs, n_processes, output_dir)
