@@ -447,6 +447,116 @@ class SphereWithNoise(Sphere):
         noise = 1 + 0.1 * np.abs(np.random.normal(size=y.shape))
         return y * noise
 
+class Func1:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        y = np.abs(x[:,0])
+        return y 
+
+class Func2:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        y = -10*np.cos(x[:,0]) + np.abs(0.001*x[:,0])
+        return y 
+    
+class Func3:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        y = x[:,0]*x[:,0]*np.sin(2*x[:,0]) + x[:,1]*x[:,1]*np.sin(2*x[:,1]) - (1)/(5*x[:,0]*x[:,0] + 5*x[:,1]*x[:,1] + 0.2) + 5
+        return y 
+    
+class Func4:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        y = 0.5*x[:,0]*x[:,0] + x[:,0]*x[:,1] + x[:,1]*x[:,1]*(1 + 0.5*np.cos(1.5*x[:,0])*np.cos(3.2*x[:,0]*x[:,1])*np.cos(3.14*x[:,1])+0.5*np.cos(2.2*x[:,0])*np.cos(4.8*x[:,0]*x[:,1])*np.cos(3.5*x[:,1]))
+        return y
+
+class Func5:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        y = 0.1*x[:,0]*x[:,0] + 0.1*x[:,1]*x[:,1] - 4*np.cos(0.8*x[:,0]) - 4*np.cos(0.8*x[:,1]) + 8
+        return y
+
+class Func6:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        alpha = np.pi / 2
+        Kx1 = 1.5
+        Kx2 = 0.8
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        A = x1 * np.cos(alpha) - x2 * np.sin(alpha)
+        B = x1 * np.sin(alpha) + x2 * np.cos(alpha)
+        term1 = (0.1 * Kx1 * A) ** 2
+        term2 = (0.1 * Kx2 * B) ** 2
+        term3 = -4 * np.cos(0.8 * Kx1 * A)
+        term4 = -4 * np.cos(0.8 * Kx2 * B)
+        return term1 + term2 + term3 + term4 + 8
+
+class Func7:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        term1 = 100 * (x2 - x1 ** 2) ** 2
+        term2 = (1 - x1) ** 2
+        return term1 + term2
+
+class Func8:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        term1 = 0.005 * (x1 ** 2 + x2 ** 2)
+        term2 = np.cos(x1) * np.cos(x2 / np.sqrt(2))
+        return -10 / (term1 - term2 + 2) + 10
+
+class Func9:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        term1 = 100 * ( x1 ** 2 - x2) ** 2
+        term2 = (1 - x1) ** 2
+        return -100 / (term1 + term2 + 1) + 100
+
+class Func10:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        r_squared = x1 ** 2 + x2 ** 2
+        numerator = 1 - np.sin(np.sqrt(r_squared)) ** 2
+        denominator = 1 + 0.001 * r_squared
+        return numerator / denominator
+
+class Func11:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        A = 0.8
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        term1 = 0.5 * (x1 ** 2 + x2 ** 2)
+        term2 = 2 * A + A * np.cos(1.5 * x1) * np.cos(3.14 * x2) + A * np.cos(np.sqrt(5) * x1) * np.cos(3.5 * x2)
+        return term1 * term2
+
+class Func12:
+    def z(self, x: np.float64) -> np.float64:
+        term1 = -1 / ((x - 1) ** 2 + 0.2)
+        term2 = -1 / (2 * (x - 2) ** 2 + 0.15)
+        term3 = -1 / (3 * (x - 3) ** 2 + 0.3)
+        return term1 + term2 + term3
+
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        z_x1 = np.array([self.z(xi) for xi in x1])
+        z_x2 = np.array([self.z(xi) for xi in x2])
+        return -z_x1 * z_x2
+
+class Func13:
+    def z(self, x: np.float64) -> np.float64:
+        term1 = -1 / ((x - 1) ** 2 + 0.2)
+        term2 = -1 / (2 * (x - 2) ** 2 + 0.15)
+        term3 = -1 / (3 * (x - 3) ** 2 + 0.3)
+        return term1 + term2 + term3
+
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        z_x1 = np.array([self.z(xi) for xi in x1])
+        z_x2 = np.array([self.z(xi) for xi in x2])
+        return z_x1 + z_x2
+
 
 # CEC05 #1
 class ShiftedSphere(TestShiftedFunction, Sphere):

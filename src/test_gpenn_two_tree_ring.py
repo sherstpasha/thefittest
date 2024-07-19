@@ -114,7 +114,7 @@ def run_multiple_experiments(n_runs, n_processes, output_dir):
 
 
 if __name__ == "__main__":
-    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results\two_norm_two_trees"  # Change this to your desired output directory
+    output_dir = r"C:\Users\user\Desktop\ring_two_trees_res"  # Change this to your desired output directory
     n_runs = 30  # Number of runs you want to perform
-    n_processes = 10  # Number of processes to use in parallel
+    n_processes = 15  # Number of processes to use in parallel
     run_multiple_experiments(n_runs, n_processes, output_dir)
