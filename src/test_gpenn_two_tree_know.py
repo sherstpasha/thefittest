@@ -7,7 +7,7 @@ from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 
 from thefittest.optimizers import SelfCGA
-from thefittest.benchmarks import TwoNormDataset
+from thefittest.benchmarks import UserKnowladgeDataset
 from thefittest.classifiers._gpnneclassifier import (
     GeneticProgrammingNeuralNetStackingClassifier,
     TwoTreeSelfCGP,
@@ -21,7 +21,7 @@ import cloudpickle
 
 
 def run_experiment(run_id, output_dir):
-    data = TwoNormDataset()
+    data = UserKnowladgeDataset()
     X = data.get_X()
     y = data.get_y()
 
@@ -32,11 +32,11 @@ def run_experiment(run_id, output_dir):
     model = GeneticProgrammingNeuralNetStackingClassifier(
         iters=50,
         pop_size=50,
-        input_block_size=3,
+        input_block_size=1,
         optimizer=TwoTreeSelfCGP,
         optimizer_args={"show_progress_each": 1, "keep_history": True},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 100, "pop_size": 100, "no_increase_num": 50},
+        weights_optimizer_args={"iters": 300, "pop_size": 300, "no_increase_num": 100},
         test_sample_ratio=0.25,
     )
 
@@ -113,7 +113,7 @@ def run_multiple_experiments(n_runs, n_processes, output_dir):
 
 
 if __name__ == "__main__":
-    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\two_tree_twonorm"
+    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\two_tree_know"
     n_runs = 20  # Number of runs you want to perform
     n_processes = 10  # Number of processes to use in parallel
     run_multiple_experiments(n_runs, n_processes, output_dir)

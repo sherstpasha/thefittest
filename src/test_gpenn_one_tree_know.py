@@ -6,11 +6,11 @@ from sklearn.model_selection import train_test_split
 from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 
+from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import SelfCGA
-from thefittest.benchmarks import TwoNormDataset
-from thefittest.classifiers._gpnneclassifier import (
+from thefittest.benchmarks import UserKnowladgeDataset
+from thefittest.classifiers._gpnneclassifier_one_tree import (
     GeneticProgrammingNeuralNetStackingClassifier,
-    TwoTreeSelfCGP,
 )
 from thefittest.tools.print import print_net
 from thefittest.tools.print import print_tree
@@ -21,7 +21,7 @@ import cloudpickle
 
 
 def run_experiment(run_id, output_dir):
-    data = TwoNormDataset()
+    data = UserKnowladgeDataset()
     X = data.get_X()
     y = data.get_y()
 
@@ -32,11 +32,11 @@ def run_experiment(run_id, output_dir):
     model = GeneticProgrammingNeuralNetStackingClassifier(
         iters=50,
         pop_size=50,
-        input_block_size=3,
-        optimizer=TwoTreeSelfCGP,
+        input_block_size=1,
+        optimizer=SelfCGP,
         optimizer_args={"show_progress_each": 1, "keep_history": True},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 100, "pop_size": 100, "no_increase_num": 50},
+        weights_optimizer_args={"iters": 300, "pop_size": 300, "no_increase_num": 100},
         test_sample_ratio=0.25,
     )
 
@@ -70,12 +70,12 @@ def run_experiment(run_id, output_dir):
     np.savetxt(os.path.join(run_dir, "y_train.txt"), y_train, fmt="%d")
     np.savetxt(os.path.join(run_dir, "y_test.txt"), y_test, fmt="%d")
 
-    print_tree(common_tree._genotypes[0])
-    plt.savefig(os.path.join(run_dir, "1_left_tree.png"))
+    print_tree(common_tree)
+    plt.savefig(os.path.join(run_dir, "1_common_tree.png"))
     plt.close()
 
-    print_tree(common_tree._genotypes[1])
-    plt.savefig(os.path.join(run_dir, "1_right_tree.png"))
+    print_trees(trees)
+    plt.savefig(os.path.join(run_dir, "2_trees.png"))
     plt.close()
 
     print_nets(ens._nets)
@@ -113,7 +113,7 @@ def run_multiple_experiments(n_runs, n_processes, output_dir):
 
 
 if __name__ == "__main__":
-    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\two_tree_twonorm"
+    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\one_tree_know"
     n_runs = 20  # Number of runs you want to perform
     n_processes = 10  # Number of processes to use in parallel
     run_multiple_experiments(n_runs, n_processes, output_dir)

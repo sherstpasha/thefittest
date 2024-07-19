@@ -36,7 +36,7 @@ def run_experiment(run_id, output_dir):
         optimizer=SelfCGP,
         optimizer_args={"show_progress_each": 1, "keep_history": True},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 300, "pop_size": 300, "no_increase_num": 100},
+        weights_optimizer_args={"iters": 100, "pop_size": 100, "no_increase_num": 50},
         test_sample_ratio=0.25,
     )
 
