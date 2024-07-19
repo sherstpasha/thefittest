@@ -7,12 +7,10 @@ from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 
 from thefittest.optimizers import SelfCGP
-from thefittest.optimizers import SHADE, SelfCGA
-from thefittest.benchmarks import TextureDataset
-from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
-from thefittest.classifiers._gpnneclassifier import (
+from thefittest.optimizers import SelfCGA
+from thefittest.benchmarks import CreditRiskDataset
+from thefittest.classifiers._gpnneclassifier_one_tree import (
     GeneticProgrammingNeuralNetStackingClassifier,
-    TwoTreeSelfCGP,
 )
 from thefittest.tools.print import print_net
 from thefittest.tools.print import print_tree
@@ -23,22 +21,23 @@ import cloudpickle
 
 
 def run_experiment(run_id, output_dir):
-    data = TextureDataset()
+    data = CreditRiskDataset()
     X = data.get_X()
     y = data.get_y()
 
     X_scaled = minmax_scale(X)
 
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.1)
 
     model = GeneticProgrammingNeuralNetStackingClassifier(
-        iters=30,
-        pop_size=20,
-        input_block_size=3,
-        optimizer=TwoTreeSelfCGP,
+        iters=50,
+        pop_size=50,
+        input_block_size=1,
+        optimizer=SelfCGP,
         optimizer_args={"show_progress_each": 1, "keep_history": True},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 1000, "pop_size": 100, "no_increase_num": 300},
+        weights_optimizer_args={"iters": 300, "pop_size": 300, "no_increase_num": 100},
+        test_sample_ratio=0.25,
     )
 
     model.fit(X_train, y_train)
@@ -71,12 +70,12 @@ def run_experiment(run_id, output_dir):
     np.savetxt(os.path.join(run_dir, "y_train.txt"), y_train, fmt="%d")
     np.savetxt(os.path.join(run_dir, "y_test.txt"), y_test, fmt="%d")
 
-    print_tree(common_tree._genotypes[0])
-    plt.savefig(os.path.join(run_dir, "1_left_tree.png"))
+    print_tree(common_tree)
+    plt.savefig(os.path.join(run_dir, "1_common_tree.png"))
     plt.close()
 
-    print_tree(common_tree._genotypes[1])
-    plt.savefig(os.path.join(run_dir, "1_right_tree.png"))
+    print_trees(trees)
+    plt.savefig(os.path.join(run_dir, "2_trees.png"))
     plt.close()
 
     print_nets(ens._nets)
@@ -114,7 +113,7 @@ def run_multiple_experiments(n_runs, n_processes, output_dir):
 
 
 if __name__ == "__main__":
-    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results\two_norm_two_trees"  # Change this to your desired output directory
-    n_runs = 30  # Number of runs you want to perform
+    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\one_tree_credit"
+    n_runs = 20  # Number of runs you want to perform
     n_processes = 10  # Number of processes to use in parallel
     run_multiple_experiments(n_runs, n_processes, output_dir)

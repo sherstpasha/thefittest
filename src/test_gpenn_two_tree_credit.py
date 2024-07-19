@@ -6,10 +6,8 @@ from sklearn.model_selection import train_test_split
 from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 
-from thefittest.optimizers import SelfCGP
-from thefittest.optimizers import SHADE, SelfCGA
-from thefittest.benchmarks import RingNormDataset
-from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
+from thefittest.optimizers import SelfCGA
+from thefittest.benchmarks import CreditRiskDataset
 from thefittest.classifiers._gpnneclassifier import (
     GeneticProgrammingNeuralNetStackingClassifier,
     TwoTreeSelfCGP,
@@ -23,22 +21,23 @@ import cloudpickle
 
 
 def run_experiment(run_id, output_dir):
-    data = RingNormDataset()
+    data = CreditRiskDataset()
     X = data.get_X()
     y = data.get_y()
 
     X_scaled = minmax_scale(X)
 
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.1)
 
     model = GeneticProgrammingNeuralNetStackingClassifier(
-        iters=30,
-        pop_size=20,
-        input_block_size=3,
+        iters=50,
+        pop_size=50,
+        input_block_size=1,
         optimizer=TwoTreeSelfCGP,
         optimizer_args={"show_progress_each": 1, "keep_history": True},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 1000, "pop_size": 100, "no_increase_num": 300},
+        weights_optimizer_args={"iters": 300, "pop_size": 300, "no_increase_num": 100},
+        test_sample_ratio=0.25,
     )
 
     model.fit(X_train, y_train)
@@ -114,7 +113,13 @@ def run_multiple_experiments(n_runs, n_processes, output_dir):
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD:src/test_gpenn_two_tree_ring.py
     output_dir = r"C:\Users\user\Desktop\ring_two_trees_res"  # Change this to your desired output directory
     n_runs = 30  # Number of runs you want to perform
     n_processes = 15  # Number of processes to use in parallel
+=======
+    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\two_tree_credit"
+    n_runs = 20  # Number of runs you want to perform
+    n_processes = 10  # Number of processes to use in parallel
+>>>>>>> 3618b62ffa1de363ce01ac98bf0376cb02476e83:src/test_gpenn_two_tree_credit.py
     run_multiple_experiments(n_runs, n_processes, output_dir)
