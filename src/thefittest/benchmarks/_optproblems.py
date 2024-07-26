@@ -459,8 +459,11 @@ class Func2:
     
 class Func3:
     def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        y = x[:,0]*x[:,0]*np.sin(2*x[:,0]) + x[:,1]*x[:,1]*np.sin(2*x[:,1]) - (1)/(5*x[:,0]*x[:,0] + 5*x[:,1]*x[:,1] + 0.2) + 5
-        return y 
+        x1, x2 = x[:,0], x[:,1]
+        term1 = x1**2 * np.abs(np.sin(2 * x1))
+        term2 = x2**2 * np.abs(np.sin(2 * x2))
+        term3 = -1 / (5 * x1**2 + 5 * x2**2 + 0.2)
+        return term1 + term2 + term3 + 5
     
 class Func4:
     def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -518,7 +521,7 @@ class Func10:
         r_squared = x1 ** 2 + x2 ** 2
         numerator = 1 - np.sin(np.sqrt(r_squared)) ** 2
         denominator = 1 + 0.001 * r_squared
-        return numerator / denominator
+        return (-1)*(numerator / denominator)
 
 class Func11:
     def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
