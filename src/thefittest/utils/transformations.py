@@ -209,7 +209,21 @@ class SamplingGrid:
             Number of bits per variable.
         """
         return self._bits_per_variable
+    
+    def get_str_len(self) -> np.int64:
+        """
+        Get the total number of bits required to represent the entire population in binary.
 
+        This method sums the number of bits for each variable, providing the total length 
+        of the binary string needed to represent a single individual in the population.
+
+        Returns
+        -------
+        np.int64
+            Total number of bits required for binary representation of an individual.
+        """
+        return self._bits_per_variable.sum()
+    
     def fit(
         self,
         left_border: Union[float, NDArray[np.float64]],
