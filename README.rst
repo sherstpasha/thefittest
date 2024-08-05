@@ -57,10 +57,11 @@ Dependencies
 
 ``thefittest`` requires:
 
-- `Python (>=3.7,<3.12) <https://www.python.org/>`_,
-- `NumPy <https://numpy.org/>`_, 
+- `Python (>=3.7,<3.12) <https://www.python.org/>`_;
+- `NumPy <https://numpy.org/>`_;
 - `Numba <https://numba.pydata.org/>`_;
-- `Scipy <https://scipy.org/>`_.
+- `Scipy <https://scipy.org/>`_;
+- `scikit-learn <https://scikit-learn.org/>`_.
 
 ``thefittest`` contains methods
 -------------------------------
@@ -106,3 +107,17 @@ Notebooks on how to use ``thefittest``:
 - `Optimizing Neural Network Structure Using Genetic Programming; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/gpnn_regression_classification_problems.ipynb>`_
 
 If some notebooks are too big to display, you can use `NBviewer <https://nbviewer.org/>`_.
+
+Kaggle Notebooks
+----------------
+
+- `Can Evolution Guide Us to Better Machine Learning? <https://www.kaggle.com/code/pashasherst/can-evolution-guide-us-to-better-machine-learning>`_
+
+Articles
+--------
+
+Publications where ``thefittest`` has been used:
+
+- *Thefittest: evolutionary machine learning in Python*, January 2024, ITM Web of Conferences 59.
+  DOI: 10.1051/itmconf/20245902020. Licensed under CC BY 4.0. Authored by Pavel Sherstnev.
+  Available at: https://doi.org/10.1051/itmconf/20245902020
