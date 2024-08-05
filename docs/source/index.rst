@@ -43,7 +43,7 @@ Dependencies
 - `NumPy <https://numpy.org/>`_;
 - `Numba <https://numba.pydata.org/>`_;
 - `Scipy <https://scipy.org/>`_;
-- `scikit-learn <https://scikit-learn.org/>`_.
+- `Scikit-learn <https://scikit-learn.org/>`_.
 
 ``thefittest`` contains methods
 -------------------------------
