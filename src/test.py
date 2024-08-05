@@ -75,6 +75,19 @@ print(individual_algorithms)
 # 3. Интервал адаптации должен составлять 5-6 поколений коэволюции.
 
 
+# Как происходит обмен. (Best to All, All to All)
+# Выбор индивида для передачи (Best, Random)
+# Выбор индивида, который будет замещен (Worst, Random)
+# BtA BrW
+# BtA BrR
+# BtA RrW
+# BtA RrR
+# AtA BrW
+# AtA BrR
+# AtA RrW
+# AtA RrR
+# SBSP
+
 for name, algorithm_i in individual_algorithms.items():
     print(name)
     algorithm_i._get_init_population()
