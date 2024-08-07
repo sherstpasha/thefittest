@@ -120,7 +120,7 @@ class MyAdaptGA(GeneticAlgorithm):
         self._mutation_operators: NDArray = self._random_choice_operators(
             list(self._mutation_set.keys()), self._pop_size
         )
-         self._mutate_operator_proba =  mutate_operator_proba
+        self._mutate_operator_proba =  mutate_operator_proba
 
     def _random_choice_operators(self: MyAdaptGA, operators_set: List[str], size: int) -> NDArray:
         chosen_operator = np.random.choice(operators_set, size)

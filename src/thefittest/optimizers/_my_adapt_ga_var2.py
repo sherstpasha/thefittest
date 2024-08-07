@@ -55,6 +55,7 @@ class MyAdaptGAVar2(GeneticAlgorithm):
         init_population: Optional[NDArray[np.byte]] = None,
         adaptation_operator: str = "rank",
         adaptation_tour_size: int = 2,
+        mutate_operator_proba: float = 0.1,
         genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
@@ -91,7 +92,7 @@ class MyAdaptGAVar2(GeneticAlgorithm):
 
         self._adaptation_operator = self._selection_pool[adaptation_operator]
         self._adaptation_tour_size = adaptation_tour_size
-        self._mutate_thresholds_proba = 1 / (self._pop_size)
+        self._mutate_thresholds_proba = mutate_operator_proba
 
         self._selection_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
         self._crossover_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
