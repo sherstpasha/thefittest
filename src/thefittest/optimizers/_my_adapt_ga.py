@@ -56,6 +56,7 @@ class MyAdaptGA(GeneticAlgorithm):
         mutations: Tuple[str, ...] = ("weak", "average", "strong"),
         init_population: Optional[NDArray[np.byte]] = None,
         adaptation_operator: str = "rank",
+        mutate_operator_proba: float = 0.1,
         adaptation_tour_size: int = 2,
         genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
@@ -119,6 +120,7 @@ class MyAdaptGA(GeneticAlgorithm):
         self._mutation_operators: NDArray = self._random_choice_operators(
             list(self._mutation_set.keys()), self._pop_size
         )
+         self._mutate_operator_proba =  mutate_operator_proba
 
     def _random_choice_operators(self: MyAdaptGA, operators_set: List[str], size: int) -> NDArray:
         chosen_operator = np.random.choice(operators_set, size)
@@ -126,7 +128,7 @@ class MyAdaptGA(GeneticAlgorithm):
 
     def _mutate_operators(self: MyAdaptGA, operators: NDArray, operators_set: List[str]) -> NDArray:
         new_operators = operators.copy()
-        roll = np.random.random(size=len(operators)) < 1 / len(operators)
+        roll = np.random.random(size=len(operators)) < self._mutate_operator_proba
         n_replaces = np.sum(roll, dtype=int)
 
         if n_replaces > 0:
