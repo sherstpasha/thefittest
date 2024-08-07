@@ -6,7 +6,6 @@ from typing import Dict
 from typing import Optional
 from typing import Tuple
 from typing import Union
-from typing import List
 
 import numpy as np
 from numpy.typing import NDArray
@@ -14,10 +13,25 @@ from numpy.typing import NDArray
 from ._geneticalgorithm import GeneticAlgorithm
 from ..tools import donothing
 from ..tools.transformations import numpy_group_by
-from scipy.stats import zscore
 
 
-class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лучший оператор по истории а не по прошлому поколению. Что то изменил и код не работает как должен
+def count_consecutive_from_end(lst):
+    if not lst:
+        return 0, None
+    
+    target_value = lst[-1]
+    count = 0
+    
+    # Итерируемся с конца списка
+    for value in reversed(lst):
+        if value == target_value:
+            count += 1
+        else:
+            break
+    
+    return count, target_value
+
+class SelfCGAd(GeneticAlgorithm): #цель - исправление долгой сходимости операторов (отсутствие обратной связи) и долгой перестройки операторов (отсутствие обратной связи и возможно перезапуск вероятностей на плато)
     """Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform
     Crossover Operator. LNCS, 7331, 2012, pp. 414-421. https://doi.org/10.1007/978-3-642-30976-2_50
     """
@@ -123,6 +137,13 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
         self._z_crossover = len(self._crossover_set)
         self._z_mutation = len(self._mutation_set)
 
+        self._fittest_s_operator_history = []
+        self._fittest_c_operator_history = []
+        self._fittest_m_operator_history = []
+        self._window = 5
+        self.fraction_of_identical_history = []
+        self.max_restart_proba = 3/self._iters
+
         self._selection_proba = dict(
             zip(list(self._selection_set.keys()), np.full(self._z_selection, 1 / self._z_selection))
         )
@@ -153,42 +174,36 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
         )
         self._mutation_operators: NDArray = self._choice_operators(proba_dict=self._mutation_proba)
 
-        self._i: int = 0
-        self._previous_fitness_i: List = []
-        self._previous_selection_operators: List = []
-        self._previous_crossover_operators: List = []
-        self._previous_mutation_operators: List = []
-        
-
-    def _choice_operators(self: MyAdaptGAVar3, proba_dict: Dict["str", float]) -> NDArray:
+    def _choice_operators(self: SelfCGAd, proba_dict: Dict["str", float]) -> NDArray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
         chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
         return chosen_operator
 
     def _get_new_proba(
-        self: MyAdaptGAVar3,
+        self: SelfCGAd,
         proba_dict: Dict["str", float],
         operator: str,
         threshold: float,
+        K,
     ) -> Dict["str", float]:
-        proba_dict[operator] += (self._K*50) / self._iters
+        proba_dict[operator] += K / self._iters
         proba_value = np.array(list(proba_dict.values()))
-        proba_value -= self._K / (len(proba_dict) * self._iters)
+        proba_value -= K / (len(proba_dict) * self._iters)
         proba_value = proba_value.clip(threshold, 1)
         proba_value = proba_value / proba_value.sum()
         new_proba_dict = dict(zip(proba_dict.keys(), proba_value))
         return new_proba_dict
 
     def _find_fittest_operator(
-        self: MyAdaptGAVar3, operators: NDArray, fitness: NDArray[np.float64]
+        self: SelfCGAd, operators: NDArray, fitness: NDArray[np.float64]
     ) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
         fittest_operator = keys[np.argmax(mean_fit)]
         return fittest_operator
 
-    def _update_data(self: MyAdaptGAVar3) -> None:
+    def _update_data(self: SelfCGAd) -> None:
         super()._update_data()
         self._update_stats(
             s_proba=self._selection_proba,
@@ -196,51 +211,76 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
             m_proba=self._mutation_proba,
         )
 
-    def _adapt(self: MyAdaptGAVar3) -> None:
-        # print(self._previous_fitness_i, 1)
-        # print(self._fitness_i, 2)
-        self._previous_fitness_i.append(self._fitness_i.copy())
-        self._previous_selection_operators.append(self._selection_operators)
-        self._previous_crossover_operators.append(self._crossover_operators)
-        self._previous_mutation_operators.append(self._mutation_operators)
+    def _adapt(self: SelfCGAd) -> None:
 
-        if (self._i + 1) % 50 == 0:
-            previous_fitness = np.hstack(self._previous_fitness_i)
-            previous_selection_operators = np.hstack(self._previous_selection_operators)
-            previous_crossover_operators = np.hstack(self._previous_crossover_operators)
-            previous_mutation_operators = np.hstack(self._previous_mutation_operators)
-            print(self._i)
-            print(previous_fitness.shape)
-            print(previous_selection_operators.shape)
-            print(previous_crossover_operators.shape)
-            print(previous_mutation_operators.shape)
+        print(np.std(self._fitness_scale_i))
 
-            s_fittest_oper = self._find_fittest_operator(self._selection_operators, self._fitness_i)
-            self._selection_proba = self._get_new_proba(
-                self._selection_proba, s_fittest_oper, self._thresholds["selection"]
+        # Считаем количество уникальных значений и общее количество элементов
+        unique_values, counts = np.unique(self._fitness_scale_i, return_counts=True)
+
+        # Находим количество одинаковых значений (повторяющихся)
+        num_repeating = np.sum(counts[counts > 1])
+
+        # Рассчитываем долю одинаковых значений
+        fraction_of_identical = num_repeating / len(self._fitness_scale_i)
+
+        print("fraction_of_identical", fraction_of_identical)
+        self.fraction_of_identical_history.append(fraction_of_identical)
+
+        if np.random.random() < min(fraction_of_identical, self.max_restart_proba):
+        # if 0.9 < min(fraction_of_identical, self.max_restart_proba):
+            self._selection_proba = dict(
+                zip(list(self._selection_set.keys()), np.full(self._z_selection, 1 / self._z_selection))
+            )
+            if "empty" in self._crossover_set.keys():
+                self._crossover_proba = dict(
+                    zip(
+                        list(self._crossover_set.keys()),
+                        np.full(self._z_crossover, 0.9 / (self._z_crossover - 1)),
+                    )
                 )
+                self._crossover_proba["empty"] = 0.1
+            else:
+                self._crossover_proba = dict(
+                    zip(
+                        list(self._crossover_set.keys()),
+                        np.full(self._z_crossover, 1 / self._z_crossover),
+                    )
+                )
+            self._mutation_proba = dict(
+                zip(list(self._mutation_set.keys()), np.full(self._z_mutation, 1 / self._z_mutation))
+            )
+        else:
+            
+            s_fittest_oper = self._find_fittest_operator(self._selection_operators, self._fitness_i)
+            self._fittest_s_operator_history.append(s_fittest_oper)
+            K_s = count_consecutive_from_end(self._fittest_s_operator_history[-self._window:])[0]
+            K_s = 1
+            self._selection_proba = self._get_new_proba(
+                self._selection_proba, s_fittest_oper, self._thresholds["selection"], K_s*self._K
+            )
 
             c_fittest_oper = self._find_fittest_operator(self._crossover_operators, self._fitness_i)
+            self._fittest_c_operator_history.append(c_fittest_oper)
+            K_c = count_consecutive_from_end(self._fittest_c_operator_history[-self._window:])[0]
+            K_c = 1
             self._crossover_proba = self._get_new_proba(
-                self._crossover_proba, c_fittest_oper, self._thresholds["crossover"]
+                self._crossover_proba, c_fittest_oper, self._thresholds["crossover"], K_c*self._K
             )
 
             m_fittest_oper = self._find_fittest_operator(self._mutation_operators, self._fitness_i)
+            self._fittest_m_operator_history.append(m_fittest_oper)
+            K_m = count_consecutive_from_end(self._fittest_m_operator_history[-self._window:])[0]
+            K_m = 1
             self._mutation_proba = self._get_new_proba(
-                self._mutation_proba, m_fittest_oper, self._thresholds["mutation"]
+                self._mutation_proba, m_fittest_oper, self._thresholds["mutation"], K_m*self._K
             )
-
-            self._previous_fitness_i = []
-            self._previous_selection_operators = []
-            self._previous_crossover_operators = []
-            self._previous_mutation_operators = []
 
             self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
             self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
             self._mutation_operators = self._choice_operators(proba_dict=self._mutation_proba)
-        self._i += 1
 
-    def _get_new_population(self: MyAdaptGAVar3) -> None:
+    def _get_new_population(self: SelfCGAd) -> None:
         self._population_g_i = np.array(
             [
                 self._get_new_individ_g(

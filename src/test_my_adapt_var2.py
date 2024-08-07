@@ -1,5 +1,5 @@
 from collections import defaultdict
-from thefittest.optimizers._my_adapt_ga_var2 import MyAdaptGAVar2
+from thefittest.optimizers._selfcganet import SelfCGANet
 from thefittest.optimizers import SelfCGA
 from thefittest.benchmarks import Sphere
 from thefittest.benchmarks import Weierstrass
@@ -25,7 +25,7 @@ parts = np.full(shape=n_dimension, fill_value=n_bits_per_variable, dtype=np.int6
 genotype_to_phenotype = GrayCode(fit_by="parts").fit(
     left=left_border_array, right=right_border_array, arg=parts
 )
-optimizer = MyAdaptGAVar2(
+optimizer = SelfCGANet(
     fitness_function=Weierstrass(),
     genotype_to_phenotype=genotype_to_phenotype.transform,
     iters=number_of_iterations,
@@ -33,13 +33,9 @@ optimizer = MyAdaptGAVar2(
     str_len=sum(parts),
     show_progress_each=1,
     minimization=True,
-    # selections=("tournament_k", "rank", "proportional"),
-    # crossovers=("two_point", "one_point", "uniform_2", "uniform_rank_2"),
     tour_size=5,
     keep_history=True,
-    adaptation_operator="rank",
     elitism=False,
-    # adaptation_tour_size=2,
 )
 
 
@@ -54,36 +50,36 @@ print("The fittest individ:", fittest["genotype"])
 print("The fittest individ:", fittest["phenotype"])
 print("with fitness", fittest["fitness"])
 
-fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=2)
+# fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=2)
 
-ax[0][0].plot(range(number_of_iterations), stats["max_fitness"])
-ax[0][0].set_title("Fitness")
-ax[0][0].set_ylabel("Fitness value")
-ax[0][0].set_xlabel("Iterations")
+# ax[0][0].plot(range(number_of_iterations), stats["max_fitness"])
+# ax[0][0].set_title("Fitness")
+# ax[0][0].set_ylabel("Fitness value")
+# ax[0][0].set_xlabel("Iterations")
 
-selectiom_proba = defaultdict(list)
-for i in range(number_of_iterations):
-    for key, value in stats["s_used"][i].items():
-        selectiom_proba[key].append(value)
+# selectiom_proba = defaultdict(list)
+# for i in range(number_of_iterations):
+#     for key, value in stats["s_used"][i].items():
+#         selectiom_proba[key].append(value)
 
-for key, value in selectiom_proba.items():
-    ax[0][1].plot(range(number_of_iterations), value, label=key)
-ax[0][1].legend()
+# for key, value in selectiom_proba.items():
+#     ax[0][1].plot(range(number_of_iterations), value, label=key)
+# ax[0][1].legend()
 
-crossover_proba = defaultdict(list)
-for i in range(number_of_iterations):
-    for key, value in stats["c_used"][i].items():
-        crossover_proba[key].append(value)
+# crossover_proba = defaultdict(list)
+# for i in range(number_of_iterations):
+#     for key, value in stats["c_used"][i].items():
+#         crossover_proba[key].append(value)
 
-for key, value in crossover_proba.items():
-    ax[1][0].plot(range(number_of_iterations), value, label=key)
-ax[1][0].legend()
-
-
-mutation_proba = np.array(stats["m_probas"])
-
-ax[1][1].plot(range(number_of_iterations), mutation_proba.mean(axis=1), label=key)
+# for key, value in crossover_proba.items():
+#     ax[1][0].plot(range(number_of_iterations), value, label=key)
+# ax[1][0].legend()
 
 
-plt.tight_layout()
-plt.savefig("my_adapt.png")
+# mutation_proba = np.array(stats["m_probas"])
+
+# ax[1][1].plot(range(number_of_iterations), mutation_proba.mean(axis=1), label=key)
+
+
+# plt.tight_layout()
+# plt.savefig("my_adapt.png")

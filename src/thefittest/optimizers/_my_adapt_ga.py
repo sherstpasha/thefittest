@@ -17,7 +17,7 @@ from ._geneticalgorithm import GeneticAlgorithm
 from ..tools import donothing
 from ..tools.transformations import numpy_group_by
 
-
+#MyAdaptGA отличается от MyAdaptGAVar2 тем, что в одном случае мутация имеет 3 значения (оператор), а во втором вероятность мутации - вещественная
 class MyAdaptGA(GeneticAlgorithm):
     """Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform
     Crossover Operator. LNCS, 7331, 2012, pp. 414-421. https://doi.org/10.1007/978-3-642-30976-2_50

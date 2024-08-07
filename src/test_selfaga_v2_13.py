@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from thefittest.benchmarks.testfunctions14 import problems_dict
-from thefittest.optimizers import GeneticAlgorithm
+from thefittest.optimizers._my_adapt_ga_var2 import MyAdaptGAVar2
 from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
 from tqdm import tqdm
@@ -12,7 +12,7 @@ def find_solution_with_precision(solution_list, true_solution, precision):
             return i + 1
     return None
 
-def run_optimization(F, content, n_vars, eps, iters_pop, selection, crossover, mutation):
+def run_optimization(F, content, n_vars, eps, iters_pop):
     reliability = 0.
     speed_sum = 0
     range_left = np.nan
@@ -26,15 +26,15 @@ def run_optimization(F, content, n_vars, eps, iters_pop, selection, crossover, m
     genotype_to_phenotype = GrayCode().fit(left, right, h)
     str_let = genotype_to_phenotype.parts.sum()
 
-    optimizer = GeneticAlgorithm(fitness_function=content["function"](),
-                                 genotype_to_phenotype=genotype_to_phenotype.transform,
+    optimizer = MyAdaptGAVar2(fitness_function=content["function"](),
+                        genotype_to_phenotype=genotype_to_phenotype.transform,
                                  iters=iters_pop[F], 
                                  pop_size=iters_pop[F],
                                  str_len=str_let,
                                  elitism=True,
-                                 selection=selection,
-                                 crossover=crossover,
-                                 mutation=mutation,
+                                selections=("tournament_k", "rank", "proportional"),
+                                crossovers=("two_point", "one_point", "uniform_2"),
+                                # mutations=("weak", "average", "strong"),
                                  keep_history=True,
                                  minimization=True)        
     optimizer.fit()
@@ -71,18 +71,15 @@ def main():
     speed_results = []
     range_results = []
 
-    total_combinations = len(problems_dict) * 3 * 3 * 3  # Total combinations of functions, selections, crossovers, and mutations
+    total_combinations = len(problems_dict) # Total combinations of functions, selections, crossovers, and mutations
     progress_bar = tqdm(total=total_combinations, desc="Optimization Progress")
 
     for F, content in problems_dict.items():
-        for selection in ["proportional", "rank", "tournament_3"]:
-            for crossover in ["one_point", "two_point", "uniform_2"]:
-                for mutation in ["weak", "average", "strong"]:
                     content = problems_dict[F]
 
                     for n_vars in content["dimentions"]:
                         pool = mp.Pool(mp.cpu_count())
-                        results = [pool.apply_async(run_optimization, args=(F, content, n_vars, eps, iters_pop, selection, crossover, mutation)) for _ in range(n_runs)]
+                        results = [pool.apply_async(run_optimization, args=(F, content, n_vars, eps, iters_pop)) for _ in range(n_runs)]
                         pool.close()
                         pool.join()
 
@@ -106,24 +103,24 @@ def main():
                         else:
                             speed = np.nan
 
-                        reliability_results.append([F, n_vars, selection, crossover, mutation, reliability])
-                        speed_results.append([F, n_vars, selection, crossover, mutation, speed])
-                        range_results.append([F, n_vars, selection, crossover, mutation, range_left, range_right])
+                        reliability_results.append([F, n_vars, reliability])
+                        speed_results.append([F, n_vars, speed])
+                        range_results.append([F, n_vars, range_left, range_right])
 
                     progress_bar.update(1)
 
     progress_bar.close()
 
-    reliability_df = pd.DataFrame(reliability_results, columns=["Function", "Dimensions", "Selection", "Crossover", "Mutation", "Reliability"])
-    speed_df = pd.DataFrame(speed_results, columns=["Function", "Dimensions", "Selection", "Crossover", "Mutation", "Speed"])
-    range_df = pd.DataFrame(range_results, columns=["Function", "Dimensions", "Selection", "Crossover", "Mutation", "Range_Left", "Range_Right"])
+    reliability_df = pd.DataFrame(reliability_results, columns=["Function", "Dimensions", "Reliability"])
+    speed_df = pd.DataFrame(speed_results, columns=["Function", "Dimensions", "Speed"])
+    range_df = pd.DataFrame(range_results, columns=["Function", "Dimensions", "Range_Left", "Range_Right"])
 
-    reliability_df.to_csv("reliability_results.csv", index=False)
-    speed_df.to_csv("speed_results.csv", index=False)
-    range_df.to_csv("range_results.csv", index=False)
+    reliability_df.to_csv("reliability_results_selfaga_v2.csv", index=False)
+    speed_df.to_csv("speed_results_selfaga_v2.csv", index=False)
+    range_df.to_csv("range_results_selfaga_v2.csv", index=False)
 
     iters_pop_df = pd.DataFrame(list(iters_pop.items()), columns=["Function", "Iters_Pop_Size"])
-    iters_pop_df.to_csv("iters_pop_size.csv", index=False)
+    iters_pop_df.to_csv("iters_pop_size_selfaga_v2.csv", index=False)
 
 if __name__ == '__main__':
     main()

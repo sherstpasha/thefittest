@@ -6,7 +6,6 @@ from typing import Dict
 from typing import Optional
 from typing import Tuple
 from typing import Union
-from typing import List
 
 import numpy as np
 from numpy.typing import NDArray
@@ -14,10 +13,24 @@ from numpy.typing import NDArray
 from ._geneticalgorithm import GeneticAlgorithm
 from ..tools import donothing
 from ..tools.transformations import numpy_group_by
-from scipy.stats import zscore
 
+import torch
+import torch.nn as nn
+import torch.optim as optim
 
-class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лучший оператор по истории а не по прошлому поколению. Что то изменил и код не работает как должен
+# Определение модели
+class Net(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(Net, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc2 = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+
+class SelfCGANet(GeneticAlgorithm):
     """Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform
     Crossover Operator. LNCS, 7331, 2012, pp. 414-421. https://doi.org/10.1007/978-3-642-30976-2_50
     """
@@ -123,6 +136,14 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
         self._z_crossover = len(self._crossover_set)
         self._z_mutation = len(self._mutation_set)
 
+
+        self.input_lag = 5
+        self.output_window = 10
+        self._selection_adapt_net = Net(input_size=self._z_selection*self.input_lag, hidden_size=10, output_size=self._z_selection*self.output_window)
+        self._lag_fitness = np.empty(shape = (self.input_lag,), dtype = np.float64)
+        self._fittest_predict = np.empty(shape = (self._z_selection, self.output_window))
+        self.i = 1
+
         self._selection_proba = dict(
             zip(list(self._selection_set.keys()), np.full(self._z_selection, 1 / self._z_selection))
         )
@@ -153,26 +174,19 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
         )
         self._mutation_operators: NDArray = self._choice_operators(proba_dict=self._mutation_proba)
 
-        self._i: int = 0
-        self._previous_fitness_i: List = []
-        self._previous_selection_operators: List = []
-        self._previous_crossover_operators: List = []
-        self._previous_mutation_operators: List = []
-        
-
-    def _choice_operators(self: MyAdaptGAVar3, proba_dict: Dict["str", float]) -> NDArray:
+    def _choice_operators(self: SelfCGANet, proba_dict: Dict["str", float]) -> NDArray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
         chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
         return chosen_operator
 
     def _get_new_proba(
-        self: MyAdaptGAVar3,
+        self: SelfCGANet,
         proba_dict: Dict["str", float],
         operator: str,
         threshold: float,
     ) -> Dict["str", float]:
-        proba_dict[operator] += (self._K*50) / self._iters
+        proba_dict[operator] += self._K / self._iters
         proba_value = np.array(list(proba_dict.values()))
         proba_value -= self._K / (len(proba_dict) * self._iters)
         proba_value = proba_value.clip(threshold, 1)
@@ -181,14 +195,14 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
         return new_proba_dict
 
     def _find_fittest_operator(
-        self: MyAdaptGAVar3, operators: NDArray, fitness: NDArray[np.float64]
+        self: SelfCGANet, operators: NDArray, fitness: NDArray[np.float64]
     ) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
         fittest_operator = keys[np.argmax(mean_fit)]
-        return fittest_operator
+        return fittest_operator, mean_fit
 
-    def _update_data(self: MyAdaptGAVar3) -> None:
+    def _update_data(self: SelfCGANet) -> None:
         super()._update_data()
         self._update_stats(
             s_proba=self._selection_proba,
@@ -196,51 +210,29 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
             m_proba=self._mutation_proba,
         )
 
-    def _adapt(self: MyAdaptGAVar3) -> None:
-        # print(self._previous_fitness_i, 1)
-        # print(self._fitness_i, 2)
-        self._previous_fitness_i.append(self._fitness_i.copy())
-        self._previous_selection_operators.append(self._selection_operators)
-        self._previous_crossover_operators.append(self._crossover_operators)
-        self._previous_mutation_operators.append(self._mutation_operators)
+    def _adapt(self: SelfCGANet) -> None:
+        print(self.i)
+        self.input_lag
+        s_fittest_oper = self._find_fittest_operator(self._selection_operators, self._fitness_i)
+        self._selection_proba = self._get_new_proba(
+            self._selection_proba, s_fittest_oper, self._thresholds["selection"]
+        )
 
-        if (self._i + 1) % 50 == 0:
-            previous_fitness = np.hstack(self._previous_fitness_i)
-            previous_selection_operators = np.hstack(self._previous_selection_operators)
-            previous_crossover_operators = np.hstack(self._previous_crossover_operators)
-            previous_mutation_operators = np.hstack(self._previous_mutation_operators)
-            print(self._i)
-            print(previous_fitness.shape)
-            print(previous_selection_operators.shape)
-            print(previous_crossover_operators.shape)
-            print(previous_mutation_operators.shape)
+        c_fittest_oper = self._find_fittest_operator(self._crossover_operators, self._fitness_i)
+        self._crossover_proba = self._get_new_proba(
+            self._crossover_proba, c_fittest_oper, self._thresholds["crossover"]
+        )
 
-            s_fittest_oper = self._find_fittest_operator(self._selection_operators, self._fitness_i)
-            self._selection_proba = self._get_new_proba(
-                self._selection_proba, s_fittest_oper, self._thresholds["selection"]
-                )
+        m_fittest_oper = self._find_fittest_operator(self._mutation_operators, self._fitness_i)
+        self._mutation_proba = self._get_new_proba(
+            self._mutation_proba, m_fittest_oper, self._thresholds["mutation"]
+        )
 
-            c_fittest_oper = self._find_fittest_operator(self._crossover_operators, self._fitness_i)
-            self._crossover_proba = self._get_new_proba(
-                self._crossover_proba, c_fittest_oper, self._thresholds["crossover"]
-            )
+        self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
+        self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
+        self._mutation_operators = self._choice_operators(proba_dict=self._mutation_proba)
 
-            m_fittest_oper = self._find_fittest_operator(self._mutation_operators, self._fitness_i)
-            self._mutation_proba = self._get_new_proba(
-                self._mutation_proba, m_fittest_oper, self._thresholds["mutation"]
-            )
-
-            self._previous_fitness_i = []
-            self._previous_selection_operators = []
-            self._previous_crossover_operators = []
-            self._previous_mutation_operators = []
-
-            self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
-            self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
-            self._mutation_operators = self._choice_operators(proba_dict=self._mutation_proba)
-        self._i += 1
-
-    def _get_new_population(self: MyAdaptGAVar3) -> None:
+    def _get_new_population(self: SelfCGANet) -> None:
         self._population_g_i = np.array(
             [
                 self._get_new_individ_g(
@@ -252,3 +244,6 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
             ],
             dtype=self._population_g_i.dtype,
         )
+        self.i = self.i + 1
+
+
