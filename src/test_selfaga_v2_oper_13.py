@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from thefittest.benchmarks.testfunctions14 import problems_dict
-from thefittest.optimizers._my_adapt_ga_3oper import MyAdaptGA3oper
+from thefittest.optimizers._my_adapt_ga_var2_3oper import MyAdaptGAVar23oper
 from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
 from tqdm import tqdm
@@ -28,7 +28,7 @@ def run_optimization(F, content, n_vars, eps, iters_pop, adapt_oper, mutate_oper
     genotype_to_phenotype = GrayCode().fit(left, right, h)
     str_let = genotype_to_phenotype.parts.sum()
 
-    optimizer = MyAdaptGA3oper(
+    optimizer = MyAdaptGAVar23oper(
         fitness_function=content["function"](),
         genotype_to_phenotype=genotype_to_phenotype.transform,
         iters=iters_pop[F],
@@ -37,7 +37,6 @@ def run_optimization(F, content, n_vars, eps, iters_pop, adapt_oper, mutate_oper
         elitism=True,
         selections=("tournament_k", "rank", "proportional"),
         crossovers=("two_point", "one_point", "uniform_2"),
-        mutations=("weak", "average", "strong"),
         adaptation_operator=adapt_oper,
         mutate_operator_proba=mutate_operator_proba,
         keep_history=True,
@@ -78,7 +77,7 @@ def main():
 
     results = []
     adaptation_operator_list = ["proportional", "rank", "tournament_3"]
-    mutate_operator_proba_range = [1 / 3, 1, 3]
+    mutate_operator_proba_range = np.arange(0, 0.21, 0.01)
     total_combinations = (
         len(problems_dict) * len(adaptation_operator_list) * len(mutate_operator_proba_range)
     )
@@ -155,10 +154,10 @@ def main():
             "Range_Right",
         ],
     )
-    combined_df.to_csv("combined_results_my_adapt_ga_3oper.csv", index=False)
+    combined_df.to_csv("combined_results_my_adapt_ga_v2_oper.csv", index=False)
 
     # iters_pop_df = pd.DataFrame(list(iters_pop.items()), columns=["Function", "Iters_Pop_Size"])
-    # iters_pop_df.to_csv("iters_pop_size_my_adapt_ga_3oper.csv", index=False)
+    # iters_pop_df.to_csv("iters_pop_size_my_adapt_ga_v2.csv", index=False)
 
 
 if __name__ == "__main__":
