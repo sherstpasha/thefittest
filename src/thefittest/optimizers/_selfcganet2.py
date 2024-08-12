@@ -24,23 +24,24 @@ def create_policy_network(input_size, output_sizes):
     class PolicyNetwork(nn.Module):
         def __init__(self, input_size, output_sizes):
             super(PolicyNetwork, self).__init__()
-            self.fc1 = nn.Linear(input_size, 20)
-            self.fc2 = nn.Linear(20, sum(output_sizes))  # Объединяем выходы в один вектор
+            self.fc1 = nn.Linear(input_size, 5)
+
+            # Три выходных слоя для трех типов операторов
+            self.fc2_crossover = nn.Linear(5, output_sizes[0])
+            self.fc2_mutation = nn.Linear(5, output_sizes[1])
+            self.fc2_selection = nn.Linear(5, output_sizes[2])
 
             self.softmax = nn.Softmax(dim=1)
 
         def forward(self, x):
             x = torch.relu(self.fc1(x))
-            combined_probs = self.fc2(x)
 
-            # Разделяем объединенный выход на три части для разных операторов
-            selection_probs = self.softmax(combined_probs[:, : output_sizes[0]])
-            crossover_probs = self.softmax(
-                combined_probs[:, output_sizes[0] : output_sizes[0] + output_sizes[1]]
-            )
-            mutation_probs = self.softmax(combined_probs[:, output_sizes[0] + output_sizes[1] :])
+            # Три выхода, по одному на каждый тип операторов
+            crossover_probs = self.softmax(self.fc2_crossover(x))
+            mutation_probs = self.softmax(self.fc2_mutation(x))
+            selection_probs = self.softmax(self.fc2_selection(x))
 
-            return selection_probs, crossover_probs, mutation_probs
+            return crossover_probs, mutation_probs, selection_probs
 
     return PolicyNetwork(input_size, output_sizes)
 
@@ -89,21 +90,11 @@ def get_operator_probabilities(state, network):
     return selection_probs, crossover_probs, mutation_probs
 
 
-def train_policy_network(optimizer, action_distributions, action_indices, rewards):
+def train_policy_network(optimizer, action_dist, action_index, reward):
     optimizer.zero_grad()
-
-    total_loss = 0
-    for dist, index, reward in zip(action_distributions, action_indices, rewards):
-        if not torch.is_tensor(index):
-            index = torch.tensor(index, dtype=torch.int64)
-        log_prob = dist.log_prob(index)
-        loss = -log_prob * reward
-        total_loss += loss
-
-    total_loss.backward()
+    loss = -action_dist.log_prob(torch.tensor(action_index)) * reward
+    loss.backward()
     optimizer.step()
-
-    return total_loss.item()  # Возвращаем значение потерь как скаляр
 
 
 class SelfCGANet(GeneticAlgorithm):
@@ -195,7 +186,6 @@ class SelfCGANet(GeneticAlgorithm):
         self._selection_proba: Dict[str, float]
         self._crossover_proba: Dict[str, float]
         self._mutation_proba: Dict[str, float]
-        self.losses = []
 
         for operator_name in selections:
             self._selection_set[operator_name] = self._selection_pool[operator_name]
@@ -219,7 +209,7 @@ class SelfCGANet(GeneticAlgorithm):
             input_size=3,
             output_sizes=[self._z_selection, self._z_crossover, self._z_mutation],
         )
-        self._selection_optimizer = create_optimizer(self._selection_adapt_net, 0.001)
+        self._selection_optimizer = create_optimizer(self._selection_adapt_net, 0.01)
         self.i = 1
 
         self._selection_proba = dict(
@@ -290,68 +280,26 @@ class SelfCGANet(GeneticAlgorithm):
         )
 
     def _adapt(self: SelfCGANet) -> None:
-        if self.i > 1:
-            state, _ = process_population_state(self._fitness_scale_i, self._population_g_i)
 
-            # Получение вероятностей операторов в виде тензоров PyTorch
-            selection_probs, crossover_probs, mutation_probs = get_operator_probabilities(
-                state, self._selection_adapt_net
-            )
+        state, avg_fitness = process_population_state(self._fitness_i, self._population_g_i)
 
-            # Преобразование numpy массивов в тензоры PyTorch
-            selection_probs = torch.tensor(selection_probs, requires_grad=True)
-            crossover_probs = torch.tensor(crossover_probs, requires_grad=True)
-            mutation_probs = torch.tensor(mutation_probs, requires_grad=True)
+        selection_probs, crossover_probs, mutation_probs = get_operator_probabilities(
+            state, self._selection_adapt_net
+        )
 
-            action_distributions = []
-            action_indices = []
-            rewards = []
+        self._selection_proba = dict(zip(self._selection_proba.keys(), selection_probs))
+        self._crossover_proba = dict(zip(self._crossover_proba.keys(), crossover_probs))
+        self._mutation_proba = dict(zip(self._mutation_proba.keys(), mutation_probs))
 
-            for ind_index in range(self._pop_size):
-                # Выбираем операторы для конкретного индивида
-                selection_dist = torch.distributions.Categorical(selection_probs)
-                selection_index = selection_dist.sample().item()
-                selected_selection_operator = list(self._selection_proba.keys())[selection_index]
-
-                crossover_dist = torch.distributions.Categorical(crossover_probs)
-                crossover_index = crossover_dist.sample().item()
-                selected_crossover_operator = list(self._crossover_proba.keys())[crossover_index]
-
-                mutation_dist = torch.distributions.Categorical(mutation_probs)
-                mutation_index = mutation_dist.sample().item()
-                selected_mutation_operator = list(self._mutation_proba.keys())[mutation_index]
-
-                # Вычисление награды для каждого индивида
-                reward = self._fitness_i[ind_index] - self._previous_fitness_i[ind_index]
-
-                # Сохраняем действия и распределения для последующего обучения
-                action_distributions.extend([selection_dist, crossover_dist, mutation_dist])
-                action_indices.extend([selection_index, crossover_index, mutation_index])
-                rewards.extend([reward, reward, reward])  # Один reward для каждого действия
-
-                # Сохраняем выбранные операторы
-                self._selection_operators[ind_index] = selected_selection_operator
-                self._crossover_operators[ind_index] = selected_crossover_operator
-                self._mutation_operators[ind_index] = selected_mutation_operator
-
-            # Обучение сети с использованием всех собранных действий
-            total_loss = train_policy_network(
-                self._selection_optimizer, action_distributions, action_indices, rewards
-            )
-            self.losses.append(np.mean(total_loss))  # Сохраняем значение потерь
-
-            # Обновление вероятностей операторов для следующего поколения
-            self._selection_proba = dict(
-                zip(self._selection_proba.keys(), selection_probs.detach().numpy())
-            )
-            self._crossover_proba = dict(
-                zip(self._crossover_proba.keys(), crossover_probs.detach().numpy())
-            )
-            self._mutation_proba = dict(
-                zip(self._mutation_proba.keys(), mutation_probs.detach().numpy())
-            )
-
-        self._previous_fitness_i = self._fitness_i.copy()
+        self._selection_operators = np.random.choice(
+            list(self._selection_proba.keys()), self._pop_size, p=selection_probs
+        )
+        self._crossover_operators = np.random.choice(
+            list(self._crossover_proba.keys()), self._pop_size, p=crossover_probs
+        )
+        self._mutation_operators = np.random.choice(
+            list(self._mutation_proba.keys()), self._pop_size, p=mutation_probs
+        )
 
     def _get_new_population(self: SelfCGANet) -> None:
         self._population_g_i = np.array(

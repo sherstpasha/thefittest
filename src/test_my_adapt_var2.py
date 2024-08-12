@@ -1,5 +1,5 @@
 from collections import defaultdict
-from thefittest.optimizers._selfcganet import SelfCGANet
+from thefittest.src.thefittest.optimizers._selfcganet2 import SelfCGANet
 from thefittest.optimizers import SelfCGA
 from thefittest.benchmarks import Sphere
 from thefittest.benchmarks import Weierstrass
