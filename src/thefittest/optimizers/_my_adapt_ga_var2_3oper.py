@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
-from collections import Counter
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -13,13 +11,13 @@ from typing import List
 import numpy as np
 from numpy.typing import NDArray
 
+from ..base import Tree
 from ._geneticalgorithm import GeneticAlgorithm
 from ..tools import donothing
-from ..tools.transformations import numpy_group_by
+from ..tools.operators import flip_mutation
 
 
-# MyAdaptGA отличается от MyAdaptGAVar2 тем, что в одном случае мутация имеет 3 значения (оператор), а во втором вероятность мутации - вещественная
-class MyAdaptGA3oper(GeneticAlgorithm):
+class MyAdaptGAVar23oper(GeneticAlgorithm):
     """Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform
     Crossover Operator. LNCS, 7331, 2012, pp. 414-421. https://doi.org/10.1007/978-3-642-30976-2_50
     """
@@ -54,11 +52,10 @@ class MyAdaptGA3oper(GeneticAlgorithm):
             "uniform_tour_3",
             "uniform_tour_7",
         ),
-        mutations: Tuple[str, ...] = ("weak", "average", "strong"),
         init_population: Optional[NDArray[np.byte]] = None,
         adaptation_operator: str = "rank",
-        mutate_operator_proba: float = 0.1,
         adaptation_tour_size: int = 2,
+        mutate_operator_proba: float = 0.1,
         genotype_to_phenotype: Callable[[NDArray[np.byte]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
@@ -95,10 +92,10 @@ class MyAdaptGA3oper(GeneticAlgorithm):
 
         self._adaptation_operator = self._selection_pool[adaptation_operator]
         self._adaptation_tour_size = adaptation_tour_size
+        self._mutate_thresholds_proba = mutate_operator_proba / self._pop_size
 
         self._selection_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
         self._crossover_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
-        self._mutation_set: Dict[str, Tuple[Callable, Union[float, int], bool]] = {}
 
         for operator_name in selections:
             self._selection_set[operator_name] = self._selection_pool[operator_name]
@@ -108,40 +105,57 @@ class MyAdaptGA3oper(GeneticAlgorithm):
             self._crossover_set[operator_name] = self._crossover_pool[operator_name]
         self._crossover_set = dict(sorted(self._crossover_set.items()))
 
-        for operator_name in mutations:
-            self._mutation_set[operator_name] = self._mutation_pool[operator_name]
-        self._mutation_set = dict(sorted(self._mutation_set.items()))
-
         self._selection_operators: NDArray = self._random_choice_operators(
             list(self._selection_set.keys()), self._pop_size
         )
         self._crossover_operators: NDArray = self._random_choice_operators(
             list(self._crossover_set.keys()), self._pop_size
         )
-        self._mutation_operators: NDArray = self._random_choice_operators(
-            list(self._mutation_set.keys()), self._pop_size
+
+        self._min_mutation_rate = 0.0
+        self._max_mutation_rate = 1.0
+
+        self._mutation_probas: NDArray = self._random_probas(
+            self._min_mutation_rate, self._max_mutation_rate, self._pop_size
         )
-        self._mutate_operator_proba = mutate_operator_proba / self._pop_size
+
+    def _random_probas(
+        self: MyAdaptGAVar23oper, left: float, right: float, size: int
+    ) -> NDArray[np.float64]:
+        probas = np.random.uniform(left, right, size)
+        return probas
+
+    def _mutate_probas(
+        self: MyAdaptGAVar23oper, mutation_probas: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        new_probas = mutation_probas.copy()
+        roll = np.random.random(size=len(mutation_probas)) < self._mutate_thresholds_proba
+        n_replaces = np.sum(roll, dtype=int)
+        if n_replaces > 0:
+            new_probas[roll] = self._random_probas(
+                self._min_mutation_rate, self._max_mutation_rate, size=n_replaces
+            )
+        return new_probas
 
     def _random_choice_operators(
-        self: MyAdaptGA3oper, operators_set: List[str], size: int
+        self: MyAdaptGAVar23oper, operators_set: List[str], size: int
     ) -> NDArray:
         chosen_operator = np.random.choice(operators_set, size)
         return chosen_operator
 
     def _mutate_operators(
-        self: MyAdaptGA3oper, operators: NDArray, operators_set: List[str]
+        self: MyAdaptGAVar23oper, operators: NDArray, operators_set: List[str]
     ) -> NDArray:
         new_operators = operators.copy()
-        roll = np.random.random(size=len(operators)) < self._mutate_operator_proba
+        roll = np.random.random(size=len(operators)) < self._mutate_thresholds_proba
         n_replaces = np.sum(roll, dtype=int)
 
         if n_replaces > 0:
             new_operators[roll] = self._random_choice_operators(operators_set, size=n_replaces)
         return new_operators
 
-    def _choice_operators_by_selection(
-        self: MyAdaptGA3oper,
+    def _choice_operators_or_proba_by_selection(
+        self: MyAdaptGAVar23oper,
         operators: NDArray,
         fitness: NDArray[np.float64],
         fitness_rank: NDArray[np.float64],
@@ -154,7 +168,7 @@ class MyAdaptGA3oper(GeneticAlgorithm):
         new_operators = operators[selected_id]
         return new_operators
 
-    def _update_data(self: MyAdaptGA3oper) -> None:
+    def _update_data(self: MyAdaptGAVar23oper) -> None:
         super()._update_data()
 
         keys, values = np.unique(self._selection_operators, return_counts=True)
@@ -171,37 +185,66 @@ class MyAdaptGA3oper(GeneticAlgorithm):
             if key not in crossover_used:
                 crossover_used[key] = 0
 
-        keys, values = np.unique(self._mutation_operators, return_counts=True)
-        mutation_used = dict(zip(keys, values))
-
-        for key in self._mutation_set.keys():
-            if key not in mutation_used:
-                mutation_used[key] = 0
-
         self._update_stats(
             s_used=selection_used,
             c_used=crossover_used,
-            m_used=mutation_used,
+            m_probas=self._mutation_probas,
         )
 
-    def _adapt(self: MyAdaptGA3oper) -> None:
+    def _adapt(self: MyAdaptGAVar23oper) -> None:
         self._selection_operators = self._mutate_operators(
-            self._choice_operators_by_selection(
-                self._selection_operators, self._fitness_scale_i, self._fitness_rank_i
+            self._choice_operators_or_proba_by_selection(
+                self._selection_operators, self._fitness_i, self._fitness_rank_i
             ),
             list(self._selection_set.keys()),
         )
 
         self._crossover_operators = self._mutate_operators(
-            self._choice_operators_by_selection(
-                self._crossover_operators, self._fitness_scale_i, self._fitness_rank_i
+            self._choice_operators_or_proba_by_selection(
+                self._crossover_operators, self._fitness_i, self._fitness_rank_i
             ),
             list(self._crossover_set.keys()),
         )
 
-        self._mutation_operators = self._mutate_operators(
-            self._choice_operators_by_selection(
-                self._mutation_operators, self._fitness_scale_i, self._fitness_rank_i
-            ),
-            list(self._mutation_set.keys()),
+        self._mutation_probas = self._mutate_probas(
+            self._choice_operators_or_proba_by_selection(
+                operators=self._mutation_probas,
+                fitness=self._fitness_i,
+                fitness_rank=self._fitness_rank_i,
+            )
         )
+
+    def _get_new_population(self: MyAdaptGAVar23oper) -> None:
+        self._population_g_i = np.array(
+            [
+                self._get_new_individ_g(
+                    self._selection_operators[i],
+                    self._crossover_operators[i],
+                    self._mutation_probas[i],
+                )
+                for i in range(self._pop_size)
+            ],
+            dtype=self._population_g_i.dtype,
+        )
+
+    def _get_new_individ_g(
+        self: GeneticAlgorithm,
+        specified_selection: str,
+        specified_crossover: str,
+        specified_mutation_proba: np.float64,
+    ) -> Union[Tree, np.byte]:
+        selection_func, tour_size = self._selection_pool[specified_selection]
+        crossover_func, quantity = self._crossover_pool[specified_crossover]
+
+        selected_id = selection_func(
+            self._fitness_scale_i, self._fitness_rank_i, np.int64(tour_size), np.int64(quantity)
+        )
+
+        offspring_no_mutated = crossover_func(
+            self._population_g_i[selected_id],
+            self._fitness_scale_i[selected_id],
+            self._fitness_rank_i[selected_id],
+        )
+
+        offspring = flip_mutation(offspring_no_mutated, np.float64(specified_mutation_proba))
+        return offspring
