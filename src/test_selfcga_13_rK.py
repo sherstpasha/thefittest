@@ -60,7 +60,7 @@ def run_optimization(F, content, n_vars, eps, iters_pop, k_loc, k_scale):
 
 def main():
     eps = 0.01
-    n_runs = 1000
+    n_runs = 100
     iters_pop = {
         "F1": 15,
         "F2": 22,
@@ -78,8 +78,8 @@ def main():
     }
 
     results = []
-    k_loc_range = np.arange(0.5, 2.1, 0.1)
-    k_scale_range = np.arange(0.15, 0.7, 0.1)
+    k_loc_range = np.arange(0.5, 20.1, 3.)
+    k_scale_range = np.arange(0.15, 8.5, 1.5)
     total_combinations = len(problems_dict) * len(k_loc_range) * len(k_scale_range)
     progress_bar = tqdm(total=total_combinations, desc="Optimization Progress")
 

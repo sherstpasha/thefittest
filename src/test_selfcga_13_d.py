@@ -61,7 +61,7 @@ def run_optimization(F, content, n_vars, eps, iters_pop, K, window, max_restart_
 
 def main():
     eps = 0.01
-    n_runs = 1
+    n_runs = 1000
     iters_pop = {
         "F1": 15,
         "F2": 22,
@@ -79,7 +79,7 @@ def main():
     }
 
     results = []
-    K_range = [1]
+    K_range = [2]
     window = range(1, 15, 3)
     max_restart_proba = np.arange(0, 0.51, 0.05)
     total_combinations = len(problems_dict) * len(K_range) * len(window) * len(max_restart_proba)
