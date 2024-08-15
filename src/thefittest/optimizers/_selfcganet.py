@@ -255,7 +255,7 @@ class SelfCGANet(GeneticAlgorithm):
     def _choice_operators(self: SelfCGANet, proba_dict: Dict["str", float]) -> NDArray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
-        print(proba)
+        # print(proba)
         chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
         return chosen_operator
 

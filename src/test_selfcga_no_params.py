@@ -1,6 +1,5 @@
 from collections import defaultdict
-from thefittest.optimizers._my_adapt_ga import MyAdaptGA
-from thefittest.optimizers import SelfCGA
+from thefittest.optimizers._selfcga_no_params import SelfCGA
 from thefittest.benchmarks import Sphere
 import matplotlib.pyplot as plt
 
@@ -33,12 +32,13 @@ optimizer = SelfCGA(
     show_progress_each=1,
     minimization=True,
     selections=("tournament_k", "rank", "proportional"),
-    crossovers=("two_point", "one_point", "uniform_2", "uniform_rank_2"),
-    mutations=("weak", "strong"),
+    crossovers=("two_point", "one_point", "uniform_2"),
+    mutations=("weak", "average", "strong"),
     tour_size=5,
     keep_history=True,
     # adaptation_operator="rank",
     # adaptation_tour_size=2,
+    alpha = 0.1
 )
 
 

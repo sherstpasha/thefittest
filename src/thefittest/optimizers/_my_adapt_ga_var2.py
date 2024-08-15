@@ -112,12 +112,13 @@ class MyAdaptGAVar2(GeneticAlgorithm):
             list(self._crossover_set.keys()), self._pop_size
         )
 
-        self._min_mutation_rate = 0.0
-        self._max_mutation_rate = 1.0
+        self._min_mutation_rate = (1/3)/self._str_len
+        self._max_mutation_rate = 3/self._str_len
 
         self._mutation_probas: NDArray = self._random_probas(
             self._min_mutation_rate, self._max_mutation_rate, self._pop_size
         )
+        self.i = 0
 
     def _random_probas(
         self: MyAdaptGAVar2, left: float, right: float, size: int
@@ -126,10 +127,10 @@ class MyAdaptGAVar2(GeneticAlgorithm):
         return probas
 
     def _mutate_probas(
-        self: MyAdaptGAVar2, mutation_probas: NDArray[np.float64]
+        self: MyAdaptGAVar2, mutation_probas: NDArray[np.float64], mutate_thresholds_proba
     ) -> NDArray[np.float64]:
         new_probas = mutation_probas.copy()
-        roll = np.random.random(size=len(mutation_probas)) < self._mutate_thresholds_proba
+        roll = np.random.random(size=len(mutation_probas)) < mutate_thresholds_proba
         n_replaces = np.sum(roll, dtype=int)
         if n_replaces > 0:
             new_probas[roll] = self._random_probas(
@@ -144,10 +145,10 @@ class MyAdaptGAVar2(GeneticAlgorithm):
         return chosen_operator
 
     def _mutate_operators(
-        self: MyAdaptGAVar2, operators: NDArray, operators_set: List[str]
+        self: MyAdaptGAVar2, operators: NDArray, operators_set: List[str], mutate_thresholds_proba
     ) -> NDArray:
         new_operators = operators.copy()
-        roll = np.random.random(size=len(operators)) < self._mutate_thresholds_proba
+        roll = np.random.random(size=len(operators)) < mutate_thresholds_proba
         n_replaces = np.sum(roll, dtype=int)
 
         if n_replaces > 0:
@@ -173,46 +174,58 @@ class MyAdaptGAVar2(GeneticAlgorithm):
 
         keys, values = np.unique(self._selection_operators, return_counts=True)
         selection_used = dict(zip(keys, values))
+        selection_mean_fitness = {}
 
         for key in self._selection_set.keys():
+            selection_mean_fitness[key] = np.mean(self._fitness_i[self._selection_operators == key])
             if key not in selection_used:
                 selection_used[key] = 0
 
         keys, values = np.unique(self._crossover_operators, return_counts=True)
         crossover_used = dict(zip(keys, values))
+        crossover_mean_fitness = {}
 
         for key in self._crossover_set.keys():
+            crossover_mean_fitness[key] = np.mean(self._fitness_i[self._crossover_operators == key])
             if key not in crossover_used:
                 crossover_used[key] = 0
 
         self._update_stats(
+            s_mean_fit = selection_mean_fitness,
+            c_mean_fit = crossover_mean_fitness,
             s_used=selection_used,
             c_used=crossover_used,
             m_probas=self._mutation_probas,
         )
 
     def _adapt(self: MyAdaptGAVar2) -> None:
+        if self.i % 1000 == 0:
+            proba = 1.0
+        else:
+            proba = self._mutate_thresholds_proba
+            
+
         self._selection_operators = self._mutate_operators(
-            self._choice_operators_or_proba_by_selection(
-                self._selection_operators, self._fitness_i, self._fitness_rank_i
-            ),
-            list(self._selection_set.keys()),
-        )
+                self._choice_operators_or_proba_by_selection(
+                    self._selection_operators, self._fitness_i, self._fitness_rank_i
+                ),
+                list(self._selection_set.keys()), proba
+            )
 
         self._crossover_operators = self._mutate_operators(
-            self._choice_operators_or_proba_by_selection(
-                self._crossover_operators, self._fitness_i, self._fitness_rank_i
-            ),
-            list(self._crossover_set.keys()),
-        )
+                self._choice_operators_or_proba_by_selection(
+                    self._crossover_operators, self._fitness_i, self._fitness_rank_i
+                ),
+                list(self._crossover_set.keys()), proba
+            )
 
         self._mutation_probas = self._mutate_probas(
-            self._choice_operators_or_proba_by_selection(
-                operators=self._mutation_probas,
-                fitness=self._fitness_i,
-                fitness_rank=self._fitness_rank_i,
+                self._choice_operators_or_proba_by_selection(
+                    operators=self._mutation_probas,
+                    fitness=self._fitness_i,
+                    fitness_rank=self._fitness_rank_i
+                ), proba
             )
-        )
 
     def _get_new_population(self: MyAdaptGAVar2) -> None:
         self._population_g_i = np.array(
@@ -226,6 +239,7 @@ class MyAdaptGAVar2(GeneticAlgorithm):
             ],
             dtype=self._population_g_i.dtype,
         )
+        self.i = self.i + 1
 
     def _get_new_individ_g(
         self: GeneticAlgorithm,

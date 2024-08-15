@@ -53,7 +53,7 @@ def run_optimization(F, content, n_vars, eps, iters_pop, adapt_oper, mutate_oper
 
 def main():
     eps = 0.01
-    n_runs = 1000
+    n_runs = 100
     iters_pop = {"F1": 15,
                  "F2": 22,
                  "F3": 25,
@@ -69,8 +69,8 @@ def main():
                  "F13": 18}
 
     results = []
-    adaptation_operator_list = ["proportional", "rank", "tournament_3"]
-    mutate_operator_proba_range = np.arange(0, 0.21, 0.01)
+    adaptation_operator_list = ["proportional", "rank", "tournament_3", "tournament_5"]
+    mutate_operator_proba_range = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     total_combinations = len(problems_dict) * len(adaptation_operator_list) * len(mutate_operator_proba_range)
     progress_bar = tqdm(total=total_combinations, desc="Optimization Progress")
 
