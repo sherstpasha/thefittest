@@ -1,9 +1,11 @@
+import multiprocessing
+import socket
+import pickle
 import numpy as np
 import pandas as pd
 from opfunu.cec_based import cec2005
 from thefittest.optimizers import GeneticAlgorithm
 from thefittest.tools.transformations import GrayCode
-import multiprocessing as mp
 from tqdm import tqdm
 
 def find_solution_with_precision(solution_list, true_solution, precision):
@@ -54,19 +56,18 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
 
     return reliability, speed_sum, range_left, range_right, find_count
 
-def main():
+def server_program():
+    task_queue = multiprocessing.SimpleQueue()
+    result_queue = multiprocessing.SimpleQueue()
+
+    # Генерация задач
     eps = 0.0001
+    initial_iters_pop = 50
+    max_iters_pop = 10000
+    increment_step = 50
     n_runs = 10
-    initial_iters_pop = 50  # Начальное значение итераций и размера популяции
-    max_iters_pop = 10000  # Максимальное значение итераций и размера популяции
-    target_reliability = 0.5
-    increment_step = 50  # Шаг увеличения итераций и размера популяции
-
-    dimensions = [10]  # Два значения для ndim
-    functions = []
-
-    for ndim in dimensions:
-        functions.extend([cec2005.F12005(ndim=ndim),
+    ndim = 10
+    functions = [cec2005.F12005(ndim=ndim),
                           cec2005.F22005(ndim=ndim),
                           cec2005.F32005(ndim=ndim),
                           cec2005.F42005(ndim=ndim),
@@ -90,57 +91,47 @@ def main():
                           cec2005.F222005(ndim=ndim),
                           cec2005.F232005(ndim=ndim),
                           cec2005.F242005(ndim=ndim),
-                          cec2005.F252005(ndim=ndim)])
+                          cec2005.F252005(ndim=ndim)]  # Укажите ваши функции
 
-    results = []
+    for function in functions:
+        for iters_pop in range(initial_iters_pop, max_iters_pop + increment_step, increment_step):
+            for selection in ["proportional", "rank", "tournament_3"]:
+                for crossover in ["one_point", "two_point", "uniform_2"]:
+                    for mutation in ["weak", "average", "strong"]:
+                        for _ in range(n_runs):
+                            task_queue.put((function, eps, iters_pop, selection, crossover, mutation))
 
-    progress_bar = tqdm(total=len(functions), desc="Optimization Progress")
+    # Настройка сокета для соединения
+    host = socket.gethostname()
+    port = 5000  # Используйте свободный порт
 
-    with mp.Pool(processes=mp.cpu_count()) as pool:
-        for function in functions:
-            successful = False
-            for iters_pop in range(initial_iters_pop, max_iters_pop + increment_step, increment_step):
-                for selection in ["proportional", "rank", "tournament_3"]:
-                    for crossover in ["one_point", "two_point", "uniform_2"]:
-                        for mutation in ["weak", "average", "strong"]:
-                            futures = [pool.apply_async(run_optimization, args=(function, eps, iters_pop, iters_pop, selection, crossover, mutation)) for _ in range(n_runs)]
-                            
-                            reliability_sum = 0
-                            speed_sum = 0
-                            range_left = np.nan
-                            range_right = np.nan
-                            find_count = 0
+    server_socket = socket.socket()
+    server_socket.bind((host, port))
+    server_socket.listen(2)  # Слушаем максимум два соединения
 
-                            for future in futures:
-                                rel, speed, left, right, count = future.get()
-                                reliability_sum += rel
-                                speed_sum += speed
-                                if not np.isnan(left):
-                                    range_left = min(range_left, left) if not np.isnan(range_left) else left
-                                if not np.isnan(right):
-                                    range_right = max(range_right, right) if not np.isnan(range_right) else right
-                                find_count += count
+    conn, address = server_socket.accept()  # Принимаем соединение
+    print(f"Connection from: {address}")
 
-                            reliability = reliability_sum / n_runs
+    # Отправляем задачи на клиент
+    while not task_queue.empty():
+        task = task_queue.get()
+        conn.send(pickle.dumps(task))
 
-                            if reliability >= target_reliability:
-                                successful = True
-                                results.append([function.__class__.__name__, function.ndim, selection, crossover, mutation, iters_pop, reliability, speed_sum / find_count, range_left, range_right])
-                                break
+    # Получаем результаты от клиента
+    while True:
+        data = conn.recv(4096)
+        if not data:
+            break
+        result = pickle.loads(data)
+        result_queue.put(result)
 
-                        if successful:
-                            break
-                    if successful:
-                        break
-                if successful:
-                    break
+    # Закрываем соединение
+    conn.close()
 
-            progress_bar.update(1)
-
-    progress_bar.close()
-
-    results_df = pd.DataFrame(results, columns=["Function", "Dimensions", "Selection", "Crossover", "Mutation", "Iters_Pop_Size", "Reliability", "Speed", "Range_Left", "Range_Right"])
-    results_df.to_csv("optimal_iters_pop_size_cec2005.csv", index=False)
+    # Обработка результатов
+    while not result_queue.empty():
+        result = result_queue.get()
+        print("Received result:", result)
 
 if __name__ == '__main__':
-    main()
+    server_program()
