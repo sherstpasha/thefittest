@@ -31,8 +31,8 @@ def run_optimization(F, content, n_vars, eps, iters_pop):
                         iters=iters_pop[F], 
                         pop_size=iters_pop[F],
                         str_len=str_let,
-                        elitism=True,
-                        selections=("tournament_3", "rank", "proportional"),
+                        elitism=False,
+                        selections=("proportional", "rank", "tournament_3", "tournament_5", "tournament_7"),
                         crossovers=("two_point", "one_point", "uniform_2"),
                         mutations=("weak", "average", "strong"),
                         keep_history=True,
@@ -103,10 +103,10 @@ def main():
     progress_bar.close()
 
     combined_df = pd.DataFrame(results, columns=["Function", "Dimensions", "Reliability", "Speed", "Range_Left", "Range_Right"])
-    combined_df.to_csv("combined_results_pdp.csv", index=False)
+    combined_df.to_csv("combined_results_pdp_conv.csv", index=False)
 
-    iters_pop_df = pd.DataFrame(list(iters_pop.items()), columns=["Function", "Iters_Pop_Size"])
-    iters_pop_df.to_csv("iters_pop_size_pdp.csv", index=False)
+    # iters_pop_df = pd.DataFrame(list(iters_pop.items()), columns=["Function", "Iters_Pop_Size"])
+    # iters_pop_df.to_csv("iters_pop_size_pdp.csv", index=False)
 
 if __name__ == '__main__':
     main()

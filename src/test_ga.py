@@ -4,13 +4,16 @@ from opfunu.cec_based import cec2005
 from thefittest.optimizers import GeneticAlgorithm
 from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
-from tqdm import tqdm
+# from tqdm import tqdm
 
 def find_solution_with_precision(solution_list, true_solution, precision):
+    errors = []
     for i, solution in enumerate(solution_list):
-        if np.all(np.abs(solution - true_solution) <= precision):
-            return i + 1
-    return None
+        error = np.abs(solution - true_solution)
+        errors.append(error)
+        if np.all(error <= precision):
+            return i + 1, errors
+    return None, errors
 
 def run_optimization(function, eps, iters, pop_size, selection, crossover, mutation):
     reliability = 0.
@@ -18,6 +21,8 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
     range_left = np.nan
     range_right = np.nan
     find_count = 0
+    min_error = np.nan
+    max_error = np.nan
 
     left = np.array(function.bounds[:, 0], dtype=np.float64)
     right = np.array(function.bounds[:, 1], dtype=np.float64)
@@ -43,7 +48,7 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
                                  minimization=True)
     optimizer.fit()
     stat = optimizer.get_stats()
-    speed_i = find_solution_with_precision(stat["max_ph"], function.f_global, h)
+    speed_i, errors = find_solution_with_precision(stat["max_ph"], function.x_global, h)
 
     if speed_i is not None:
         reliability = 1
@@ -51,59 +56,55 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
         range_left = speed_i
         range_right = speed_i
         find_count = 1
+    else:
+        if errors:
+            min_error = np.min([e.mean() for e in errors])
+            max_error = np.max([e.mean() for e in errors])
+            print(f"Minimum error: {min_error}, Maximum error: {max_error}")
 
     return reliability, speed_sum, range_left, range_right, find_count
 
 def main():
-    eps = 0.0001
-    n_runs = 10
-    initial_iters_pop = 50  # Начальное значение итераций и размера популяции
-    max_iters_pop = 10000  # Максимальное значение итераций и размера популяции
+    eps = 0.1
+    n_runs = 15
+    initial_iters_pop = 20
+    max_iters = 50000
+    max_pop_size = 5000
     target_reliability = 0.5
-    increment_step = 50  # Шаг увеличения итераций и размера популяции
 
-    dimensions = [10]  # Два значения для ndim
-    functions = []
+    iters_values = []
+    pop_size_values = []
+    
+    iters = initial_iters_pop
+    pop_size = initial_iters_pop
+    
+    while pop_size <= max_pop_size and iters <= max_iters:
+        iters_values.append(iters)
+        pop_size_values.append(pop_size)
+        iters = iters + int(iters * 0.5)
+        pop_size = pop_size + int(pop_size * 0.5)
+        
+    while iters <= max_iters:
+        iters_values.append(iters)
+        pop_size_values.append(max_pop_size)
+        iters = iters + int(iters * 0.5)
 
-    for ndim in dimensions:
-        functions.extend([cec2005.F12005(ndim=ndim),
-                          cec2005.F22005(ndim=ndim),
-                          cec2005.F32005(ndim=ndim),
-                          cec2005.F42005(ndim=ndim),
-                          cec2005.F52005(ndim=ndim),
-                          cec2005.F62005(ndim=ndim),
-                          cec2005.F72005(ndim=ndim),
-                          cec2005.F82005(ndim=ndim),
-                          cec2005.F92005(ndim=ndim),
-                          cec2005.F102005(ndim=ndim),
-                          cec2005.F112005(ndim=ndim),
-                          cec2005.F122005(ndim=ndim),
-                          cec2005.F132005(ndim=ndim),
-                          cec2005.F142005(ndim=ndim),
-                          cec2005.F152005(ndim=ndim),
-                          cec2005.F162005(ndim=ndim),
-                          cec2005.F172005(ndim=ndim),
-                          cec2005.F182005(ndim=ndim),
-                          cec2005.F192005(ndim=ndim),
-                          cec2005.F202005(ndim=ndim),
-                          cec2005.F212005(ndim=ndim),
-                          cec2005.F222005(ndim=ndim),
-                          cec2005.F232005(ndim=ndim),
-                          cec2005.F242005(ndim=ndim),
-                          cec2005.F252005(ndim=ndim)])
+    dimensions = [10]
+    functions = [cec2005.F52005(ndim=dim) for dim in dimensions]
 
     results = []
 
-    progress_bar = tqdm(total=len(functions), desc="Optimization Progress")
+    # progress_bar = tqdm(total=len(functions) * (len(iters_values)), desc="Optimization Progress")
 
     with mp.Pool(processes=mp.cpu_count()) as pool:
         for function in functions:
             successful = False
-            for iters_pop in range(initial_iters_pop, max_iters_pop + increment_step, increment_step):
-                for selection in ["proportional", "rank", "tournament_3"]:
-                    for crossover in ["one_point", "two_point", "uniform_2"]:
+
+            for iters, pop_size in zip(iters_values, pop_size_values):
+                for selection in ["tournament_3"]:
+                    for crossover in ["uniform_2"]:
                         for mutation in ["weak", "average", "strong"]:
-                            futures = [pool.apply_async(run_optimization, args=(function, eps, iters_pop, iters_pop, selection, crossover, mutation)) for _ in range(n_runs)]
+                            futures = [pool.apply_async(run_optimization, args=(function, eps, iters, pop_size, selection, crossover, mutation)) for _ in range(n_runs)]
                             
                             reliability_sum = 0
                             speed_sum = 0
@@ -123,9 +124,12 @@ def main():
 
                             reliability = reliability_sum / n_runs
 
+                            print(function, iters, pop_size, reliability, selection, crossover, mutation)
+
                             if reliability >= target_reliability:
                                 successful = True
-                                results.append([function.__class__.__name__, function.ndim, selection, crossover, mutation, iters_pop, reliability, speed_sum / find_count, range_left, range_right])
+                                results.append([function.__class__.__name__, function.ndim, selection, crossover, mutation, pop_size, iters, reliability, speed_sum / find_count, range_left, range_right])
+                                print(results[-1])
                                 break
 
                         if successful:
@@ -135,12 +139,13 @@ def main():
                 if successful:
                     break
 
-            progress_bar.update(1)
+    #         progress_bar.update(1)
 
-    progress_bar.close()
+    # progress_bar.close()
 
-    results_df = pd.DataFrame(results, columns=["Function", "Dimensions", "Selection", "Crossover", "Mutation", "Iters_Pop_Size", "Reliability", "Speed", "Range_Left", "Range_Right"])
+    results_df = pd.DataFrame(results, columns=["Function", "Dimensions", "Selection", "Crossover", "Mutation", "Pop_Size", "Iters", "Reliability", "Speed", "Range_Left", "Range_Right"])
     results_df.to_csv("optimal_iters_pop_size_cec2005.csv", index=False)
 
 if __name__ == '__main__':
     main()
+

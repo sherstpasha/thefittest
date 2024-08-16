@@ -32,7 +32,7 @@ def run_optimization(F, content, n_vars, eps, iters_pop):
                           iters=iters_pop[F], 
                           pop_size=iters_pop[F],
                           str_len=str_let,
-                          elitism=True,
+                          elitism=False,
                           keep_history=True,
                           minimization=True)
         
@@ -107,8 +107,8 @@ def main():
     combined_df = pd.DataFrame(results, columns=["Function", "Dimensions", "Reliability", "Speed", "Range_Left", "Range_Right"])
     combined_df.to_csv("combined_results_shaga.csv", index=False)
 
-    iters_pop_df = pd.DataFrame(list(iters_pop.items()), columns=["Function", "Iters_Pop_Size"])
-    iters_pop_df.to_csv("iters_pop_size_shaga.csv", index=False)
+    # iters_pop_df = pd.DataFrame(list(iters_pop.items()), columns=["Function", "Iters_Pop_Size"])
+    # iters_pop_df.to_csv("iters_pop_size_shaga.csv", index=False)
 
 if __name__ == '__main__':
     main()

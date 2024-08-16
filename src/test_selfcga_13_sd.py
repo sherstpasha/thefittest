@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from thefittest.benchmarks.testfunctions14 import problems_dict
-from thefittest.optimizers._selfcga_no_params import SelfCGA
+from thefittest.optimizers import SelfCGA
 from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
 from tqdm import tqdm
@@ -12,7 +12,7 @@ def find_solution_with_precision(solution_list, true_solution, precision):
             return i + 1
     return None
 
-def run_optimization(F, content, n_vars, eps, iters_pop, A_i):
+def run_optimization(F, content, n_vars, eps, iters_pop, K):
     reliability = 0.
     speed_sum = 0
     range_left = np.nan
@@ -31,12 +31,21 @@ def run_optimization(F, content, n_vars, eps, iters_pop, A_i):
                         iters=iters_pop[F], 
                         pop_size=iters_pop[F],
                         str_len=str_let,
-                        elitism=True,
-                        selections=("tournament_3", "rank", "proportional"),
-                        crossovers=("two_point", "one_point", "uniform_2"),
+                        elitism=False,
+                        selections=("proportional", "rank", "tournament_3", "tournament_5", "tournament_7"),
+                        crossovers=("empty",
+                                    "one_point",
+                                    "two_point",
+                                    "uniform_2",
+                                    "uniform_7",
+                                    "uniform_prop_2",
+                                    "uniform_prop_7",
+                                    "uniform_rank_2",
+                                    "uniform_rank_7",
+                                    "uniform_tour_3",
+                                    "uniform_tour_7",),
                         mutations=("weak", "average", "strong"),
-                        alpha=A_i,
-                        K=2,
+                        K=K,
                         keep_history=True,
                         minimization=True)
     
@@ -71,15 +80,15 @@ def main():
                  "F13": 18}
 
     results = []
-    alpha_range = np.arange(0., 1.1, 0.1)
-    total_combinations = len(problems_dict) * len(alpha_range)
+    K_range = [2,]
+    total_combinations = len(problems_dict) * len(K_range)
     progress_bar = tqdm(total=total_combinations, desc="Optimization Progress")
 
     with mp.Pool(processes=mp.cpu_count()) as pool:
         for F, content in problems_dict.items():
-            for A_i in alpha_range:
+            for K_i in K_range:
                 for n_vars in content["dimentions"]:
-                    futures = [pool.apply_async(run_optimization, args=(F, content, n_vars, eps, iters_pop, A_i)) for _ in range(n_runs)]
+                    futures = [pool.apply_async(run_optimization, args=(F, content, n_vars, eps, iters_pop, K_i)) for _ in range(n_runs)]
                     
                     reliability = 0.
                     speed_sum = 0
@@ -101,16 +110,16 @@ def main():
                     else:
                         speed = np.nan
 
-                    results.append([F, n_vars, A_i, reliability, speed, range_left, range_right])
+                    results.append([F, n_vars, K_i, reliability, speed, range_left, range_right])
                 progress_bar.update(1)
 
     progress_bar.close()
 
-    combined_df = pd.DataFrame(results, columns=["Function", "Dimensions", "A_i", "Reliability", "Speed", "Range_Left", "Range_Right"])
-    combined_df.to_csv("combined_results_selfcga_no_param.csv", index=False)
+    combined_df = pd.DataFrame(results, columns=["Function", "Dimensions", "K", "Reliability", "Speed", "Range_Left", "Range_Right"])
+    combined_df.to_csv("combined_results_selfcga_sd.csv", index=False)
 
-    iters_pop_df = pd.DataFrame(list(iters_pop.items()), columns=["Function", "Iters_Pop_Size"])
-    iters_pop_df.to_csv("iters_pop_size_selfcga_no_param.csv", index=False)
+    # iters_pop_df = pd.DataFrame(list(iters_pop.items()), columns=["Function", "Iters_Pop_Size"])
+    # iters_pop_df.to_csv("iters_pop_size_selfcga_conv.csv", index=False)
 
 if __name__ == '__main__':
     main()

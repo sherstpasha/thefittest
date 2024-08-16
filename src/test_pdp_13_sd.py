@@ -1,11 +1,10 @@
 import numpy as np
 import pandas as pd
 from thefittest.benchmarks.testfunctions14 import problems_dict
-from thefittest.optimizers._selfcganet import SelfCGANet
+from thefittest.optimizers import PDPGA
 from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
 from tqdm import tqdm
-
 
 def find_solution_with_precision(solution_list, true_solution, precision):
     for i, solution in enumerate(solution_list):
@@ -13,9 +12,8 @@ def find_solution_with_precision(solution_list, true_solution, precision):
             return i + 1
     return None
 
-
-def run_optimization(F, content, n_vars, eps, iters_pop, K):
-    reliability = 0.0
+def run_optimization(F, content, n_vars, eps, iters_pop):
+    reliability = 0.
     speed_sum = 0
     range_left = np.nan
     range_right = np.nan
@@ -28,21 +26,27 @@ def run_optimization(F, content, n_vars, eps, iters_pop, K):
     genotype_to_phenotype = GrayCode().fit(left, right, h)
     str_let = genotype_to_phenotype.parts.sum()
 
-    optimizer = SelfCGANet(
-        fitness_function=content["function"](),
-        genotype_to_phenotype=genotype_to_phenotype.transform,
-        iters=iters_pop[F],
-        pop_size=iters_pop[F],
-        str_len=str_let,
-        elitism=True,
-        selections=("tournament_3", "rank", "proportional"),
-        crossovers=("two_point", "one_point", "uniform_2"),
-        mutations=("weak", "average", "strong"),
-        K=K,
-        keep_history=True,
-        minimization=True,
-    )
-
+    optimizer = PDPGA(fitness_function=content["function"](),
+                        genotype_to_phenotype=genotype_to_phenotype.transform,
+                        iters=iters_pop[F], 
+                        pop_size=iters_pop[F],
+                        str_len=str_let,
+                        elitism=False,
+                        selections=("proportional", "rank", "tournament_3", "tournament_5", "tournament_7"),
+                        crossovers=("one_point",
+                                  "two_point",
+                                  "uniform_2",
+                                  "uniform_7",
+                                  "uniform_prop_2",
+                                  "uniform_prop_7",
+                                  "uniform_rank_2",
+                                  "uniform_rank_7",
+                                  "uniform_tour_3",
+                                  "uniform_tour_7",),
+                        mutations=("weak", "average", "strong"),
+                        keep_history=True,
+                        minimization=True)
+    
     optimizer.fit()
     stat = optimizer.get_stats()
     speed_i = find_solution_with_precision(stat["max_ph"], content["optimum_x"][:n_vars], h)
@@ -56,43 +60,33 @@ def run_optimization(F, content, n_vars, eps, iters_pop, K):
 
     return reliability, speed_sum, range_left, range_right, find_count
 
-
 def main():
     eps = 0.01
-    n_runs = 300
-    iters_pop = {
-        "F1": 15,
-        "F2": 22,
-        "F3": 25,
-        "F4": 20,
-        "F5": 30,
-        "F6": 70,
-        "F7": 80,
-        "F8": 120,
-        "F9": 70,
-        "F10": 400,
-        "F11": 45,
-        "F12": 16,
-        "F13": 18,
-    }
+    n_runs = 1000
+    iters_pop = {"F1": 15,
+                 "F2": 22,
+                 "F3": 25,
+                 "F4": 20,
+                 "F5": 30,
+                 "F6": 70,
+                 "F7": 80,
+                 "F8": 120,
+                 "F9": 70,
+                 "F10": 400,
+                 "F11": 45,
+                 "F12": 16,
+                 "F13": 18}
 
     results = []
-    K_range = [0]
-    total_combinations = len(problems_dict) * len(K_range)
+    total_combinations = len(problems_dict)
     progress_bar = tqdm(total=total_combinations, desc="Optimization Progress")
 
     with mp.Pool(processes=mp.cpu_count()) as pool:
         for F, content in problems_dict.items():
-            for K_i in K_range:
                 for n_vars in content["dimentions"]:
-                    futures = [
-                        pool.apply_async(
-                            run_optimization, args=(F, content, n_vars, eps, iters_pop, K_i)
-                        )
-                        for _ in range(n_runs)
-                    ]
-
-                    reliability = 0.0
+                    futures = [pool.apply_async(run_optimization, args=(F, content, n_vars, eps, iters_pop)) for _ in range(n_runs)]
+                    
+                    reliability = 0.
                     speed_sum = 0
                     range_left = np.nan
                     range_right = np.nan
@@ -112,28 +106,16 @@ def main():
                     else:
                         speed = np.nan
 
-                    results.append([F, n_vars, K_i, reliability, speed, range_left, range_right])
+                    results.append([F, n_vars, reliability, speed, range_left, range_right])
                 progress_bar.update(1)
 
     progress_bar.close()
 
-    combined_df = pd.DataFrame(
-        results,
-        columns=[
-            "Function",
-            "Dimensions",
-            "K",
-            "Reliability",
-            "Speed",
-            "Range_Left",
-            "Range_Right",
-        ],
-    )
-    combined_df.to_csv("combined_results_selfcganet.csv", index=False)
+    combined_df = pd.DataFrame(results, columns=["Function", "Dimensions", "Reliability", "Speed", "Range_Left", "Range_Right"])
+    combined_df.to_csv("combined_results_pdp_sd.csv", index=False)
 
-    iters_pop_df = pd.DataFrame(list(iters_pop.items()), columns=["Function", "Iters_Pop_Size"])
-    iters_pop_df.to_csv("iters_pop_size_selfcganet.csv", index=False)
+    # iters_pop_df = pd.DataFrame(list(iters_pop.items()), columns=["Function", "Iters_Pop_Size"])
+    # iters_pop_df.to_csv("iters_pop_size_pdp.csv", index=False)
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
