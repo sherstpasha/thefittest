@@ -66,7 +66,7 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
 
 def main():
     eps = 0.1
-    n_runs = 15
+    n_runs = 100
     initial_iters_pop = 20
     max_iters = 50000
     max_pop_size = 5000
@@ -81,16 +81,16 @@ def main():
     while pop_size <= max_pop_size and iters <= max_iters:
         iters_values.append(iters)
         pop_size_values.append(pop_size)
-        iters = iters + int(iters * 0.5)
-        pop_size = pop_size + int(pop_size * 0.5)
+        iters = iters + int(iters * 0.3)
+        pop_size = pop_size + int(pop_size * 0.3)
         
     while iters <= max_iters:
         iters_values.append(iters)
         pop_size_values.append(max_pop_size)
-        iters = iters + int(iters * 0.5)
+        iters = iters + int(iters * 0.3)
 
-    dimensions = [10]
-    functions = [cec2005.F52005(ndim=dim) for dim in dimensions]
+    dimensions = [5]
+    functions = [cec2005.F22005(ndim=dim) for dim in dimensions]
 
     results = []
 

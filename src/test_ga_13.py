@@ -52,7 +52,7 @@ def run_optimization(F, content, n_vars, eps, iters_pop, selection, crossover, m
 
 def main():
     eps = 0.01
-    n_runs = 1000
+    n_runs = 300
     iters_pop = {"F1": 15,
                  "F2": 22,
                  "F3": 25,
@@ -71,13 +71,14 @@ def main():
     speed_results = []
     range_results = []
 
-    total_combinations = len(problems_dict) * 5 * 3 * 3  # Total combinations of functions, selections, crossovers, and mutations
+    total_combinations = len(problems_dict) * 5 * 11 * 3  # Total combinations of functions, selections, crossovers, and mutations
     progress_bar = tqdm(total=total_combinations, desc="Optimization Progress")
 
     with mp.Pool(processes=mp.cpu_count()) as pool:
         for F, content in problems_dict.items():
             for selection in ["proportional", "rank", "tournament_3", "tournament_5", "tournament_7"]:
-                for crossover in ["one_point",
+                for crossover in ["empty",
+                                  "one_point",
                                   "two_point",
                                   "uniform_2",
                                   "uniform_7",
