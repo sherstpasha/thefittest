@@ -90,7 +90,7 @@ def main():
         iters = iters + int(iters * 0.3)
 
     dimensions = [5]
-    functions = [cec2005.F22005(ndim=dim) for dim in dimensions]
+    functions = [cec2005.F52005(ndim=dim) for dim in dimensions]
 
     results = []
 
