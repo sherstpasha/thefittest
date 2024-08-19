@@ -67,13 +67,13 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
     else:
         if errors:
             argmin = np.argmin(np.array(errors)[:, 1])
-            print(np.array(errors)[argmin])
+            # print(np.array(errors)[argmin])
 
-    return reliability, speed_sum, range_left, range_right, find_count
+    return reliability, speed_sum, range_left, range_right, find_count, np.array(errors)[argmin]
 
 
 def main():
-    eps = 0.05
+    eps = 0.01
     n_runs = 50
     initial_iters_pop = 20
     max_iters = 50000
@@ -98,7 +98,7 @@ def main():
         iters = iters + int(iters * 0.7)
 
     dimensions = [10]
-    functions = [problems_dict["F2"]]
+    functions = [problems_dict["F3"]]
 
     results = []
 
@@ -133,9 +133,11 @@ def main():
                             range_left = np.nan
                             range_right = np.nan
                             find_count = 0
+                            all_errors = []
 
                             for future in futures:
-                                rel, speed, left, right, count = future.get()
+                                rel, speed, left, right, count, errors = future.get()  #
+                                all_errors.append(errors)
                                 reliability_sum += rel
                                 speed_sum += speed
                                 if not np.isnan(left):
@@ -152,6 +154,9 @@ def main():
 
                             reliability = reliability_sum / n_runs
 
+                            argmin = np.argmin(np.array(all_errors)[:, 1])
+                            error = np.array(all_errors)[argmin]
+
                             print(
                                 function["function"],
                                 iters,
@@ -160,6 +165,7 @@ def main():
                                 selection,
                                 crossover,
                                 mutation,
+                                error,
                             )
 
                             if reliability >= target_reliability:
