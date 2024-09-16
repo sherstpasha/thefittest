@@ -67,6 +67,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        fitness_update_eps: float = 0,
     ):
         EvolutionaryAlgorithm.__init__(
             self,
@@ -85,6 +86,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            fitness_update_eps=fitness_update_eps,
         )
         self._str_len: int = str_len
         self._tour_size: int = tour_size

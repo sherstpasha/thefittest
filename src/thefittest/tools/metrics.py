@@ -27,6 +27,22 @@ def root_mean_square_error2d(
     return to_return
 
 
+@njit(float64[:](float64[:, :], float64[:, :, :]))
+def root_mean_square_error3d(y_true: np.ndarray, y_predict2d: np.ndarray) -> np.ndarray:
+    size = len(y_predict2d)
+    num_variables = y_true.shape[1]
+    to_return = np.empty(size, dtype=np.float64)
+
+    for i in range(size):
+        error_sum = 0.0
+        for j in range(num_variables):
+            error = y_true[:, j] - y_predict2d[i, :, j]
+            error_sum += np.mean(error**2)
+        to_return[i] = np.sqrt(error_sum / num_variables)
+
+    return to_return
+
+
 @njit(float64(float64[:], float64[:]))
 def coefficient_determination(
     y_true: NDArray[np.float64], y_predict: NDArray[np.float64]

@@ -2,7 +2,12 @@ import numpy as np
 import pandas as pd
 
 # from opfunu.cec_based import cec2005
-from thefittest.benchmarks.CEC2005 import problems_dict
+from thefittest.benchmarks import Sphere
+from thefittest.benchmarks import Schwefe1_2
+from thefittest.benchmarks import Rosenbrock
+from thefittest.benchmarks import Rastrigin, Griewank
+from thefittest.benchmarks import Ackley
+from thefittest.benchmarks import Weierstrass
 from thefittest.optimizers import GeneticAlgorithm
 from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
@@ -14,7 +19,7 @@ def find_solution_with_precision(solution_list, true_solution, precision):
     errors = []
     for i, solution in enumerate(solution_list):
         # print(solution, true_solution)
-        error = np.abs(solution - true_solution[:2])
+        error = np.abs(solution - true_solution[:30])
         errors.append([error.min(), error.max()])
         if np.all(error <= precision):
             return i + 1, errors
@@ -30,9 +35,9 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
     min_error = np.nan
     max_error = np.nan
 
-    left = np.array([function["bounds"][0]] * 2, dtype=np.float64)
-    right = np.array([function["bounds"][1]] * 2, dtype=np.float64)
-    h = np.array([eps] * 2, dtype=np.float64)
+    left = np.array([function["bounds"][0]] * 30, dtype=np.float64)
+    right = np.array([function["bounds"][1]] * 30, dtype=np.float64)
+    h = np.array([eps] * 30, dtype=np.float64)
 
     genotype_to_phenotype = GrayCode().fit(left, right, h)
     str_len = genotype_to_phenotype.parts.sum()
@@ -76,8 +81,8 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
 
 def main():
     eps = 0.01
-    n_runs = 40
-    initial_iters_pop = 450
+    n_runs = 50
+    initial_iters_pop = 200
     max_iters = 50000
     max_pop_size = 5000
     target_reliability = 0.5
@@ -91,16 +96,73 @@ def main():
     while pop_size <= max_pop_size and iters <= max_iters:
         iters_values.append(iters)
         pop_size_values.append(pop_size)
-        iters = iters + int(iters * 0.05)
-        pop_size = pop_size + int(pop_size * 0.05)
+        iters = iters + int(iters * 0.01)
+        pop_size = pop_size + int(pop_size * 0.01)
 
     while iters <= max_iters:
         iters_values.append(iters)
         pop_size_values.append(max_pop_size)
-        iters = iters + int(iters * 0.05)
+        iters = iters + int(iters * 0.01)
 
-    dimensions = [2]
-    functions = [problems_dict["F6"]]
+    dimensions = [30]
+    functions = [
+        # {
+        #     "function": Sphere,
+        #     "bounds": (-5.12, 5.12),
+        #     "fix_accuracy": 1e-2,
+        #     "optimum": 0,
+        #     "optimum_x": np.zeros(shape=100, dtype=np.float64),
+        #     "dimentions": range(2, 101),
+        # },
+        # {
+        #     "function": Schwefe1_2,
+        #     "bounds": (-5.12, 5.12),
+        #     "fix_accuracy": 1e-2,
+        #     "optimum": 0,
+        #     "optimum_x": np.zeros(shape=100, dtype=np.float64),
+        #     "dimentions": range(2, 101),
+        # },
+        # {
+        #     "function": Rosenbrock,
+        #     "bounds": (-2.048, 2.048),
+        #     "fix_accuracy": 1e-2,
+        #     "optimum": 0,
+        #     "optimum_x": np.ones(shape=100, dtype=np.float64),
+        #     "dimentions": range(2, 101),
+        # },
+        # {
+        #     "function": Rastrigin,
+        #     "bounds": (-5.12, 5.12),
+        #     "fix_accuracy": 1e-2,
+        #     "optimum": 0,
+        #     "optimum_x": np.zeros(shape=100, dtype=np.float64),
+        #     "dimentions": range(2, 101),
+        # },
+        # {
+        #     "function": Griewank,
+        #     "bounds": (-600, 600),
+        #     "fix_accuracy": 1e-2,
+        #     "optimum": 0,
+        #     "optimum_x": np.zeros(shape=100, dtype=np.float64),
+        #     "dimentions": range(2, 101),
+        # },
+        {
+            "function": Ackley,
+            "bounds": (-32.768, 32.768),
+            "fix_accuracy": 1e-2,
+            "optimum": 0,
+            "optimum_x": np.zeros(shape=100, dtype=np.float64),
+            "dimentions": range(2, 101),
+        },
+        # {
+        #     "function": Weierstrass,
+        #     "bounds": (-1, 1),
+        #     "fix_accuracy": 1e-2,
+        #     "optimum": 0,
+        #     "optimum_x": np.zeros(shape=100, dtype=np.float64),
+        #     "dimentions": range(2, 101),
+        # },
+    ]
 
     results = []
 

@@ -32,10 +32,13 @@ class TheFittest:
         population_g: NDArray[Any],
         population_ph: NDArray[Any],
         fitness: NDArray[np.float64],
+        eps: float = 0.0,  # Добавлен параметр eps, по умолчанию 0
     ) -> None:
         temp_best_id = np.argmax(fitness)
         temp_best_fitness = fitness[temp_best_id]
-        if temp_best_fitness > self._fitness:
+
+        # Проверка на улучшение с учётом eps
+        if temp_best_fitness - self._fitness > eps:
             self._replace(
                 new_genotype=population_g[temp_best_id],
                 new_phenotype=population_ph[temp_best_id],
@@ -91,6 +94,7 @@ class EvolutionaryAlgorithm:
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        fitness_update_eps: float = 0,
     ):
         self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]] = fitness_function
         self._iters: int = iters
@@ -126,7 +130,10 @@ class EvolutionaryAlgorithm:
         self._population_ph_i: NDArray
         self._fitness_i: NDArray[np.float64]
 
-        self._parallel = Parallel(self._n_jobs)
+        if self._n_jobs > 1:
+            self._parallel = Parallel(self._n_jobs)
+
+        self._fitness_update_eps = fitness_update_eps
 
     def _first_generation(self: EvolutionaryAlgorithm) -> None:
         return None
@@ -163,7 +170,10 @@ class EvolutionaryAlgorithm:
         fitness: NDArray[np.float64],
     ) -> None:
         self._thefittest._update(
-            population_g=population_g, population_ph=population_ph, fitness=fitness
+            population_g=population_g,
+            population_ph=population_ph,
+            fitness=fitness,
+            eps=self._fitness_update_eps,
         )
 
     def _update_stats(self: EvolutionaryAlgorithm, **kwargs: Any) -> None:
@@ -171,28 +181,40 @@ class EvolutionaryAlgorithm:
             self._stats._update(kwargs)
 
     def _get_phenotype(self, population_g: NDArray[Any]) -> NDArray[Any]:
-        populations_g = self._split_population(population_g)
-        populations_ph = self._parallel(
-            delayed(self._genotype_to_phenotype)(
-                populations_g_i, **self._genotype_to_phenotype_args
-            )
-            for populations_g_i in populations_g
-        )
-        population_ph = np.concatenate(populations_ph, axis=0)
+        if self._genotype_to_phenotype is not None:
+            if self._n_jobs > 1:
+                populations_g = self._split_population(population_g)
+                populations_ph = self._parallel(
+                    delayed(self._genotype_to_phenotype)(
+                        populations_g_i, **self._genotype_to_phenotype_args
+                    )
+                    for populations_g_i in populations_g
+                )
+                population_ph = np.concatenate(populations_ph, axis=0)
+            else:
+                population_ph = self._genotype_to_phenotype(
+                    population_g, **self._genotype_to_phenotype_args
+                )
+        else:
+            population_ph = population_g
         return population_ph
 
     def _get_fitness(
         self: EvolutionaryAlgorithm, population_ph: NDArray[Any]
     ) -> NDArray[np.float64]:
-        populations_ph = self._split_population(population_ph)
-        values = self._parallel(
-            delayed(self._fitness_function)(populations_ph_i, **self._fitness_function_args)
-            for populations_ph_i in populations_ph
-        )
-        value = np.concatenate(values, axis=0)
+        if self._n_jobs > 1:
+            populations_ph = self._split_population(population_ph)
+            values = self._parallel(
+                delayed(self._fitness_function)(populations_ph_i, **self._fitness_function_args)
+                for populations_ph_i in populations_ph
+            )
+            value = np.concatenate(values, axis=0)
+        else:
+            value = self._fitness_function(population_ph, **self._fitness_function_args)
 
         self._calls += len(value)
-        return self._sign * value
+        fitness = self._sign * value
+        return fitness
 
     def get_remains_calls(self: EvolutionaryAlgorithm) -> int:
         return (self._pop_size * self._iters) - self._calls
@@ -286,6 +308,7 @@ class MultiGenome:
     def load_from_file(cls, file_path: str) -> MultiGenome:
         with open(file_path, "rb") as file:
             return cloudpickle.load(file)
+
 
 class MutliGenomeEA(EvolutionaryAlgorithm):
     def __init__(

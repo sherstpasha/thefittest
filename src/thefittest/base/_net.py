@@ -21,12 +21,25 @@ from ..tools.operators import forward2d
 
 import cloudpickle
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
 INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
 HIDDEN_COLOR_CODE = (0.0, 0.74, 0.99, 1)
 OUTPUT_COLOR_CODE = (0.94, 0.50, 0.50, 1)
 ACTIVATION_NAME = {0: "sg", 1: "rl", 2: "gs", 3: "th", 4: "ln", 5: "sm"}
 ACTIV_NAME_INV = {"sigma": 0, "relu": 1, "gauss": 2, "tanh": 3, "ln": 4, "softmax": 5}
+
+# Словарь для сопоставления имен активаций с их индексами
+TORCH_ACTIVATION_NAME = {
+    0: torch.sigmoid,  # "sigma"
+    1: F.relu,  # "relu"
+    2: lambda x: torch.exp(-(x**2)),  # "gauss", реализация гауссовой функции активации
+    3: torch.tanh,  # "tanh"
+    4: lambda x: x,  # "ln", линейная функция (нет изменений)
+    5: lambda x: torch.softmax(x, dim=1),  # "softmax"
+}
 
 
 class Net:
@@ -56,6 +69,74 @@ class Net:
         self._numba_weights_id: numbaList[NDArray[np.int64]]
         self._numba_activs_code: numbaList[NDArray[np.int64]]
         self._numba_activs_nodes: numbaList[numbaList[NDArray[np.int64]]]
+
+    def forward(
+        self, X: NDArray[np.float64], weights: Optional[NDArray[np.float64]] = None
+    ) -> NDArray[np.float64]:
+        if weights is None:
+            weights = self._weights.reshape(1, -1)
+        else:
+            weights = weights
+
+        if self._numpy_inputs is None:
+            self._get_order()
+
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        X = torch.tensor(X, device=device, dtype=torch.float64)
+        weights = torch.tensor(weights, device=device, dtype=torch.float64)
+
+        weights_cases = weights.shape[0]
+        num_nodes = X.shape[1] + self._n_hiddens + len(self._outputs)
+        shape = (weights_cases, num_nodes, len(X))
+
+        nodes = torch.empty(shape, device=device, dtype=torch.float64)
+
+        for idx, neuron_idx in enumerate(self._inputs):
+            nodes[:, neuron_idx] = X.T[idx]
+
+        for from_i, to_i, weights_id_i, a_code_i, a_nodes_i in zip(
+            self._numba_from,
+            self._numba_to,
+            self._numba_weights_id,
+            self._numba_activs_code,
+            self._numba_activs_nodes,
+        ):
+            arr_mask = weights[:, weights_id_i.flatten()]
+            weights_i = arr_mask.reshape(
+                shape=(len(weights), weights_id_i.shape[0], weights_id_i.shape[1])
+            )
+
+            nodes[:, to_i] = torch.matmul(weights_i, nodes[:, from_i])
+
+            for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
+                # print(nodes[:, a_nodes_i_i].shape)
+                nodes[:, a_nodes_i_i] = TORCH_ACTIVATION_NAME[a_code_i_i](nodes[:, a_nodes_i_i])
+
+        return nodes[:, self._numpy_outputs].transpose(1, 2).cpu().numpy()
+
+        # for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
+        #     print("a_nodes_i", a_code_i, a_nodes_i)
+        # nodes[a_nodes_i_i] = multiactivation2d(nodes[a_nodes_i_i].T, a_code_i_i).T
+
+        # Проходим по всем связям и считаем значения для скрытых и выходных нейронов
+        # for i, (frm, to) in enumerate(self._connects):
+        #     weight = weights[i]
+        #     signal = neurons[frm] * weight
+
+        #     if to in neurons:
+        #         neurons[to] += signal
+        #     else:
+        #         neurons[to] = signal
+
+        # # Если нейрон скрытый или выходной, применяем функцию активации
+        # if to in self._activs:
+        #     act_func_idx = self._activs[to]
+        #     neurons[to] = TORCH_ACTIVATION_NAME[act_func_idx](neurons[to])
+
+        # Возвращаем значения выходных нейронов
+        # output_values = {out: neurons[out] for out in self._outputs}
+        # return output_values
 
     def __len__(self) -> int:
         return len(self._weights)
@@ -266,7 +347,7 @@ class Net:
         self._numba_activs_code = activ_code
         self._numba_activs_nodes = active_nodes
 
-    def forward(
+    def forward1(
         self, X: NDArray[np.float64], weights: Optional[NDArray[np.float64]] = None
     ) -> NDArray[np.float64]:
         if weights is None:
@@ -349,7 +430,9 @@ class Net:
         with open(file_path, "rb") as file:
             return cloudpickle.load(file)
 
+
 class HiddenBlock:
+
     def __init__(self, max_size: int) -> None:
         self._activ = random.sample([0, 1, 2, 3, 4], k=1)[0]
         self._size = random.randrange(1, max_size)
@@ -381,7 +464,7 @@ class NetEnsemble:
     def get_nets(self: NetEnsemble) -> NDArray:
         return self._nets
 
-    def forward(
+    def forward1(
         self: NetEnsemble,
         X: NDArray[np.float64],
         weights_list: Optional[List[NDArray[np.float64]]] = None,

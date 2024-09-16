@@ -191,6 +191,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         weights_optimizer: weights_type_optimizer_alias = SHADE,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
         net_size_penalty: float = 0.0,
+        fitness_update_eps: float = 0.0,
     ):
         Model.__init__(self)
         self._iters: int = iters
@@ -207,6 +208,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
         self._optimizer: Union[SelfCGP, GeneticProgramming]
         self._net_size_penalty: float = net_size_penalty
+        self._fitness_update_eps = fitness_update_eps
 
     def _get_uniset(
         self: GeneticProgrammingNeuralNetClassifier, X: NDArray[np.float64]

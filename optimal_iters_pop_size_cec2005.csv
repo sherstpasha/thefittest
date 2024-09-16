@@ -1,2 +1,0 @@
-Function,Dimensions,Selection,Crossover,Mutation,Pop_Size,Iters,Reliability,Speed,Range_Left,Range_Right
-F22005,5,tournament_3,uniform_2,weak,952,952,0.6,579.4666666666667,176,927

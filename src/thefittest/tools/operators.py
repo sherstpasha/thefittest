@@ -229,6 +229,17 @@ def empty_crossover(
     return offspring
 
 
+def empty_crossover_shaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    offspring = individ.copy()
+    return offspring
+
+
 @njit(int8[:](int8[:], int8[:], float64))
 def binomialGA(
     individ: NDArray[np.int8], mutant: NDArray[np.int8], CR: np.float64
@@ -292,6 +303,25 @@ def uniform_crossover(
     return offspring
 
 
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def uniform_crossover_shaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    size = len(individ)
+    offspring = individ.copy()
+    j = random.randrange(size)
+
+    choosen = random_sample(range_size=len(fitness), quantity=len(individs[0]), replace=True)
+    for i in range(individs.shape[1]):
+        if np.random.rand() <= CR or i == j:
+            offspring[i] = individs[choosen[i]][i]
+    return offspring
+
+
 @njit(int8[:](int8[:, :], float64[:], float64[:]))
 def uniform_prop_crossover(
     individs: NDArray[np.byte], fitness: NDArray[np.float64], rank: NDArray[np.float64]
@@ -300,6 +330,26 @@ def uniform_prop_crossover(
     offspring = np.empty_like(individs[0])
     for i in range(individs.shape[1]):
         offspring[i] = individs[choosen[i]][i]
+    return offspring
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def uniform_prop_crossover_shaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    size = len(individ)
+    offspring = individ.copy()
+    j = random.randrange(size)
+
+    choosen = random_weighted_sample(weights=fitness, quantity=len(individs[0]), replace=True)
+
+    for i in range(individs.shape[1]):
+        if np.random.rand() <= CR or i == j:
+            offspring[i] = individs[choosen[i]][i]
     return offspring
 
 
@@ -314,6 +364,25 @@ def uniform_rank_crossover(
     return offspring
 
 
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def uniform_rank_crossover_shaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    size = len(individ)
+    offspring = individ.copy()
+    j = random.randrange(size)
+
+    choosen = random_weighted_sample(weights=rank, quantity=len(individs[0]), replace=True)
+    for i in range(individs.shape[1]):
+        if np.random.rand() <= CR or i == j:
+            offspring[i] = individs[choosen[i]][i]
+    return offspring
+
+
 def uniform_tour_crossover(
     individs: NDArray[np.byte], fitness: NDArray[np.float64], rank: NDArray[np.float64]
 ) -> NDArray[np.byte]:
@@ -325,6 +394,42 @@ def uniform_tour_crossover(
     choosen = np.argmax(fitness[tournament], axis=1)
     offspring = individs[choosen, diag].copy()
     return offspring
+
+
+def uniform_tour_crossover_shaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    size = len(individ)
+    offspring = individ.copy()
+    range_ = np.arange(len(individs))
+    diag = np.arange(len(individs[0]))
+
+    tournament = np.random.choice(range_, 2 * len(individs[0]))
+    tournament = tournament.reshape(-1, 2)
+    choosen = np.argmax(fitness[tournament], axis=1)
+    right_individ = individs[choosen, diag].copy()
+
+    mask = np.random.random(size=size) <= CR
+
+    offspring[mask] = right_individ[mask]
+    return offspring
+
+
+# def uniform_tour_crossover_shaga(
+#     individs: NDArray[np.byte], fitness: NDArray[np.float64], rank: NDArray[np.float64]
+# ) -> NDArray[np.byte]:
+#     range_ = np.arange(len(individs))
+#     diag = np.arange(len(individs[0]))
+
+#     tournament = np.random.choice(range_, 2 * len(individs[0]))
+#     tournament = tournament.reshape(-1, 2)
+#     choosen = np.argmax(fitness[tournament], axis=1)
+#     offspring = individs[choosen, diag].copy()
+#     return offspring
 
 
 # differential evolution
@@ -718,6 +823,7 @@ def forward(
         nodes[to_i] = out.T
 
         for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
+            # print(nodes[a_nodes_i_i].T.shape)
             nodes[a_nodes_i_i] = multiactivation2d(nodes[a_nodes_i_i].T, a_code_i_i).T
 
     return nodes

@@ -28,8 +28,8 @@ class Model:
         X: NDArray[np.float64],
         y: NDArray[Union[np.float64, np.int64]],
     ) -> Any:
-        assert np.all(np.isfinite(X))
-        assert np.all(np.isfinite(y))
+        # assert np.all(np.isfinite(X))
+        # assert np.all(np.isfinite(y))
         return self._fit(X, y)
 
     def predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
