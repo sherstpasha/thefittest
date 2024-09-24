@@ -114,6 +114,8 @@ class SHAGACONF(EvolutionaryAlgorithm):
 
         self._crossover_pool: Dict[str, Tuple[Callable, Union[float, int]]] = {
             "empty": (empty_crossover_shaga, 1),
+            "one_point": (one_point_crossover, 2),
+            "two_point": (two_point_crossover, 2),
             "uniform_1": (uniform_crossover_shaga, 1),
             "uniform_2": (uniform_crossover_shaga, 2),
             "uniform_7": (uniform_crossover_shaga, 7),
@@ -250,8 +252,8 @@ class SHAGACONF(EvolutionaryAlgorithm):
         self._population_g_i[mask] = mutant_cr_b_g[mask]
         self._population_ph_i[mask] = mutant_cr_ph[mask]
         self._fitness_i[mask] = mutant_cr_fit[mask]
-        self._fitness_scale_i[mask] = scale_data(self._fitness_i[mask])
-        self._fitness_rank_i[mask] = rank_data(self._fitness_i[mask])
+        self._fitness_scale_i = scale_data(self._fitness_i)
+        self._fitness_rank_i = rank_data(self._fitness_i)
 
         d_fitness = np.abs(will_be_replaced_fit - self._fitness_i[succeses])
 

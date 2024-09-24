@@ -77,7 +77,7 @@ class SelfCSHAGA(SHAGACONF):
             "tournament_7",
         ),
         crossovers: Tuple[str, ...] = (
-            # "empty",
+            "empty",
             "uniform_1",
             "uniform_2",
             "uniform_7",
@@ -186,10 +186,9 @@ class SelfCSHAGA(SHAGACONF):
         operator: str,
         threshold: float,
     ) -> Dict["str", float]:
-        K = np.random.uniform(0, 10)
-        proba_dict[operator] += K / self._iters
+        proba_dict[operator] += self._K / self._iters
         proba_value = np.array(list(proba_dict.values()))
-        proba_value -= K / (len(proba_dict) * self._iters)
+        proba_value -= self._K / (len(proba_dict) * self._iters)
         proba_value = proba_value.clip(threshold, 1)
         proba_value = proba_value / proba_value.sum()
         new_proba_dict = dict(zip(proba_dict.keys(), proba_value))
