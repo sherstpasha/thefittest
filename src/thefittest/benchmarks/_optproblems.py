@@ -311,6 +311,50 @@ class OneMax(TestFunction):
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.sum(x, axis=1, dtype=np.float64)
 
+class ZeroOne(TestFunction):
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        # Shift the array by one position and compare the result
+        shifted_x = np.roll(x, -1, axis=1)
+        # Identify '01' pairs (where x is 0 and shifted_x is 1)
+        zero_one_pairs = (x == 0) & (shifted_x == 1)
+        # Sum the valid '01' pairs across each row
+        return np.sum(zero_one_pairs, axis=1, dtype=np.float64)
+
+class Jump(TestFunction):
+    def __init__(self, k: int):
+        self.k = k  # Размер "ямы" для перепрыгивания
+
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        n = x.shape[1]
+        ones_count = np.sum(x, axis=1)
+        
+        # Вычисляем значение функции в зависимости от количества единиц
+        results = np.where(
+            ones_count == n,  # Если все биты 1, это глобальный оптимум
+            n,
+            np.where(
+                ones_count < n - self.k,  # Локальный оптимум при малом числе единиц
+                ones_count,
+                n - ones_count  # Локальная "яма" при почти всех единицах
+            )
+        )
+        return results
+
+class BalancedString(TestFunction):
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        # Количество единиц в каждой строке популяции
+        ones_count = np.sum(x, axis=1)
+        # Количество нулей - это разница между длиной строки и количеством единиц
+        zeros_count = x.shape[1] - ones_count
+        
+        # Приспособленность: чем ближе числа нулей и единиц, тем выше значение
+        return -np.abs(ones_count - zeros_count)  # Чем меньше разница, тем выше приспособленность
+
+class LeadingOnes(TestFunction):
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        # Вычисляем количество подряд идущих единиц начиная с первого бита
+        return np.array([np.argmax(row == 0) if np.any(row == 0) else len(row) for row in x], dtype=np.float64)
+
 
 class Sphere(TestFunction):
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
