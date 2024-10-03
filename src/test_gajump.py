@@ -1,6 +1,6 @@
 from collections import defaultdict
 from thefittest.optimizers import SelfCGA
-from thefittest.benchmarks._optproblems import OneMax, Jump, BalancedString, LeadingOnes
+from thefittest.benchmarks._optproblems import OneMax, Jump, BalancedString, LeadingOnes, ZeroOne
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -11,21 +11,19 @@ from thefittest.benchmarks import Rastrigin
 number_of_iterations = 500
 
 optimizer = SelfCGA(
-    fitness_function=Jump(k = 5),
+    fitness_function=Jump(k=5),
     iters=number_of_iterations,
-    pop_size=6000,
+    pop_size=500,
     str_len=1000,
     show_progress_each=1,
     minimization=False,
-    selections=("tournament_k",
-                 "rank",
-                   "proportional"
-                   ),
-    crossovers=("two_point",
-                 "one_point",
-                   "uniform_2"
-                   ),
-    mutations=("weak", "average", "strong"),
+    # selections=("tournament_k",
+
+    #                ),
+    # crossovers=(
+    #                "one_point",
+    #                ),
+    # mutations=("strong",),
     elitism=False,
     keep_history=True,
 )

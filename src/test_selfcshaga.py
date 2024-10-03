@@ -44,7 +44,7 @@ stats = optimizer.get_stats()
 print("The fittest individ:", fittest["genotype"])
 print("The fittest individ:", fittest["phenotype"])
 print("with fitness", fittest["fitness"])
-fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=2)
+fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=3)
 
 ax[0][0].plot(range(number_of_iterations), stats["max_fitness"])
 ax[0][0].set_title("Fitness")
@@ -69,6 +69,9 @@ for key, value in crossover_proba.items():
     ax[1][0].plot(range(number_of_iterations), value, label=key)
 ax[1][0].legend()
 
+ax[1][1].plot(range(number_of_iterations), np.array(stats["H_MR"]).mean(axis = 1))
+
+ax[2][1].plot(range(number_of_iterations), np.array(stats["H_CR"]).mean(axis = 1))
 
 plt.tight_layout()
 plt.savefig("selfcshaga.png")

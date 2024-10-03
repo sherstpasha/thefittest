@@ -19,16 +19,16 @@ problems_tuple = (
         "str_len": 1000,
         "optimum": 500,
         "optimum_x": np.tile([0, 1], 500),
-        "iters": 22,
-        "pop_size": 22,
+        "iters": 230,
+        "pop_size": 230,
     },
     {  # 3
         "function": LeadingOnes,
         "str_len": 1000,
         "optimum": 1000,
         "optimum_x": np.ones(shape=1000),
-        "iters": 22,
-        "pop_size": 22,
+        "iters": 1600,
+        "pop_size": 1600,
     },
     {  # 4
         "function": Jump,
@@ -36,7 +36,7 @@ problems_tuple = (
         "optimum": 1000,
         "k": 5,
         "optimum_x": np.ones(shape=1000),
-        "iters": 22,
-        "pop_size": 22,
+        "iters": 256,
+        "pop_size": 256,
     }
 )

@@ -25,8 +25,13 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
     min_error = np.nan
     max_error = np.nan
 
+    if "k" in function.keys():
+        problem = function["function"](function["k"]).__call__
+    else:
+        problem = function["function"]().__call__
+
     optimizer = GeneticAlgorithm(
-        fitness_function=function["function"]().__call__,
+        fitness_function=problem,
         iters=iters,
         pop_size=pop_size,
         str_len=function["str_len"],
@@ -52,13 +57,15 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
         if errors:
             argmin = np.argmin(np.array(errors)[:, 1])
 
+    print(stat["max_fitness"][-1])
+
     return reliability, speed_sum, range_left, range_right, find_count, None
 
 
 def main():
     eps = 0.0
-    n_runs = 20
-    initial_iters_pop = 100
+    n_runs = 10
+    initial_iters_pop = 200
     max_iters = 50000
     max_pop_size = 5000
     target_reliability = 0.5
@@ -67,18 +74,18 @@ def main():
     pop_size_values = []
 
     iters = initial_iters_pop
-    pop_size = 5000
+    pop_size = initial_iters_pop
 
     while pop_size <= max_pop_size and iters <= max_iters:
         iters_values.append(iters)
         pop_size_values.append(pop_size)
         iters = iters + int(iters * .15)
-        pop_size = pop_size + int(pop_size * 0)
+        pop_size = pop_size + int(pop_size * 0.15)
 
     while iters <= max_iters:
         iters_values.append(iters)
         pop_size_values.append(max_pop_size)
-        iters = iters + int(iters * 0.1)
+        iters = iters + int(iters * 0.15)
 
 
     function_ = problems_tuple[3]
@@ -86,7 +93,7 @@ def main():
 
     results = []
 
-    with mp.Pool(processes=mp.cpu_count()) as pool:
+    with mp.Pool(processes=min(mp.cpu_count(), n_runs)) as pool:
         for function in functions:
             successful = False
 

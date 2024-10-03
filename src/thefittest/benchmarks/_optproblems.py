@@ -313,11 +313,14 @@ class OneMax(TestFunction):
 
 class ZeroOne(TestFunction):
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        # Shift the array by one position and compare the result
-        shifted_x = np.roll(x, -1, axis=1)
-        # Identify '01' pairs (where x is 0 and shifted_x is 1)
-        zero_one_pairs = (x == 0) & (shifted_x == 1)
-        # Sum the valid '01' pairs across each row
+        # Разделяем строки на четные и нечетные позиции
+        even_positions = x[:, ::2]  # Берем все четные индексы (0, 2, 4, ...)
+        odd_positions = x[:, 1::2]  # Берем все нечетные индексы (1, 3, 5, ...)
+        
+        # Пара "01" возникает, если в четных позициях 0, а в нечетных — 1
+        zero_one_pairs = (even_positions == 0) & (odd_positions == 1)
+        
+        # Суммируем количество таких пар по строкам
         return np.sum(zero_one_pairs, axis=1, dtype=np.float64)
 
 class Jump(TestFunction):
@@ -352,10 +355,13 @@ class BalancedString(TestFunction):
 
 class LeadingOnes(TestFunction):
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        # Вычисляем количество подряд идущих единиц начиная с первого бита
-        return np.array([np.argmax(row == 0) if np.any(row == 0) else len(row) for row in x], dtype=np.float64)
-
-
+        # Одна проверка на x == 1
+        is_one = x == 1  # Логический массив, где True соответствует элементам, равным 1
+        # Инвертируем is_one, чтобы получить маску, где True соответствует элементам, которые не равны 1
+        first_non_one = np.argmax(~is_one, axis=1)
+        # Проверка, полностью ли строка состоит из единиц
+        return np.where(np.all(is_one, axis=1), x.shape[1], first_non_one)
+    
 class Sphere(TestFunction):
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.sum(x**2, axis=-1)
