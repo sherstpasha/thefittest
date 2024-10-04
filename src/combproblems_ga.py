@@ -8,16 +8,24 @@ from comb_problems import problems_tuple
 
 
 # Функции для оптимизации и анализа результатов
-def find_solution_with_precision(solution_list, true_solution):
+# def find_solution_with_precision(solution_list, true_solution):
 
-    for i, solution in enumerate(solution_list):
-        if np.array_equal(solution, true_solution):
-            return i + 1, None  # Возвращаем индекс + 1 и ошибки
+#     for i, solution in enumerate(solution_list):
+#         if np.array_equal(solution, true_solution):
+#             return i + 1, None  # Возвращаем индекс + 1 и ошибки
 
-    return None, None  # Если ни одно решение не совпало
+#     return None, None  # Если ни одно решение не совпало
 
 
-def run_optimization(function, eps, iters, pop_size, selection, crossover, mutation,):
+def run_optimization(
+    function,
+    eps,
+    iters,
+    pop_size,
+    selection,
+    crossover,
+    mutation,
+):
     reliability = 0.0
     speed_sum = 0
     range_left = np.nan
@@ -45,10 +53,11 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
     )
     optimizer.fit()
     stat = optimizer.get_stats()
-    speed_i, errors = find_solution_with_precision(stat["max_ph"], function["optimum_x"])
+    # speed_i, errors = find_solution_with_precision(stat["max_ph"], function["optimum_x"])
+    return optimizer.get_fittest()["fitness"]
 
-    if speed_i is not None:
-        return 1, speed_i  # Возвращаем 1 и номер поколения
+    # if speed_i is not None:
+    #     return 1, speed_i  # Возвращаем 1 и номер поколения
     return 0, np.nan  # Возвращаем 0 и NaN, если решение не найдено
 
 
@@ -74,7 +83,7 @@ def process_problem(problem):
 
     total_combinations = len(selections) * len(crossovers) * len(mutations)
 
-    with mp.Pool(processes=mp.cpu_count()) as pool:  # Создаем пул один раз
+    with mp.Pool(5) as pool:  # Создаем пул один раз
         with tqdm(
             total=total_combinations, desc="Processing combinations", ncols=100, leave=False
         ) as pbar:
@@ -98,7 +107,7 @@ def process_problem(problem):
                         ]
 
                         for future in futures:
-                            find_solution, speed_i = future.get()
+                            fitness = future.get()
                             results.append(
                                 [
                                     problem["function"].__name__,
@@ -107,8 +116,8 @@ def process_problem(problem):
                                     mutation,
                                     problem["pop_size"],
                                     problem["iters"],
-                                    find_solution,  # Это будет 1 или 0
-                                    speed_i,  # Это будет номер поколения или NaN
+                                    fitness,  # Это будет 1 или 0
+                                    # speed_i,  # Это будет номер поколения или NaN
                                 ]
                             )
 
@@ -131,8 +140,8 @@ if __name__ == "__main__":
         "Mutation",
         "Pop_Size",
         "Iters",
-        "find_solution",
-        "generation_found",
+        "fitness",
+        # "generation_found",
     ]
 
     # Запись заголовков в CSV (только если файл не существует)
