@@ -83,7 +83,7 @@ def process_problem(problem):
 
     total_combinations = len(selections) * len(crossovers) * len(mutations)
 
-    with mp.Pool(5) as pool:  # Создаем пул один раз
+    with mp.Pool(20     ) as pool:  # Создаем пул один раз
         with tqdm(
             total=total_combinations, desc="Processing combinations", ncols=100, leave=False
         ) as pbar:
