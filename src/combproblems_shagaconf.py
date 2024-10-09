@@ -24,7 +24,6 @@ def run_optimization(
     pop_size,
     selection,
     crossover,
-    mutation,
 ):
     reliability = 0.0
     speed_sum = 0
@@ -47,7 +46,6 @@ def run_optimization(
         elitism=False,
         selection=selection,
         crossover=crossover,
-        mutation=mutation,
         keep_history=True,
         minimization=False,
     )
@@ -125,7 +123,7 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "shagaconf_combproblems.csv"
+    results_file = "shagaconf_combproblems_2.csv"
 
     # Заголовки для CSV-файла
     columns = [
