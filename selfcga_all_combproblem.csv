@@ -1,0 +1,13 @@
+Function,Pop_Size,Iters,fitness
+OneMax,146,146,676.0
+OneMax,146,146,689.0
+OneMax,146,146,689.0
+ZeroOne,230,230,233.0
+ZeroOne,230,230,236.0
+ZeroOne,230,230,235.0
+LeadingOnes,1600,1600,8
+LeadingOnes,1600,1600,5
+LeadingOnes,1600,1600,8
+Jump,256,256,680
+Jump,256,256,685
+Jump,256,256,682
