@@ -38,20 +38,8 @@ def run_optimization_selfcga(function, eps, iters, pop_size):
         str_len=function["str_len"],
         elitism=False,
         K=2,
-        selections=("proportional", "rank", "tournament_3", "tournament_5", "tournament_7"),
-        crossovers=(
-            "empty",
-            "one_point",
-            "two_point",
-            "uniform_2",
-            "uniform_7",
-            "uniform_prop_2",
-            "uniform_prop_7",
-            "uniform_rank_2",
-            "uniform_rank_7",
-            "uniform_tour_3",
-            "uniform_tour_7",
-        ),
+        selections=("proportional", "rank", "tournament_3"),
+        crossovers=("empty", "one_point", "uniform_2"),
         mutations=("weak", "average", "strong"),
         keep_history=True,
         minimization=False,
@@ -105,7 +93,7 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "selfcga_all_combproblem.csv"
+    results_file = "selfcga_conv_combproblem.csv"
 
     # Заголовки для CSV-файла
     columns = [

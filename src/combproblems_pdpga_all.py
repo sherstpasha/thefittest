@@ -1,5 +1,5 @@
 import pandas as pd
-from thefittest.optimizers import SelfCGA
+from thefittest.optimizers import PDPGA
 from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
 import numpy as np
@@ -30,14 +30,13 @@ def run_optimization_selfcga(function, eps, iters, pop_size):
     # genotype_to_phenotype = GrayCode().fit(left, right, h)
     # str_len = genotype_to_phenotype.parts.sum()
 
-    optimizer = SelfCGA(
+    optimizer = PDPGA(
         fitness_function=problem,
         # genotype_to_phenotype=genotype_to_phenotype.transform,
         iters=iters,
         pop_size=pop_size,
         str_len=function["str_len"],
         elitism=False,
-        K=2,
         selections=("proportional", "rank", "tournament_3", "tournament_5", "tournament_7"),
         crossovers=(
             "empty",
@@ -105,7 +104,7 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "selfcga_all_combproblem.csv"
+    results_file = "pdpga_all_combproblem.csv"
 
     # Заголовки для CSV-файла
     columns = [
