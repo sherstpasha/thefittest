@@ -121,3 +121,7 @@ Publications where ``thefittest`` has been used:
 - *Thefittest: evolutionary machine learning in Python*, January 2024, ITM Web of Conferences 59.
   DOI: 10.1051/itmconf/20245902020. Licensed under CC BY 4.0. Authored by Pavel Sherstnev.
   Available at: https://doi.org/10.1051/itmconf/20245902020
+
+Awards
+------
+- **1st place**, Samsung Innovation Campus (IT Academy), *Artificial Intelligence* track, October 2024. `Read more <https://news.samsung.com/ru/объявлены-итоги-ежегодного-межвузов>`_
