@@ -98,7 +98,50 @@ The following example demonstrates how to use ``thefittest`` library with the SH
     print('The fittest individ:', fittest['phenotype'])
     print('with fitness', fittest['fitness'])
 
-For more detailed examples and use cases, please refer to our notebooks and documentation.
+Machine Learning Example
+------------------------
+
+This example demonstrates how to train a machine learning model on the Iris dataset using ``thefittest`` library's ``MLPEAClassifier`` with the SHAGA evolutionary optimizer.
+
+.. code-block:: python
+
+    from thefittest.optimizers import SHAGA
+    from thefittest.benchmarks import IrisDataset
+    from thefittest.classifiers import MLPEAClassifier
+
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import minmax_scale
+    from sklearn.metrics import confusion_matrix, f1_score
+
+    # Load the Iris dataset
+    data = IrisDataset()
+    X = data.get_X()
+    y = data.get_y()
+
+    # Scale features to the [0, 1] range
+    X_scaled = minmax_scale(X)
+
+    # Split the data into training and test sets
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.1)
+
+    # Initialize the MLPEAClassifier with SHAGA as the optimizer
+    model = MLPEAClassifier(
+        n_iter=500,
+        pop_size=500,
+        hidden_layers=[5, 5],
+        weights_optimizer=SHAGA,
+        weights_optimizer_args={"show_progress_each": 10}
+    )
+
+    # Train the model
+    model.fit(X_train, y_train)
+    
+    # Make predictions on the test set
+    predict = model.predict(X_test)
+
+    # Evaluate the model
+    print("confusion_matrix: \n", confusion_matrix(y_test, predict))
+    print("f1_score: \n", f1_score(y_test, predict, average="macro"))
 
 ``thefittest`` contains methods
 -------------------------------
