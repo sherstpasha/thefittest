@@ -25,6 +25,7 @@
     :alt: Documentation Status
 
 |
+
 .. image:: docs/logos/logo1.png
    :align: center
 
@@ -44,9 +45,10 @@ Features of ``thefittest``
 **Integration with scikit-learn**
   Easily integrate machine learning methods from ``thefittest`` with `scikit-learn <https://scikit-learn.org/>`_ tools, creating comprehensive and versatile solutions for evolutionary optimization and model training tasks.
 
-
 Installation
 ------------
+
+To install ``thefittest`` library, use the following command:
 
 .. code-block:: bash
 
@@ -62,6 +64,41 @@ Dependencies
 - `Numba <https://numba.pydata.org/>`_;
 - `Scipy <https://scipy.org/>`_;
 - `Scikit-learn <https://scikit-learn.org/>`_.
+
+Usage Example
+-------------
+
+The following example demonstrates how to use ``thefittest`` library with the SHADE optimizer to minimize a custom objective function. This quick start example showcases the main components needed to set up and run an optimization.
+
+.. code-block:: python
+
+    from thefittest.optimizers import SHADE
+
+    # Define the objective function to minimize
+    def custom_problem(x):
+        return (5 - x[:, 0])**2 + (12 - x[:, 1])**2
+
+    # Initialize the SHADE optimizer with custom parameters
+    optimizer = SHADE(
+        fitness_function=custom_problem,
+        iters=25,
+        pop_size=10,
+        left_border=-100,
+        right_border=100,
+        num_variables=2,
+        show_progress_each=10,
+        minimization=True,
+    )
+
+    # Run the optimization
+    optimizer.fit()
+
+    # Retrieve and print the best solution found
+    fittest = optimizer.get_fittest()
+    print('The fittest individ:', fittest['phenotype'])
+    print('with fitness', fittest['fitness'])
+
+For more detailed examples and use cases, please refer to our notebooks and documentation.
 
 ``thefittest`` contains methods
 -------------------------------
@@ -100,7 +137,7 @@ Examples
 
 Notebooks on how to use ``thefittest``:
 
-- `Solving Binary and Real-Valued Optimization Problems with Genetic Algorithms;; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb>`_
+- `Solving Binary and Real-Valued Optimization Problems with Genetic Algorithms; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb>`_
 - `Solving Real-Valued Optimization Problems with Differential Evolution; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb>`_
 - `Solving Symbolic Regression Problems Using Genetic Programming Algorithms; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_programming_symbolic_regression_problem.ipynb>`_
 - `Training Neural Networks Using Evolutionary Algorithms for Regression and Classification Problems; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/mlpea_regression_classification_problem.ipynb>`_
@@ -124,4 +161,5 @@ Publications where ``thefittest`` has been used:
 
 Awards
 ------
-- **1st place**, Samsung Innovation Campus (IT Academy), *Artificial Intelligence* track, October 2024. `Read more <https://news.samsung.com/ru/объявлены-итоги-ежегодного-межвузов>`_
+- **1st place**, Samsung Innovation Campus (IT Academy), *Artificial Intelligence* track, October 2024. `Read more <https://news.samsung.com/ru/объявлены-итоги-ежегодного-межвузов>`_;
+- **Best PhD Student Paper** at the 12th International Workshop on Mathematical Models and their Applications (IWMMA'2023) for the paper "Thefittest: Evolutionary Machine Learning in Python" by Pavel Sherstnev;

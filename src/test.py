@@ -7,7 +7,7 @@ import numpy as np
 # проследить какие параметры нельзя передавать индивидуальным алгоритмам например минимизацию или критерий остановки
 
 
-iters = 10
+iters = 100
 adapt_period = 5
 pop_size = 100
 num_variables = 5
@@ -23,6 +23,8 @@ ga_genotype_to_phenotype = GrayCode().fit(
 )
 
 print(ga_genotype_to_phenotype.get_str_len())
+
+fitness_function = Rastrigin()
 
 individual_algorithms_params = (
     {
@@ -72,7 +74,7 @@ individual_algorithms_params = (
             "str_len": ga_genotype_to_phenotype.get_str_len(),
             "selection": "tournament_5",
             "crossover": "uniform_rank_2",
-            "mutation": "weak",
+            "mutation": "strong",
             "elitism": True,
             "show_progress_each": 1,
             "minimization": True,
@@ -81,14 +83,15 @@ individual_algorithms_params = (
 )
 
 
-individual_algorithms = (iap["optimizer"](**iap["params"]) for iap in individual_algorithms_params)
+# individual_algorithms = (iap["optimizer"](**iap["params"]) for iap in individual_algorithms_params)
+
 individual_algorithms = {}
 for i, iap in enumerate(individual_algorithms_params):
     name = iap["name"]
     optimizer = iap["optimizer"]
     params = iap["params"]
 
-    params["fitness_function"] = Rastrigin()
+    params["fitness_function"] = fitness_function
     params["iters"] = iters
     params["pop_size"] = pop_size
     individual_algorithms[name] = optimizer(**params)
@@ -118,15 +121,38 @@ print(individual_algorithms)
 # AtA RrR
 # SBSP
 
+
+def culc_q_i(best_fitness_in, adapt_period):
+    b_k = (best_fitness_in == np.max(best_fitness_in, axis=1, keepdims=True)).astype(int)
+
+    k = np.arange(adapt_period - 1, -1, -1)
+    up = adapt_period - k
+    down = k + 1
+
+    q_i = np.sum(b_k * (up / down).reshape(-1, 1), axis=0)
+
+    return q_i
+
+
 for name, algorithm_i in individual_algorithms.items():
     print(name)
     algorithm_i._get_init_population()
     algorithm_i._from_population_g_to_fitness()
 
-for j in range(1):  # нужно итераций чтобы выполнить iters раз
+iters_div = int(np.ceil(iters / adapt_period))
+
+# pop_sizes
+
+for j in range(iters_div):  # нужно итераций чтобы выполнить iters раз
     best_fitness_in = np.empty(shape=(adapt_period, len(individual_algorithms)), dtype=np.float64)
-    for k, algorithm_i in enumerate(individual_algorithms.values()):
-        for i in range(adapt_period):  # нужно заменить на период адаптации
+    for k, (algorithm_name, algorithm_i) in enumerate(individual_algorithms.items()):
+        print(
+            k,
+            (algorithm_name, algorithm_i),
+            algorithm_i._pop_size,
+            algorithm_i._population_g_i.shape,
+        )
+        for i in range(adapt_period):
             algorithm_i._show_progress(i)  # отображение прогресса самой коэволюции
             if algorithm_i._termitation_check():  # проверка остановки самой коэволюии
                 pass
@@ -140,7 +166,9 @@ for j in range(1):  # нужно итераций чтобы выполнить 
 
                 if algorithm_i._on_generation is not None:
                     algorithm_i._on_generation(algorithm_i)
-    print(individual_algorithms.keys())
-    print("best_fitness_in: ", best_fitness_in)
-    print("argmax:", np.argmax(best_fitness_in, axis=1))
-    # print(algorithm_i._population_g_i, algorithm_i._population_ph_i)
+
+    q_i = culc_q_i(best_fitness_in, adapt_period)
+    print(q_i)
+    individual_algorithms["DE"]._pop_size = individual_algorithms["DE"]._pop_size + 15
+    individual_algorithms["GA1"]._pop_size = individual_algorithms["GA1"]._pop_size + 15
+    individual_algorithms["GA2"]._pop_size = individual_algorithms["GA2"]._pop_size + 15
