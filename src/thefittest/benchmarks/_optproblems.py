@@ -362,6 +362,219 @@ class LeadingOnes(TestFunction):
         # Проверка, полностью ли строка состоит из единиц
         return np.where(np.all(is_one, axis=1), x.shape[1], first_non_one)
     
+class F11(TestFunction):
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Фитнес-функция для задачи F11, принимает популяцию битовых строк.
+        Каждая строка состоит из 30 бит (5 блоков по 6 бит).
+        
+        :param x: Популяция строк (размерность (pop_size, 30))
+        :return: Фитнес значений для каждой строки в популяции
+        """
+        def u(x: int) -> float:
+            """Единичная функция для подсчета значения в зависимости от количества единичных бит в блоке."""
+            if x == 0 or x == 6:
+                return 1
+            elif x == 1 or x == 5:
+                return 0
+            elif x == 2 or x == 4:
+                return 0.360384
+            elif x == 3:
+                return 0.640576
+            return 0
+
+        # Разделим каждую строку на 5 блоков по 6 бит
+        pop_size = x.shape[0]
+        total_fitness = np.zeros(pop_size, dtype=np.float64)
+
+        for i in range(pop_size):
+            blocks = x[i].reshape(5, 6)
+            fitness = 0.0
+            for block in blocks:
+                ones_count = np.sum(block)  # Подсчитываем количество единичных бит в блоке
+                fitness += u(ones_count)
+            total_fitness[i] = fitness
+        
+        return total_fitness
+
+
+class F12(TestFunction):
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Фитнес-функция для задачи F12, которая вычисляется как 5 * (f11(x) / 5) ** 15.
+        
+        :param x: Популяция строк (размерность (pop_size, 30))
+        :return: Фитнес значений для каждой строки в популяции
+        """
+        
+        # Вычисляем фитнес для задачи F11
+        f11_values = F11().f(x)
+        
+        # Применяем преобразование для F12: 5 * (f11 / 5) ** 15
+        f12_values = 5 * (f11_values / 5) ** 15
+        
+        return f12_values
+
+class F13(TestFunction):
+    def __init__(self):
+        # Глобальные подстроки
+        self.global_substrings = np.array([0b00000000, 0b10001100, 0b01001010])
+
+    def hamming_distance(self, a: int, b: int) -> int:
+        """Вычисление расстояния Хэмминга между двумя числами (целыми)."""
+        return bin(a ^ b).count('1')
+
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Фитнес-функция для задачи F13.
+        Строка состоит из 24 бит, делится на три 8-битные подстроки.
+        Для каждой подстроки рассчитывается фитнес в зависимости от расстояния Хэмминга
+        до ближайшей глобальной подстроки.
+        
+        :param x: Популяция строк (размерность (pop_size, 24))
+        :return: Фитнес значений для каждой строки в популяции
+        """
+        
+        pop_size = x.shape[0]
+        total_fitness = np.zeros(pop_size, dtype=np.float64)
+
+        for i in range(pop_size):
+            # Разделяем строку на 3 подстроки по 8 бит
+            substrings = [x[i, j:j+8] for j in range(0, 24, 8)]
+            
+            fitness = 0.0
+            for sub in substrings:
+                sub_int = int("".join(str(bit) for bit in sub), 2)  # Преобразуем подстроку в целое число
+                # Находим минимальное расстояние Хэмминга до глобальных подстрок
+                min_distance = min(self.hamming_distance(sub_int, gs) for gs in self.global_substrings)
+                # Присваиваем фитнес значению подстроки: 10 - расстояние
+                fitness += (10 - min_distance)
+            
+            total_fitness[i] = fitness
+        
+        return total_fitness
+
+class F14(TestFunction):
+    def __init__(self):
+        # Глобальные подстроки для F14
+        self.global_substrings = np.array([0b010011, 0b100001])
+
+    def hamming_distance(self, a: int, b: int) -> int:
+        """Вычисление расстояния Хэмминга между двумя числами (целыми)."""
+        return bin(a ^ b).count('1')
+
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Фитнес-функция для задачи F14.
+        Строка состоит из 30 бит, делится на пять 6-битных подстрок.
+        Для каждой подстроки рассчитывается фитнес в зависимости от расстояния Хэмминга
+        до ближайшей глобальной подстроки.
+        
+        :param x: Популяция строк (размерность (pop_size, 30))
+        :return: Фитнес значений для каждой строки в популяции
+        """
+        
+        pop_size = x.shape[0]
+        total_fitness = np.zeros(pop_size, dtype=np.float64)
+
+        for i in range(pop_size):
+            # Разделяем строку на 5 подстрок по 6 бит
+            substrings = [x[i, j:j+6] for j in range(0, 30, 6)]
+            
+            fitness = 0.0
+            for sub in substrings:
+                sub_int = int("".join(str(bit) for bit in sub), 2)  # Преобразуем подстроку в целое число
+                # Находим минимальное расстояние Хэмминга до глобальных подстрок
+                min_distance = min(self.hamming_distance(sub_int, gs) for gs in self.global_substrings)
+                # Присваиваем фитнес значению подстроки: 6 - расстояние
+                fitness += (6 - min_distance)
+            
+            total_fitness[i] = fitness
+        
+        return total_fitness
+
+class F15(TestFunction):
+    def unitation_function(self, x: int) -> float:
+        """
+        Юнификационная функция для подсчета фитнеса подстроки.
+        :param x: Количество единичных бит в подстроке.
+        :return: Значение фитнеса для данной подстроки.
+        """
+        if x > 5:
+            return 6
+        return 1 - 0.2 * x
+
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Фитнес-функция для задачи F15.
+        Строка состоит из 30 бит, делится на 5 подстрок по 6 бит.
+        Для каждой подстроки применяется юнификационная функция.
+        
+        :param x: Популяция строк (размерность (pop_size, 30))
+        :return: Фитнес значений для каждой строки в популяции
+        """
+        
+        pop_size = x.shape[0]
+        total_fitness = np.zeros(pop_size, dtype=np.float64)
+
+        for i in range(pop_size):
+            fitness = 0.0
+            # Разделяем строку на 5 подстрок по 6 бит
+            for j in range(0, 30, 6):
+                sub = x[i, j:j+6]  # Извлекаем подстроку
+                ones_count = np.sum(sub)  # Считаем количество единичных бит в подстроке
+                fitness += self.unitation_function(ones_count)  # Применяем юнификационную функцию
+            
+            total_fitness[i] = fitness
+        
+        return total_fitness
+
+class F16(TestFunction):
+    def fitness_function(self, sub: NDArray[np.int64]) -> float:
+        """
+        Фитнес для подстроки из 8 бит.
+        :param sub: Подстрока из 8 бит.
+        :return: Фитнес для подстроки.
+        """
+        ones_count = np.sum(sub)  # Считаем количество единичных бит в подстроке
+        
+        # Проверка на совпадение с глобальными подстроками
+        if np.array_equal(sub, [1, 0, 1, 0, 0, 0, 0, 0]) or np.array_equal(sub, [0, 1, 1, 1, 1, 1, 1, 0]):
+            return 1.0
+        
+        # Применяем функцию фитнеса для подстроки, если она не совпадает с глобальными
+        if ones_count in [0, 4, 8]:
+            return 0.6
+        elif ones_count in [1, 3, 5, 7]:
+            return 0.3
+        elif ones_count in [2, 6]:
+            return 0.0
+        return 0.0
+
+    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Фитнес-функция для задачи F16.
+        Строка состоит из 40 бит, делится на 5 подстрок по 8 бит.
+        Для каждой подстроки применяется фитнес-функция.
+        
+        :param x: Популяция строк (размерность (pop_size, 40))
+        :return: Фитнес значений для каждой строки в популяции
+        """
+        
+        pop_size = x.shape[0]
+        total_fitness = np.zeros(pop_size, dtype=np.float64)
+
+        for i in range(pop_size):
+            fitness = 0.0
+            # Разделяем строку на 5 подстрок по 8 бит
+            for j in range(0, 40, 8):
+                sub = x[i, j:j+8]  # Извлекаем подстроку
+                fitness += self.fitness_function(sub)  # Применяем фитнес-функцию для подстроки
+            
+            total_fitness[i] = fitness
+        
+        return total_fitness
+
 class Sphere(TestFunction):
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.sum(x**2, axis=-1)
