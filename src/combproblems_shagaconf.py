@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from thefittest.optimizers import GeneticAlgorithm
+from thefittest.optimizers._shaga_conf import SHAGACONF
 from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
 from tqdm import tqdm  # Для прогресс-бара
@@ -24,7 +24,6 @@ def run_optimization(
     pop_size,
     selection,
     crossover,
-    mutation,
 ):
     reliability = 0.0
     speed_sum = 0
@@ -39,7 +38,7 @@ def run_optimization(
     else:
         problem = function["function"]().__call__
 
-    optimizer = GeneticAlgorithm(
+    optimizer = SHAGACONF(
         fitness_function=problem,
         iters=iters,
         pop_size=pop_size,
@@ -47,7 +46,6 @@ def run_optimization(
         elitism=False,
         selection=selection,
         crossover=crossover,
-        mutation=mutation,
         keep_history=True,
         minimization=False,
     )
@@ -68,8 +66,7 @@ def process_problem(problem):
     selections = ["proportional", "rank", "tournament_3", "tournament_5", "tournament_7"]
     crossovers = [
         "empty",
-        "one_point",
-        "two_point",
+        "uniform_1",
         "uniform_2",
         "uniform_7",
         "uniform_prop_2",
@@ -79,9 +76,8 @@ def process_problem(problem):
         "uniform_tour_3",
         "uniform_tour_7",
     ]
-    mutations = ["weak", "average", "strong"]
 
-    total_combinations = len(selections) * len(crossovers) * len(mutations)
+    total_combinations = len(selections) * len(crossovers)
 
     with mp.Pool(20) as pool:  # Создаем пул один раз
         with tqdm(
@@ -89,39 +85,36 @@ def process_problem(problem):
         ) as pbar:
             for selection in selections:
                 for crossover in crossovers:
-                    for mutation in mutations:
-                        futures = [
-                            pool.apply_async(
-                                run_optimization,
-                                (
-                                    problem,
-                                    eps,
-                                    problem["iters"],
-                                    problem["pop_size"],
-                                    selection,
-                                    crossover,
-                                    mutation,
-                                ),
-                            )
-                            for _ in range(n_runs)
-                        ]
+                    futures = [
+                        pool.apply_async(
+                            run_optimization,
+                            (
+                                problem,
+                                eps,
+                                problem["iters"],
+                                problem["pop_size"],
+                                selection,
+                                crossover,
+                            ),
+                        )
+                        for _ in range(n_runs)
+                    ]
 
-                        for future in futures:
-                            fitness = future.get()
-                            results.append(
-                                [
-                                    problem["function"].__name__,
-                                    selection,
-                                    crossover,
-                                    mutation,
-                                    problem["pop_size"],
-                                    problem["iters"],
-                                    fitness,  # Это будет 1 или 0
-                                    # speed_i,  # Это будет номер поколения или NaN
-                                ]
-                            )
+                    for future in futures:
+                        fitness = future.get()
+                        results.append(
+                            [
+                                problem["function"].__name__,
+                                selection,
+                                crossover,
+                                problem["pop_size"],
+                                problem["iters"],
+                                fitness,  # Это будет 1 или 0
+                                # speed_i,  # Это будет номер поколения или NaN
+                            ]
+                        )
 
-                        pbar.update(1)  # Обновляем прогресс-бар после каждой комбинации
+                    pbar.update(1)  # Обновляем прогресс-бар после каждой комбинации
 
     return results
 
@@ -130,14 +123,13 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "ga_combproblems.csv"
+    results_file = "shagaconf_combproblems_2.csv"
 
     # Заголовки для CSV-файла
     columns = [
         "Function",
         "Selection",
         "Crossover",
-        "Mutation",
         "Pop_Size",
         "Iters",
         "fitness",
