@@ -439,12 +439,12 @@ class F13(TestFunction):
         total_fitness = np.zeros(pop_size, dtype=np.float64)
 
         for i in range(pop_size):
-            # Разделяем строку на 3 подстроки по 8 бит
-            substrings = [x[i, j:j+8] for j in range(0, 24, 8)]
+            # Разделяем строку на 3 подстроки по 8 бит и приводим к типу np.int8
+            substrings = [x[i, j:j+8].astype(np.int8) for j in range(0, 24, 8)]
             
             fitness = 0.0
             for sub in substrings:
-                sub_int = int("".join(str(bit) for bit in sub), 2)  # Преобразуем подстроку в целое число
+                sub_int = int("".join(map(str, sub)), 2)  # Преобразуем подстроку в целое число
                 # Находим минимальное расстояние Хэмминга до глобальных подстрок
                 min_distance = min(self.hamming_distance(sub_int, gs) for gs in self.global_substrings)
                 # Присваиваем фитнес значению подстроки: 10 - расстояние
@@ -478,12 +478,13 @@ class F14(TestFunction):
         total_fitness = np.zeros(pop_size, dtype=np.float64)
 
         for i in range(pop_size):
-            # Разделяем строку на 5 подстрок по 6 бит
-            substrings = [x[i, j:j+6] for j in range(0, 30, 6)]
+            # Разделяем строку на 5 подстрок по 6 бит и приводим к типу np.int8
+            substrings = [x[i, j:j+6].astype(np.int8) for j in range(0, 30, 6)]
             
             fitness = 0.0
             for sub in substrings:
-                sub_int = int("".join(str(bit) for bit in sub), 2)  # Преобразуем подстроку в целое число
+                # Преобразуем подстроку в целое число (из бинарного представления)
+                sub_int = int("".join(map(str, sub)), 2)  # Преобразуем подстроку в целое число
                 # Находим минимальное расстояние Хэмминга до глобальных подстрок
                 min_distance = min(self.hamming_distance(sub_int, gs) for gs in self.global_substrings)
                 # Присваиваем фитнес значению подстроки: 6 - расстояние

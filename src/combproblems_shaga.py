@@ -8,12 +8,12 @@ from combproblems_ga import problems_tuple
 
 
 # Функции для оптимизации и анализа результатов
-# def find_solution_with_precision(solution_list, true_solution, precision):
-#     for i, solution in enumerate(solution_list):
-#         error = np.abs(solution - true_solution)
-#         if np.all(error <= precision):
-#             return i + 1  # Возвращаем только количество итераций
-#     return None
+def find_solution_with_precision(solution_list, true_solution, precision):
+    for i, solution in enumerate(solution_list):
+        error = np.abs(solution - true_solution)
+        if np.all(error <= precision):
+            return i + 1  # Возвращаем только количество итераций
+    return None
 
 
 def run_optimization_selfcga(function, eps, iters, pop_size):
@@ -37,20 +37,20 @@ def run_optimization_selfcga(function, eps, iters, pop_size):
         pop_size=pop_size,
         str_len=function["str_len"],
         elitism=False,
-        selections=("proportional", "rank", "tournament_3"),
-        crossovers=("empty", "one_point", "uniform_2"),
-        mutations=("weak", "average", "strong"),
+        # selections=("proportional", "rank", "tournament_3"),
+        # crossovers=("empty", "one_point", "uniform_2"),
+        # mutations=("weak", "average", "strong"),
         keep_history=True,
         minimization=False,
     )
     optimizer.fit()
     stat = optimizer.get_stats()
-    # speed_i, errors = find_solution_with_precision(stat["max_ph"], function["optimum_x"])
-    return optimizer.get_fittest()["fitness"]
+    speed_i = find_solution_with_precision(stat["max_fitness"], function["optimum"], 1)
+    return optimizer.get_fittest()["fitness"], speed_i
 
     # if speed_i is not None:
     #     return 1, speed_i  # Возвращаем 1 и номер поколения
-    return 0, np.nan  # Возвращаем 0 и NaN, если решение не найдено
+    # return 0, np.nan  # Возвращаем 0 и NaN, если решение не найдено
 
 
 def process_problem(problem):
@@ -73,15 +73,16 @@ def process_problem(problem):
         ]
 
         for future in futures:
-            find_solution = future.get()
+            print(future.get())
+            fitness, speed_i = future.get()
             results.append(
                 [
                     problem["function"].__name__,
                     # problem["dimention"],
                     problem["pop_size"],
                     problem["iters"],
-                    find_solution,  # Это будет 1 или 0
-                    # speed_i,  # Это будет номер поколения или NaN
+                    fitness,  # Это будет 1 или 0
+                    speed_i,  # Это будет номер поколения или NaN
                 ]
             )
 
@@ -92,7 +93,7 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "shaga_combproblem.csv"
+    results_file = "shaga_combproblem_new.csv"
 
     # Заголовки для CSV-файла
     columns = [
@@ -101,7 +102,7 @@ if __name__ == "__main__":
         "Pop_Size",
         "Iters",
         "fitness",  # Это будет 1 или 0 для каждого отдельного запуска
-        # "generation_found",  # Номер поколения, на котором найдено решение, или NaN
+        "generation_found",  # Номер поколения, на котором найдено решение, или NaN
     ]
 
     # Запись заголовков в CSV (только если файл не существует)
