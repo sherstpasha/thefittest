@@ -53,6 +53,7 @@ from thefittest.benchmarks._optproblems import F12
 from thefittest.benchmarks._optproblems import F13
 from thefittest.benchmarks._optproblems import F14
 from thefittest.benchmarks._optproblems import F15
+from thefittest.benchmarks._optproblems import F16
 
 
 problems_tuple = (
@@ -63,6 +64,7 @@ problems_tuple = (
         # "optimum_x": np.ones(shape=100),
         "iters": 200,
         "pop_size": 100,
+        "minimization": False,
     },
     {  # 2
         "function": F11,
@@ -71,6 +73,7 @@ problems_tuple = (
         # "optimum_x": np.ones(shape=1000),
         "iters": 200,
         "pop_size": 250,
+        "minimization": False,
     },
     {  # 3
         "function": F12,
@@ -79,6 +82,7 @@ problems_tuple = (
         # "optimum_x": np.tile([0, 1], 500),
         "iters": 200,
         "pop_size": 250,
+        "minimization": False,
     },
     {  # 4
         "function": F13,
@@ -87,6 +91,7 @@ problems_tuple = (
         # "optimum_x": np.ones(shape=1000),
         "iters": 200,
         "pop_size": 250,
+        "minimization": False,
     },
     {  # 5
         "function": F14,
@@ -95,13 +100,24 @@ problems_tuple = (
         # "optimum_x": np.ones(shape=1000),
         "iters": 200,
         "pop_size": 250,
+        "minimization": False,
     },
     {  # 6
         "function": F15,
         "str_len": 30,
+        "optimum": 30,
+        # "optimum_x": np.ones(shape=1000),
+        "iters": 200,
+        "pop_size": 250,
+        "minimization": False,
+    },
+    {  # 7
+        "function": F16,
+        "str_len": 40,
         "optimum": 5,
         # "optimum_x": np.ones(shape=1000),
         "iters": 200,
         "pop_size": 250,
+        "minimization": False,
     },
 )

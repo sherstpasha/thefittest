@@ -8,14 +8,12 @@ from comb_problems import problems_tuple
 
 
 # Функции для оптимизации и анализа результатов
-# def find_solution_with_precision(solution_list, true_solution):
-
-#     for i, solution in enumerate(solution_list):
-#         if np.array_equal(solution, true_solution):
-#             return i + 1, None  # Возвращаем индекс + 1 и ошибки
-
-#     return None, None  # Если ни одно решение не совпало
-
+def find_solution_with_precision(solution_list, true_solution, precision):
+    for i, solution in enumerate(solution_list):
+        error = np.abs(solution - true_solution)
+        if np.all(error <= precision):
+            return i + 1  # Возвращаем только количество итераций
+    return None
 
 def run_optimization(
     function,
@@ -53,8 +51,8 @@ def run_optimization(
     )
     optimizer.fit()
     stat = optimizer.get_stats()
-    # speed_i, errors = find_solution_with_precision(stat["max_ph"], function["optimum_x"])
-    return optimizer.get_fittest()["fitness"]
+    speed_i = find_solution_with_precision(stat["max_fitness"], function["optimum"], 1)
+    return optimizer.get_fittest()["fitness"], speed_i
 
     # if speed_i is not None:
     #     return 1, speed_i  # Возвращаем 1 и номер поколения
@@ -107,7 +105,12 @@ def process_problem(problem):
                         ]
 
                         for future in futures:
-                            fitness = future.get()
+                            # fitness = future.get()
+                            fitness, speed_i = future.get()
+                            if speed_i is not None:
+                                fe = speed_i*problem["iters"]
+                            else:
+                                fe = None
                             results.append(
                                 [
                                     problem["function"].__name__,
@@ -117,7 +120,8 @@ def process_problem(problem):
                                     problem["pop_size"],
                                     problem["iters"],
                                     fitness,  # Это будет 1 или 0
-                                    # speed_i,  # Это будет номер поколения или NaN
+                                    speed_i,  # Это будет номер поколения или NaN,
+                                    fe
                                 ]
                             )
 
@@ -126,7 +130,7 @@ def process_problem(problem):
     return results
 
 
-n_runs = 100
+n_runs = 5
 eps = 0.01
 
 if __name__ == "__main__":
@@ -141,7 +145,8 @@ if __name__ == "__main__":
         "Pop_Size",
         "Iters",
         "fitness",
-        # "generation_found",
+        "generation_found",  # Номер поколения, на котором найдено решение, или NaN
+        'FE'
     ]
 
     # Запись заголовков в CSV (только если файл не существует)

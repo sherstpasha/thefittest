@@ -514,7 +514,6 @@ class F15(TestFunction):
         :param x: Популяция строк (размерность (pop_size, 30))
         :return: Фитнес значений для каждой строки в популяции
         """
-        
         pop_size = x.shape[0]
         total_fitness = np.zeros(pop_size, dtype=np.float64)
 
@@ -524,11 +523,14 @@ class F15(TestFunction):
             for j in range(0, 30, 6):
                 sub = x[i, j:j+6]  # Извлекаем подстроку
                 ones_count = np.sum(sub)  # Считаем количество единичных бит в подстроке
+                
                 fitness += self.unitation_function(ones_count)  # Применяем юнификационную функцию
+                # print(j, sub, ones_count, self.unitation_function(ones_count), fitness)
             
             total_fitness[i] = fitness
         
         return total_fitness
+
 
 class F16(TestFunction):
     def fitness_function(self, sub: NDArray[np.int64]) -> float:
