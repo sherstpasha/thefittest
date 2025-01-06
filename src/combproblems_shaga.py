@@ -45,7 +45,7 @@ def run_optimization_selfcga(function, eps, iters, pop_size):
     )
     optimizer.fit()
     stat = optimizer.get_stats()
-    speed_i = find_solution_with_precision(stat["max_fitness"], function["optimum"], 1)
+    speed_i = find_solution_with_precision(stat["max_fitness"], function["optimum"], 0)
     return optimizer.get_fittest()["fitness"], speed_i
 
     # if speed_i is not None:
@@ -76,7 +76,7 @@ def process_problem(problem):
             # print(future.get())
             fitness, speed_i = future.get()
             if speed_i is not None:
-                fe = speed_i*problem["iters"]
+                fe = speed_i * problem["iters"]
             else:
                 fe = None
             results.append(
@@ -87,7 +87,7 @@ def process_problem(problem):
                     problem["iters"],
                     fitness,  # Это будет 1 или 0
                     speed_i,  # Это будет номер поколения или NaN,
-                    fe
+                    fe,
                 ]
             )
 
@@ -108,7 +108,7 @@ if __name__ == "__main__":
         "Iters",
         "fitness",  # Это будет 1 или 0 для каждого отдельного запуска
         "generation_found",  # Номер поколения, на котором найдено решение, или NaN
-        'FE'
+        "FE",
     ]
 
     # Запись заголовков в CSV (только если файл не существует)

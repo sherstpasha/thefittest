@@ -15,6 +15,7 @@ def find_solution_with_precision(solution_list, true_solution, precision):
             return i + 1  # Возвращаем только количество итераций
     return None
 
+
 def run_optimization(
     function,
     eps,
@@ -51,7 +52,7 @@ def run_optimization(
     )
     optimizer.fit()
     stat = optimizer.get_stats()
-    speed_i = find_solution_with_precision(stat["max_fitness"], function["optimum"], 1)
+    speed_i = find_solution_with_precision(stat["max_fitness"], function["optimum"], 0)
     return optimizer.get_fittest()["fitness"], speed_i
 
     # if speed_i is not None:
@@ -108,7 +109,7 @@ def process_problem(problem):
                             # fitness = future.get()
                             fitness, speed_i = future.get()
                             if speed_i is not None:
-                                fe = speed_i*problem["iters"]
+                                fe = speed_i * problem["iters"]
                             else:
                                 fe = None
                             results.append(
@@ -121,7 +122,7 @@ def process_problem(problem):
                                     problem["iters"],
                                     fitness,  # Это будет 1 или 0
                                     speed_i,  # Это будет номер поколения или NaN,
-                                    fe
+                                    fe,
                                 ]
                             )
 
@@ -130,7 +131,7 @@ def process_problem(problem):
     return results
 
 
-n_runs = 5
+n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
@@ -146,7 +147,7 @@ if __name__ == "__main__":
         "Iters",
         "fitness",
         "generation_found",  # Номер поколения, на котором найдено решение, или NaN
-        'FE'
+        "FE",
     ]
 
     # Запись заголовков в CSV (только если файл не существует)

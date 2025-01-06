@@ -8,13 +8,12 @@ from comb_problems import problems_tuple
 
 
 # Функции для оптимизации и анализа результатов
-# def find_solution_with_precision(solution_list, true_solution):
-
-#     for i, solution in enumerate(solution_list):
-#         if np.array_equal(solution, true_solution):
-#             return i + 1, None  # Возвращаем индекс + 1 и ошибки
-
-#     return None, None  # Если ни одно решение не совпало
+def find_solution_with_precision(solution_list, true_solution, precision):
+    for i, solution in enumerate(solution_list):
+        error = np.abs(solution - true_solution)
+        if np.all(error <= precision):
+            return i + 1  # Возвращаем только количество итераций
+    return None
 
 
 def run_optimization(
@@ -51,8 +50,8 @@ def run_optimization(
     )
     optimizer.fit()
     stat = optimizer.get_stats()
-    # speed_i, errors = find_solution_with_precision(stat["max_ph"], function["optimum_x"])
-    return optimizer.get_fittest()["fitness"]
+    speed_i = find_solution_with_precision(stat["max_fitness"], function["optimum"], 0)
+    return optimizer.get_fittest()["fitness"], speed_i
 
     # if speed_i is not None:
     #     return 1, speed_i  # Возвращаем 1 и номер поколения
@@ -79,7 +78,7 @@ def process_problem(problem):
 
     total_combinations = len(selections) * len(crossovers)
 
-    with mp.Pool(20) as pool:  # Создаем пул один раз
+    with mp.Pool(10) as pool:  # Создаем пул один раз
         with tqdm(
             total=total_combinations, desc="Processing combinations", ncols=100, leave=False
         ) as pbar:
@@ -101,20 +100,25 @@ def process_problem(problem):
                     ]
 
                     for future in futures:
-                        fitness = future.get()
+                        # print(future.get())
+                        fitness, speed_i = future.get()
+                        if speed_i is not None:
+                            fe = speed_i * problem["iters"]
+                        else:
+                            fe = None
                         results.append(
                             [
                                 problem["function"].__name__,
+                                # problem["dimention"],
                                 selection,
                                 crossover,
                                 problem["pop_size"],
                                 problem["iters"],
                                 fitness,  # Это будет 1 или 0
-                                # speed_i,  # Это будет номер поколения или NaN
+                                speed_i,  # Это будет номер поколения или NaN,
+                                fe,
                             ]
                         )
-
-                    pbar.update(1)  # Обновляем прогресс-бар после каждой комбинации
 
     return results
 
@@ -123,17 +127,17 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "shagaconf_combproblems_2.csv"
+    results_file = "shagaconf_combproblems.csv"
 
-    # Заголовки для CSV-файла
     columns = [
         "Function",
         "Selection",
         "Crossover",
         "Pop_Size",
         "Iters",
-        "fitness",
-        # "generation_found",
+        "fitness",  # Это будет 1 или 0 для каждого отдельного запуска
+        "generation_found",  # Номер поколения, на котором найдено решение, или NaN
+        "FE",
     ]
 
     # Запись заголовков в CSV (только если файл не существует)

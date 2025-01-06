@@ -1,5 +1,0 @@
-Function,Selection,Crossover,Mutation,fitness,avg_fitness_best,average_fitness_of_combinations
-Jump,rank,uniform_2,average,1000.0,995.08,879.1774074074075
-LeadingOnes,tournament_3,uniform_2,weak,1000.0,993.47,314.48592592592587
-OneMax,tournament_3,uniform_2,average,1000.0,999.25,813.5151851851851
-ZeroOne,rank,uniform_2,average,500.0,497.85,385.00333333333333

@@ -102,7 +102,8 @@ class PDPGA(SelfCGA):
         self._success_i: NDArray[np.bool_]
 
     def _choice_parent(self: PDPGA, fitness_i_selected: NDArray[np.float64]) -> np.float64:
-        choosen = random.choice(fitness_i_selected)
+        # print(fitness_i_selected)
+        choosen = random.choice(list(fitness_i_selected))
         return choosen
 
     def _get_new_proba_pdp(

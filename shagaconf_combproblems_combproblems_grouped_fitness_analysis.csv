@@ -1,5 +1,0 @@
-Function,Selection,Crossover,fitness,avg_fitness_best,average_fitness_of_combinations
-Jump,proportional,uniform_1,1000.0,998.8,962.1516
-LeadingOnes,rank,uniform_rank_7,1000.0,987.0,855.3924000000001
-OneMax,proportional,uniform_1,1000.0,999.29,959.09
-ZeroOne,proportional,uniform_1,500.0,499.95,469.84340000000003
