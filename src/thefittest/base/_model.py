@@ -10,12 +10,12 @@ from numpy.typing import NDArray
 class Model:
     def _fit(
         self,
-        X: NDArray[np.float64],
-        y: NDArray[Union[np.float64, np.int64]],
+        X: NDArray[np.float32],
+        y: NDArray[Union[np.float32, np.int64]],
     ) -> Any:
         pass
 
-    def _predict(self, X: NDArray[np.float64]) -> Any:
+    def _predict(self, X: NDArray[np.float32]) -> Any:
         pass
 
     def get_optimizer(
@@ -25,12 +25,12 @@ class Model:
 
     def fit(
         self,
-        X: NDArray[np.float64],
-        y: NDArray[Union[np.float64, np.int64]],
+        X: NDArray[np.float32],
+        y: NDArray[Union[np.float32, np.int64]],
     ) -> Any:
         # assert np.all(np.isfinite(X))
         # assert np.all(np.isfinite(y))
         return self._fit(X, y)
 
-    def predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
+    def predict(self, X: NDArray[np.float32]) -> NDArray[Union[np.float32, np.int64]]:
         return self._predict(X)

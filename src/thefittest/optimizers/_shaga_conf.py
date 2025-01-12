@@ -51,7 +51,7 @@ class SHAGACONF(EvolutionaryAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
@@ -92,11 +92,11 @@ class SHAGACONF(EvolutionaryAlgorithm):
         )
 
         self._str_len = str_len
-        self._MR: NDArray[np.float64]
-        self._CR: NDArray[np.float64]
+        self._MR: NDArray[np.float32]
+        self._CR: NDArray[np.float32]
         self._H_size: int = pop_size
-        self._H_MR = np.full(self._H_size, 1 / (self._str_len), dtype=np.float64)
-        self._H_CR = np.full(self._H_size, 0.5, dtype=np.float64)
+        self._H_MR = np.full(self._H_size, 1 / (self._str_len), dtype=np.float32)
+        self._H_CR = np.full(self._H_size, 0.5, dtype=np.float32)
         self._k: int = 0
         self._parents_num: int = parents_num
         self._tour_size: int = tour_size
@@ -160,7 +160,7 @@ class SHAGACONF(EvolutionaryAlgorithm):
         self._fitness_scale_i = scale_data(self._fitness_i)
         self._fitness_rank_i = rank_data(self._fitness_i)
 
-    def _randc(self: SHAGACONF, u: float, scale: float) -> NDArray[np.float64]:
+    def _randc(self: SHAGACONF, u: float, scale: float) -> NDArray[np.float32]:
         value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
         while value <= 0 or value > 5 / self._str_len:
             value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
@@ -174,7 +174,7 @@ class SHAGACONF(EvolutionaryAlgorithm):
             value = 1
         return value
 
-    def _generate_MR_CR(self: SHAGACONF) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+    def _generate_MR_CR(self: SHAGACONF) -> Tuple[NDArray[np.float32], NDArray[np.float32]]:
         MR_i = np.zeros(self._pop_size)
         CR_i = np.zeros(self._pop_size)
         for i in range(self._pop_size):
@@ -186,7 +186,7 @@ class SHAGACONF(EvolutionaryAlgorithm):
         return MR_i, CR_i
 
     def _update_u(
-        self: SHAGACONF, u: float, S: NDArray[np.float64], df: NDArray[np.float64]
+        self: SHAGACONF, u: float, S: NDArray[np.float32], df: NDArray[np.float32]
     ) -> float:
         if len(S):
             sum_ = np.sum(df)
@@ -199,10 +199,10 @@ class SHAGACONF(EvolutionaryAlgorithm):
         self: SHAGACONF,
         specified_selection: str,
         specified_crossover: str,
-        individ_g: NDArray[np.float64],
+        individ_g: NDArray[np.float32],
         MR: float,
         CR: float,
-    ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float32]:
         selection_func, tour_size = self._selection_pool[specified_selection]
         crossover_func, quantity = self._crossover_pool[specified_crossover]
 
@@ -238,7 +238,7 @@ class SHAGACONF(EvolutionaryAlgorithm):
                 get_new_individ_g(individ_g=self._population_g_i[i], MR=self._MR[i], CR=self._CR[i])
                 for i in range(self._pop_size)
             ],
-            dtype=np.float64,
+            dtype=np.float32,
         )
 
         mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)

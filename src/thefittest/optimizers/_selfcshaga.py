@@ -62,7 +62,7 @@ class SelfCSHAGA(SHAGACONF):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
@@ -199,7 +199,7 @@ class SelfCSHAGA(SHAGACONF):
         return new_proba_dict
 
     def _find_fittest_operator(
-        self: SelfCSHAGA, operators: NDArray, fitness: NDArray[np.float64]
+        self: SelfCSHAGA, operators: NDArray, fitness: NDArray[np.float32]
     ) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
@@ -244,7 +244,7 @@ class SelfCSHAGA(SHAGACONF):
                 )
                 for i in range(self._pop_size)
             ],
-            dtype=np.float64,
+            dtype=np.float32,
         )
 
         mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)

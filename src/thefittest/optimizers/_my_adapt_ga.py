@@ -17,7 +17,8 @@ from ._geneticalgorithm import GeneticAlgorithm
 from ..tools import donothing
 from ..tools.transformations import numpy_group_by
 
-#MyAdaptGA отличается от MyAdaptGAVar2 тем, что в одном случае мутация имеет 3 значения (оператор), а во втором вероятность мутации - вещественная
+
+# MyAdaptGA отличается от MyAdaptGAVar2 тем, что в одном случае мутация имеет 3 значения (оператор), а во втором вероятность мутации - вещественная
 class MyAdaptGA(GeneticAlgorithm):
     """Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform
     Crossover Operator. LNCS, 7331, 2012, pp. 414-421. https://doi.org/10.1007/978-3-642-30976-2_50
@@ -25,7 +26,7 @@ class MyAdaptGA(GeneticAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
@@ -120,7 +121,7 @@ class MyAdaptGA(GeneticAlgorithm):
         self._mutation_operators: NDArray = self._random_choice_operators(
             list(self._mutation_set.keys()), self._pop_size
         )
-        self._mutate_operator_proba =  mutate_operator_proba
+        self._mutate_operator_proba = mutate_operator_proba
 
     def _random_choice_operators(self: MyAdaptGA, operators_set: List[str], size: int) -> NDArray:
         chosen_operator = np.random.choice(operators_set, size)
@@ -138,8 +139,8 @@ class MyAdaptGA(GeneticAlgorithm):
     def _choice_operators_by_selection(
         self: MyAdaptGA,
         operators: NDArray,
-        fitness: NDArray[np.float64],
-        fitness_rank: NDArray[np.float64],
+        fitness: NDArray[np.float32],
+        fitness_rank: NDArray[np.float32],
     ) -> NDArray:
         selection, _ = self._adaptation_operator
         tour_size = self._adaptation_tour_size

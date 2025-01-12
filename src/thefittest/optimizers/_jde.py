@@ -21,19 +21,19 @@ class jDE(DifferentialEvolution):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
-        left: NDArray[np.float64],
-        right: NDArray[np.float64],
+        left: NDArray[np.float32],
+        right: NDArray[np.float32],
         mutation: str = "rand_1",
         F_min: float = 0.1,
         F_max: float = 0.9,
         t_F: float = 0.1,
         t_CR: float = 0.1,
         elitism: bool = True,
-        init_population: Optional[NDArray[np.float64]] = None,
-        genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
+        init_population: Optional[NDArray[np.float32]] = None,
+        genotype_to_phenotype: Callable[[NDArray[np.float32]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -71,10 +71,10 @@ class jDE(DifferentialEvolution):
         self._t_F: float = t_F
         self._t_CR: float = t_CR
 
-        self._F: NDArray[np.float64] = np.full(self._pop_size, 0.5, dtype=np.float64)
-        self._CR: NDArray[np.float64] = np.full(self._pop_size, 0.9, dtype=np.float64)
+        self._F: NDArray[np.float32] = np.full(self._pop_size, 0.5, dtype=np.float32)
+        self._CR: NDArray[np.float32] = np.full(self._pop_size, 0.9, dtype=np.float32)
 
-    def _get_mutate_F(self: jDE) -> NDArray[np.float64]:
+    def _get_mutate_F(self: jDE) -> NDArray[np.float32]:
         mutate_F = self._F.copy()
         mask = np.random.random(size=self._pop_size) < self._t_F
 
@@ -82,7 +82,7 @@ class jDE(DifferentialEvolution):
         mutate_F[mask] = self._F_min + random_values * self._F_max
         return mutate_F
 
-    def _get_mutate_CR(self: jDE) -> NDArray[np.float64]:
+    def _get_mutate_CR(self: jDE) -> NDArray[np.float32]:
         mutate_CR = self._CR.copy()
         mask = np.random.random(size=self._pop_size) < self._t_CR
 
@@ -103,7 +103,7 @@ class jDE(DifferentialEvolution):
                 get_new_individ_g(individ_g=self._population_g_i[i], F=mutate_F[i], CR=mutate_CR[i])
                 for i in range(self._pop_size)
             ],
-            dtype=np.float64,
+            dtype=np.float32,
         )
 
         mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)

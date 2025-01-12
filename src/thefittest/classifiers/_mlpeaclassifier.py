@@ -38,11 +38,11 @@ weights_optimizer_alias = Union[DifferentialEvolution, jDE, SHADE, GeneticAlgori
 
 
 def fitness_function(
-    weights: NDArray[np.float64],
+    weights: NDArray[np.float32],
     net: Net,
-    X: NDArray[np.float64],
-    targets: NDArray[Union[np.float64, np.int64]],
-) -> NDArray[np.float64]:
+    X: NDArray[np.float32],
+    targets: NDArray[Union[np.float32, np.int64]],
+) -> NDArray[np.float32]:
     output3d = net.forward(X, weights)
     error = categorical_crossentropy3d(targets, output3d)
     return error
@@ -112,9 +112,9 @@ class MLPEAClassifier(Model):
     def _train_net(
         self: MLPEAClassifier,
         net: Net,
-        X_train: NDArray[np.float64],
-        proba_train: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
+        X_train: NDArray[np.float32],
+        proba_train: NDArray[np.float32],
+    ) -> NDArray[np.float32]:
         if self._weights_optimizer_args is not None:
             for arg in (
                 "fitness_function",
@@ -139,13 +139,13 @@ class MLPEAClassifier(Model):
 
         weights_optimizer_args["iters"] = self._iters
         weights_optimizer_args["pop_size"] = self._pop_size
-        left: NDArray[np.float64] = np.full(
-            shape=len(net._weights), fill_value=-10, dtype=np.float64
+        left: NDArray[np.float32] = np.full(
+            shape=len(net._weights), fill_value=-10, dtype=np.float32
         )
-        right: NDArray[np.float64] = np.full(
-            shape=len(net._weights), fill_value=10, dtype=np.float64
+        right: NDArray[np.float32] = np.full(
+            shape=len(net._weights), fill_value=10, dtype=np.float32
         )
-        initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = float_population(
+        initial_population: Union[NDArray[np.float32], NDArray[np.byte]] = float_population(
             weights_optimizer_args["pop_size"], left, right
         )
         initial_population[0] = net._weights.copy()
@@ -196,16 +196,16 @@ class MLPEAClassifier(Model):
         return self._net
 
     def _fit(
-        self: MLPEAClassifier, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
+        self: MLPEAClassifier, X: NDArray[np.float32], y: NDArray[Union[np.float32, np.int64]]
     ) -> MLPEAClassifier:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
         n_inputs: int = X.shape[1]
         n_outputs: int = len(set(y))
-        eye: NDArray[np.float64] = np.eye(n_outputs, dtype=np.float64)
+        eye: NDArray[np.float32] = np.eye(n_outputs, dtype=np.float32)
 
-        proba: NDArray[np.float64] = eye[y]
+        proba: NDArray[np.float32] = eye[y]
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         proba_tensor = torch.tensor(proba, dtype=torch.float32, device=device)
 
@@ -215,8 +215,8 @@ class MLPEAClassifier(Model):
         return self
 
     def _predict(
-        self: MLPEAClassifier, X: NDArray[np.float64]
-    ) -> NDArray[Union[np.float64, np.int64]]:
+        self: MLPEAClassifier, X: NDArray[np.float32]
+    ) -> NDArray[Union[np.float32, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 

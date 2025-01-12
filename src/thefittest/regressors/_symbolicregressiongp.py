@@ -33,12 +33,12 @@ from ..tools.operators import Pow2
 from ..tools.operators import Sin
 
 
-def fitness_function(trees: NDArray, y: NDArray[np.float64]) -> NDArray[np.float64]:
+def fitness_function(trees: NDArray, y: NDArray[np.float32]) -> NDArray[np.float32]:
     fitness = []
     for tree in trees:
         y_pred = tree() * np.ones(len(y))
         fitness.append(coefficient_determination(y, y_pred))
-    return np.array(fitness, dtype=np.float64)
+    return np.array(fitness, dtype=np.float32)
 
 
 def generator1() -> float:
@@ -69,7 +69,7 @@ class SymbolicRegressionGP(Model):
         self._optimizer_class: Union[Type[SelfCGP], Type[GeneticProgramming]] = optimizer
         self._optimizer: Union[SelfCGP, GeneticProgramming]
 
-    def _get_uniset(self: SymbolicRegressionGP, X: NDArray[np.float64]) -> UniversalSet:
+    def _get_uniset(self: SymbolicRegressionGP, X: NDArray[np.float32]) -> UniversalSet:
         uniset: UniversalSet
         terminal_set: Union[
             List[Union[TerminalNode, EphemeralNode]], Tuple[Union[TerminalNode, EphemeralNode]]
@@ -105,7 +105,7 @@ class SymbolicRegressionGP(Model):
         return self._optimizer
 
     def _fit(
-        self: SymbolicRegressionGP, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
+        self: SymbolicRegressionGP, X: NDArray[np.float32], y: NDArray[Union[np.float32, np.int64]]
     ) -> SymbolicRegressionGP:
         optimizer_args: dict[str, Any]
         uniset: UniversalSet
@@ -147,8 +147,8 @@ class SymbolicRegressionGP(Model):
         return self
 
     def _predict(
-        self: SymbolicRegressionGP, X: NDArray[np.float64]
-    ) -> NDArray[Union[np.float64, np.int64]]:
+        self: SymbolicRegressionGP, X: NDArray[np.float32]
+    ) -> NDArray[Union[np.float32, np.int64]]:
         n_dimension = X.shape[1]
         solution = self.get_optimizer().get_fittest()
 

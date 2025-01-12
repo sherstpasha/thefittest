@@ -148,9 +148,9 @@ class EnsembleUniversalSet(UniversalSet):
         UniversalSet.__init__(self, functional_set, terminal_set)
         self._functional_set_proba = self._define_functional_set_proba()
 
-    def _define_functional_set_proba(self: EnsembleUniversalSet) -> Dict[int, NDArray[np.float64]]:
-        functional_set_proba: Dict[int, NDArray[np.float64]] = defaultdict(
-            lambda: np.array([], dtype=np.float64)
+    def _define_functional_set_proba(self: EnsembleUniversalSet) -> Dict[int, NDArray[np.float32]]:
+        functional_set_proba: Dict[int, NDArray[np.float32]] = defaultdict(
+            lambda: np.array([], dtype=np.float32)
         )
         for n_args, value in self._functional_set.items():
             count = Counter([type(node._value) for node in value])
@@ -317,7 +317,7 @@ class Tree:
 
         to_return = {"edges": edges, "labels": labels, "nodes": nodes, "pos": pos, "colors": colors}
         return to_return
-    
+
     def save_to_file(self, file_path: str) -> None:
         with open(file_path, "wb") as file:
             cloudpickle.dump(self, file)

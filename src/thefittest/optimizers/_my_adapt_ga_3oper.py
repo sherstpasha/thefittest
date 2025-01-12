@@ -26,7 +26,7 @@ class MyAdaptGA3oper(GeneticAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
@@ -143,8 +143,8 @@ class MyAdaptGA3oper(GeneticAlgorithm):
     def _choice_operators_by_selection(
         self: MyAdaptGA3oper,
         operators: NDArray,
-        fitness: NDArray[np.float64],
-        fitness_rank: NDArray[np.float64],
+        fitness: NDArray[np.float32],
+        fitness_rank: NDArray[np.float32],
     ) -> NDArray:
         selection, _ = self._adaptation_operator
         tour_size = self._adaptation_tour_size

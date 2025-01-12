@@ -21,11 +21,11 @@ from ..base._net import ACTIV_NAME_INV
 
 
 def fitness_function(
-    weights: NDArray[np.float64],
+    weights: NDArray[np.float32],
     net: Net,
-    X: NDArray[np.float64],
-    targets: NDArray[Union[np.float64, np.int64]],
-) -> NDArray[np.float64]:
+    X: NDArray[np.float32],
+    targets: NDArray[Union[np.float32, np.int64]],
+) -> NDArray[np.float32]:
     output3d = net.forward(X, weights)
     # print(output2d.shape, targets.shape)
     error = root_mean_square_error3d(targets, output3d)
@@ -95,9 +95,9 @@ class MLPEARegressorMO(MLPEAClassifier):
     def _train_net(
         self: MLPEAClassifier,
         net: Net,
-        X_train: NDArray[np.float64],
-        y_train: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
+        X_train: NDArray[np.float32],
+        y_train: NDArray[np.float32],
+    ) -> NDArray[np.float32]:
         if self._weights_optimizer_args is not None:
             for arg in (
                 "fitness_function",
@@ -122,13 +122,13 @@ class MLPEARegressorMO(MLPEAClassifier):
 
         weights_optimizer_args["iters"] = self._iters
         weights_optimizer_args["pop_size"] = self._pop_size
-        left: NDArray[np.float64] = np.full(
-            shape=len(net._weights), fill_value=-10, dtype=np.float64
+        left: NDArray[np.float32] = np.full(
+            shape=len(net._weights), fill_value=-10, dtype=np.float32
         )
-        right: NDArray[np.float64] = np.full(
-            shape=len(net._weights), fill_value=10, dtype=np.float64
+        right: NDArray[np.float32] = np.full(
+            shape=len(net._weights), fill_value=10, dtype=np.float32
         )
-        initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = float_population(
+        initial_population: Union[NDArray[np.float32], NDArray[np.byte]] = float_population(
             weights_optimizer_args["pop_size"], left, right
         )
         initial_population[0] = net._weights.copy()
@@ -162,7 +162,7 @@ class MLPEARegressorMO(MLPEAClassifier):
         return phenotype
 
     def _fit(
-        self: MLPEARegressorMO, X: NDArray[np.float64], y: NDArray[Union[np.float64, np.int64]]
+        self: MLPEARegressorMO, X: NDArray[np.float32], y: NDArray[Union[np.float32, np.int64]]
     ) -> MLPEARegressorMO:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
@@ -174,12 +174,12 @@ class MLPEARegressorMO(MLPEAClassifier):
 
         print(self._net)
 
-        self._net._weights = self._train_net(self._net, X, y.astype(np.float64))
+        self._net._weights = self._train_net(self._net, X, y.astype(np.float32))
         return self
 
     def _predict(
-        self: MLPEARegressorMO, X: NDArray[np.float64]
-    ) -> NDArray[Union[np.float64, np.int64]]:
+        self: MLPEARegressorMO, X: NDArray[np.float32]
+    ) -> NDArray[Union[np.float32, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 

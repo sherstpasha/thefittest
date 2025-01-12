@@ -4,7 +4,7 @@ from typing import Tuple
 from typing import Union
 
 from numba import boolean
-from numba import float64
+from numba import float32
 from numba import int64
 from numba import njit
 
@@ -35,31 +35,31 @@ def binary_string_population(pop_size: int, str_len: int) -> NDArray[np.byte]:
 
 
 def float_population(
-    pop_size: int, left: NDArray[np.float64], right: NDArray[np.float64]
-) -> NDArray[np.float64]:
+    pop_size: int, left: NDArray[np.float32], right: NDArray[np.float32]
+) -> NDArray[np.float32]:
     return np.array(
         [np.random.uniform(left_i, right_i, pop_size) for left_i, right_i in zip(left, right)]
     ).T
 
 
-@njit(float64[:](float64, float64, int64))
-def cauchy_distribution(loc: np.float64, scale: np.float64, size: np.int64) -> NDArray[np.float64]:
-    x_ = np.random.standard_cauchy(size=size).astype(np.float64)
+@njit(float32[:](float32, float32, int64))
+def cauchy_distribution(loc: np.float32, scale: np.float32, size: np.int64) -> NDArray[np.float32]:
+    x_ = np.random.standard_cauchy(size=size).astype(np.float32)
     return loc + scale * x_
 
 
-@njit(float64(float64))
-def randc01(u: np.float64) -> np.float64:
-    value = cauchy_distribution(loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
+@njit(float32(float32))
+def randc01(u: np.float32) -> np.float32:
+    value = cauchy_distribution(loc=u, scale=np.float32(0.1), size=np.int64(1))[0]
     while value <= 0:
-        value = cauchy_distribution(loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
+        value = cauchy_distribution(loc=u, scale=np.float32(0.1), size=np.int64(1))[0]
     if value > 1:
         value = 1
     return value
 
 
-@njit(float64(float64))
-def randn01(u: np.float64) -> Union[float, np.float64]:
+@njit(float32(float32))
+def randn01(u: np.float32) -> Union[float, np.float32]:
     value = np.random.normal(u, 0.1, size=1)[0]
     if value < 0:
         return 0.0
@@ -149,9 +149,9 @@ def half_and_half(pop_size: int, uniset: UniversalSet, max_level: int) -> NDArra
     return np.array(population, dtype=object)
 
 
-@njit(int64[:](float64[:], int64, boolean))
+@njit(int64[:](float32[:], int64, boolean))
 def random_weighted_sample(
-    weights: NDArray[np.float64], quantity: Union[np.int64, int] = 1, replace: bool = True
+    weights: NDArray[np.float32], quantity: Union[np.int64, int] = 1, replace: bool = True
 ) -> NDArray[np.int64]:
     if not replace:
         assert len(weights) >= quantity
@@ -212,7 +212,7 @@ def stratified_sample(data: NDArray[np.int64], sample_ratio: float) -> NDArray[n
 
 
 def train_test_split_stratified(
-    X: NDArray[Union[np.float64, np.int64]],
+    X: NDArray[Union[np.float32, np.int64]],
     y: NDArray[np.int64],
     test_size: float,
 ) -> Tuple:
@@ -221,16 +221,16 @@ def train_test_split_stratified(
     test_id = sample_id
     train_id = np.setdiff1d(indexes, test_id)
     return (
-        X[train_id].astype(np.float64),
-        X[test_id].astype(np.float64),
+        X[train_id].astype(np.float32),
+        X[test_id].astype(np.float32),
         y[train_id].astype(np.int64),
         y[test_id].astype(np.int64),
     )
 
 
 def train_test_split(
-    X: NDArray[Union[np.float64, np.int64]],
-    y: NDArray[Union[np.float64, np.int64]],
+    X: NDArray[Union[np.float32, np.int64]],
+    y: NDArray[Union[np.float32, np.int64]],
     test_size: float,
 ) -> Tuple:
     data_size = len(X)
@@ -240,8 +240,8 @@ def train_test_split(
     test_id = sample_id
     train_id = np.setdiff1d(indexes, test_id)
     return (
-        X[train_id].astype(np.float64),
-        X[test_id].astype(np.float64),
-        y[train_id].astype(np.float64),
-        y[test_id].astype(np.float64),
+        X[train_id].astype(np.float32),
+        X[test_id].astype(np.float32),
+        y[train_id].astype(np.float32),
+        y[test_id].astype(np.float32),
     )

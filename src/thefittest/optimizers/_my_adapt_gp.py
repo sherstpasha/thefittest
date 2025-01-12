@@ -19,7 +19,7 @@ from ..tools import donothing
 class MyAdaptGP(GeneticProgramming, MyAdaptGA):
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         uniset: UniversalSet,
         iters: int,
         pop_size: int,

@@ -99,11 +99,11 @@ def _defitne_net(
 
 def fitness_function(
     population: NDArray,
-    X: NDArray[np.float64],
-    targets: NDArray[np.float64],
+    X: NDArray[np.float32],
+    targets: NDArray[np.float32],
     net_size_penalty: float,
-) -> NDArray[np.float64]:
-    fitness = np.empty(shape=len(population), dtype=np.float64)
+) -> NDArray[np.float32]:
+    fitness = np.empty(shape=len(population), dtype=np.float32)
     for i, ensemble in enumerate(population):
         output2d = ensemble.meta_output(X)
         fitness[i] = categorical_crossentropy(targets, output2d)
@@ -171,10 +171,10 @@ def genotype_to_phenotype_ensemble(
 
 def genotype_to_phenotype(
     population_g: NDArray,
-    X_train_ens: NDArray[np.float64],
-    proba_train_ens: NDArray[np.float64],
-    X_train_meta: NDArray[np.float64],
-    proba_train_meta: NDArray[np.float64],
+    X_train_ens: NDArray[np.float32],
+    proba_train_ens: NDArray[np.float32],
+    X_train_meta: NDArray[np.float32],
+    proba_train_meta: NDArray[np.float32],
     weights_optimizer_args: Dict,
     weights_optimizer_class: weights_type_optimizer_alias,
     n_outputs: int,
@@ -216,10 +216,10 @@ def genotype_to_phenotype(
 
 def train_ensemble(
     ensemble: NetEnsemble,
-    X_train_ens: NDArray[np.float64],
-    proba_train_ens: NDArray[np.float64],
-    X_train_meta: NDArray[np.float64],
-    proba_train_meta: NDArray[np.float64],
+    X_train_ens: NDArray[np.float32],
+    proba_train_ens: NDArray[np.float32],
+    X_train_meta: NDArray[np.float32],
+    proba_train_meta: NDArray[np.float32],
     weights_optimizer_args: Dict,
     weights_optimizer_class: weights_type_optimizer_alias,
     fitness_function: Callable,
@@ -317,7 +317,7 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
         self._cache: List[NetEnsemble] = []
 
     def _get_uniset_1(
-        self: GeneticProgrammingNeuralNetStackingClassifier, X: NDArray[np.float64]
+        self: GeneticProgrammingNeuralNetStackingClassifier, X: NDArray[np.float32]
     ) -> EnsembleUniversalSet:
         uniset: EnsembleUniversalSet
         if self._offset:
@@ -362,12 +362,12 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
         self: GeneticProgrammingNeuralNetStackingClassifier,
         uniset: UniversalSet,
         n_outputs: int,
-        X_train_ens: NDArray[np.float64],
-        proba_train_ens: NDArray[np.float64],
-        X_train_meta: NDArray[np.float64],
-        proba_train_meta: NDArray[np.float64],
-        X_test: NDArray[np.float64],
-        target_test: NDArray[np.float64],
+        X_train_ens: NDArray[np.float32],
+        proba_train_ens: NDArray[np.float32],
+        X_train_meta: NDArray[np.float32],
+        proba_train_meta: NDArray[np.float32],
+        X_test: NDArray[np.float32],
+        target_test: NDArray[np.float32],
         fitness_function: Callable,
         evaluate_nets: Callable,
     ):
@@ -422,14 +422,14 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
 
     def _fit(
         self: GeneticProgrammingNeuralNetStackingClassifier,
-        X: NDArray[np.float64],
-        y: NDArray[Union[np.float64, np.int64]],
+        X: NDArray[np.float32],
+        y: NDArray[Union[np.float32, np.int64]],
     ) -> GeneticProgrammingNeuralNetStackingClassifier:
         if self._offset:
             X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])
 
         n_outputs: int = len(set(y))
-        eye: NDArray[np.float64] = np.eye(n_outputs, dtype=np.float64)
+        eye: NDArray[np.float32] = np.eye(n_outputs, dtype=np.float32)
 
         X_train, X_test, y_train, y_test = train_test_split_stratified(
             X, y.astype(np.int64), self._test_sample_ratio
@@ -439,9 +439,9 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
             X_train, y_train, 0.5
         )
 
-        proba_test: NDArray[np.float64] = eye[y_test]
-        proba_train_ens: NDArray[np.float64] = eye[y_train_ens]
-        proba_train_meta: NDArray[np.float64] = eye[y_train_meta]
+        proba_test: NDArray[np.float32] = eye[y_test]
+        proba_train_ens: NDArray[np.float32] = eye[y_train_ens]
+        proba_train_meta: NDArray[np.float32] = eye[y_train_meta]
 
         self._optimizer = self._define_optimizer_ensembles(
             uniset=self._get_uniset_1(X),
@@ -460,7 +460,7 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
 
         return self
 
-    def _predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
+    def _predict(self, X: NDArray[np.float32]) -> NDArray[Union[np.float32, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 

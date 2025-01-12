@@ -24,7 +24,7 @@ from ..tools.random import half_and_half
 
 def test_GeneticAlgorithm_start_settings():
     def fitness_function(x):
-        return np.sum(x, axis=1, dtype=np.float64)
+        return np.sum(x, axis=1, dtype=np.float32)
 
     iters = 100
     pop_size = 50
@@ -57,7 +57,7 @@ def test_GeneticAlgorithm_start_settings():
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.float64)
+        return np.ones(len(x), dtype=np.float32)
 
     no_increase_num = 15
     optimizer = GeneticAlgorithm(
@@ -98,7 +98,7 @@ def test_GeneticAlgorithm_start_settings():
 
 def test_GeneticAlgorithm_set_strategy():
     def fitness_function(x):
-        return np.sum(x, axis=1, dtype=np.float64)
+        return np.sum(x, axis=1, dtype=np.float32)
 
     iters = 3
     pop_size = 8
@@ -195,7 +195,7 @@ def test_GeneticAlgorithm_set_strategy():
 
 def test_SelfCGA_start_settings():
     def fitness_function(x):
-        return np.sum(x, axis=1, dtype=np.float64)
+        return np.sum(x, axis=1, dtype=np.float32)
 
     iters = 100
     pop_size = 50
@@ -228,7 +228,7 @@ def test_SelfCGA_start_settings():
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.float64)
+        return np.ones(len(x), dtype=np.float32)
 
     no_increase_num = 15
     optimizer = SelfCGA(
@@ -269,7 +269,7 @@ def test_SelfCGA_start_settings():
 
 def test_SelfCGA_set_strategy():
     def fitness_function(x):
-        return np.sum(x, axis=1, dtype=np.float64)
+        return np.sum(x, axis=1, dtype=np.float32)
 
     iters = 10
     pop_size = 10
@@ -390,7 +390,7 @@ def test_GeneticProgramming_start_settings():
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.float64)
+        return np.ones(len(x), dtype=np.float32)
 
     no_increase_num = 15
 
@@ -617,7 +617,7 @@ def test_SelfCGP_start_settings():
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.float64)
+        return np.ones(len(x), dtype=np.float32)
 
     no_increase_num = 15
 
@@ -770,13 +770,13 @@ def test_SelfCGP_set_strategy():
 
 def test_DifferentialEvolution_start_settings():
     def fitness_function(x):
-        return np.sum(x, axis=1, dtype=np.float64)
+        return np.sum(x, axis=1, dtype=np.float32)
 
     iters = 100
     pop_size = 50
     n_vars = 10
-    left = np.full(n_vars, -1, dtype=np.float64)
-    right = np.full(n_vars, 1, dtype=np.float64)
+    left = np.full(n_vars, -1, dtype=np.float32)
+    right = np.full(n_vars, 1, dtype=np.float32)
 
     # simple start
     optimizer = DifferentialEvolution(
@@ -806,7 +806,7 @@ def test_DifferentialEvolution_start_settings():
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.float64)
+        return np.ones(len(x), dtype=np.float32)
 
     no_increase_num = 15
     optimizer = DifferentialEvolution(
@@ -849,13 +849,13 @@ def test_DifferentialEvolution_start_settings():
 
 def test_DifferentialEvolution_set_strategy():
     def fitness_function(x):
-        return np.sum(x, axis=1, dtype=np.float64)
+        return np.sum(x, axis=1, dtype=np.float32)
 
     iters = 2
     pop_size = 10
     n_vars = 10
-    left = np.full(n_vars, -1, dtype=np.float64)
-    right = np.full(n_vars, 1, dtype=np.float64)
+    left = np.full(n_vars, -1, dtype=np.float32)
+    right = np.full(n_vars, 1, dtype=np.float32)
     initial_population = float_population(pop_size=pop_size, left=left, right=right)
 
     mutations = ("best_1", "rand_1", "current_to_best_1", "rand_to_best1", "best_2", "rand_2")
@@ -894,13 +894,13 @@ def test_DifferentialEvolution_set_strategy():
 
 def test_jDE_start_settings():
     def fitness_function(x):
-        return np.sum(x, axis=1, dtype=np.float64)
+        return np.sum(x, axis=1, dtype=np.float32)
 
     iters = 100
     pop_size = 50
     n_vars = 10
-    left = np.full(n_vars, -1, dtype=np.float64)
-    right = np.full(n_vars, 1, dtype=np.float64)
+    left = np.full(n_vars, -1, dtype=np.float32)
+    right = np.full(n_vars, 1, dtype=np.float32)
 
     # simple start
     optimizer = jDE(
@@ -930,7 +930,7 @@ def test_jDE_start_settings():
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.float64)
+        return np.ones(len(x), dtype=np.float32)
 
     no_increase_num = 15
     optimizer = jDE(
@@ -973,13 +973,13 @@ def test_jDE_start_settings():
 
 def test_jDE_set_strategy():
     def fitness_function(x):
-        return np.sum(x, axis=1, dtype=np.float64)
+        return np.sum(x, axis=1, dtype=np.float32)
 
     iters = 2
     pop_size = 10
     n_vars = 10
-    left = np.full(n_vars, -1, dtype=np.float64)
-    right = np.full(n_vars, 1, dtype=np.float64)
+    left = np.full(n_vars, -1, dtype=np.float32)
+    right = np.full(n_vars, 1, dtype=np.float32)
     initial_population = float_population(pop_size=pop_size, left=left, right=right)
 
     mutations = ("best_1", "rand_1", "current_to_best_1", "rand_to_best1", "best_2", "rand_2")
@@ -1026,13 +1026,13 @@ def test_jDE_set_strategy():
 
 def test_SHADE_start_settings():
     def fitness_function(x):
-        return np.sum(x, axis=1, dtype=np.float64)
+        return np.sum(x, axis=1, dtype=np.float32)
 
     iters = 100
     pop_size = 50
     n_vars = 10
-    left = np.full(n_vars, -1, dtype=np.float64)
-    right = np.full(n_vars, 1, dtype=np.float64)
+    left = np.full(n_vars, -1, dtype=np.float32)
+    right = np.full(n_vars, 1, dtype=np.float32)
 
     # simple start
     optimizer = SHADE(
@@ -1062,7 +1062,7 @@ def test_SHADE_start_settings():
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.float64)
+        return np.ones(len(x), dtype=np.float32)
 
     no_increase_num = 15
     optimizer = SHADE(
@@ -1105,7 +1105,7 @@ def test_SHADE_start_settings():
 
 def test_SHAGA_start_settings():
     def fitness_function(x):
-        return np.sum(x, axis=1, dtype=np.float64)
+        return np.sum(x, axis=1, dtype=np.float32)
 
     iters = 100
     pop_size = 50
@@ -1138,7 +1138,7 @@ def test_SHAGA_start_settings():
 
     # start with the no_increase_num is equal 15
     def fitness_function(x):
-        return np.ones(len(x), dtype=np.float64)
+        return np.ones(len(x), dtype=np.float32)
 
     no_increase_num = 15
     optimizer = SHAGA(

@@ -49,7 +49,7 @@ class Net:
         hidden_layers: Optional[List] = None,
         outputs: Optional[Set] = None,
         connects: Optional[NDArray[np.int64]] = None,
-        weights: Optional[NDArray[np.float64]] = None,
+        weights: Optional[NDArray[np.float32]] = None,
         activs: Optional[Dict[int, int]] = None,
     ):
         self._inputs = inputs or set()
@@ -71,8 +71,8 @@ class Net:
         self._numba_activs_nodes: numbaList[numbaList[NDArray[np.int64]]]
 
     def forward(
-        self, X: NDArray[np.float64], weights: Optional[NDArray[np.float64]] = None
-    ) -> NDArray[np.float64]:
+        self, X: NDArray[np.float32], weights: Optional[NDArray[np.float32]] = None
+    ) -> NDArray[np.float32]:
         if weights is None:
             weights = self._weights.reshape(1, -1)
         else:
@@ -166,9 +166,9 @@ class Net:
             to_return = values
         return to_return
 
-    def _set_weights(self, values: Optional[NDArray[np.float64]]) -> NDArray[np.float64]:
+    def _set_weights(self, values: Optional[NDArray[np.float32]]) -> NDArray[np.float32]:
         if values is None:
-            to_return = np.empty((0), dtype=np.float64)
+            to_return = np.empty((0), dtype=np.float32)
         else:
             to_return = values
 
@@ -195,13 +195,13 @@ class Net:
 
     def _get_connect(
         self, left: Set[int], right: Set[int]
-    ) -> Tuple[NDArray[np.int64], NDArray[np.float64]]:
+    ) -> Tuple[NDArray[np.int64], NDArray[np.float32]]:
         if len(left) and len(right):
             connects = np.array(list(product(left, right)), dtype=np.int64)
-            weights = np.random.uniform(-2, 2, len(connects)).astype(np.float64)
+            weights = np.random.uniform(-2, 2, len(connects)).astype(np.float32)
             return (connects, weights)
         else:
-            return (np.zeros((0, 2), dtype=np.int64), np.zeros((0), dtype=np.float64))
+            return (np.zeros((0, 2), dtype=np.int64), np.zeros((0), dtype=np.float32))
 
     def __add__(self, other: Net) -> Net:
         len_i_1, len_i_2 = len(self._inputs), len(other._inputs)
@@ -347,8 +347,8 @@ class Net:
         self._numba_activs_nodes = active_nodes
 
     def forward1(
-        self, X: NDArray[np.float64], weights: Optional[NDArray[np.float64]] = None
-    ) -> NDArray[np.float64]:
+        self, X: NDArray[np.float32], weights: Optional[NDArray[np.float32]] = None
+    ) -> NDArray[np.float32]:
         if weights is None:
             weights = self._weights.reshape(1, -1)
         else:
@@ -465,9 +465,9 @@ class NetEnsemble:
 
     def forward(
         self: NetEnsemble,
-        X: NDArray[np.float64],
-        weights_list: Optional[List[NDArray[np.float64]]] = None,
-    ) -> NDArray[np.float64]:
+        X: NDArray[np.float32],
+        weights_list: Optional[List[NDArray[np.float32]]] = None,
+    ) -> NDArray[np.float32]:
         if weights_list is not None:
             to_return = [
                 net_i.forward(X, weights_i) for net_i, weights_i in zip(self._nets, weights_list)
@@ -475,11 +475,11 @@ class NetEnsemble:
         else:
             to_return = [net_i.forward(X) for net_i in self._nets]
 
-        return np.array(to_return, dtype=np.float64)
+        return np.array(to_return, dtype=np.float32)
 
     def _get_meta_inputs(
-        self: NetEnsemble, X: NDArray[np.float64], offset: bool = True
-    ) -> NDArray[np.float64]:
+        self: NetEnsemble, X: NDArray[np.float32], offset: bool = True
+    ) -> NDArray[np.float32]:
         outputs = self.forward(X)[:, 0]
         X_input = np.concatenate(outputs, axis=1)
         if offset:
@@ -489,8 +489,8 @@ class NetEnsemble:
 
     def meta_output(
         self: NetEnsemble,
-        X: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
+        X: NDArray[np.float32],
+    ) -> NDArray[np.float32]:
         if self._meta_algorithm is not None:
             X_input = self._get_meta_inputs(X, offset=self._meta_algorithm._offset)
             output = self._meta_algorithm.forward(X=X_input)[0]

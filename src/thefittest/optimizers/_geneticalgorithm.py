@@ -45,7 +45,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
@@ -160,8 +160,8 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             "gp_custom_rate_shrink": (shrink_mutation, self._mutation_rate, True),
         }
 
-        self._fitness_scale_i: NDArray[np.float64]
-        self._fitness_rank_i: NDArray[np.float64]
+        self._fitness_scale_i: NDArray[np.float32]
+        self._fitness_rank_i: NDArray[np.float32]
 
     def _first_generation(self: GeneticAlgorithm) -> None:
         if self._init_population is None:
@@ -194,7 +194,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         else:
             proba = proba / len(offspring_no_mutated)
 
-        offspring = mutation_func(offspring_no_mutated, np.float64(proba))
+        offspring = mutation_func(offspring_no_mutated, np.float32(proba))
         return offspring
 
     def _get_new_population(self: GeneticAlgorithm) -> None:

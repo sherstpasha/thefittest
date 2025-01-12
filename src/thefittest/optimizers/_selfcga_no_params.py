@@ -23,7 +23,7 @@ class SelfCGA(GeneticAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
@@ -67,7 +67,7 @@ class SelfCGA(GeneticAlgorithm):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
-        alpha = 0.5
+        alpha=0.5,
     ):
         GeneticAlgorithm.__init__(
             self,
@@ -156,16 +156,14 @@ class SelfCGA(GeneticAlgorithm):
 
         self._previous_fitness_i = []
         self._success_i: NDArray[np.bool_]
-        
+
     def _choice_operators(self: SelfCGA, proba_dict: Dict["str", float]) -> NDArray:
         operators = list(proba_dict.keys())
         proba = list(proba_dict.values())
         chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
         return chosen_operator
 
-
-
-    def _choice_parent(self, fitness_i_selected: NDArray[np.float64]) -> np.float64:
+    def _choice_parent(self, fitness_i_selected: NDArray[np.float32]) -> np.float32:
         choosen = random.choice(fitness_i_selected)
         return choosen
 
@@ -183,9 +181,7 @@ class SelfCGA(GeneticAlgorithm):
         new_proba_dict = dict(sorted(new_proba_dict.items()))
         return new_proba_dict
 
-    def _culc_r_i(
-        self, success: NDArray[np.bool_], operator: NDArray, operator_keys
-    ) -> Tuple:
+    def _culc_r_i(self, success: NDArray[np.bool_], operator: NDArray, operator_keys) -> Tuple:
         keys, groups = numpy_group_by(group=success, by=operator)
         r_values = np.array(list(map(lambda x: (np.sum(x) ** 2 + 1) / (len(x) + 1), groups)))
         for key in operator_keys:
@@ -211,7 +207,7 @@ class SelfCGA(GeneticAlgorithm):
         return new_proba_dict
 
     def _find_fittest_operator(
-        self: SelfCGA, operators: NDArray, fitness: NDArray[np.float64]
+        self: SelfCGA, operators: NDArray, fitness: NDArray[np.float32]
     ) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
@@ -228,7 +224,7 @@ class SelfCGA(GeneticAlgorithm):
 
     def _adapt(self: SelfCGA) -> None:
         if len(self._previous_fitness_i):
-            self._success_i = np.array(self._previous_fitness_i, dtype=np.float64) < self._fitness_i
+            self._success_i = np.array(self._previous_fitness_i, dtype=np.float32) < self._fitness_i
 
             pdp_selection_proba = self._get_new_proba_pdp(
                 self._selection_proba, self._selection_operators, self._thresholds["selection"]
@@ -259,9 +255,21 @@ class SelfCGA(GeneticAlgorithm):
 
             self._previous_fitness_i = []
 
-            self._selection_proba = {key: self.alpha * pdp_selection_proba[key] + (1 - self.alpha) * selfcea_selection_proba[key] for key in pdp_selection_proba}
-            self._crossover_proba = {key: self.alpha * pdp_crossover_proba[key] + (1 - self.alpha) * selfcea_crossover_proba[key] for key in pdp_crossover_proba}
-            self._mutation_proba = {key: self.alpha * pdp_mutation_proba[key] + (1 - self.alpha) * selfcea_mutation_proba[key] for key in pdp_mutation_proba}
+            self._selection_proba = {
+                key: self.alpha * pdp_selection_proba[key]
+                + (1 - self.alpha) * selfcea_selection_proba[key]
+                for key in pdp_selection_proba
+            }
+            self._crossover_proba = {
+                key: self.alpha * pdp_crossover_proba[key]
+                + (1 - self.alpha) * selfcea_crossover_proba[key]
+                for key in pdp_crossover_proba
+            }
+            self._mutation_proba = {
+                key: self.alpha * pdp_mutation_proba[key]
+                + (1 - self.alpha) * selfcea_mutation_proba[key]
+                for key in pdp_mutation_proba
+            }
 
             # print(pdp_selection_proba)
             # print(pdp_crossover_proba)
@@ -272,7 +280,6 @@ class SelfCGA(GeneticAlgorithm):
             # print(self._selection_proba)
             # print(self._crossover_proba)
             # print(self._mutation_proba)
-
 
         # self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
         # self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
@@ -319,5 +326,5 @@ class SelfCGA(GeneticAlgorithm):
         else:
             proba = proba / len(offspring_no_mutated)
 
-        offspring = mutation_func(offspring_no_mutated, np.float64(proba))
+        offspring = mutation_func(offspring_no_mutated, np.float32(proba))
         return offspring

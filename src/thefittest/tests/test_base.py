@@ -32,7 +32,7 @@ def test_thefittest_class():
 
     population_g = np.array([net_1, net_2, net_3], dtype=object)
     population_ph = population_g
-    fitness = np.array([1, 2, 3], dtype=np.float64)
+    fitness = np.array([1, 2, 3], dtype=np.float32)
 
     thefittest_ = TheFittest()
     thefittest_._update(population_g, population_ph, fitness)
@@ -42,12 +42,12 @@ def test_thefittest_class():
     assert thefittest_._genotype is not population_g[2]
     assert thefittest_._phenotype is not population_ph[2]
 
-    fitness = np.array([1, 2, 2], dtype=np.float64)
+    fitness = np.array([1, 2, 2], dtype=np.float32)
     thefittest_._update(population_g, population_ph, fitness)
     assert thefittest_._no_update_counter == 1
     assert thefittest_._fitness == 3
 
-    fitness = np.array([1, 2, 4], dtype=np.float64)
+    fitness = np.array([1, 2, 4], dtype=np.float32)
     thefittest_._update(population_g, population_ph, fitness)
     assert thefittest_._no_update_counter == 0
     assert thefittest_._fitness == 4
@@ -63,7 +63,7 @@ def test_statistic_class():
     net_3 = Net()
     population_g = np.array([net_1, net_2, net_3], dtype=object)
     population_ph = population_g
-    fitness = np.array([1, 2, 3], dtype=np.float64)
+    fitness = np.array([1, 2, 3], dtype=np.float32)
 
     statistics_ = Statistics()
     fitness_max = np.max(fitness)
@@ -258,11 +258,11 @@ def test_net():
         hidden_layers=[{2, 3}, {4}],
         outputs={5},
         connects=np.array([[0, 2], [1, 3], [2, 4], [3, 4], [4, 5]], dtype=np.int64),
-        weights=np.array([0.1, 0.2, 0.4, 0.5, 1.5], dtype=np.float64),
+        weights=np.array([0.1, 0.2, 0.4, 0.5, 1.5], dtype=np.float32),
         activs={2: 1, 3: 1, 4: 1, 5: 1},
     )
 
-    X = np.array([[1, 2]], dtype=np.float64)
+    X = np.array([[1, 2]], dtype=np.float32)
     out = net16.forward(X)
 
     print(out)

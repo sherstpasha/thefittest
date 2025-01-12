@@ -22,7 +22,7 @@ class SelfCGAKF(GeneticAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
@@ -179,8 +179,8 @@ class SelfCGAKF(GeneticAlgorithm):
         self: SelfCGAKF,
         proba_dict: Dict["str", float],
         operator: str,
-        kf_value, 
-        #threshold: float,
+        kf_value,
+        # threshold: float,
     ) -> Dict["str", float]:
         # print("kf_value:", kf_value)
         for operator_i in proba_dict.keys():
@@ -201,7 +201,7 @@ class SelfCGAKF(GeneticAlgorithm):
         # return new_proba_dict
 
     def _find_fittest_operator(
-        self: SelfCGAKF, operators: NDArray, fitness: NDArray[np.float64]
+        self: SelfCGAKF, operators: NDArray, fitness: NDArray[np.float32]
     ) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
@@ -211,7 +211,7 @@ class SelfCGAKF(GeneticAlgorithm):
         up = np.max(np.abs(mean_fit[argmax] - mean_fit))
         down = np.max(np.abs(mean_fit))
 
-        return fittest_operator, up/down
+        return fittest_operator, up / down
 
     def _update_data(self: SelfCGAKF) -> None:
         super()._update_data()
@@ -222,22 +222,28 @@ class SelfCGAKF(GeneticAlgorithm):
         )
 
     def _adapt(self: SelfCGAKF) -> None:
-        self.i  = self.i + 1
+        self.i = self.i + 1
         if self.i % 1 == 0:
-            s_fittest_oper, s_kf = self._find_fittest_operator(self._selection_operators, self._fitness_i)
-            self.s_kf = self.s_kf*0.2 + 0.8*s_kf
+            s_fittest_oper, s_kf = self._find_fittest_operator(
+                self._selection_operators, self._fitness_i
+            )
+            self.s_kf = self.s_kf * 0.2 + 0.8 * s_kf
             self._selection_proba = self._get_new_probakf(
                 self._selection_proba, s_fittest_oper, self.s_kf
             )
 
-            c_fittest_oper, c_kf = self._find_fittest_operator(self._crossover_operators, self._fitness_i)
-            self.c_kf = self.c_kf*0.2 + 0.8*c_kf
+            c_fittest_oper, c_kf = self._find_fittest_operator(
+                self._crossover_operators, self._fitness_i
+            )
+            self.c_kf = self.c_kf * 0.2 + 0.8 * c_kf
             self._crossover_proba = self._get_new_probakf(
                 self._crossover_proba, c_fittest_oper, self.c_kf
             )
 
-            m_fittest_oper, m_kf = self._find_fittest_operator(self._mutation_operators, self._fitness_i)
-            self.m_kf = self.m_kf*0.2 + 0.8*m_kf
+            m_fittest_oper, m_kf = self._find_fittest_operator(
+                self._mutation_operators, self._fitness_i
+            )
+            self.m_kf = self.m_kf * 0.2 + 0.8 * m_kf
             self._mutation_proba = self._get_new_probakf(
                 self._mutation_proba, m_fittest_oper, self.m_kf
             )

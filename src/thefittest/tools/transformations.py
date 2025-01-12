@@ -5,7 +5,7 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
-from numba import float64
+from numba import float32
 from numba import njit
 
 import numpy as np
@@ -108,9 +108,9 @@ def numpy_group_by(group: NDArray, by: NDArray) -> Tuple:
 
 
 def lehmer_mean(
-    x: NDArray[np.float64], power: int = 2, weight: Optional[NDArray[np.float64]] = None
+    x: NDArray[np.float32], power: int = 2, weight: Optional[NDArray[np.float32]] = None
 ) -> float:
-    weight_arg: Union[NDArray[np.float64], int]
+    weight_arg: Union[NDArray[np.float32], int]
     if weight is None:
         weight_arg = 1
     else:
@@ -121,7 +121,7 @@ def lehmer_mean(
     return np.sum(x_up) / np.sum(x_down)
 
 
-def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
+def rank_data(arr: NDArray[Union[np.int64, np.float32]]) -> NDArray[np.float32]:
     arange = np.arange(len(arr), dtype=np.int64)
 
     argsort = np.argsort(arr)
@@ -132,15 +132,15 @@ def rank_data(arr: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
     ranks = (raw_ranks[1:] + raw_ranks[:-1] + 1) / 2
     count = raw_ranks[1:] - raw_ranks[:-1]
 
-    results = np.empty_like(arr, dtype=np.float64)
+    results = np.empty_like(arr, dtype=np.float32)
     results[argsort] = ranks.repeat(count)
     return results
 
 
-@njit(float64[:](float64[:]))
-def protect_norm(input_array: NDArray[np.float64]) -> NDArray[np.float64]:
-    normalized_array = np.empty(len(input_array), dtype=np.float64)
-    total_sum = np.sum(input_array, dtype=np.float64)
+@njit(float32[:](float32[:]))
+def protect_norm(input_array: NDArray[np.float32]) -> NDArray[np.float32]:
+    normalized_array = np.empty(len(input_array), dtype=np.float32)
+    total_sum = np.sum(input_array, dtype=np.float32)
     if total_sum > 0:
         for i in range(normalized_array.size):
             normalized_array[i] = input_array[i] / total_sum
@@ -151,14 +151,14 @@ def protect_norm(input_array: NDArray[np.float64]) -> NDArray[np.float64]:
     return normalized_array
 
 
-def scale_data(data: NDArray[Union[np.int64, np.float64]]) -> NDArray[np.float64]:
+def scale_data(data: NDArray[Union[np.int64, np.float32]]) -> NDArray[np.float32]:
     data_copy = data.copy()
     max_value = data_copy.max()
     min_value = data_copy.min()
     if max_value == min_value:
-        scaled_data = np.ones_like(data_copy, dtype=np.float64)
+        scaled_data = np.ones_like(data_copy, dtype=np.float32)
     else:
-        scaled_data = ((data_copy - min_value) / (max_value - min_value)).astype(np.float64)
+        scaled_data = ((data_copy - min_value) / (max_value - min_value)).astype(np.float32)
     return scaled_data
 
 
@@ -199,20 +199,20 @@ def numpy_bit_to_gray(bit_array: NDArray[np.byte]) -> NDArray[np.byte]:
 class SamplingGrid:
     def __init__(self, fit_by: str = "h") -> None:
         self._fit_by = fit_by
-        self.left: NDArray[np.float64]
-        self.right: NDArray[np.float64]
+        self.left: NDArray[np.float32]
+        self.right: NDArray[np.float32]
         self.parts: NDArray[np.int64]
-        self.h: NDArray[np.float64]
+        self.h: NDArray[np.float32]
         self._power_arange: NDArray[np.int64]
 
     def _culc_h_from_parts(
-        self, left: NDArray[np.float64], right: NDArray[np.float64], parts: NDArray[np.int64]
-    ) -> NDArray[np.float64]:
+        self, left: NDArray[np.float32], right: NDArray[np.float32], parts: NDArray[np.int64]
+    ) -> NDArray[np.float32]:
         h = (right - left) / (2.0**parts - 1)
         return h
 
     def _culc_parts_from_h(
-        self, left: NDArray[np.float64], right: NDArray[np.float64], h: NDArray[np.float64]
+        self, left: NDArray[np.float32], right: NDArray[np.float32], h: NDArray[np.float32]
     ) -> NDArray[np.int64]:
         parts = np.ceil(np.log2((right - left) / h + 1)).astype(int)
         return parts
@@ -223,9 +223,9 @@ class SamplingGrid:
 
     def fit(
         self,
-        left: NDArray[np.float64],
-        right: NDArray[np.float64],
-        arg: Union[NDArray[np.float64], NDArray[np.int64]],
+        left: NDArray[np.float32],
+        right: NDArray[np.float32],
+        arg: Union[NDArray[np.float32], NDArray[np.int64]],
     ) -> SamplingGrid:
         self.left = left
         self.right = right
@@ -280,10 +280,10 @@ class GrayCode(SamplingGrid):
         return gray_array
 
 
-@njit(float64[:](float64[:], float64[:], float64[:]))
+@njit(float32[:](float32[:], float32[:], float32[:]))
 def bounds_control(
-    array: NDArray[np.float64], left: NDArray[np.float64], right: NDArray[np.float64]
-) -> NDArray[np.float64]:
+    array: NDArray[np.float32], left: NDArray[np.float32], right: NDArray[np.float32]
+) -> NDArray[np.float32]:
     to_return = array.copy()
 
     size = len(array)
@@ -295,10 +295,10 @@ def bounds_control(
     return to_return
 
 
-@njit(float64[:](float64[:], float64[:], float64[:]))
+@njit(float32[:](float32[:], float32[:], float32[:]))
 def bounds_control_mean(
-    array: NDArray[np.float64], left: NDArray[np.float64], right: NDArray[np.float64]
-) -> NDArray[np.float64]:
+    array: NDArray[np.float32], left: NDArray[np.float32], right: NDArray[np.float32]
+) -> NDArray[np.float32]:
     to_return = array.copy()
     size = len(array)
     for i in range(size):

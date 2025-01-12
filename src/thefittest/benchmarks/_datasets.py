@@ -23,8 +23,8 @@ texture_data = np.loadtxt(path + "texture_dataset.txt", delimiter=",")
 class Dataset:
     def __init__(
         self,
-        X: NDArray[np.float64],
-        y: NDArray[Union[np.int64, np.float64]],
+        X: NDArray[np.float32],
+        y: NDArray[Union[np.int64, np.float32]],
         X_names: Dict,
         y_names: Dict,
     ):
@@ -33,10 +33,10 @@ class Dataset:
         self._X_names = X_names
         self._y_names = y_names
 
-    def get_X(self) -> NDArray[np.float64]:
+    def get_X(self) -> NDArray[np.float32]:
         return self._X
 
-    def get_y(self) -> NDArray[Union[np.int64, np.float64]]:
+    def get_y(self) -> NDArray[Union[np.int64, np.float32]]:
         return self._y
 
     def get_X_names(self) -> Dict[int, str]:
@@ -53,7 +53,7 @@ class IrisDataset(Dataset):
     def __init__(self) -> None:
         Dataset.__init__(
             self,
-            X=iris_data[:, :-1].astype(np.float64),
+            X=iris_data[:, :-1].astype(np.float32),
             y=iris_data[:, -1].astype(np.int64),
             X_names={
                 0: "sepal length in cm",
@@ -72,7 +72,7 @@ class WineDataset(Dataset):
     def __init__(self) -> None:
         Dataset.__init__(
             self,
-            X=wine_data[:, 1:].astype(np.float64),
+            X=wine_data[:, 1:].astype(np.float32),
             y=wine_data[:, 0].astype(np.int64) - 1,
             X_names={
                 0: "Alcohol",
@@ -102,7 +102,7 @@ class BreastCancerDataset(Dataset):
     def __init__(self) -> None:
         Dataset.__init__(
             self,
-            X=breast_data[:, 2:].astype(np.float64),
+            X=breast_data[:, 2:].astype(np.float32),
             y=breast_data[:, 1].astype(np.int64),
             X_names={
                 0: "mean radius",
@@ -147,7 +147,7 @@ class DigitsDataset(Dataset):
     def __init__(self) -> None:
         Dataset.__init__(
             self,
-            X=digits_data[:, :-1].astype(np.float64),
+            X=digits_data[:, :-1].astype(np.float32),
             y=digits_data[:, -1].astype(np.int64),
             X_names=dict(zip(range(64), range(64))),
             y_names=dict(zip(range(10), range(10))),
@@ -160,7 +160,7 @@ class CreditRiskDataset(Dataset):
     def __init__(self) -> None:
         Dataset.__init__(
             self,
-            X=credit_data[:, 1:-1].astype(np.float64),
+            X=credit_data[:, 1:-1].astype(np.float32),
             y=credit_data[:, -1].astype(np.int64),
             X_names={0: "income", 1: "age", 2: "loan"},
             y_names={0: "good client", 1: "bad client"},
@@ -174,7 +174,7 @@ class UserKnowladgeDataset(Dataset):
     def __init__(self) -> None:
         Dataset.__init__(
             self,
-            X=know_data[:, :-1].astype(np.float64),
+            X=know_data[:, :-1].astype(np.float32),
             y=know_data[:, -1].astype(np.int64),
             X_names={
                 0: "STG (The degree of study time for goal object materails)",
@@ -195,7 +195,7 @@ class BanknoteDataset(Dataset):
     def __init__(self) -> None:
         Dataset.__init__(
             self,
-            X=banknote_data[:, :-1].astype(np.float64),
+            X=banknote_data[:, :-1].astype(np.float32),
             y=banknote_data[:, -1].astype(np.int64),
             X_names={
                 0: "variance of Wavelet Transformed image (continuous)",
@@ -213,7 +213,7 @@ class TwoNormDataset(Dataset):
     def __init__(self) -> None:
         Dataset.__init__(
             self,
-            X=twonorm_data[:, :-1].astype(np.float64),
+            X=twonorm_data[:, :-1].astype(np.float32),
             y=twonorm_data[:, -1].astype(np.int64),
             X_names={i: f"A{i+1}" for i in range(twonorm_data.shape[1] - 1)},
             y_names={0: "Class 1", 1: "Class 2"},
@@ -226,7 +226,7 @@ class RingNormDataset(Dataset):
     def __init__(self) -> None:
         Dataset.__init__(
             self,
-            X=ringnorm_data[:, :-1].astype(np.float64),
+            X=ringnorm_data[:, :-1].astype(np.float32),
             y=ringnorm_data[:, -1].astype(np.int64),
             X_names={i: f"A{i+1}" for i in range(ringnorm_data.shape[1] - 1)},
             y_names={0: "Class 1", 1: "Class 2"},
@@ -241,7 +241,7 @@ class TextureDataset(Dataset):
         label_map = {original_label: i for i, original_label in enumerate(original_labels)}
         shifted_labels = np.array([label_map[label] for label in texture_data[:, -1].astype(int)])
         super().__init__(
-            X=texture_data[:, :-1].astype(np.float64),
+            X=texture_data[:, :-1].astype(np.float32),
             y=shifted_labels,
             X_names={i: f"A {i+1}" for i in range(texture_data.shape[1] - 1)},
             y_names={

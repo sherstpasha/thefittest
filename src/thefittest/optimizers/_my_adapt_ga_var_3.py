@@ -17,14 +17,16 @@ from ..tools.transformations import numpy_group_by
 from scipy.stats import zscore
 
 
-class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лучший оператор по истории а не по прошлому поколению. Что то изменил и код не работает как должен
+class MyAdaptGAVar3(
+    GeneticAlgorithm
+):  # тут попытка искать лучший оператор по истории а не по прошлому поколению. Что то изменил и код не работает как должен
     """Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform
     Crossover Operator. LNCS, 7331, 2012, pp. 414-421. https://doi.org/10.1007/978-3-642-30976-2_50
     """
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
@@ -158,7 +160,6 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
         self._previous_selection_operators: List = []
         self._previous_crossover_operators: List = []
         self._previous_mutation_operators: List = []
-        
 
     def _choice_operators(self: MyAdaptGAVar3, proba_dict: Dict["str", float]) -> NDArray:
         operators = list(proba_dict.keys())
@@ -172,7 +173,7 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
         operator: str,
         threshold: float,
     ) -> Dict["str", float]:
-        proba_dict[operator] += (self._K*50) / self._iters
+        proba_dict[operator] += (self._K * 50) / self._iters
         proba_value = np.array(list(proba_dict.values()))
         proba_value -= self._K / (len(proba_dict) * self._iters)
         proba_value = proba_value.clip(threshold, 1)
@@ -181,7 +182,7 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
         return new_proba_dict
 
     def _find_fittest_operator(
-        self: MyAdaptGAVar3, operators: NDArray, fitness: NDArray[np.float64]
+        self: MyAdaptGAVar3, operators: NDArray, fitness: NDArray[np.float32]
     ) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))
@@ -218,7 +219,7 @@ class MyAdaptGAVar3(GeneticAlgorithm): # тут попытка искать лу
             s_fittest_oper = self._find_fittest_operator(self._selection_operators, self._fitness_i)
             self._selection_proba = self._get_new_proba(
                 self._selection_proba, s_fittest_oper, self._thresholds["selection"]
-                )
+            )
 
             c_fittest_oper = self._find_fittest_operator(self._crossover_operators, self._fitness_i)
             self._crossover_proba = self._get_new_proba(

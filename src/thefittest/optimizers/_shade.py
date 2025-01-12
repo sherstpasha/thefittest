@@ -29,14 +29,14 @@ class SHADE(DifferentialEvolution):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
-        left: NDArray[np.float64],
-        right: NDArray[np.float64],
+        left: NDArray[np.float32],
+        right: NDArray[np.float32],
         elitism: bool = True,
-        init_population: Optional[NDArray[np.float64]] = None,
-        genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
+        init_population: Optional[NDArray[np.float32]] = None,
+        genotype_to_phenotype: Callable[[NDArray[np.float32]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -70,46 +70,46 @@ class SHADE(DifferentialEvolution):
             fitness_update_eps=fitness_update_eps,
         )
 
-        self._F: NDArray[np.float64]
-        self._CR: NDArray[np.float64]
-        self._population_g_archive_i: NDArray[np.float64] = np.zeros(shape=(0, len(self._left)))
-        self._population_archive: NDArray[np.float64]
+        self._F: NDArray[np.float32]
+        self._CR: NDArray[np.float32]
+        self._population_g_archive_i: NDArray[np.float32] = np.zeros(shape=(0, len(self._left)))
+        self._population_archive: NDArray[np.float32]
         self._pbest_id: NDArray[np.int64]
         self._H_size: int = pop_size
-        self._H_F = np.full(self._H_size, 0.5, dtype=np.float64)
-        self._H_CR = np.full(self._H_size, 0.5, dtype=np.float64)
+        self._H_F = np.full(self._H_size, 0.5, dtype=np.float32)
+        self._H_CR = np.full(self._H_size, 0.5, dtype=np.float32)
         self._k: int = 0
         self._p: float = 0.05
 
-    def _generate_F_CR(self: SHADE) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
-        F_i = np.zeros(self._pop_size, dtype=np.float64)
-        CR_i = np.zeros(self._pop_size, dtype=np.float64)
+    def _generate_F_CR(self: SHADE) -> Tuple[NDArray[np.float32], NDArray[np.float32]]:
+        F_i = np.zeros(self._pop_size, dtype=np.float32)
+        CR_i = np.zeros(self._pop_size, dtype=np.float32)
         for i in range(self._pop_size):
             r_i = np.random.randint(0, self._H_size)
             u_F = self._H_F[r_i]
             u_CR = self._H_CR[r_i]
-            F_i[i] = randc01(np.float64(u_F))
-            CR_i[i] = randn01(np.float64(u_CR))
+            F_i[i] = randc01(np.float32(u_F))
+            CR_i[i] = randn01(np.float32(u_CR))
         return (F_i, CR_i)
 
     def _append_archive(
         self,
-        archive: Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]],
-        worse_g: Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]],
-    ) -> Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]:
+        archive: Union[NDArray[Any], NDArray[np.byte], NDArray[np.float32]],
+        worse_g: Union[NDArray[Any], NDArray[np.byte], NDArray[np.float32]],
+    ) -> Union[NDArray[Any], NDArray[np.byte], NDArray[np.float32]]:
         archive = np.append(archive, worse_g, axis=0)
         if len(archive) > self._pop_size:
             np.random.shuffle(archive)
             archive = archive[: self._pop_size]
         return archive
 
-    def _update_u_F(self, u_F: float, S_F: NDArray[np.float64]) -> float:
+    def _update_u_F(self, u_F: float, S_F: NDArray[np.float32]) -> float:
         if len(S_F):
             return lehmer_mean(S_F)
         return u_F
 
     def _update_u_CR(
-        self, u_CR: float, S_CR: NDArray[np.float64], df: NDArray[np.float64]
+        self, u_CR: float, S_CR: NDArray[np.float32], df: NDArray[np.float32]
     ) -> float:
         if len(S_CR):
             sum_ = np.sum(df)
@@ -120,15 +120,15 @@ class SHADE(DifferentialEvolution):
 
     def _get_new_individ_g(
         self: SHADE,
-        individ_g: NDArray[np.float64],
+        individ_g: NDArray[np.float32],
         F: float,
         CR: float,
-    ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float32]:
         mutant_g = current_to_pbest_1_archive_p_min(
             individ_g, self._population_g_i, self._pbest_id, F, self._population_archive
         )
 
-        mutant_cr_g = binomial(individ_g, mutant_g, np.float64(CR))
+        mutant_cr_g = binomial(individ_g, mutant_g, np.float32(CR))
         return bounds_control_mean(mutant_cr_g, self._left, self._right)
 
     def _get_new_population(self: SHADE) -> None:
@@ -137,7 +137,7 @@ class SHADE(DifferentialEvolution):
         )
 
         self._F, self._CR = self._generate_F_CR()
-        self._pbest_id = find_pbest_id(self._fitness_i, np.float64(self._p))
+        self._pbest_id = find_pbest_id(self._fitness_i, np.float32(self._p))
         self._population_archive = np.vstack([self._population_g_i, self._population_g_archive_i])
 
         mutant_cr_b_g = np.array(
@@ -145,7 +145,7 @@ class SHADE(DifferentialEvolution):
                 get_new_individ_g(individ_g=self._population_g_i[i], F=self._F[i], CR=self._CR[i])
                 for i in range(self._pop_size)
             ],
-            dtype=np.float64,
+            dtype=np.float32,
         )
 
         mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)

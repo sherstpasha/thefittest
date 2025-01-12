@@ -1,4 +1,4 @@
-from numba import float64
+from numba import float32
 from numba import int64
 from numba import njit
 
@@ -6,20 +6,20 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-@njit(float64(float64[:], float64[:]))
+@njit(float32(float32[:], float32[:]))
 def root_mean_square_error(
-    y_true: NDArray[np.float64], y_predict: NDArray[np.float64]
-) -> np.float64:
+    y_true: NDArray[np.float32], y_predict: NDArray[np.float32]
+) -> np.float32:
     error = y_true - y_predict
     return np.sqrt(np.mean((error) ** 2))
 
 
-@njit(float64[:](float64[:], float64[:, :]))
+@njit(float32[:](float32[:], float32[:, :]))
 def root_mean_square_error2d(
-    y_true: NDArray[np.float64], y_predict2d: NDArray[np.float64]
-) -> NDArray[np.float64]:
+    y_true: NDArray[np.float32], y_predict2d: NDArray[np.float32]
+) -> NDArray[np.float32]:
     size = len(y_predict2d)
-    to_return = np.empty(size, dtype=np.float64)
+    to_return = np.empty(size, dtype=np.float32)
 
     for i in range(size):
         error = y_true - y_predict2d[i]
@@ -27,11 +27,11 @@ def root_mean_square_error2d(
     return to_return
 
 
-@njit(float64[:](float64[:, :], float64[:, :, :]))
+@njit(float32[:](float32[:, :], float32[:, :, :]))
 def root_mean_square_error3d(y_true: np.ndarray, y_predict2d: np.ndarray) -> np.ndarray:
     size = len(y_predict2d)
     num_variables = y_true.shape[1]
-    to_return = np.empty(size, dtype=np.float64)
+    to_return = np.empty(size, dtype=np.float32)
 
     for i in range(size):
         error_sum = 0.0
@@ -43,10 +43,10 @@ def root_mean_square_error3d(y_true: np.ndarray, y_predict2d: np.ndarray) -> np.
     return to_return
 
 
-@njit(float64(float64[:], float64[:]))
+@njit(float32(float32[:], float32[:]))
 def coefficient_determination(
-    y_true: NDArray[np.float64], y_predict: NDArray[np.float64]
-) -> np.float64:
+    y_true: NDArray[np.float32], y_predict: NDArray[np.float32]
+) -> np.float32:
     error = y_true - y_predict
     mean_y_true = np.mean(y_true)
     residual_sum = np.sum((error) ** 2)
@@ -54,12 +54,12 @@ def coefficient_determination(
     return 1 - residual_sum / total_sum
 
 
-@njit(float64[:](float64[:], float64[:, :]))
+@njit(float32[:](float32[:], float32[:, :]))
 def coefficient_determination2d(
-    y_true: NDArray[np.float64], y_predict2d: NDArray[np.float64]
-) -> NDArray[np.float64]:
+    y_true: NDArray[np.float32], y_predict2d: NDArray[np.float32]
+) -> NDArray[np.float32]:
     size = len(y_predict2d)
-    to_return = np.empty(size, dtype=np.float64)
+    to_return = np.empty(size, dtype=np.float32)
 
     mean_y_true = np.mean(y_true)
     total_sum = np.sum((y_true - mean_y_true) ** 2)
@@ -70,21 +70,21 @@ def coefficient_determination2d(
     return to_return
 
 
-@njit(float64(float64[:, :], float64[:, :]))
+@njit(float32(float32[:, :], float32[:, :]))
 def categorical_crossentropy(
-    target: NDArray[np.float64], output: NDArray[np.float64]
-) -> np.float64:
+    target: NDArray[np.float32], output: NDArray[np.float32]
+) -> np.float32:
     output_c = np.clip(output, 1e-7, 1 - 1e-7)
     to_return = np.mean(np.sum(target * (-np.log(output_c)), axis=1))
     return to_return
 
 
-# @njit(float64[:](float64[:, :], float64[:, :, :]))
+# @njit(float32[:](float32[:, :], float32[:, :, :]))
 # def categorical_crossentropy3d(
-#     target: NDArray[np.float64], output3d: NDArray[np.float64]
-# ) -> NDArray[np.float64]:
+#     target: NDArray[np.float32], output3d: NDArray[np.float32]
+# ) -> NDArray[np.float32]:
 #     size = len(output3d)
-#     to_return = np.empty(size, dtype=np.float64)
+#     to_return = np.empty(size, dtype=np.float32)
 #     for i in range(size):
 #         to_return[i] = categorical_crossentropy(target, output3d[i])
 #     return to_return
@@ -102,20 +102,20 @@ def categorical_crossentropy3d(target, output3d, epsilon=1e-12):
     """
     # Если target имеет размер (n, m), а output3d – (p, n, m), PyTorch выполнит broadcast target до (p, n, m)
     loss = -(target * torch.log(output3d + epsilon)).sum(dim=(1, 2))
-    return loss.detach().cpu().numpy().astype(np.float64)
+    return loss.detach().cpu().numpy().astype(np.float32)
 
 
-@njit(float64(int64[:], int64[:]))
-def accuracy_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float64:
+@njit(float32(int64[:], int64[:]))
+def accuracy_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float32:
     return np.mean((y_true == y_predict).astype(np.int64))
 
 
-@njit(float64[:](int64[:], int64[:, :]))
+@njit(float32[:](int64[:], int64[:, :]))
 def accuracy_score2d(
     y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]
-) -> NDArray[np.float64]:
+) -> NDArray[np.float32]:
     size = len(y_predict2d)
-    to_return = np.empty(size, dtype=np.float64)
+    to_return = np.empty(size, dtype=np.float32)
     for i in range(size):
         to_return[i] = accuracy_score(y_true, y_predict2d[i])
     return to_return
@@ -137,8 +137,8 @@ def confusion_matrix(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) ->
     return to_return
 
 
-@njit(float64(int64[:], int64[:]))
-def recall_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float64:
+@njit(float32(int64[:], int64[:]))
+def recall_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float32:
     """
     y_true = np.array([0, 1, 0, 2 ...], dtype = np.int64)
     y_predict = np.array([1, 2, 0, 2 ...], dtype = np.int64)
@@ -148,7 +148,7 @@ def recall_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.
 
     up = np.zeros(shape=n_classes, dtype=np.int64)
     down = np.zeros(shape=n_classes, dtype=np.int64)
-    recall = np.zeros(shape=n_classes, dtype=np.float64)
+    recall = np.zeros(shape=n_classes, dtype=np.float32)
 
     for i in range(size):
         if y_true[i] == y_predict[i]:
@@ -163,19 +163,19 @@ def recall_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.
     return np.mean(recall)
 
 
-@njit(float64[:](int64[:], int64[:, :]))
+@njit(float32[:](int64[:], int64[:, :]))
 def recall_score2d(
     y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]
-) -> NDArray[np.float64]:
+) -> NDArray[np.float32]:
     size = len(y_predict2d)
-    to_return = np.empty(size, dtype=np.float64)
+    to_return = np.empty(size, dtype=np.float32)
     for i in range(size):
         to_return[i] = recall_score(y_true, y_predict2d[i])
     return to_return
 
 
-@njit(float64(int64[:], int64[:]))
-def precision_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float64:
+@njit(float32(int64[:], int64[:]))
+def precision_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float32:
     """
     y_true = np.array([0, 1, 0, 2 ...], dtype = np.int64)
     y_predict = np.array([1, 2, 0, 2 ...], dtype = np.int64)
@@ -186,7 +186,7 @@ def precision_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> 
 
     up = np.zeros(shape=n_classes, dtype=np.int64)
     down = np.zeros(shape=n_classes, dtype=np.int64)
-    precision = np.zeros(shape=n_classes, dtype=np.float64)
+    precision = np.zeros(shape=n_classes, dtype=np.float32)
 
     for i in range(size):
         if y_true[i] == y_predict[i]:
@@ -201,19 +201,19 @@ def precision_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> 
     return np.mean(precision)
 
 
-@njit(float64[:](int64[:], int64[:, :]))
+@njit(float32[:](int64[:], int64[:, :]))
 def precision_score2d(
     y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]
-) -> NDArray[np.float64]:
+) -> NDArray[np.float32]:
     size = len(y_predict2d)
-    to_return = np.empty(size, dtype=np.float64)
+    to_return = np.empty(size, dtype=np.float32)
     for i in range(size):
         to_return[i] = precision_score(y_true, y_predict2d[i])
     return to_return
 
 
-@njit(float64(int64[:], int64[:]))
-def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float64:
+@njit(float32(int64[:], int64[:]))
+def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.float32:
     """
     y_true = np.array([0, 1, 0, 2 ...], dtype = np.int64)
     y_predict = np.array([1, 2, 0, 2 ...], dtype = np.int64)
@@ -224,7 +224,7 @@ def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.floa
     up = np.zeros(shape=n_classes, dtype=np.int64)
     down_recall = np.zeros(shape=n_classes, dtype=np.int64)
     down_precision = np.zeros(shape=n_classes, dtype=np.int64)
-    f1 = np.zeros(shape=n_classes, dtype=np.float64)
+    f1 = np.zeros(shape=n_classes, dtype=np.float32)
 
     for i in range(size):
         if y_true[i] == y_predict[i]:
@@ -242,10 +242,10 @@ def f1_score(y_true: NDArray[np.int64], y_predict: NDArray[np.int64]) -> np.floa
     return np.mean(f1)
 
 
-@njit(float64[:](int64[:], int64[:, :]))
-def f1_score2d(y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]) -> NDArray[np.float64]:
+@njit(float32[:](int64[:], int64[:, :]))
+def f1_score2d(y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]) -> NDArray[np.float32]:
     size = len(y_predict2d)
-    to_return = np.empty(size, dtype=np.float64)
+    to_return = np.empty(size, dtype=np.float32)
     for i in range(size):
         to_return[i] = f1_score(y_true, y_predict2d[i])
     return to_return

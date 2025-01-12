@@ -31,7 +31,7 @@ class TheFittest:
         self,
         population_g: NDArray[Any],
         population_ph: NDArray[Any],
-        fitness: NDArray[np.float64],
+        fitness: NDArray[np.float32],
         eps: float = 0.0,  # Добавлен параметр eps, по умолчанию 0
     ) -> None:
         temp_best_id = np.argmax(fitness)
@@ -77,12 +77,12 @@ class Statistics(dict):
 class EvolutionaryAlgorithm:
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         elitism: bool = True,
         init_population: Optional[
-            Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
+            Union[NDArray[Any], NDArray[np.byte], NDArray[np.float32]]
         ] = None,
         genotype_to_phenotype: Callable[[NDArray[Any]], NDArray[Any]] = donothing,
         optimal_value: Optional[Union[float, int]] = None,
@@ -96,12 +96,12 @@ class EvolutionaryAlgorithm:
         genotype_to_phenotype_args: Optional[Dict] = None,
         fitness_update_eps: float = 0,
     ):
-        self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]] = fitness_function
+        self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]] = fitness_function
         self._iters: int = iters
         self._pop_size: int = pop_size
         self._elitism: bool = elitism
         self._init_population: Optional[
-            Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
+            Union[NDArray[Any], NDArray[np.byte], NDArray[np.float32]]
         ] = init_population
         self._genotype_to_phenotype: Callable = genotype_to_phenotype
         self._no_increase_num: Optional[int] = no_increase_num
@@ -126,9 +126,9 @@ class EvolutionaryAlgorithm:
         self._thefittest: TheFittest = TheFittest()
         self._stats: Statistics = Statistics()
 
-        self._population_g_i: Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
+        self._population_g_i: Union[NDArray[Any], NDArray[np.byte], NDArray[np.float32]]
         self._population_ph_i: NDArray
-        self._fitness_i: NDArray[np.float64]
+        self._fitness_i: NDArray[np.float32]
 
         if self._n_jobs > 1:
             self._parallel = Parallel(self._n_jobs)
@@ -167,7 +167,7 @@ class EvolutionaryAlgorithm:
         self: EvolutionaryAlgorithm,
         population_g: NDArray[Any],
         population_ph: NDArray[Any],
-        fitness: NDArray[np.float64],
+        fitness: NDArray[np.float32],
     ) -> None:
         self._thefittest._update(
             population_g=population_g,
@@ -201,7 +201,7 @@ class EvolutionaryAlgorithm:
 
     def _get_fitness(
         self: EvolutionaryAlgorithm, population_ph: NDArray[Any]
-    ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float32]:
         if self._n_jobs > 1:
             populations_ph = self._split_population(population_ph)
             values = self._parallel(
@@ -290,11 +290,11 @@ class EvolutionaryAlgorithm:
 
 class MultiGenome:
     def __init__(
-        self, genotypes: Tuple[Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]], ...]
+        self, genotypes: Tuple[Union[NDArray[Any], NDArray[np.byte], NDArray[np.float32]], ...]
     ) -> None:
         self._genotypes = genotypes
 
-    def __getitem__(self, index: int) -> Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]:
+    def __getitem__(self, index: int) -> Union[NDArray[Any], NDArray[np.byte], NDArray[np.float32]]:
         return self._genotypes[index]
 
     def copy(self) -> MultiGenome:
@@ -315,12 +315,12 @@ class MutliGenomeEA(EvolutionaryAlgorithm):
         self,
         optimizers: Tuple,
         optimizers_args: Tuple[Dict],
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         elitism: bool = True,
         init_population: Optional[
-            Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
+            Union[NDArray[Any], NDArray[np.byte], NDArray[np.float32]]
         ] = None,
         genotype_to_phenotype: Callable[[NDArray[Any]], NDArray[Any]] = donothing,
         optimal_value: Optional[Union[float, int]] = None,

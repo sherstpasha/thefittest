@@ -40,11 +40,11 @@ from ..tools.transformations import GrayCode
 
 def fitness_function(
     population: NDArray,
-    X: NDArray[np.float64],
-    targets: NDArray[np.float64],
+    X: NDArray[np.float32],
+    targets: NDArray[np.float32],
     net_size_penalty: float,
-) -> NDArray[np.float64]:
-    output3d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)
+) -> NDArray[np.float32]:
+    output3d = np.array([net.forward(X)[0] for net in population], dtype=np.float32)
     lens = np.array(list(map(len, population)))
     fitness = categorical_crossentropy3d(targets, output3d) + net_size_penalty * lens
     return fitness
@@ -85,8 +85,8 @@ def genotype_to_phenotype_tree(
 def genotype_to_phenotype(
     population_g: NDArray,
     n_outputs: int,
-    X_train: NDArray[np.float64],
-    proba_train: NDArray[np.float64],
+    X_train: NDArray[np.float32],
+    proba_train: NDArray[np.float32],
     weights_optimizer_args: Dict,
     weights_optimizer_class: weights_type_optimizer_alias,
     output_activation: str,
@@ -117,8 +117,8 @@ def genotype_to_phenotype(
 
 def train_net(
     net: Net,
-    X_train: NDArray[np.float64],
-    proba_train: NDArray[np.float64],
+    X_train: NDArray[np.float32],
+    proba_train: NDArray[np.float32],
     weights_optimizer_args: Dict,
     weights_optimizer_class: weights_type_optimizer_alias,
     fitness_function: Callable,
@@ -141,9 +141,9 @@ def train_net(
     else:
         weights_optimizer_args = {"iters": 100, "pop_size": 100}
 
-    left: NDArray[np.float64] = np.full(shape=len(net._weights), fill_value=-10, dtype=np.float64)
-    right: NDArray[np.float64] = np.full(shape=len(net._weights), fill_value=10, dtype=np.float64)
-    initial_population: Union[NDArray[np.float64], NDArray[np.byte]] = float_population(
+    left: NDArray[np.float32] = np.full(shape=len(net._weights), fill_value=-10, dtype=np.float32)
+    right: NDArray[np.float32] = np.full(shape=len(net._weights), fill_value=10, dtype=np.float32)
+    initial_population: Union[NDArray[np.float32], NDArray[np.byte]] = float_population(
         weights_optimizer_args["pop_size"], left, right
     )
     initial_population[0] = net._weights.copy()
@@ -211,7 +211,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         self._fitness_update_eps = fitness_update_eps
 
     def _get_uniset(
-        self: GeneticProgrammingNeuralNetClassifier, X: NDArray[np.float64]
+        self: GeneticProgrammingNeuralNetClassifier, X: NDArray[np.float32]
     ) -> UniversalSet:
         uniset: UniversalSet
         if self._offset:
@@ -246,10 +246,10 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         self: GeneticProgrammingNeuralNetClassifier,
         uniset: UniversalSet,
         n_outputs: int,
-        X_train: NDArray[np.float64],
-        target_train: NDArray[np.float64],
-        X_test: NDArray[np.float64],
-        target_test: NDArray[np.float64],
+        X_train: NDArray[np.float32],
+        target_train: NDArray[np.float32],
+        X_test: NDArray[np.float32],
+        target_test: NDArray[np.float32],
         fitness_function: Callable,
         evaluate_nets: Callable,
     ) -> Union[SelfCGP, GeneticProgramming]:
@@ -322,21 +322,21 @@ class GeneticProgrammingNeuralNetClassifier(Model):
 
     def _fit(
         self: GeneticProgrammingNeuralNetClassifier,
-        X: NDArray[np.float64],
-        y: NDArray[Union[np.float64, np.int64]],
+        X: NDArray[np.float32],
+        y: NDArray[Union[np.float32, np.int64]],
     ) -> GeneticProgrammingNeuralNetClassifier:
         if self._offset:
             X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])
 
         n_outputs: int = len(set(y))
-        eye: NDArray[np.float64] = np.eye(n_outputs, dtype=np.float64)
+        eye: NDArray[np.float32] = np.eye(n_outputs, dtype=np.float32)
 
         X_train, X_test, y_train, y_test = train_test_split_stratified(
             X, y.astype(np.int64), self._test_sample_ratio
         )
 
-        proba_test: NDArray[np.float64] = eye[y_test]
-        proba_train: NDArray[np.float64] = eye[y_train]
+        proba_test: NDArray[np.float32] = eye[y_test]
+        proba_train: NDArray[np.float32] = eye[y_train]
 
         uniset: UniversalSet = self._get_uniset(X)
 
@@ -356,11 +356,11 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         return self
 
     def _prepare_output(
-        self: GeneticProgrammingNeuralNetClassifier, output: NDArray[np.float64]
-    ) -> Union[NDArray[np.float64], NDArray[np.int64]]:
+        self: GeneticProgrammingNeuralNetClassifier, output: NDArray[np.float32]
+    ) -> Union[NDArray[np.float32], NDArray[np.int64]]:
         return np.argmax(output, axis=1)
 
-    def _predict(self, X: NDArray[np.float64]) -> NDArray[Union[np.float64, np.int64]]:
+    def _predict(self, X: NDArray[np.float32]) -> NDArray[Union[np.float32, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 

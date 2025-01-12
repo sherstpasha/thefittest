@@ -28,7 +28,7 @@ class PDPGA(SelfCGA):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
@@ -101,7 +101,7 @@ class PDPGA(SelfCGA):
         self._previous_fitness_i: List = []
         self._success_i: NDArray[np.bool_]
 
-    def _choice_parent(self: PDPGA, fitness_i_selected: NDArray[np.float64]) -> np.float64:
+    def _choice_parent(self: PDPGA, fitness_i_selected: NDArray[np.float32]) -> np.float32:
         # print(fitness_i_selected)
         choosen = random.choice(list(fitness_i_selected))
         return choosen
@@ -134,7 +134,7 @@ class PDPGA(SelfCGA):
 
     def _adapt(self: PDPGA) -> None:
         if len(self._previous_fitness_i):
-            self._success_i = np.array(self._previous_fitness_i, dtype=np.float64) < self._fitness_i
+            self._success_i = np.array(self._previous_fitness_i, dtype=np.float32) < self._fitness_i
 
             self._selection_proba = self._get_new_proba_pdp(
                 self._selection_proba, self._selection_operators, self._thresholds["selection"]
@@ -178,5 +178,5 @@ class PDPGA(SelfCGA):
         else:
             proba = proba / len(offspring_no_mutated)
 
-        offspring = mutation_func(offspring_no_mutated, np.float64(proba))
+        offspring = mutation_func(offspring_no_mutated, np.float32(proba))
         return offspring

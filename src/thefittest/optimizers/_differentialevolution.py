@@ -30,17 +30,17 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
-        left: NDArray[np.float64],
-        right: NDArray[np.float64],
+        left: NDArray[np.float32],
+        right: NDArray[np.float32],
         mutation: str = "rand_1",
         F: float = 0.5,
         CR: float = 0.5,
         elitism: bool = True,
-        init_population: Optional[NDArray[np.float64]] = None,
-        genotype_to_phenotype: Callable[[NDArray[np.float64]], NDArray[Any]] = donothing,
+        init_population: Optional[NDArray[np.float32]] = None,
+        genotype_to_phenotype: Callable[[NDArray[np.float32]], NDArray[Any]] = donothing,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
@@ -72,11 +72,11 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
             fitness_update_eps=fitness_update_eps,
         )
 
-        self._left: NDArray[np.float64] = left
-        self._right: NDArray[np.float64] = right
+        self._left: NDArray[np.float32] = left
+        self._right: NDArray[np.float32] = right
         self._specified_mutation: str = mutation
-        self._F: Union[float, NDArray[np.float64]] = F
-        self._CR: Union[float, NDArray[np.float64]] = CR
+        self._F: Union[float, NDArray[np.float32]] = F
+        self._CR: Union[float, NDArray[np.float32]] = CR
 
         self._mutation_pool: Dict[str, Callable] = {
             "best_1": best_1,
@@ -102,17 +102,17 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
     def _get_new_individ_g(
         self: DifferentialEvolution,
-        individ_g: NDArray[np.float64],
+        individ_g: NDArray[np.float32],
         F: float,
         CR: float,
-    ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float32]:
         mutation_func = self._mutation_pool[self._specified_mutation]
 
         mutant_g = mutation_func(
-            individ_g, self._thefittest._genotype, self._population_g_i, np.float64(F)
+            individ_g, self._thefittest._genotype, self._population_g_i, np.float32(F)
         )
 
-        mutant_cr_g = binomial(individ_g, mutant_g, np.float64(CR))
+        mutant_cr_g = binomial(individ_g, mutant_g, np.float32(CR))
         return bounds_control(mutant_cr_g, self._left, self._right)
 
     def _get_new_population(self: DifferentialEvolution) -> None:
@@ -124,7 +124,7 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
 
         mutant_cr_b_g = np.array(
             [get_new_individ_g(individ_g=self._population_g_i[i]) for i in range(self._pop_size)],
-            dtype=np.float64,
+            dtype=np.float32,
         )
 
         mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)

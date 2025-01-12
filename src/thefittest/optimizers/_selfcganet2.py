@@ -104,7 +104,7 @@ class SelfCGANet(GeneticAlgorithm):
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
@@ -264,7 +264,7 @@ class SelfCGANet(GeneticAlgorithm):
         return new_proba_dict
 
     def _find_fittest_operator(
-        self: SelfCGANet, operators: NDArray, fitness: NDArray[np.float64]
+        self: SelfCGANet, operators: NDArray, fitness: NDArray[np.float32]
     ) -> str:
         keys, groups = numpy_group_by(group=fitness, by=operators)
         mean_fit = np.array(list(map(np.mean, groups)))

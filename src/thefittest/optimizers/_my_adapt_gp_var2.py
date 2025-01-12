@@ -24,7 +24,7 @@ from ..base import Tree
 class MyAdaptGPVar2(GeneticProgramming, MyAdaptGAVar2):
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         uniset: UniversalSet,
         iters: int,
         pop_size: int,
@@ -134,7 +134,7 @@ class MyAdaptGPVar2(GeneticProgramming, MyAdaptGAVar2):
         self: MyAdaptGPVar2,
         specified_selection: str,
         specified_crossover: str,
-        specified_mutation_proba: np.float64,
+        specified_mutation_proba: np.float32,
     ) -> Tree:
         selection_func, tour_size = self._selection_pool[specified_selection]
         crossover_func, quantity = self._crossover_pool[specified_crossover]
@@ -154,7 +154,7 @@ class MyAdaptGPVar2(GeneticProgramming, MyAdaptGAVar2):
         offspring = mutation(
             offspring_no_mutated,
             self._uniset,
-            np.float64(specified_mutation_proba),
+            np.float32(specified_mutation_proba),
             self._max_level,
         )
         return offspring

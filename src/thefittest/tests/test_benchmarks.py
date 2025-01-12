@@ -154,7 +154,7 @@ def test_symbolicregression17():
 
     X = np.array(
         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)],
-        dtype=np.float64,
+        dtype=np.float32,
     ).T
 
     F1(X)
@@ -166,7 +166,7 @@ def test_symbolicregression17():
 
     X = np.array(
         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)],
-        dtype=np.float64,
+        dtype=np.float32,
     ).T
 
     F3(X)
@@ -197,7 +197,7 @@ def test_CEC2005():
 
         X = np.array(
             [np.linspace(left_scalar, right_scalar, sample_size) for _ in range(n_dimension)],
-            dtype=np.float64,
+            dtype=np.float32,
         ).T
 
         function = problem["function"]()
@@ -207,8 +207,8 @@ def test_CEC2005():
         for dim in problem["dimentions"]:
             print(problem, dim)
 
-            left = np.full(shape=dim, fill_value=left_scalar, dtype=np.float64)
-            right = np.full(shape=dim, fill_value=right_scalar, dtype=np.float64)
+            left = np.full(shape=dim, fill_value=left_scalar, dtype=np.float32)
+            right = np.full(shape=dim, fill_value=right_scalar, dtype=np.float32)
 
             optimizer_args = {
                 "fitness_function": function,
@@ -221,9 +221,9 @@ def test_CEC2005():
 
             if "init_bounds" in problem.keys():
                 init_left_scalar = problem["init_bounds"][1]
-                init_left = np.full(shape=dim, fill_value=init_left_scalar, dtype=np.float64)
+                init_left = np.full(shape=dim, fill_value=init_left_scalar, dtype=np.float32)
                 init_right_scalar = problem["init_bounds"][1]
-                init_right = np.full(shape=dim, fill_value=init_right_scalar, dtype=np.float64)
+                init_right = np.full(shape=dim, fill_value=init_right_scalar, dtype=np.float32)
 
                 initial_population = float_population(
                     pop_size=pop_size, left=init_left, right=init_right

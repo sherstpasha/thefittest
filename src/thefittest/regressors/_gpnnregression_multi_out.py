@@ -24,11 +24,11 @@ from ..tools.random import train_test_split
 
 def fitness_function(
     population: NDArray,
-    X: NDArray[np.float64],
-    targets: NDArray[np.float64],
+    X: NDArray[np.float32],
+    targets: NDArray[np.float32],
     net_size_penalty: float,
-) -> NDArray[np.float64]:
-    output2d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)
+) -> NDArray[np.float32]:
+    output2d = np.array([net.forward(X)[0] for net in population], dtype=np.float32)
     lens = np.array(list(map(len, population)))
     print(output2d.shape)
     fitness = root_mean_square_error3d(targets, output2d) + net_size_penalty * lens
@@ -38,8 +38,8 @@ def fitness_function(
 def genotype_to_phenotype(
     population_g: NDArray,
     n_outputs: int,
-    X_train: NDArray[np.float64],
-    proba_train: NDArray[np.float64],
+    X_train: NDArray[np.float32],
+    proba_train: NDArray[np.float32],
     weights_optimizer_args: Dict,
     weights_optimizer_class: weights_type_optimizer_alias,
     output_activation: str,
@@ -103,8 +103,8 @@ class GeneticProgrammingNeuralNetRegressorMO(GeneticProgrammingNeuralNetClassifi
 
     def _fit(
         self: GeneticProgrammingNeuralNetClassifier,
-        X: NDArray[np.float64],
-        y: NDArray[Union[np.float64, np.int64]],
+        X: NDArray[np.float32],
+        y: NDArray[Union[np.float32, np.int64]],
     ) -> GeneticProgrammingNeuralNetClassifier:
         if self._offset:
             X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])
@@ -131,6 +131,6 @@ class GeneticProgrammingNeuralNetRegressorMO(GeneticProgrammingNeuralNetClassifi
         return self
 
     def _prepare_output(
-        self: GeneticProgrammingNeuralNetClassifier, output: NDArray[np.float64]
-    ) -> Union[NDArray[np.float64], NDArray[np.int64]]:
+        self: GeneticProgrammingNeuralNetClassifier, output: NDArray[np.float32]
+    ) -> Union[NDArray[np.float32], NDArray[np.int64]]:
         return output

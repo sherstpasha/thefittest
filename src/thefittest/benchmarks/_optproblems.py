@@ -94,10 +94,10 @@ hybrid_func4_m_d50 = np.loadtxt(path + "hybrid_func4_M_D50.txt")
 
 
 class TestFunction:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         return self.f(x)
 
-    def build_grid(self, x: NDArray[np.float64], y: NDArray[np.float64]) -> NDArray[np.float64]:
+    def build_grid(self, x: NDArray[np.float32], y: NDArray[np.float32]) -> NDArray[np.float32]:
         x1, y1 = np.meshgrid(x, y)
         xy = np.concatenate([x1[:, :, np.newaxis], y1[:, :, np.newaxis]], axis=2)
         z = np.zeros(shape=xy.shape[:-1])
@@ -107,20 +107,20 @@ class TestFunction:
 
 
 class TestShiftedFunction:
-    def __init__(self, fbias: NDArray[np.float64], x_shift: NDArray[np.float64]) -> None:
+    def __init__(self, fbias: NDArray[np.float32], x_shift: NDArray[np.float32]) -> None:
         self.fbias = fbias
         self.x_shift = x_shift
 
-    def shift(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def shift(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         shape = x.shape
         axis = [1] * (len(shape) - 1) + [-1]
         return x - self.x_shift[: shape[-1]].reshape(axis)
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         z = self.shift(x)
         return self.f(z) + self.fbias
 
-    def build_grid(self, x: NDArray[np.float64], y: NDArray[np.float64]) -> NDArray[np.float64]:
+    def build_grid(self, x: NDArray[np.float32], y: NDArray[np.float32]) -> NDArray[np.float32]:
         x1, y1 = np.meshgrid(x, y)
         xy = np.concatenate([x1[:, :, np.newaxis], y1[:, :, np.newaxis]], axis=2)
         z = np.zeros(shape=xy.shape[:-1])
@@ -132,12 +132,12 @@ class TestShiftedFunction:
 class TestShiftedRotatedFunction:
     def __init__(
         self,
-        fbias: NDArray[np.float64],
-        x_shift: NDArray[np.float64],
-        rotate_M_D2: NDArray[np.float64],
-        rotate_M_D10: NDArray[np.float64],
-        rotate_M_D30: NDArray[np.float64],
-        rotate_M_D50: NDArray[np.float64],
+        fbias: NDArray[np.float32],
+        x_shift: NDArray[np.float32],
+        rotate_M_D2: NDArray[np.float32],
+        rotate_M_D10: NDArray[np.float32],
+        rotate_M_D30: NDArray[np.float32],
+        rotate_M_D50: NDArray[np.float32],
     ) -> None:
         self.fbias = fbias
         self.x_shift = x_shift
@@ -146,12 +146,12 @@ class TestShiftedRotatedFunction:
         self.rotate_M_D30 = rotate_M_D30
         self.rotate_M_D50 = rotate_M_D50
 
-    def shift(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def shift(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         shape = x.shape
         axis = [1] * (len(shape) - 1) + [-1]
         return x - self.x_shift[: shape[-1]].reshape(axis)
 
-    def rotate(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def rotate(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         if x.shape[1] == 2:
             z = x @ self.rotate_M_D2
         elif x.shape[1] == 10:
@@ -162,12 +162,12 @@ class TestShiftedRotatedFunction:
             z = x @ self.rotate_M_D50
         return z
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         z = self.shift(x)
         z_rotated = self.rotate(z)
         return self.f(z_rotated) + self.fbias
 
-    def build_grid(self, x: NDArray[np.float64], y: NDArray[np.float64]) -> NDArray[np.float64]:
+    def build_grid(self, x: NDArray[np.float32], y: NDArray[np.float32]) -> NDArray[np.float32]:
         x1, y1 = np.meshgrid(x, y)
         xy = np.concatenate([x1[:, :, np.newaxis], y1[:, :, np.newaxis]], axis=2)
         z = np.zeros(shape=xy.shape[:-1])
@@ -180,14 +180,14 @@ class SampleHybridCompositionFunction:
     def __init__(
         self,
         basic_functions: Tuple,
-        sigmas: NDArray[np.float64],
-        lambdas: NDArray[np.float64],
-        fbias: NDArray[np.float64],
-        x_shift: NDArray[np.float64],
-        M_D2: NDArray[np.float64],
-        M_D10: NDArray[np.float64],
-        M_D30: NDArray[np.float64],
-        M_D50: NDArray[np.float64],
+        sigmas: NDArray[np.float32],
+        lambdas: NDArray[np.float32],
+        fbias: NDArray[np.float32],
+        x_shift: NDArray[np.float32],
+        M_D2: NDArray[np.float32],
+        M_D10: NDArray[np.float32],
+        M_D30: NDArray[np.float32],
+        M_D50: NDArray[np.float32],
     ) -> None:
         self.basic_functions = basic_functions
         self.sigmas = sigmas
@@ -199,22 +199,22 @@ class SampleHybridCompositionFunction:
         self.fbias = fbias
         self.x_shift = x_shift
 
-        self.bias = np.array([0, 100, 200, 300, 400, 500, 600, 700, 800, 900], dtype=np.float64)
+        self.bias = np.array([0, 100, 200, 300, 400, 500, 600, 700, 800, 900], dtype=np.float32)
         self.C = 2000
 
-    def shift(self, x: NDArray[np.float64], i: np.int64) -> NDArray[np.float64]:
+    def shift(self, x: NDArray[np.float32], i: np.int64) -> NDArray[np.float32]:
         shape = x.shape
         axis = [1] * (len(shape) - 1) + [-1]
         return x - self.x_shift[i][: shape[-1]].reshape(axis)
 
     def rotate(
         self,
-        x: NDArray[np.float64],
-        M_D2: NDArray[np.float64],
-        M_D10: NDArray[np.float64],
-        M_D30: NDArray[np.float64],
-        M_D50: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
+        x: NDArray[np.float32],
+        M_D2: NDArray[np.float32],
+        M_D10: NDArray[np.float32],
+        M_D30: NDArray[np.float32],
+        M_D50: NDArray[np.float32],
+    ) -> NDArray[np.float32]:
         if x.shape[1] == 2:
             z = x @ M_D2
         elif x.shape[1] == 10:
@@ -227,9 +227,9 @@ class SampleHybridCompositionFunction:
 
     def calc_w(
         self,
-        x: NDArray[np.float64],
-        shift_i: np.float64,
-        sigma_i: np.float64,
+        x: NDArray[np.float32],
+        shift_i: np.float32,
+        sigma_i: np.float32,
         i: np.int64,
     ) -> Tuple:
         D = x.shape[1]
@@ -244,15 +244,15 @@ class SampleHybridCompositionFunction:
 
     def procces_i_function(
         self,
-        x: NDArray[np.float64],
+        x: NDArray[np.float32],
         func_i: Callable,
-        sigma_i: np.float64,
-        lambda_i: np.float64,
-        shift_i: np.float64,
-        M_D2i: NDArray[np.float64],
-        M_D10i: NDArray[np.float64],
-        M_D30i: NDArray[np.float64],
-        M_D50i: NDArray[np.float64],
+        sigma_i: np.float32,
+        lambda_i: np.float32,
+        shift_i: np.float32,
+        M_D2i: NDArray[np.float32],
+        M_D10i: NDArray[np.float32],
+        M_D30i: NDArray[np.float32],
+        M_D50i: NDArray[np.float32],
         i: np.int64,
     ) -> Tuple:
         y = np.full(shape=x.shape, fill_value=5)
@@ -268,7 +268,7 @@ class SampleHybridCompositionFunction:
 
         return w_i, fit_i
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         result = tuple(
             self.procces_i_function(
                 x, func_i, sigma_i, lambda_i, shift_i, M_D2i, M_D10i, M_D30i, M_D50i, i
@@ -286,8 +286,8 @@ class SampleHybridCompositionFunction:
             )
         )
         w_i, fit_i = list(zip(*result))
-        w_i = np.array(w_i, np.float64).T
-        fit_i = np.array(fit_i, np.float64).T
+        w_i = np.array(w_i, np.float32).T
+        fit_i = np.array(fit_i, np.float32).T
         max_w = np.max(w_i, axis=1)
 
         for i, w_i_j in enumerate(w_i.T):
@@ -298,7 +298,7 @@ class SampleHybridCompositionFunction:
 
         return np.sum(w_i * (fit_i + self.bias), axis=-1) + self.fbias
 
-    def build_grid(self, x: NDArray[np.float64], y: NDArray[np.float64]) -> NDArray[np.float64]:
+    def build_grid(self, x: NDArray[np.float32], y: NDArray[np.float32]) -> NDArray[np.float32]:
         x1, y1 = np.meshgrid(x, y)
         xy = np.concatenate([x1[:, :, np.newaxis], y1[:, :, np.newaxis]], axis=2)
         z = np.zeros(shape=xy.shape[:-1])
@@ -308,29 +308,31 @@ class SampleHybridCompositionFunction:
 
 
 class OneMax(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
-        return np.sum(x, axis=1, dtype=np.float64)
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
+        return np.sum(x, axis=1, dtype=np.float32)
+
 
 class ZeroOne(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         # Разделяем строки на четные и нечетные позиции
         even_positions = x[:, ::2]  # Берем все четные индексы (0, 2, 4, ...)
         odd_positions = x[:, 1::2]  # Берем все нечетные индексы (1, 3, 5, ...)
-        
+
         # Пара "01" возникает, если в четных позициях 0, а в нечетных — 1
         zero_one_pairs = (even_positions == 0) & (odd_positions == 1)
-        
+
         # Суммируем количество таких пар по строкам
-        return np.sum(zero_one_pairs, axis=1, dtype=np.float64)
+        return np.sum(zero_one_pairs, axis=1, dtype=np.float32)
+
 
 class Jump(TestFunction):
     def __init__(self, k: int):
         self.k = k  # Размер "ямы" для перепрыгивания
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         n = x.shape[1]
         ones_count = np.sum(x, axis=1)
-        
+
         # Вычисляем значение функции в зависимости от количества единиц
         results = np.where(
             ones_count == n,  # Если все биты 1, это глобальный оптимум
@@ -338,39 +340,43 @@ class Jump(TestFunction):
             np.where(
                 ones_count < n - self.k,  # Локальный оптимум при малом числе единиц
                 ones_count,
-                n - ones_count  # Локальная "яма" при почти всех единицах
-            )
+                n - ones_count,  # Локальная "яма" при почти всех единицах
+            ),
         )
         return results
 
+
 class BalancedString(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         # Количество единиц в каждой строке популяции
         ones_count = np.sum(x, axis=1)
         # Количество нулей - это разница между длиной строки и количеством единиц
         zeros_count = x.shape[1] - ones_count
-        
+
         # Приспособленность: чем ближе числа нулей и единиц, тем выше значение
         return -np.abs(ones_count - zeros_count)  # Чем меньше разница, тем выше приспособленность
 
+
 class LeadingOnes(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         # Одна проверка на x == 1
         is_one = x == 1  # Логический массив, где True соответствует элементам, равным 1
         # Инвертируем is_one, чтобы получить маску, где True соответствует элементам, которые не равны 1
         first_non_one = np.argmax(~is_one, axis=1)
         # Проверка, полностью ли строка состоит из единиц
         return np.where(np.all(is_one, axis=1), x.shape[1], first_non_one)
-    
+
+
 class F11(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         """
         Фитнес-функция для задачи F11, принимает популяцию битовых строк.
         Каждая строка состоит из 30 бит (5 блоков по 6 бит).
-        
+
         :param x: Популяция строк (размерность (pop_size, 30))
         :return: Фитнес значений для каждой строки в популяции
         """
+
         def u(x: int) -> float:
             """Единичная функция для подсчета значения в зависимости от количества единичных бит в блоке."""
             if x == 0 or x == 6:
@@ -385,7 +391,7 @@ class F11(TestFunction):
 
         # Разделим каждую строку на 5 блоков по 6 бит
         pop_size = x.shape[0]
-        total_fitness = np.zeros(pop_size, dtype=np.float64)
+        total_fitness = np.zeros(pop_size, dtype=np.float32)
 
         for i in range(pop_size):
             blocks = x[i].reshape(5, 6)
@@ -394,26 +400,27 @@ class F11(TestFunction):
                 ones_count = np.sum(block)  # Подсчитываем количество единичных бит в блоке
                 fitness += u(ones_count)
             total_fitness[i] = fitness
-        
+
         return total_fitness
 
 
 class F12(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         """
         Фитнес-функция для задачи F12, которая вычисляется как 5 * (f11(x) / 5) ** 15.
-        
+
         :param x: Популяция строк (размерность (pop_size, 30))
         :return: Фитнес значений для каждой строки в популяции
         """
-        
+
         # Вычисляем фитнес для задачи F11
         f11_values = F11().f(x)
-        
+
         # Применяем преобразование для F12: 5 * (f11 / 5) ** 15
         f12_values = 5 * (f11_values / 5) ** 15
-        
+
         return f12_values
+
 
 class F13(TestFunction):
     def __init__(self):
@@ -422,37 +429,40 @@ class F13(TestFunction):
 
     def hamming_distance(self, a: int, b: int) -> int:
         """Вычисление расстояния Хэмминга между двумя числами (целыми)."""
-        return bin(a ^ b).count('1')
+        return bin(a ^ b).count("1")
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         """
         Фитнес-функция для задачи F13.
         Строка состоит из 24 бит, делится на три 8-битные подстроки.
         Для каждой подстроки рассчитывается фитнес в зависимости от расстояния Хэмминга
         до ближайшей глобальной подстроки.
-        
+
         :param x: Популяция строк (размерность (pop_size, 24))
         :return: Фитнес значений для каждой строки в популяции
         """
-        
+
         pop_size = x.shape[0]
-        total_fitness = np.zeros(pop_size, dtype=np.float64)
+        total_fitness = np.zeros(pop_size, dtype=np.float32)
 
         for i in range(pop_size):
             # Разделяем строку на 3 подстроки по 8 бит и приводим к типу np.int8
-            substrings = [x[i, j:j+8].astype(np.int8) for j in range(0, 24, 8)]
-            
+            substrings = [x[i, j : j + 8].astype(np.int8) for j in range(0, 24, 8)]
+
             fitness = 0.0
             for sub in substrings:
                 sub_int = int("".join(map(str, sub)), 2)  # Преобразуем подстроку в целое число
                 # Находим минимальное расстояние Хэмминга до глобальных подстрок
-                min_distance = min(self.hamming_distance(sub_int, gs) for gs in self.global_substrings)
+                min_distance = min(
+                    self.hamming_distance(sub_int, gs) for gs in self.global_substrings
+                )
                 # Присваиваем фитнес значению подстроки: 10 - расстояние
-                fitness += (10 - min_distance)
-            
+                fitness += 10 - min_distance
+
             total_fitness[i] = fitness
-        
+
         return total_fitness
+
 
 class F14(TestFunction):
     def __init__(self):
@@ -461,38 +471,41 @@ class F14(TestFunction):
 
     def hamming_distance(self, a: int, b: int) -> int:
         """Вычисление расстояния Хэмминга между двумя числами (целыми)."""
-        return bin(a ^ b).count('1')
+        return bin(a ^ b).count("1")
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         """
         Фитнес-функция для задачи F14.
         Строка состоит из 30 бит, делится на пять 6-битных подстрок.
         Для каждой подстроки рассчитывается фитнес в зависимости от расстояния Хэмминга
         до ближайшей глобальной подстроки.
-        
+
         :param x: Популяция строк (размерность (pop_size, 30))
         :return: Фитнес значений для каждой строки в популяции
         """
-        
+
         pop_size = x.shape[0]
-        total_fitness = np.zeros(pop_size, dtype=np.float64)
+        total_fitness = np.zeros(pop_size, dtype=np.float32)
 
         for i in range(pop_size):
             # Разделяем строку на 5 подстрок по 6 бит и приводим к типу np.int8
-            substrings = [x[i, j:j+6].astype(np.int8) for j in range(0, 30, 6)]
-            
+            substrings = [x[i, j : j + 6].astype(np.int8) for j in range(0, 30, 6)]
+
             fitness = 0.0
             for sub in substrings:
                 # Преобразуем подстроку в целое число (из бинарного представления)
                 sub_int = int("".join(map(str, sub)), 2)  # Преобразуем подстроку в целое число
                 # Находим минимальное расстояние Хэмминга до глобальных подстрок
-                min_distance = min(self.hamming_distance(sub_int, gs) for gs in self.global_substrings)
+                min_distance = min(
+                    self.hamming_distance(sub_int, gs) for gs in self.global_substrings
+                )
                 # Присваиваем фитнес значению подстроки: 6 - расстояние
-                fitness += (6 - min_distance)
-            
+                fitness += 6 - min_distance
+
             total_fitness[i] = fitness
-        
+
         return total_fitness
+
 
 class F15(TestFunction):
     def unitation_function(self, x: int) -> float:
@@ -505,30 +518,30 @@ class F15(TestFunction):
             return 6
         return 1 - 0.2 * x
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         """
         Фитнес-функция для задачи F15.
         Строка состоит из 30 бит, делится на 5 подстрок по 6 бит.
         Для каждой подстроки применяется юнификационная функция.
-        
+
         :param x: Популяция строк (размерность (pop_size, 30))
         :return: Фитнес значений для каждой строки в популяции
         """
         pop_size = x.shape[0]
-        total_fitness = np.zeros(pop_size, dtype=np.float64)
+        total_fitness = np.zeros(pop_size, dtype=np.float32)
 
         for i in range(pop_size):
             fitness = 0.0
             # Разделяем строку на 5 подстрок по 6 бит
             for j in range(0, 30, 6):
-                sub = x[i, j:j+6]  # Извлекаем подстроку
+                sub = x[i, j : j + 6]  # Извлекаем подстроку
                 ones_count = np.sum(sub)  # Считаем количество единичных бит в подстроке
-                
+
                 fitness += self.unitation_function(ones_count)  # Применяем юнификационную функцию
                 # print(j, sub, ones_count, self.unitation_function(ones_count), fitness)
-            
+
             total_fitness[i] = fitness
-        
+
         return total_fitness
 
 
@@ -540,11 +553,13 @@ class F16(TestFunction):
         :return: Фитнес для подстроки.
         """
         ones_count = np.sum(sub)  # Считаем количество единичных бит в подстроке
-        
+
         # Проверка на совпадение с глобальными подстроками
-        if np.array_equal(sub, [1, 0, 1, 0, 0, 0, 0, 0]) or np.array_equal(sub, [0, 1, 1, 1, 1, 1, 1, 0]):
+        if np.array_equal(sub, [1, 0, 1, 0, 0, 0, 0, 0]) or np.array_equal(
+            sub, [0, 1, 1, 1, 1, 1, 1, 0]
+        ):
             return 1.0
-        
+
         # Применяем функцию фитнеса для подстроки, если она не совпадает с глобальными
         if ones_count in [0, 4, 8]:
             return 0.6
@@ -554,60 +569,61 @@ class F16(TestFunction):
             return 0.0
         return 0.0
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         """
         Фитнес-функция для задачи F16.
         Строка состоит из 40 бит, делится на 5 подстрок по 8 бит.
         Для каждой подстроки применяется фитнес-функция.
-        
+
         :param x: Популяция строк (размерность (pop_size, 40))
         :return: Фитнес значений для каждой строки в популяции
         """
-        
+
         pop_size = x.shape[0]
-        total_fitness = np.zeros(pop_size, dtype=np.float64)
+        total_fitness = np.zeros(pop_size, dtype=np.float32)
 
         for i in range(pop_size):
             fitness = 0.0
             # Разделяем строку на 5 подстрок по 8 бит
             for j in range(0, 40, 8):
-                sub = x[i, j:j+8]  # Извлекаем подстроку
+                sub = x[i, j : j + 8]  # Извлекаем подстроку
                 fitness += self.fitness_function(sub)  # Применяем фитнес-функцию для подстроки
-            
+
             total_fitness[i] = fitness
-        
+
         return total_fitness
 
+
 class Sphere(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         return np.sum(x**2, axis=-1)
 
 
 class Schwefe1_2(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         return np.sum(np.add.accumulate(x, axis=-1) ** 2, axis=-1)
 
 
 class HighConditionedElliptic(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         i = np.arange(1, x.shape[1] + 1)
         demension = x.shape[1]
         return np.sum((1e6 ** ((i - 1) / (demension - 1))) * x**2, axis=-1)
 
 
 class Rosenbrock(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         value = 100 * ((x.T[:-1] ** 2 - x.T[1:]) ** 2) + (x.T[:-1] - 1) ** 2
         return np.sum(value.T, axis=-1)
 
 
 class Rastrigin(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         return np.sum(x**2 - 10 * np.cos(2 * np.pi * x) + 10, axis=-1)
 
 
 class Griewank(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         sqrt_i = np.sqrt(np.arange(1, x.shape[1] + 1))
         sum_ = np.sum((x**2) / 4000, axis=-1)
         prod_ = np.prod(np.cos(x / sqrt_i), axis=-1)
@@ -615,7 +631,7 @@ class Griewank(TestFunction):
 
 
 class Ackley(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         a = 20
         c = 2 * np.pi
         b = 0.2
@@ -626,7 +642,7 @@ class Ackley(TestFunction):
 
 
 class Weierstrass(TestFunction):
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         a = 0.5
         b = 3
         k_max = np.arange(20, dtype=np.int64)
@@ -649,7 +665,7 @@ class F8F2(TestFunction):
         self.rosenbrock_f = Rosenbrock()
         self.griewank_f = Griewank()
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         if x.shape[1] == 2:
             indexes = np.array([0, 1, 1, 0], dtype=np.int64)
         else:
@@ -669,13 +685,13 @@ class F8F2(TestFunction):
 
 
 class ExpandedScaffers_F6(TestFunction):
-    def Scaffes_F6(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def Scaffes_F6(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         sum_of_power = x[:, 0] ** 2 + x[:, 1] ** 2
         up = np.sin(np.sqrt(sum_of_power)) ** 2 - 0.5
         down = (1 + 0.001 * (sum_of_power)) ** 2
         return 0.5 + up / down
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         if x.shape[1] == 2:
             indexes = np.array([0, 1, 1, 0], dtype=np.int64)
         else:
@@ -694,40 +710,40 @@ class ExpandedScaffers_F6(TestFunction):
 
 
 class NonContinuosRastrigin(Rastrigin):
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         cond = np.abs(x) >= 0.5
         x[cond] = (np.round(2 * x) / 2)[cond]
         return super().__call__(x)
 
 
 class NonContinuosExpandedScaffers_F6(ExpandedScaffers_F6):
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         cond = np.abs(x) >= 0.5
         x[cond] = (np.round(2 * x) / 2)[cond]
         return super().__call__(x)
 
 
 class SphereWithNoise(Sphere):
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         y = super().__call__(x)
         noise = 1 + 0.1 * np.abs(np.random.normal(size=y.shape))
         return y * noise
 
 
 class Func1:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         y = np.abs(x[:, 0])
         return y
 
 
 class Func2:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         y = -10 * np.cos(x[:, 0]) + np.abs(0.001 * x[:, 0])
         return y
 
 
 class Func3:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         x1, x2 = x[:, 0], x[:, 1]
         term1 = x1**2 * np.abs(np.sin(2 * x1))
         term2 = x2**2 * np.abs(np.sin(2 * x2))
@@ -736,7 +752,7 @@ class Func3:
 
 
 class Func4:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         y = (
             0.5 * x[:, 0] * x[:, 0]
             + x[:, 0] * x[:, 1]
@@ -758,7 +774,7 @@ class Func4:
 
 
 class Func5:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         y = (
             0.1 * x[:, 0] * x[:, 0]
             + 0.1 * x[:, 1] * x[:, 1]
@@ -770,7 +786,7 @@ class Func5:
 
 
 class Func6:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         alpha = np.pi / 2
         Kx1 = 1.5
         Kx2 = 0.8
@@ -786,7 +802,7 @@ class Func6:
 
 
 class Func7:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         x1 = x[:, 0]
         x2 = x[:, 1]
         term1 = 100 * (x2 - x1**2) ** 2
@@ -795,7 +811,7 @@ class Func7:
 
 
 class Func8:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         x1 = x[:, 0]
         x2 = x[:, 1]
         term1 = 0.005 * (x1**2 + x2**2)
@@ -804,7 +820,7 @@ class Func8:
 
 
 class Func9:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         x1 = x[:, 0]
         x2 = x[:, 1]
         term1 = 100 * (x1**2 - x2) ** 2
@@ -813,7 +829,7 @@ class Func9:
 
 
 class Func10:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         x1 = x[:, 0]
         x2 = x[:, 1]
         r_squared = x1**2 + x2**2
@@ -823,7 +839,7 @@ class Func10:
 
 
 class Func11:
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         A = 0.8
         x1 = x[:, 0]
         x2 = x[:, 1]
@@ -837,13 +853,13 @@ class Func11:
 
 
 class Func12:
-    def z(self, x: np.float64) -> np.float64:
+    def z(self, x: np.float32) -> np.float32:
         term1 = -1 / ((x - 1) ** 2 + 0.2)
         term2 = -1 / (2 * (x - 2) ** 2 + 0.15)
         term3 = -1 / (3 * (x - 3) ** 2 + 0.3)
         return term1 + term2 + term3
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         x1 = x[:, 0]
         x2 = x[:, 1]
         z_x1 = np.array([self.z(xi) for xi in x1])
@@ -852,13 +868,13 @@ class Func12:
 
 
 class Func13:
-    def z(self, x: np.float64) -> np.float64:
+    def z(self, x: np.float32) -> np.float32:
         term1 = -1 / ((x - 1) ** 2 + 0.2)
         term2 = -1 / (2 * (x - 2) ** 2 + 0.15)
         term3 = -1 / (3 * (x - 3) ** 2 + 0.3)
         return term1 + term2 + term3
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         x1 = x[:, 0]
         x2 = x[:, 1]
         z_x1 = np.array([self.z(xi) for xi in x1])
@@ -897,7 +913,7 @@ class ShiftedSchwefe1_2WithNoise(TestShiftedFunction, Schwefe1_2):
     def __init__(self) -> None:
         TestShiftedFunction.__init__(self, fbias=fbias_data[3], x_shift=schwefel_102_data)
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         z = self.shift(x)
         y = self.f(z)
         noise = 1 + 0.4 * np.abs(np.random.normal(size=y.shape))
@@ -909,13 +925,13 @@ class Schwefel2_6(TestShiftedFunction):
     def __init__(self) -> None:
         TestShiftedFunction.__init__(self, fbias=fbias_data[4], x_shift=o_206)
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         D = x.shape[1]
         self.x_shift[: int(0.25 * D) + 1] = -100
         self.x_shift[int(0.75 * D) :] = 100
         return self.f(x) + self.fbias
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         o = self.x_shift[: x.shape[1]]
         A = A_206[: x.shape[1], : x.shape[1]]
         Ax = A @ x.T
@@ -929,7 +945,7 @@ class ShiftedRosenbrock(TestShiftedFunction, Rosenbrock):
     def __init__(self) -> None:
         TestShiftedFunction.__init__(self, fbias=fbias_data[5], x_shift=rosenbrock_func_data)
 
-    def shift(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def shift(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         shape = x.shape
         axis = [1] * (len(shape) - 1) + [-1]
         return x - self.x_shift[: shape[-1]].reshape(axis) + 1
@@ -962,7 +978,7 @@ class ShiftedRotatedAckley(TestShiftedRotatedFunction, Ackley):
             rotate_M_D50=ackley_m_d50,
         )
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         D = x.shape[1]
         self.x_shift[:D:2] = -32.0
         return super().__call__(x)
@@ -1007,10 +1023,10 @@ class Schwefel2_13(TestShiftedFunction):
     def __init__(self) -> None:
         TestShiftedFunction.__init__(self, fbias=fbias_data[11], x_shift=alpha_213)
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         return self.f(x) + self.fbias
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         a = a_213[: x.shape[1], : x.shape[1]]
         b = b_213[: x.shape[1], : x.shape[1]]
         alpha = self.x_shift[: x.shape[1]]
@@ -1031,12 +1047,12 @@ class ShiftedExpandedGriewankRosenbrock(TestShiftedFunction):
         self.rosenbrock_f = Rosenbrock()
         self.griewank_f = Griewank()
 
-    def shift(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def shift(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         shape = x.shape
         axis = [1] * (len(shape) - 1) + [-1]
         return x - self.x_shift[: shape[-1]].reshape(axis) + 1
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         if x.shape[1] == 2:
             indexes = np.array([0, 1, 1, 0], dtype=np.int64)
         else:
@@ -1068,13 +1084,13 @@ class ShiftedRotatedExpandedScaffes_F6(TestShiftedRotatedFunction):
             rotate_M_D50=E_ScafferF6_m_d50,
         )
 
-    def Scaffes_F6(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def Scaffes_F6(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         sum_of_power = x[:, 0] ** 2 + x[:, 1] ** 2
         up = np.sin(np.sqrt(sum_of_power)) ** 2 - 0.5
         down = (1 + 0.001 * (sum_of_power)) ** 2
         return 0.5 + up / down
 
-    def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def f(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         if x.shape[1] == 2:
             indexes = np.array([0, 1, 1, 0], dtype=np.int64)
         else:
@@ -1112,7 +1128,7 @@ class HybridCompositionFunction1(SampleHybridCompositionFunction):
             ),
             sigmas=np.ones(10),
             lambdas=np.array(
-                [1, 1, 10, 10, 5 / 60, 5 / 60, 5 / 32, 5 / 32, 5 / 100, 5 / 100], dtype=np.float64
+                [1, 1, 10, 10, 5 / 60, 5 / 60, 5 / 32, 5 / 32, 5 / 100, 5 / 100], dtype=np.float32
             ),
             fbias=fbias_data[14],
             x_shift=hybrid_func1_data,
@@ -1142,7 +1158,7 @@ class RotatedVersionHybridCompositionFunction1(SampleHybridCompositionFunction):
             ),
             sigmas=np.ones(10),
             lambdas=np.array(
-                [1, 1, 10, 10, 5 / 60, 5 / 60, 5 / 32, 5 / 32, 5 / 100, 5 / 100], dtype=np.float64
+                [1, 1, 10, 10, 5 / 60, 5 / 60, 5 / 32, 5 / 32, 5 / 100, 5 / 100], dtype=np.float32
             ),
             fbias=fbias_data[15],
             x_shift=hybrid_func1_data,
@@ -1172,7 +1188,7 @@ class RotatedVersionHybridCompositionFunction1Noise(SampleHybridCompositionFunct
             ),
             sigmas=np.ones(10),
             lambdas=np.array(
-                [1, 1, 10, 10, 5 / 60, 5 / 60, 5 / 32, 5 / 32, 5 / 100, 5 / 100], dtype=np.float64
+                [1, 1, 10, 10, 5 / 60, 5 / 60, 5 / 32, 5 / 32, 5 / 100, 5 / 100], dtype=np.float32
             ),
             fbias=fbias_data[16],
             x_shift=hybrid_func1_data,
@@ -1182,7 +1198,7 @@ class RotatedVersionHybridCompositionFunction1Noise(SampleHybridCompositionFunct
             M_D50=hybrid_func1_m_d50,
         )
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         G_x = RotatedVersionHybridCompositionFunction1()(x) - fbias_data[15]
         noise = np.abs(np.random.normal(size=G_x.shape))
         return G_x * (1 + 0.2 * noise) + fbias_data[16]
@@ -1205,7 +1221,7 @@ class RotatedHybridCompositionFunction(SampleHybridCompositionFunction):
                 Griewank,
                 Griewank,
             ),
-            sigmas=np.array([1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float64),
+            sigmas=np.array([1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float32),
             lambdas=np.array(
                 [
                     2 * (5 / 32),
@@ -1219,7 +1235,7 @@ class RotatedHybridCompositionFunction(SampleHybridCompositionFunction):
                     2 * (5 / 60),
                     5 / 60,
                 ],
-                dtype=np.float64,
+                dtype=np.float32,
             ),
             fbias=fbias_data[17],
             x_shift=hybrid_func2_data,
@@ -1248,7 +1264,7 @@ class RotatedHybridCompositionFunctionNarrowBasin(SampleHybridCompositionFunctio
                 Griewank,
                 Griewank,
             ),
-            sigmas=np.array([0.1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float64),
+            sigmas=np.array([0.1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float32),
             lambdas=np.array(
                 [
                     0.1 * (5 / 32),
@@ -1262,7 +1278,7 @@ class RotatedHybridCompositionFunctionNarrowBasin(SampleHybridCompositionFunctio
                     2 * (5 / 60),
                     5 / 60,
                 ],
-                dtype=np.float64,
+                dtype=np.float32,
             ),
             fbias=fbias_data[17],
             x_shift=hybrid_func2_data,
@@ -1291,7 +1307,7 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
                 Griewank,
                 Griewank,
             ),
-            sigmas=np.array([1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float64),
+            sigmas=np.array([1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2], dtype=np.float32),
             lambdas=np.array(
                 [
                     2 * (5 / 32),
@@ -1305,7 +1321,7 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
                     2 * (5 / 60),
                     5 / 60,
                 ],
-                dtype=np.float64,
+                dtype=np.float32,
             ),
             fbias=fbias_data[19],
             x_shift=hybrid_func2_data,
@@ -1316,7 +1332,7 @@ class RotatedHybridCompositionFunctionOptimalBounds(SampleHybridCompositionFunct
         )
         self.x_shift[9] = 0
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         D = x.shape[1]
         self.x_shift[0, 1::2] = 5
         return super().__call__(x)
@@ -1339,10 +1355,10 @@ class HybridCompositionFunction3(SampleHybridCompositionFunction):
                 Griewank,
                 Griewank,
             ),
-            sigmas=np.array([1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0], dtype=np.float64),
+            sigmas=np.array([1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0], dtype=np.float32),
             lambdas=np.array(
                 [5 * 5 / 100, 5 / 100, 5 * 1, 1, 5 * 1, 1, 5 * 10, 10, 5 * 5 / 200, 5 / 200],
-                dtype=np.float64,
+                dtype=np.float32,
             ),
             fbias=fbias_data[20],
             x_shift=hybrid_func3_data,
@@ -1370,10 +1386,10 @@ class HybridCompositionFunction3H(SampleHybridCompositionFunction):
                 Griewank,
                 Griewank,
             ),
-            sigmas=np.array([1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0], dtype=np.float64),
+            sigmas=np.array([1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0], dtype=np.float32),
             lambdas=np.array(
                 [5 * 5 / 100, 5 / 100, 5 * 1, 1, 5 * 1, 1, 5 * 10, 10, 5 * 5 / 200, 5 / 200],
-                dtype=np.float64,
+                dtype=np.float32,
             ),
             fbias=fbias_data[21],
             x_shift=hybrid_func3_data,
@@ -1401,10 +1417,10 @@ class NonContinuousHybridCompositionFunction3(SampleHybridCompositionFunction):
                 Griewank,
                 Griewank,
             ),
-            sigmas=np.array([1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0], dtype=np.float64),
+            sigmas=np.array([1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0], dtype=np.float32),
             lambdas=np.array(
                 [5 * 5 / 100, 5 / 100, 5 * 1, 1, 5 * 1, 1, 5 * 10, 10, 5 * 5 / 200, 5 / 200],
-                dtype=np.float64,
+                dtype=np.float32,
             ),
             fbias=fbias_data[22],
             x_shift=hybrid_func3_data,
@@ -1414,7 +1430,7 @@ class NonContinuousHybridCompositionFunction3(SampleHybridCompositionFunction):
             M_D50=hybrid_func3_m_d50,
         )
 
-    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
+    def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         shape = x.shape
         axis = [1] * (len(shape) - 1) + [-1]
         o = self.x_shift[0][: shape[-1]].reshape(axis)
@@ -1440,9 +1456,9 @@ class HybridCompositionFunction4(SampleHybridCompositionFunction):
                 HighConditionedElliptic,
                 SphereWithNoise,
             ),
-            sigmas=np.array([2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0], dtype=np.float64),
+            sigmas=np.array([2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0], dtype=np.float32),
             lambdas=np.array(
-                [10, 5 / 20, 1, 5 / 32, 1, 5 / 100, 5 / 50, 1, 5 / 100, 5 / 100], dtype=np.float64
+                [10, 5 / 20, 1, 5 / 32, 1, 5 / 100, 5 / 50, 1, 5 / 100, 5 / 100], dtype=np.float32
             ),
             fbias=fbias_data[23],
             x_shift=hybrid_func4_data,
@@ -1470,9 +1486,9 @@ class HybridCompositionFunction4withoutbounds(SampleHybridCompositionFunction):
                 HighConditionedElliptic,
                 SphereWithNoise,
             ),
-            sigmas=np.array([2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0], dtype=np.float64),
+            sigmas=np.array([2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0], dtype=np.float32),
             lambdas=np.array(
-                [10, 5 / 20, 1, 5 / 32, 1, 5 / 100, 5 / 50, 1, 5 / 100, 5 / 100], dtype=np.float64
+                [10, 5 / 20, 1, 5 / 32, 1, 5 / 100, 5 / 50, 1, 5 / 100, 5 / 100], dtype=np.float32
             ),
             fbias=fbias_data[24],
             x_shift=hybrid_func4_data,

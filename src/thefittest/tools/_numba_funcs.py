@@ -1,5 +1,5 @@
 from numba import boolean
-from numba import float64
+from numba import float32
 from numba import int64
 from numba import njit
 from numba.typed import Dict as numbaDict
@@ -60,8 +60,8 @@ def find_first_difference_between_two(
     return i
 
 
-@njit(int64(float64, float64[:]))
-def binary_search_interval(value: np.float64, intervals: NDArray[np.float64]) -> int:
+@njit(int64(float32, float32[:]))
+def binary_search_interval(value: np.float32, intervals: NDArray[np.float32]) -> int:
     if value <= intervals[0]:
         ind = 0
     else:
@@ -87,8 +87,8 @@ def check_for_value(value: np.int64, index_array: NDArray[np.int64], end: np.int
     return found
 
 
-@njit(int64[:](float64[:], int64))
-def argsort_k(array: NDArray[np.float64], k: np.int64) -> NDArray[np.int64]:
+@njit(int64[:](float32[:], int64))
+def argsort_k(array: NDArray[np.float32], k: np.int64) -> NDArray[np.int64]:
     size = len(array)
     array_copy = array.copy()
     to_return = np.arange(size, dtype=np.int64)
@@ -103,8 +103,8 @@ def argsort_k(array: NDArray[np.float64], k: np.int64) -> NDArray[np.int64]:
     return to_return
 
 
-@njit(int64[:](float64[:], float64))
-def find_pbest_id(array: NDArray[np.float64], p: np.float64) -> NDArray[np.int64]:
+@njit(int64[:](float32[:], float32))
+def find_pbest_id(array: NDArray[np.float32], p: np.float32) -> NDArray[np.int64]:
     size = len(array)
     count = max(np.int64(1), np.int64(p * size))
     argsort = argsort_k(array, count)
@@ -112,9 +112,9 @@ def find_pbest_id(array: NDArray[np.float64], p: np.float64) -> NDArray[np.int64
     return to_return
 
 
-@njit(float64[:](float64[:, :]))
-def max_axis(array: NDArray[np.float64]) -> NDArray[np.float64]:
-    res = np.zeros((array.shape[1]), dtype=np.float64)
+@njit(float32[:](float32[:, :]))
+def max_axis(array: NDArray[np.float32]) -> NDArray[np.float32]:
+    res = np.zeros((array.shape[1]), dtype=np.float32)
     for i in range(array.shape[1]):
         res[i] = np.max(array[:, i])
     return res
