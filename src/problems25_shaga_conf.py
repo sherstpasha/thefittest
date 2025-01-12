@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
-from thefittest.optimizers import GeneticAlgorithm
+from thefittest.optimizers._shaga_conf import SHAGACONF
 from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
 from tqdm import tqdm  # Для прогресс-бара
-from problems13 import problems_tuple
+from problems25 import problems_tuple
 
 
 # Функции для оптимизации и анализа результатов
@@ -16,7 +16,7 @@ def find_solution_with_precision(solution_list, true_solution, precision):
     return None
 
 
-def run_optimization(function, eps, iters, pop_size, selection, crossover, mutation):
+def run_optimization(function, eps, iters, pop_size, selection, crossover):
     dimension = function["dimention"]  # Получаем реальную размерность задачи
     left = np.array([function["bounds"][0]] * dimension, dtype=np.float64)
     right = np.array([function["bounds"][1]] * dimension, dtype=np.float64)
@@ -25,7 +25,7 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
     genotype_to_phenotype = GrayCode().fit(left, right, h)
     str_len = genotype_to_phenotype.parts.sum()
 
-    optimizer = GeneticAlgorithm(
+    optimizer = SHAGACONF(
         fitness_function=function["function"]().__call__,
         genotype_to_phenotype=genotype_to_phenotype.transform,
         iters=iters,
@@ -34,7 +34,7 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
         elitism=False,
         selection=selection,
         crossover=crossover,
-        mutation=mutation,
+        # mutation=mutation,
         keep_history=True,
         minimization=True,
     )
@@ -53,21 +53,24 @@ def process_problem(problem):
     # Параметры для цикла
     selections = ["proportional", "rank", "tournament_3", "tournament_5", "tournament_7"]
     crossovers = [
-        "empty",
-        "one_point",
-        "two_point",
-        "uniform_2",
-        "uniform_7",
-        "uniform_prop_2",
-        "uniform_prop_7",
-        "uniform_rank_2",
-        "uniform_rank_7",
-        "uniform_tour_3",
-        "uniform_tour_7",
+        # "empty",
+        # "one_point",
+        # "two_point",
+        "one_point_7",
+        "two_point_7",
+        # "uniform_1",
+        # "uniform_2",
+        # "uniform_7",
+        # "uniform_prop_2",
+        # "uniform_prop_7",
+        # "uniform_rank_2",
+        # "uniform_rank_7",
+        # "uniform_tour_3",
+        # "uniform_tour_7",
     ]
-    mutations = ["weak", "average", "strong"]
+    # mutations = ["weak", "average", "strong"]
 
-    total_combinations = len(selections) * len(crossovers) * len(mutations)
+    total_combinations = len(selections) * len(crossovers)
 
     with mp.Pool(processes=mp.cpu_count()) as pool:  # Создаем пул один раз
         with tqdm(
@@ -75,40 +78,40 @@ def process_problem(problem):
         ) as pbar:
             for selection in selections:
                 for crossover in crossovers:
-                    for mutation in mutations:
-                        futures = [
-                            pool.apply_async(
-                                run_optimization,
-                                (
-                                    problem,
-                                    eps,
-                                    problem["iters"],
-                                    problem["pop_size"],
-                                    selection,
-                                    crossover,
-                                    mutation,
-                                ),
-                            )
-                            for _ in range(n_runs)
-                        ]
+                    # for mutation in mutations:
+                    futures = [
+                        pool.apply_async(
+                            run_optimization,
+                            (
+                                problem,
+                                eps,
+                                problem["iters"],
+                                problem["pop_size"],
+                                selection,
+                                crossover,
+                                # mutation,
+                            ),
+                        )
+                        for _ in range(n_runs)
+                    ]
 
-                        for future in futures:
-                            find_solution, speed_i = future.get()
-                            results.append(
-                                [
-                                    problem["function"].__name__,
-                                    problem["dimention"],
-                                    selection,
-                                    crossover,
-                                    mutation,
-                                    problem["pop_size"],
-                                    problem["iters"],
-                                    find_solution,  # Это будет 1 или 0
-                                    speed_i,  # Это будет номер поколения или NaN
-                                ]
-                            )
+                    for future in futures:
+                        find_solution, speed_i = future.get()
+                        results.append(
+                            [
+                                problem["function"].__name__,
+                                problem["dimention"],
+                                selection,
+                                crossover,
+                                # mutation,
+                                problem["pop_size"],
+                                problem["iters"],
+                                find_solution,  # Это будет 1 или 0
+                                speed_i,  # Это будет номер поколения или NaN
+                            ]
+                        )
 
-                        pbar.update(1)  # Обновляем прогресс-бар после каждой комбинации
+                    pbar.update(1)  # Обновляем прогресс-бар после каждой комбинации
 
     return results
 
@@ -117,7 +120,7 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "ga_problems13.csv"
+    results_file = "shagaconf_cec2005_new.csv"
 
     # Заголовки для CSV-файла
     columns = [
@@ -125,7 +128,7 @@ if __name__ == "__main__":
         "Dimensions",
         "Selection",
         "Crossover",
-        "Mutation",
+        # "Mutation",
         "Pop_Size",
         "Iters",
         "find_solution",

@@ -1,6 +1,6 @@
 # import numpy as np
 
-# from thefittest.benchmarks._optproblems import OneMax  
+# from thefittest.benchmarks._optproblems import OneMax
 # from thefittest.benchmarks._optproblems import ZeroOne
 # from thefittest.benchmarks._optproblems import LeadingOnes
 # from thefittest.benchmarks._optproblems import Jump
@@ -44,7 +44,7 @@
 
 import numpy as np
 
-from thefittest.benchmarks._optproblems import OneMax  
+from thefittest.benchmarks._optproblems import OneMax
 from thefittest.benchmarks._optproblems import ZeroOne
 from thefittest.benchmarks._optproblems import LeadingOnes
 from thefittest.benchmarks._optproblems import Jump
@@ -64,6 +64,8 @@ problems_tuple = (
         # "optimum_x": np.ones(shape=100),
         "iters": 200,
         "pop_size": 100,
+        # "iters": 70,
+        # "pop_size": 70,
         "minimization": False,
     },
     {  # 2
@@ -73,6 +75,8 @@ problems_tuple = (
         # "optimum_x": np.ones(shape=1000),
         "iters": 200,
         "pop_size": 250,
+        # "iters": 55,
+        # "pop_size": 55,
         "minimization": False,
     },
     {  # 3
@@ -82,6 +86,8 @@ problems_tuple = (
         # "optimum_x": np.tile([0, 1], 500),
         "iters": 200,
         "pop_size": 250,
+        # "iters": 55,
+        # "pop_size": 55,
         "minimization": False,
     },
     {  # 4
@@ -91,6 +97,8 @@ problems_tuple = (
         # "optimum_x": np.ones(shape=1000),
         "iters": 200,
         "pop_size": 250,
+        # "iters": 30,
+        # "pop_size": 30,
         "minimization": False,
     },
     {  # 5
@@ -98,8 +106,8 @@ problems_tuple = (
         "str_len": 30,
         "optimum": 30,
         # "optimum_x": np.ones(shape=1000),
-        "iters": 200,
-        "pop_size": 250,
+        "iters": 30,
+        "pop_size": 30,
         "minimization": False,
     },
     {  # 6
@@ -109,6 +117,8 @@ problems_tuple = (
         # "optimum_x": np.ones(shape=1000),
         "iters": 200,
         "pop_size": 250,
+        # "iters": 55,
+        # "pop_size": 55,
         "minimization": False,
     },
     {  # 7
@@ -118,6 +128,8 @@ problems_tuple = (
         # "optimum_x": np.ones(shape=1000),
         "iters": 200,
         "pop_size": 250,
+        # "iters": 66,
+        # "pop_size": 66,
         "minimization": False,
     },
 )

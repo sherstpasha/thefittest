@@ -1,10 +1,10 @@
 import pandas as pd
-from thefittest.optimizers import SelfCGA
+from thefittest.optimizers._selfcshaga import SelfCSHAGA
 from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
 import numpy as np
 from tqdm import tqdm  # Для прогресс-бара
-from problems13 import problems_tuple
+from problems25 import problems_tuple
 
 
 # Функции для оптимизации и анализа результатов
@@ -25,7 +25,7 @@ def run_optimization_selfcga(function, eps, iters, pop_size):
     genotype_to_phenotype = GrayCode().fit(left, right, h)
     str_len = genotype_to_phenotype.parts.sum()
 
-    optimizer = SelfCGA(
+    optimizer = SelfCSHAGA(
         fitness_function=function["function"]().__call__,
         genotype_to_phenotype=genotype_to_phenotype.transform,
         iters=iters,
@@ -33,11 +33,18 @@ def run_optimization_selfcga(function, eps, iters, pop_size):
         str_len=str_len,
         elitism=False,
         K=2,
-        selections=("proportional", "rank", "tournament_3", "tournament_5", "tournament_7"),
+        selections=(
+            "proportional",
+            "rank",
+            "tournament_3",
+            "tournament_5",
+            "tournament_7",
+        ),
         crossovers=(
             "empty",
             "one_point",
             "two_point",
+            "uniform_1",
             "uniform_2",
             "uniform_7",
             "uniform_prop_2",
@@ -47,7 +54,7 @@ def run_optimization_selfcga(function, eps, iters, pop_size):
             "uniform_tour_3",
             "uniform_tour_7",
         ),
-        mutations=("weak", "average", "strong"),
+        # mutations=("weak", "average", "strong"),
         keep_history=True,
         minimization=True,
     )
@@ -99,7 +106,7 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "selfcga_all_problem13.csv"
+    results_file = "8 selfcshaga_cec2005_new.csv"
 
     # Заголовки для CSV-файла
     columns = [

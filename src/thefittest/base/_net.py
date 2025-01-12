@@ -83,14 +83,14 @@ class Net:
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        X = torch.tensor(X, device=device, dtype=torch.float64)
-        weights = torch.tensor(weights, device=device, dtype=torch.float64)
+        X = torch.tensor(X, device=device, dtype=torch.float32)
+        weights = torch.tensor(weights, device=device, dtype=torch.float32)
 
         weights_cases = weights.shape[0]
         num_nodes = X.shape[1] + self._n_hiddens + len(self._outputs)
         shape = (weights_cases, num_nodes, len(X))
 
-        nodes = torch.empty(shape, device=device, dtype=torch.float64)
+        nodes = torch.empty(shape, device=device, dtype=torch.float32)
 
         for idx, neuron_idx in enumerate(self._inputs):
             nodes[:, neuron_idx] = X.T[idx]
@@ -110,10 +110,9 @@ class Net:
             nodes[:, to_i] = torch.matmul(weights_i, nodes[:, from_i])
 
             for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
-                # print(nodes[:, a_nodes_i_i].shape)
                 nodes[:, a_nodes_i_i] = TORCH_ACTIVATION_NAME[a_code_i_i](nodes[:, a_nodes_i_i])
 
-        return nodes[:, self._numpy_outputs].transpose(1, 2).cpu().numpy()
+        return nodes[:, self._numpy_outputs].transpose(1, 2)
 
         # for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
         #     print("a_nodes_i", a_code_i, a_nodes_i)
@@ -464,7 +463,7 @@ class NetEnsemble:
     def get_nets(self: NetEnsemble) -> NDArray:
         return self._nets
 
-    def forward1(
+    def forward(
         self: NetEnsemble,
         X: NDArray[np.float64],
         weights_list: Optional[List[NDArray[np.float64]]] = None,

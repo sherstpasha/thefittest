@@ -112,7 +112,7 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "pdpga_all_combproblem.csv"
+    results_file = "3 pdpga_all_combproblem.csv"
 
     # Заголовки для CSV-файла
     columns = [

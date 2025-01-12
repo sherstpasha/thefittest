@@ -419,17 +419,59 @@ def uniform_tour_crossover_shaga(
     return offspring
 
 
-# def uniform_tour_crossover_shaga(
-#     individs: NDArray[np.byte], fitness: NDArray[np.float64], rank: NDArray[np.float64]
-# ) -> NDArray[np.byte]:
-#     range_ = np.arange(len(individs))
-#     diag = np.arange(len(individs[0]))
+def one_point_crossover_shaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    if random.random() <= CR:
+        cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
+        choosen = random_weighted_sample(weights=rank, quantity=1, replace=True)[0]
+        # print(choosen)
 
-#     tournament = np.random.choice(range_, 2 * len(individs[0]))
-#     tournament = tournament.reshape(-1, 2)
-#     choosen = np.argmax(fitness[tournament], axis=1)
-#     offspring = individs[choosen, diag].copy()
-#     return offspring
+        if random.random() > 0.5:
+            offspring = individ.copy()
+            for i in range(len(individ)):
+                if i > cross_point:
+                    offspring[i] = individs[choosen][i]
+        else:
+            offspring = individs[choosen].copy()
+            for i in range(len(individ)):
+                if i > cross_point:
+                    offspring[i] = individ[i]
+        return offspring
+    else:
+        return individ
+
+
+def two_point_crossover_shaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    if random.random() <= CR:
+        size = len(individs[0])
+        c_points = random_sample(range_size=len(individs[0]), quantity=2, replace=False)
+        c_points = sorted(c_points)
+        choosen = random_weighted_sample(weights=rank, quantity=1, replace=True)[0]
+        # print(choosen)
+
+        if random.random() > 0.5:
+            offspring = individ.copy()
+            other_individ = individs[choosen]
+        else:
+            offspring = individs[choosen].copy()
+            other_individ = individ
+        for i in range(size):
+            if c_points[0] <= i <= c_points[1]:
+                offspring[i] = other_individ[i]
+        return offspring
+    else:
+        return individ
 
 
 # differential evolution

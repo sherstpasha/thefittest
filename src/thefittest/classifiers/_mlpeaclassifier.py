@@ -23,6 +23,7 @@ from ..optimizers import jDE
 from ..tools.metrics import categorical_crossentropy3d
 from ..tools.random import float_population
 from ..tools.transformations import GrayCode
+import torch
 
 
 weights_type_optimizer_alias = Union[
@@ -205,10 +206,12 @@ class MLPEAClassifier(Model):
         eye: NDArray[np.float64] = np.eye(n_outputs, dtype=np.float64)
 
         proba: NDArray[np.float64] = eye[y]
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        proba_tensor = torch.tensor(proba, dtype=torch.float32, device=device)
 
         self._net = self._defitne_net(n_inputs, n_outputs)
 
-        self._net._weights = self._train_net(self._net, X, proba)
+        self._net._weights = self._train_net(self._net, X, proba_tensor)
         return self
 
     def _predict(
@@ -218,5 +221,5 @@ class MLPEAClassifier(Model):
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
         output = self._net.forward(X)[0]
-        y_pred = np.argmax(output, axis=1)
+        y_pred = torch.argmax(output, dim=1).cpu().numpy()
         return y_pred

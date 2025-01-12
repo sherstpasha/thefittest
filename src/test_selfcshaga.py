@@ -8,13 +8,13 @@ from thefittest.tools.transformations import GrayCode
 from thefittest.benchmarks.CEC2005 import ShiftedExpandedGriewankRosenbrock
 
 
-n_dimension = 30
+n_dimension = 10
 left_border = -5.0
 right_border = 5.0
 n_bits_per_variable = 32
 
-number_of_iterations = 800
-population_size = 500
+number_of_iterations = 100
+population_size = 100
 
 left_border_array = np.full(shape=n_dimension, fill_value=left_border, dtype=np.float64)
 right_border_array = np.full(shape=n_dimension, fill_value=right_border, dtype=np.float64)
@@ -33,6 +33,15 @@ optimizer = SelfCSHAGA(
     minimization=True,
     keep_history=True,
     elitism=False,
+    crossovers=(
+        "empty",
+        "uniform_1",
+        "uniform_2",
+        "one_point",
+        "two_point",
+        "one_point_7",
+        "two_point_7",
+    ),
 )
 
 
@@ -69,9 +78,9 @@ for key, value in crossover_proba.items():
     ax[1][0].plot(range(number_of_iterations), value, label=key)
 ax[1][0].legend()
 
-ax[1][1].plot(range(number_of_iterations), np.array(stats["H_MR"]).mean(axis = 1))
+ax[1][1].plot(range(number_of_iterations), np.array(stats["H_MR"]).mean(axis=1))
 
-ax[2][1].plot(range(number_of_iterations), np.array(stats["H_CR"]).mean(axis = 1))
+ax[2][1].plot(range(number_of_iterations), np.array(stats["H_CR"]).mean(axis=1))
 
 plt.tight_layout()
 plt.savefig("selfcshaga.png")

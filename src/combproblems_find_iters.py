@@ -7,16 +7,24 @@ from thefittest.tools.transformations import GrayCode
 import multiprocessing as mp
 from comb_problems import problems_tuple
 
-def find_solution_with_precision(solution_list, true_solution):
 
+def find_solution_with_precision(solution_list, true_solution, precision=0):
     for i, solution in enumerate(solution_list):
-        if np.array_equal(solution, true_solution):
-            return i + 1, None  # Возвращаем индекс + 1 и ошибки
+        error = np.abs(solution - true_solution)
+        if np.all(error <= precision):
+            return i + 1  # Возвращаем только количество итераций
+    return None
 
-    return None, None  # Если ни одно решение не совпало
 
-
-def run_optimization(function, eps, iters, pop_size, selection, crossover, mutation,):
+def run_optimization(
+    function,
+    eps,
+    iters,
+    pop_size,
+    selection,
+    crossover,
+    mutation,
+):
     reliability = 0.0
     speed_sum = 0
     range_left = np.nan
@@ -44,7 +52,7 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
     )
     optimizer.fit()
     stat = optimizer.get_stats()
-    speed_i, errors = find_solution_with_precision(stat["max_ph"], function["optimum_x"])
+    speed_i = find_solution_with_precision(stat["max_fitness"], function["optimum"], 0)
     argmin = 0
 
     if speed_i is not None:
@@ -54,8 +62,9 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
         range_right = speed_i
         find_count = 1
     else:
-        if errors:
-            argmin = np.argmin(np.array(errors)[:, 1])
+        pass
+        # if errors:
+        #     argmin = np.argmin(np.array(errors)[:, 1])
 
     print(stat["max_fitness"][-1])
 
@@ -65,10 +74,10 @@ def run_optimization(function, eps, iters, pop_size, selection, crossover, mutat
 def main():
     eps = 0.0
     n_runs = 10
-    initial_iters_pop = 200
+    initial_iters_pop = 30
     max_iters = 50000
     max_pop_size = 5000
-    target_reliability = 0.5
+    target_reliability = 0.4
 
     iters_values = []
     pop_size_values = []
@@ -79,16 +88,15 @@ def main():
     while pop_size <= max_pop_size and iters <= max_iters:
         iters_values.append(iters)
         pop_size_values.append(pop_size)
-        iters = iters + int(iters * .15)
-        pop_size = pop_size + int(pop_size * 0.15)
+        iters = iters + int(iters * 0.1)
+        pop_size = pop_size + int(pop_size * 0.1)
 
     while iters <= max_iters:
         iters_values.append(iters)
         pop_size_values.append(max_pop_size)
-        iters = iters + int(iters * 0.15)
+        iters = iters + int(iters * 0.1)
 
-
-    function_ = problems_tuple[3]
+    function_ = problems_tuple[6]
     functions = [function_]
 
     results = []

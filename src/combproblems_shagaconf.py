@@ -64,16 +64,20 @@ def process_problem(problem):
     # Параметры для цикла
     selections = ["proportional", "rank", "tournament_3", "tournament_5", "tournament_7"]
     crossovers = [
-        "empty",
-        "uniform_1",
-        "uniform_2",
-        "uniform_7",
-        "uniform_prop_2",
-        "uniform_prop_7",
-        "uniform_rank_2",
-        "uniform_rank_7",
-        "uniform_tour_3",
-        "uniform_tour_7",
+        # "empty",
+        # "one_point",
+        # "two_point",
+        "one_point_7",
+        "two_point_7",
+        # "uniform_1",
+        # "uniform_2",
+        # "uniform_7",
+        # "uniform_prop_2",
+        # "uniform_prop_7",
+        # "uniform_rank_2",
+        # "uniform_rank_7",
+        # "uniform_tour_3",
+        # "uniform_tour_7",
     ]
 
     total_combinations = len(selections) * len(crossovers)
@@ -127,7 +131,7 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "shagaconf_combproblems.csv"
+    results_file = "shagaconf_combproblem_new.csv"
 
     columns = [
         "Function",

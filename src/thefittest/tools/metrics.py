@@ -79,15 +79,30 @@ def categorical_crossentropy(
     return to_return
 
 
-@njit(float64[:](float64[:, :], float64[:, :, :]))
-def categorical_crossentropy3d(
-    target: NDArray[np.float64], output3d: NDArray[np.float64]
-) -> NDArray[np.float64]:
-    size = len(output3d)
-    to_return = np.empty(size, dtype=np.float64)
-    for i in range(size):
-        to_return[i] = categorical_crossentropy(target, output3d[i])
-    return to_return
+# @njit(float64[:](float64[:, :], float64[:, :, :]))
+# def categorical_crossentropy3d(
+#     target: NDArray[np.float64], output3d: NDArray[np.float64]
+# ) -> NDArray[np.float64]:
+#     size = len(output3d)
+#     to_return = np.empty(size, dtype=np.float64)
+#     for i in range(size):
+#         to_return[i] = categorical_crossentropy(target, output3d[i])
+#     return to_return
+import torch
+
+
+def categorical_crossentropy3d(target, output3d, epsilon=1e-12):
+    """
+    Вычисляет категориальную кросс-энтропию для батча, где:
+      - target имеет размер (n, m)
+      - output3d имеет размер (p, n, m) для p примеров
+    Возвращает тензор размера (p,), где для каждого примера считается:
+        loss[i] = -sum_{j,k} target[j,k] * log(output3d[i,j,k] + epsilon)
+    Параметр epsilon используется для численной устойчивости.
+    """
+    # Если target имеет размер (n, m), а output3d – (p, n, m), PyTorch выполнит broadcast target до (p, n, m)
+    loss = -(target * torch.log(output3d + epsilon)).sum(dim=(1, 2))
+    return loss.detach().cpu().numpy().astype(np.float64)
 
 
 @njit(float64(int64[:], int64[:]))

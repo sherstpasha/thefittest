@@ -44,6 +44,8 @@ def run_optimization_selfcga(function, eps, iters, pop_size):
         ),
         crossovers=(
             "empty",
+            "one_point",
+            "two_point",
             "uniform_1",
             "uniform_2",
             "uniform_7",
@@ -88,7 +90,7 @@ def process_problem(problem):
 
         for future in futures:
 
-            find_solution = future.get()
+            # find_solution = future.get()
             fitness, speed_i = future.get()
             if speed_i is not None:
                 fe = speed_i * problem["iters"]
@@ -100,7 +102,8 @@ def process_problem(problem):
                     # problem["dimention"],
                     problem["pop_size"],
                     problem["iters"],
-                    find_solution,  # Это будет 1 или 0
+                    # find_solution,  # Это будет 1 или 0
+                    fitness,
                     speed_i,  # Это будет номер поколения или NaN,
                     fe,
                 ]
@@ -113,7 +116,7 @@ n_runs = 100
 eps = 0.01
 
 if __name__ == "__main__":
-    results_file = "selfcshaga_all_combproblem.csv"
+    results_file = "6 selfcshaga_combproblem.csv"
 
     # Заголовки для CSV-файла
     columns = [

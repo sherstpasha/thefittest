@@ -22,7 +22,7 @@ from ..tools.transformations import lehmer_mean
 from ..tools.operators import empty_crossover_shaga
 from ..tools.operators import flip_mutation
 from ..tools.operators import growing_mutation
-from ..tools.operators import one_point_crossover
+from ..tools.operators import one_point_crossover_shaga
 from ..tools.operators import one_point_crossoverGP
 from ..tools.operators import point_mutation
 from ..tools.operators import proportional_selection
@@ -31,7 +31,7 @@ from ..tools.operators import shrink_mutation
 from ..tools.operators import standart_crossover
 from ..tools.operators import swap_mutation
 from ..tools.operators import tournament_selection
-from ..tools.operators import two_point_crossover
+from ..tools.operators import two_point_crossover_shaga
 from ..tools.operators import uniform_crossover_shaga
 from ..tools.operators import uniform_crossoverGP
 from ..tools.operators import uniform_prop_crossover_shaga
@@ -114,8 +114,10 @@ class SHAGACONF(EvolutionaryAlgorithm):
 
         self._crossover_pool: Dict[str, Tuple[Callable, Union[float, int]]] = {
             "empty": (empty_crossover_shaga, 1),
-            "one_point": (one_point_crossover, 2),
-            "two_point": (two_point_crossover, 2),
+            "one_point": (one_point_crossover_shaga, 1),
+            "two_point": (two_point_crossover_shaga, 1),
+            "one_point_7": (one_point_crossover_shaga, 7),
+            "two_point_7": (two_point_crossover_shaga, 7),
             "uniform_1": (uniform_crossover_shaga, 1),
             "uniform_2": (uniform_crossover_shaga, 2),
             "uniform_7": (uniform_crossover_shaga, 7),
