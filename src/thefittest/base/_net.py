@@ -82,8 +82,6 @@ class Net:
             self._get_order()
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-        X = torch.tensor(X, device=device, dtype=torch.float32)
         weights = torch.tensor(weights, device=device, dtype=torch.float32)
 
         weights_cases = weights.shape[0]

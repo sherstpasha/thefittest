@@ -207,6 +207,7 @@ class MLPEAClassifier(Model):
 
         proba: NDArray[np.float32] = eye[y]
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        X = torch.tensor(X, device=device, dtype=torch.float32)
         proba_tensor = torch.tensor(proba, dtype=torch.float32, device=device)
 
         self._net = self._defitne_net(n_inputs, n_outputs)
@@ -220,6 +221,8 @@ class MLPEAClassifier(Model):
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        X = torch.tensor(X, device=device, dtype=torch.float32)
         output = self._net.forward(X)[0]
         y_pred = torch.argmax(output, dim=1).cpu().numpy()
         return y_pred
