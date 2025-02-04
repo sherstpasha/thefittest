@@ -38,7 +38,8 @@ def float_population(
     pop_size: int, left: NDArray[np.float32], right: NDArray[np.float32]
 ) -> NDArray[np.float32]:
     return np.array(
-        [np.random.uniform(left_i, right_i, pop_size) for left_i, right_i in zip(left, right)]
+        [np.random.uniform(left_i, right_i, pop_size) for left_i, right_i in zip(left, right)],
+        dtype=np.float32,
     ).T
 
 

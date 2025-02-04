@@ -40,6 +40,7 @@ from ..tools.random import half_and_half
 from ..classifiers._mlpeaclassifier import fitness_function as evaluate_nets
 from ..tools.random import train_test_split_stratified
 from ..base._net import ACTIV_NAME_INV
+import torch
 
 
 weights_type_optimizer_alias = Union[
@@ -106,7 +107,7 @@ def fitness_function(
     fitness = np.empty(shape=len(population), dtype=np.float32)
     for i, ensemble in enumerate(population):
         output2d = ensemble.meta_output(X)
-        fitness[i] = categorical_crossentropy(targets, output2d)
+        fitness[i] = categorical_crossentropy(targets.cpu().numpy(), output2d.cpu().numpy())
 
     return fitness
 
@@ -237,7 +238,10 @@ def train_ensemble(
         )
 
     X_meta = ensemble._get_meta_inputs(X_train_meta, offset=True)
-    y_meta = np.argmax(proba_train_meta, axis=1)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    X_meta = torch.tensor(X_meta, device=device, dtype=torch.float32)
+
+    y_meta = np.argmax(proba_train_meta.cpu().numpy(), axis=1)
 
     tree = ensemble._meta_tree
 
@@ -431,6 +435,8 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
         n_outputs: int = len(set(y))
         eye: NDArray[np.float32] = np.eye(n_outputs, dtype=np.float32)
 
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         X_train, X_test, y_train, y_test = train_test_split_stratified(
             X, y.astype(np.int64), self._test_sample_ratio
         )
@@ -442,6 +448,13 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
         proba_test: NDArray[np.float32] = eye[y_test]
         proba_train_ens: NDArray[np.float32] = eye[y_train_ens]
         proba_train_meta: NDArray[np.float32] = eye[y_train_meta]
+
+        X_train_ens = torch.tensor(X_train_ens, device=device, dtype=torch.float32)
+        X_train_meta = torch.tensor(X_train_meta, device=device, dtype=torch.float32)
+        X_test = torch.tensor(X_test, device=device, dtype=torch.float32)
+        proba_test = torch.tensor(proba_test, dtype=torch.float32, device=device)
+        proba_train_ens = torch.tensor(proba_train_ens, dtype=torch.float32, device=device)
+        proba_train_meta = torch.tensor(proba_train_meta, dtype=torch.float32, device=device)
 
         self._optimizer = self._define_optimizer_ensembles(
             uniset=self._get_uniset_1(X),
@@ -464,7 +477,9 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        X = torch.tensor(X, device=device, dtype=torch.float32)
         fittest = self._optimizer.get_fittest()
         output = fittest["phenotype"].meta_output(X)
 
-        return np.argmax(output, axis=1)
+        return np.argmax(output.cpu().numpy(), axis=1)

@@ -82,6 +82,7 @@ class Net:
             self._get_order()
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         weights = torch.tensor(weights, device=device, dtype=torch.float32)
 
         weights_cases = weights.shape[0]
@@ -468,10 +469,11 @@ class NetEnsemble:
     ) -> NDArray[np.float32]:
         if weights_list is not None:
             to_return = [
-                net_i.forward(X, weights_i) for net_i, weights_i in zip(self._nets, weights_list)
+                net_i.forward(X, weights_i).cpu().numpy()
+                for net_i, weights_i in zip(self._nets, weights_list)
             ]
         else:
-            to_return = [net_i.forward(X) for net_i in self._nets]
+            to_return = [net_i.forward(X).cpu().numpy() for net_i in self._nets]
 
         return np.array(to_return, dtype=np.float32)
 
@@ -489,8 +491,11 @@ class NetEnsemble:
         self: NetEnsemble,
         X: NDArray[np.float32],
     ) -> NDArray[np.float32]:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         if self._meta_algorithm is not None:
             X_input = self._get_meta_inputs(X, offset=self._meta_algorithm._offset)
+            X_input = torch.tensor(X_input, device=device, dtype=torch.float32)
             output = self._meta_algorithm.forward(X=X_input)[0]
             return output
         else:

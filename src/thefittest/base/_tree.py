@@ -166,7 +166,9 @@ class EnsembleUniversalSet(UniversalSet):
 
         n_args_functionals = self._functional_set[n_args]
         weights = self._functional_set_proba[n_args]
-        index = random_weighted_sample(weights=weights, quantity=1, replace=True)[0]
+        index = random_weighted_sample(
+            weights=weights.astype(np.float32), quantity=1, replace=True
+        )[0]
         choosen = n_args_functionals[index]
 
         if isinstance(choosen._value, DualNode):

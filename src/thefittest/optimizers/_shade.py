@@ -124,8 +124,19 @@ class SHADE(DifferentialEvolution):
         F: float,
         CR: float,
     ) -> NDArray[np.float32]:
+        # print(
+        #     individ_g.dtype,
+        #     self._population_g_i.dtype,
+        #     self._pbest_id.dtype,
+        #     F.dtype,
+        #     self._population_archive.dtype,
+        # )
         mutant_g = current_to_pbest_1_archive_p_min(
-            individ_g, self._population_g_i, self._pbest_id, F, self._population_archive
+            individ_g.astype(np.float32),
+            self._population_g_i.astype(np.float32),
+            self._pbest_id,
+            F,
+            self._population_archive.astype(np.float32),
         )
 
         mutant_cr_g = binomial(individ_g, mutant_g, np.float32(CR))

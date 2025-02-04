@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, f1_score
 from sklearn.preprocessing import minmax_scale
 from sklearn.model_selection import train_test_split
+from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 
 from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import SelfCGA
-from thefittest.optimizers._selfcshaga import SelfCSHAGA
 from thefittest.benchmarks import UserKnowladgeDataset
 from thefittest.classifiers._gpnneclassifier_one_tree import (
     GeneticProgrammingNeuralNetStackingClassifier,
@@ -101,13 +101,12 @@ def run_experiment(run_id, output_dir):
     return f1
 
 
-def run_multiple_experiments(n_runs, output_dir):
+def run_multiple_experiments(n_runs, n_processes, output_dir):
     start_time = time.time()
 
-    f1_scores = []
-    for i in range(n_runs):
-        f1 = run_experiment(i, output_dir)
-        f1_scores.append(f1)
+    with ProcessPoolExecutor(max_workers=n_processes) as executor:
+        futures = [executor.submit(run_experiment, i, output_dir) for i in range(n_runs)]
+        f1_scores = [future.result() for future in futures]
 
     avg_f1 = np.mean(f1_scores)
 
@@ -122,4 +121,5 @@ def run_multiple_experiments(n_runs, output_dir):
 if __name__ == "__main__":
     output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\one_tree_know"
     n_runs = 5  # Number of runs you want to perform
-    run_multiple_experiments(n_runs, output_dir)
+    n_processes = 5  # Number of processes to use in parallel
+    run_multiple_experiments(n_runs, n_processes, output_dir)

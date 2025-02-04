@@ -44,6 +44,7 @@ def fitness_function(
     targets: NDArray[Union[np.float32, np.int64]],
 ) -> NDArray[np.float32]:
     output3d = net.forward(X, weights)
+    # print(output3d, targets)
     error = categorical_crossentropy3d(targets, output3d)
     return error
 
