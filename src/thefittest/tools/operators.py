@@ -419,6 +419,39 @@ def uniform_tour_crossover_shaga(
     return offspring
 
 
+def uniform_crossoverSHAGP(
+    individ: NDArray,
+    second_individ: NDArray,
+    max_level: int,
+    CR: float,
+) -> Tree:
+    weight = np.array([1 - CR, CR], dtype=np.float32)
+    individs = [individ, second_individ]
+
+    to_return = Tree([], [])
+    new_n_args = []
+    common, border = common_region(individs)
+    # print(common, border)
+    pool = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+    # pool = random_sample(range_size=len(fitness), quantity=len(common[0]), replace=True)
+    # print(weight)
+    for i, common_0_i in enumerate(common[0]):
+        j = pool[i]
+        id_ = common[j][i]
+        if common_0_i in border[0]:
+            subtree = individs[j].subtree(id_)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
+        else:
+            to_return._nodes.append(individs[j]._nodes[id_])
+            new_n_args.append(individs[j]._n_args[id_])
+
+    to_return = to_return.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
+    # print(to_return)
+    return to_return
+
+
 def one_point_crossover_shaga(
     individ: NDArray[np.byte],
     individs: NDArray[np.byte],

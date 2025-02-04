@@ -33,4 +33,4 @@ class Model:
         return self._fit(X, y)
 
     def predict(self, X: NDArray[np.float32]) -> NDArray[Union[np.float32, np.int64]]:
-        return self._predict(X)
+        return self._predict(X).astype(np.float32)

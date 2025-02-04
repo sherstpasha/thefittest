@@ -37,7 +37,7 @@ def fitness_function(trees: NDArray, y: NDArray[np.float32]) -> NDArray[np.float
     fitness = []
     for tree in trees:
         y_pred = tree() * np.ones(len(y))
-        fitness.append(coefficient_determination(y, y_pred))
+        fitness.append(coefficient_determination(y, y_pred.astype(np.float32)))
     return np.array(fitness, dtype=np.float32)
 
 
