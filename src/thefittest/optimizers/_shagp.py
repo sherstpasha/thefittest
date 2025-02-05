@@ -20,10 +20,16 @@ from ..base._ea import EvolutionaryAlgorithm
 from ..optimizers import SHAGA
 from ..tools.random import half_and_half
 from ..tools.operators import tournament_selection
-from ..tools.operators import uniform_crossoverSHAGP, uniform_crossoverGP
-from ..tools.operators import one_point_crossoverGP, standart_crossover
-from ..tools.operators import point_mutation, growing_mutation
+from ..tools.operators import uniform_crossoverSHAGP
+from ..tools.operators import standart_crossover_shagp
+from ..tools.operators import one_point_crossover_SHAGP
+from ..tools.operators import point_mutation, growing_mutation, swap_mutation, shrink_mutation
 from ..tools.random import cauchy_distribution
+from typing import Union
+from ..tools.operators import proportional_selection
+from ..tools.operators import rank_selection
+from ..tools.transformations import rank_data
+from ..tools.transformations import scale_data
 
 
 class SHAGP(SHAGA):
@@ -41,6 +47,11 @@ class SHAGP(SHAGA):
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
         no_increase_num: Optional[int] = None,
+        parents_num: int = 2,
+        tour_size: int = 2,
+        selection: str = "rank",
+        crossover: str = "gp_standart",
+        mutation: str = "shrink",
         minimization: bool = False,
         show_progress_each: Optional[int] = None,
         keep_history: bool = False,
@@ -73,6 +84,45 @@ class SHAGP(SHAGA):
         self._init_level: int = init_level
         self._H_MR = np.full(self._H_size, 0.1, dtype=np.float32)
         self._H_CR = np.full(self._H_size, 0.5, dtype=np.float32)
+        self._parents_num: int = parents_num
+        self._tour_size: int = tour_size
+        self._specified_selection: str = selection
+        self._specified_crossover: str = crossover
+        self._specified_mutation: str = mutation
+
+        self._selection_pool: Dict[str, Tuple[Callable, Union[float, int]]] = {
+            "proportional": (proportional_selection, 0),
+            "rank": (rank_selection, 0),
+            "tournament_k": (tournament_selection, self._tour_size),
+            "tournament_3": (tournament_selection, 3),
+            "tournament_5": (tournament_selection, 5),
+            "tournament_7": (tournament_selection, 7),
+        }
+
+        self._crossover_pool: Dict[str, Tuple[Callable, Union[float, int]]] = {
+            # "empty": (empty_crossover_shaga, 1),
+            "gp_standart": (standart_crossover_shagp, 1),
+            "gp_uniform_1": (uniform_crossoverSHAGP, 1),
+            "gp_one_point": (one_point_crossover_SHAGP, 1),
+            # "gp_uniform_7": (uniform_crossoverGP, 7),
+            # "gp_uniform_k": (uniform_crossoverGP, self._parents_num),
+            # "gp_uniform_prop_2": (uniform_prop_crossover_GP, 2),
+            # "gp_uniform_prop_7": (uniform_prop_crossover_GP, 7),
+            # "gp_uniform_prop_k": (uniform_prop_crossover_GP, self._parents_num),
+            # "gp_uniform_rank_2": (uniform_rank_crossover_GP, 2),
+            # "gp_uniform_rank_7": (uniform_rank_crossover_GP, 7),
+            # "gp_uniform_rank_k": (uniform_rank_crossover_GP, self._parents_num),
+            # "gp_uniform_tour_3": (uniform_tour_crossover_GP, 3),
+            # "gp_uniform_tour_7": (uniform_tour_crossover_GP, 7),
+            # "gp_uniform_tour_k": (uniform_tour_crossover_GP, self._parents_num),
+        }
+
+        self._mutation_pool: Dict[str, Callable] = {
+            "point": point_mutation,
+            "grow": growing_mutation,
+            "swap": swap_mutation,
+            "shrink": shrink_mutation,
+        }
 
     def _first_generation(self: GeneticProgramming) -> None:
         if self._init_population is None:
@@ -82,21 +132,44 @@ class SHAGP(SHAGA):
         else:
             self._population_g_i = self._init_population.copy()
 
+    def _get_init_population(self: SHAGP) -> None:
+        self._first_generation()
+        self._population_ph_i = self._get_phenotype(self._population_g_i)
+        self._fitness_i = self._get_fitness(self._population_ph_i)
+        self._fitness_scale_i = scale_data(self._fitness_i)
+        self._fitness_rank_i = rank_data(self._fitness_i)
+
     def _get_new_individ_g(
         self: SHAGA,
+        specified_selection: str,
+        specified_crossover: str,
+        specified_mutation: str,
         individ_g: NDArray[np.float32],
         MR: float,
         CR: float,
     ) -> NDArray[np.float32]:
-        # print(MR)
-        # print(CR)
-        second_parent_id = tournament_selection(self._fitness_i, self._fitness_i, 2, 1)[0]
-        second_parent = self._population_g_i[second_parent_id].copy()
+        selection_func, tour_size = self._selection_pool[specified_selection]
+        crossover_func, quantity = self._crossover_pool[specified_crossover]
+        mutation_func = self._mutation_pool[specified_mutation]
 
-        # offspring = uniform_crossoverSHAGP(individ_g, second_parent, self._max_level, CR)
-        offspring = standart_crossover([individ_g, second_parent], [1, 1], [1, 1], self._max_level)
+        selected_id = selection_func(
+            self._fitness_scale_i,
+            self._fitness_rank_i,
+            np.int64(tour_size),
+            np.int64(quantity),
+        )
 
-        mutant = growing_mutation(offspring, self._uniset, MR, self._max_level)
+        second_parent = self._population_g_i[selected_id].copy()
+
+        offspring = crossover_func(
+            individ_g,
+            second_parent,
+            self._fitness_scale_i[selected_id],
+            self._fitness_rank_i[selected_id],
+            self._max_level,
+            CR,
+        )
+        mutant = mutation_func(offspring, self._uniset, MR, self._max_level)
         return mutant
 
     def _randc(self: SHAGA, u: float, scale: float) -> NDArray[np.float32]:
@@ -119,6 +192,9 @@ class SHAGP(SHAGA):
     def _get_new_population(self: SHAGA) -> None:
         get_new_individ_g = partial(
             self._get_new_individ_g,
+            self._specified_selection,
+            self._specified_crossover,
+            self._specified_mutation,
         )
         self._MR, self._CR = self._generate_MR_CR()
 
@@ -142,6 +218,8 @@ class SHAGP(SHAGA):
         self._population_g_i[mask] = mutant_cr_b_g[mask]
         self._population_ph_i[mask] = mutant_cr_ph[mask]
         self._fitness_i[mask] = mutant_cr_fit[mask]
+        self._fitness_scale_i = scale_data(self._fitness_i)
+        self._fitness_rank_i = rank_data(self._fitness_i)
 
         d_fitness = np.abs(will_be_replaced_fit - self._fitness_i[succeses])
 

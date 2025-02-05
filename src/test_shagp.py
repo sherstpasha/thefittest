@@ -8,17 +8,19 @@ from thefittest.base import FunctionalNode
 from thefittest.base import TerminalNode
 from thefittest.base import EphemeralNode
 from thefittest.base import UniversalSet
-from thefittest.optimizers import GeneticProgramming
+from thefittest.optimizers import GeneticProgramming, PDPGP
 from thefittest.tools.operators import Mul
 from thefittest.tools.operators import Add
 from thefittest.tools.operators import Div
 from thefittest.tools.operators import Neg
+from thefittest.tools.operators import Sin
+from thefittest.tools.operators import Exp
 from thefittest.tools.metrics import coefficient_determination
 from thefittest.tools.print import print_tree
 from thefittest.benchmarks.symbolicregression17 import problems_dict
 
 
-F = "F1"
+F = "F2"
 
 
 def generator1():
@@ -30,6 +32,7 @@ def generator2():
 
 
 def problem(x):
+    # return np.sin(X[:, 0])
     return problems_dict[F]["function"](x)
 
 
@@ -39,8 +42,8 @@ right_border = problems_dict[F]["bounds"][1]
 sample_size = 300
 n_dimension = problems_dict[F]["n_vars"]
 
-number_of_iterations = 200
-population_size = 200
+number_of_iterations = 300
+population_size = 300
 
 X = np.array([np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]).T
 y = function(X)
@@ -51,6 +54,8 @@ functional_set = (
     FunctionalNode(Mul()),
     FunctionalNode(Neg()),
     FunctionalNode(Div()),
+    FunctionalNode(Sin()),
+    # FunctionalNode(Exp()),
 )
 
 
@@ -75,8 +80,27 @@ optimizer = SHAGP(
     show_progress_each=10,
     minimization=False,
     keep_history=True,
+    selection="rank",
+    crossover="gp_standart",
+    mutation="shrink",
+    # tour_size=10,
     # max_level=10,
 )
+
+# optimizer = PDPGP(
+#     fitness_function=fitness_function,
+#     uniset=uniset,
+#     pop_size=population_size,
+#     iters=number_of_iterations,
+#     show_progress_each=10,
+#     minimization=False,
+#     keep_history=True,
+#     # selection="rank",
+#     # crossover="gp_standart",
+#     # mutation="shrink",
+#     # tour_size=10,
+#     # max_level=10,
+# )
 
 print(optimizer._first_generation())
 print(optimizer._population_g_i)
@@ -85,7 +109,7 @@ optimizer.fit()
 fittest = optimizer.get_fittest()
 stats = optimizer.get_stats()
 
-predict = fittest["phenotype"]()
+predict = fittest["phenotype"]() * np.ones(len(y))
 
 print("The fittest individ:", fittest["phenotype"])
 print("with fitness", fittest["fitness"])

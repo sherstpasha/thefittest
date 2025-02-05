@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
+from sklearn.metrics import mean_squared_error
 from thefittest.optimizers._shagp import SHAGP
 from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import PDPGP
@@ -13,7 +13,7 @@ import concurrent.futures
 number_of_iterations = 100
 population_size = 100
 sample_size = 300  # число точек для формирования выборки
-num_runs = 50  # число запусков для каждой функции (N)
+num_runs = 100  # число запусков для каждой функции (N)
 
 # Список функций: F1, F2, ..., F17
 functions_list = [f"F{i}" for i in range(1, 18)]
@@ -62,12 +62,12 @@ def run_single_run(F, iteration, sample_size, number_of_iterations, population_s
     )
     model.fit(X_train, y_train)
 
-    # Получаем прогноз на тестовой выборке и вычисляем r2
+    # Получаем прогноз на тестовой выборке и вычисляем RMSE
     y_pred = model.predict(X_test)
-    r2 = r2_score(y_test, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
-    print(f"Function {F} | Iteration {iteration} | Method {method} | r2: {r2:.4f}")
-    return {"iteration": iteration, "F": F, "method": method, "r2": r2}
+    print(f"Function {F} | Iteration {iteration} | Method {method} | RMSE: {rmse:.4f}")
+    return {"iteration": iteration, "F": F, "method": method, "rmse": rmse}
 
 
 if __name__ == "__main__":
@@ -105,11 +105,11 @@ if __name__ == "__main__":
     df_results = pd.DataFrame(results)
 
     # Агрегирование по функциям: строки – функции, столбцы – методы
-    agg_by_F_method = df_results.groupby(["F", "method"])["r2"].mean().unstack("method")
+    agg_by_F_method = df_results.groupby(["F", "method"])["rmse"].mean().unstack("method")
 
     # Агрегация по итерациям: усредняем по всем итерациям (и функциям) для каждого метода
-    # Получаем один ряд со средним значением r2 для каждого метода
-    agg_by_iterations = df_results.groupby("method")["r2"].mean().to_frame().T
+    # Получаем один ряд со средним значением RMSE для каждого метода
+    agg_by_iterations = df_results.groupby("method")["rmse"].mean().to_frame().T
     agg_by_iterations.index = ["Average"]
 
     # Сохраняем результаты в один Excel-файл с тремя листами:

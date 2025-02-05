@@ -196,7 +196,7 @@ def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_leve: int)
         more_one_args_cond = to_return._n_args > 1
         indexes = np.arange(len(tree), dtype=int)[more_one_args_cond]
         if len(indexes) > 0:
-            i = random.choice(indexes)
+            i = random.choice(list(indexes))
             args_id = to_return.get_args_id(i)
             new_arg_id = args_id.copy()
             sattolo_shuffle(new_arg_id)
@@ -213,9 +213,9 @@ def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: i
             no_terminal_cond = to_return._n_args > 0
             indexes = np.arange(len(tree), dtype=int)[no_terminal_cond]
             if len(indexes) > 0:
-                i = random.choice(indexes)
+                i = random.choice(list(indexes))
                 args_id = to_return.get_args_id(i)
-                choosen_id = random.choice(args_id)
+                choosen_id = random.choice(list(args_id))
                 to_return = to_return.concat(i, tree.subtree(choosen_id))
     return to_return
 
@@ -419,39 +419,6 @@ def uniform_tour_crossover_shaga(
     return offspring
 
 
-def uniform_crossoverSHAGP(
-    individ: NDArray,
-    second_individ: NDArray,
-    max_level: int,
-    CR: float,
-) -> Tree:
-    weight = np.array([1 - CR, CR], dtype=np.float32)
-    individs = [individ, second_individ]
-
-    to_return = Tree([], [])
-    new_n_args = []
-    common, border = common_region(individs)
-    # print(common, border)
-    pool = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
-    # pool = random_sample(range_size=len(fitness), quantity=len(common[0]), replace=True)
-    # print(weight)
-    for i, common_0_i in enumerate(common[0]):
-        j = pool[i]
-        id_ = common[j][i]
-        if common_0_i in border[0]:
-            subtree = individs[j].subtree(id_)
-            to_return._nodes.extend(subtree._nodes)
-            new_n_args.extend(subtree._n_args)
-        else:
-            to_return._nodes.append(individs[j]._nodes[id_])
-            new_n_args.append(individs[j]._n_args[id_])
-
-    to_return = to_return.copy()
-    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
-    # print(to_return)
-    return to_return
-
-
 def one_point_crossover_shaga(
     individ: NDArray[np.byte],
     individs: NDArray[np.byte],
@@ -542,6 +509,96 @@ def standart_crossover(
         if offspring.get_max_level() > max_level:
             offspring = individ_1
     return offspring
+
+
+# genetic propramming
+def standart_crossover_shagp(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    if random.random() <= CR:
+        individ_1 = individ.copy()
+        individ_2 = individs[0].copy()
+        first_point = random.randrange(len(individ_1))
+        second_point = random.randrange(len(individ_2))
+
+        if random.random() < 0.5:
+            first_subtree = individ_1.subtree(first_point)
+            offspring = individ_2.concat(second_point, first_subtree)
+            if offspring.get_max_level() > max_level:
+                offspring = individ_2
+        else:
+            second_subtree = individ_2.subtree(second_point)
+            offspring = individ_1.concat(first_point, second_subtree)
+            if offspring.get_max_level() > max_level:
+                offspring = individ_1
+        return offspring
+    else:
+        return individ
+
+
+def uniform_crossoverSHAGP(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    weight = np.array([1 - CR, CR], dtype=np.float32)
+    second_individ = individs[0]
+    individs = [individ, second_individ]
+
+    to_return = Tree([], [])
+    new_n_args = []
+    common, border = common_region(individs)
+    pool = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+
+    for i, common_0_i in enumerate(common[0]):
+        j = pool[i]
+        id_ = common[j][i]
+        if common_0_i in border[0]:
+            subtree = individs[j].subtree(id_)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
+        else:
+            to_return._nodes.append(individs[j]._nodes[id_])
+            new_n_args.append(individs[j]._n_args[id_])
+
+    to_return = to_return.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
+    return to_return
+
+
+def one_point_crossover_SHAGP(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    if random.random() <= CR:
+        individ_1 = individ
+        individ_2 = individs[0]
+        common_indexes, _ = common_region([individ_1, individ_2])
+
+        point = random.randrange(len(common_indexes[0]))
+        first_point = common_indexes[0][point]
+        second_point = common_indexes[1][point]
+        if random.random() < 0.5:
+            first_subtree = individ_1.subtree(first_point)
+            offspring = individ_2.concat(second_point, first_subtree)
+        else:
+            second_subtree = individ_2.subtree(second_point)
+            offspring = individ_1.concat(first_point, second_subtree)
+        return offspring
+    else:
+        return individ
 
 
 def one_point_crossoverGP(
