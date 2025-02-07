@@ -2,23 +2,25 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-from thefittest.optimizers._shagp import SHAGP
+from thefittest.optimizers._cshagp import CSHAGP
 from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import PDPGP
 from thefittest.regressors import SymbolicRegressionGP
 from thefittest.benchmarks.symbolicregression17 import problems_dict
 import concurrent.futures
+from thefittest.optimizers._selfcshagp import SelfCSHAGP
+
 
 # Параметры алгоритма и эксперимента
-number_of_iterations = 100
-population_size = 100
+number_of_iterations = 200
+population_size = 200
 sample_size = 300  # число точек для формирования выборки
 num_runs = 100  # число запусков для каждой функции (N)
 
 # Список функций: F1, F2, ..., F17
 functions_list = [f"F{i}" for i in range(1, 18)]
 # Список методов (оптимизаторов)
-methods = ["SHAGP", "SelfCGP", "PDPGP"]
+methods = ["CSHAGP", "SelfCGP", "PDPGP", "SelfCSHAGP"]
 
 
 def run_single_run(F, iteration, sample_size, number_of_iterations, population_size, method):
@@ -44,12 +46,14 @@ def run_single_run(F, iteration, sample_size, number_of_iterations, population_s
     )
 
     # Выбираем оптимизатор согласно переданному методу
-    if method == "SHAGP":
-        optimizer_class = SHAGP
+    if method == "CSHAGP":
+        optimizer_class = CSHAGP
     elif method == "SelfCGP":
         optimizer_class = SelfCGP
     elif method == "PDPGP":
         optimizer_class = PDPGP
+    elif method == "SelfCSHAGP":
+        optimizer_class = SelfCSHAGP
     else:
         raise ValueError(f"Unknown method: {method}")
 

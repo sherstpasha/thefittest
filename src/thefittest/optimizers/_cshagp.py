@@ -17,12 +17,16 @@ from ._selfcga import SelfCGA
 from ..base import UniversalSet
 from ..tools import donothing
 from ..base._ea import EvolutionaryAlgorithm
-from ..optimizers import SHAGA
+from . import SHAGA
 from ..tools.random import half_and_half
 from ..tools.operators import tournament_selection
 from ..tools.operators import uniform_crossoverSHAGP
 from ..tools.operators import standart_crossover_shagp
 from ..tools.operators import one_point_crossover_SHAGP
+from ..tools.operators import uniform_prop_crossoverSHAGP
+from ..tools.operators import uniform_rank_crossoverSHAGP
+from ..tools.operators import uniform_tour_crossoverSHAGP
+from ..tools.operators import empty_crossover_SHAGP
 from ..tools.operators import point_mutation, growing_mutation, swap_mutation, shrink_mutation
 from ..tools.random import cauchy_distribution
 from typing import Union
@@ -32,7 +36,7 @@ from ..tools.transformations import rank_data
 from ..tools.transformations import scale_data
 
 
-class SHAGP(SHAGA):
+class CSHAGP(SHAGA):
     def __init__(
         self,
         fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
@@ -100,21 +104,18 @@ class SHAGP(SHAGA):
         }
 
         self._crossover_pool: Dict[str, Tuple[Callable, Union[float, int]]] = {
-            # "empty": (empty_crossover_shaga, 1),
+            "empty": (empty_crossover_SHAGP, 1),
             "gp_standart": (standart_crossover_shagp, 1),
             "gp_uniform_1": (uniform_crossoverSHAGP, 1),
             "gp_one_point": (one_point_crossover_SHAGP, 1),
-            # "gp_uniform_7": (uniform_crossoverGP, 7),
-            # "gp_uniform_k": (uniform_crossoverGP, self._parents_num),
-            # "gp_uniform_prop_2": (uniform_prop_crossover_GP, 2),
-            # "gp_uniform_prop_7": (uniform_prop_crossover_GP, 7),
-            # "gp_uniform_prop_k": (uniform_prop_crossover_GP, self._parents_num),
-            # "gp_uniform_rank_2": (uniform_rank_crossover_GP, 2),
-            # "gp_uniform_rank_7": (uniform_rank_crossover_GP, 7),
-            # "gp_uniform_rank_k": (uniform_rank_crossover_GP, self._parents_num),
-            # "gp_uniform_tour_3": (uniform_tour_crossover_GP, 3),
-            # "gp_uniform_tour_7": (uniform_tour_crossover_GP, 7),
-            # "gp_uniform_tour_k": (uniform_tour_crossover_GP, self._parents_num),
+            "gp_uniform_2": (uniform_crossoverSHAGP, 2),
+            "gp_uniform_7": (uniform_crossoverSHAGP, 7),
+            "gp_uniform_prop_2": (uniform_prop_crossoverSHAGP, 2),
+            "gp_uniform_prop_7": (uniform_prop_crossoverSHAGP, 7),
+            "gp_uniform_rank_2": (uniform_rank_crossoverSHAGP, 2),
+            "gp_uniform_rank_7": (uniform_rank_crossoverSHAGP, 7),
+            "gp_uniform_tour_3": (uniform_tour_crossoverSHAGP, 3),
+            "gp_uniform_tour_7": (uniform_tour_crossoverSHAGP, 7),
         }
 
         self._mutation_pool: Dict[str, Callable] = {
@@ -132,7 +133,7 @@ class SHAGP(SHAGA):
         else:
             self._population_g_i = self._init_population.copy()
 
-    def _get_init_population(self: SHAGP) -> None:
+    def _get_init_population(self: CSHAGP) -> None:
         self._first_generation()
         self._population_ph_i = self._get_phenotype(self._population_g_i)
         self._fitness_i = self._get_fitness(self._population_ph_i)
@@ -187,6 +188,7 @@ class SHAGP(SHAGA):
             u_CR = self._H_CR[r_i]
             MR_i[i] = self._randc(u_MR, 0.1)
             CR_i[i] = self._randn(u_CR, 0.1)
+
         return MR_i, CR_i
 
     def _get_new_population(self: SHAGA) -> None:
@@ -222,6 +224,7 @@ class SHAGP(SHAGA):
         self._fitness_rank_i = rank_data(self._fitness_i)
 
         d_fitness = np.abs(will_be_replaced_fit - self._fitness_i[succeses])
+        d_fitness[d_fitness == np.inf] = 1e4
 
         if self._k + 1 == self._H_size:
             next_k = 0

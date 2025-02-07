@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from thefittest.tools.transformations import GrayCode
 from thefittest.benchmarks import Rastrigin
-
+from thefittest.optimizers._pdpshaga import PDPSHAGA
 
 n_dimension = 10
 left_border = -5.0
@@ -27,7 +27,7 @@ parts = np.full(shape=n_dimension, fill_value=n_bits_per_variable, dtype=np.int6
 genotype_to_phenotype = GrayCode(fit_by="parts").fit(
     left=left_border_array, right=right_border_array, arg=parts
 )
-optimizer = PDPGA(
+optimizer = PDPSHAGA(
     fitness_function=Sphere(),
     genotype_to_phenotype=genotype_to_phenotype.transform,
     iters=number_of_iterations,
@@ -48,13 +48,11 @@ fittest = optimizer.get_fittest()
 
 stats = optimizer.get_stats()
 
-print(stats.keys())
-
 print("The fittest individ:", fittest["genotype"])
 print("The fittest individ:", fittest["phenotype"])
 print("with fitness", fittest["fitness"])
 
-fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=2)
+fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=3)
 
 ax[0][0].plot(range(number_of_iterations), stats["max_fitness"])
 ax[0][0].set_title("Fitness")
@@ -79,14 +77,9 @@ for key, value in crossover_proba.items():
     ax[1][0].plot(range(number_of_iterations), value, label=key)
 ax[1][0].legend()
 
-mutation_proba = defaultdict(list)
-for i in range(number_of_iterations):
-    for key, value in stats["m_proba"][i].items():
-        mutation_proba[key].append(value)
+ax[1][1].plot(range(number_of_iterations), np.array(stats["H_MR"]).mean(axis=1))
 
-for key, value in mutation_proba.items():
-    ax[1][1].plot(range(number_of_iterations), value, label=key)
-ax[1][1].legend()
+ax[2][1].plot(range(number_of_iterations), np.array(stats["H_CR"]).mean(axis=1))
 
 plt.tight_layout()
-plt.savefig("test.png")
+plt.savefig("pdpshaga.png")

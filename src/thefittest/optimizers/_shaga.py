@@ -110,9 +110,10 @@ class SHAGA(EvolutionaryAlgorithm):
     def _update_u(self: SHAGA, u: float, S: NDArray[np.float32], df: NDArray[np.float32]) -> float:
         if len(S):
             sum_ = np.sum(df)
-            if sum_ > 0:
+            if sum_ > 0 and np.sum(S) > 0:
                 weight_i = df / sum_
-                return lehmer_mean(x=S, weight=weight_i)
+                mean = lehmer_mean(x=S, weight=weight_i)
+                return mean
         return u
 
     def _get_new_individ_g(
@@ -164,6 +165,7 @@ class SHAGA(EvolutionaryAlgorithm):
 
         self._H_MR[next_k] = self._update_u(self._H_MR[self._k], succeses_MR, d_fitness)
         self._H_CR[next_k] = self._update_u(self._H_CR[self._k], succeses_CR, d_fitness)
+        print(self._H_CR[next_k])
 
         if self._k == self._H_size - 1:
             self._k = 0

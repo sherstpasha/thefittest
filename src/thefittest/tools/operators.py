@@ -549,25 +549,132 @@ def uniform_crossoverSHAGP(
     max_level: int,
     CR: float,
 ) -> Tree:
-    weight = np.array([1 - CR, CR], dtype=np.float32)
-    second_individ = individs[0]
-    individs = [individ, second_individ]
-
     to_return = Tree([], [])
     new_n_args = []
-    common, border = common_region(individs)
-    pool = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+    weight = np.array([1 - CR, CR], dtype=np.float32)
+
+    all_members = np.append(individs, individ)
+    common, border = common_region(all_members)
+
+    pool_stage_1 = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+    pool_stage_2 = random_sample(range_size=len(fitness), quantity=len(common[0]), replace=True)
+    all_members_pool = pool_stage_1 * pool_stage_2 + pool_stage_1
 
     for i, common_0_i in enumerate(common[0]):
-        j = pool[i]
+        j = all_members_pool[i]
         id_ = common[j][i]
         if common_0_i in border[0]:
-            subtree = individs[j].subtree(id_)
+            subtree = all_members[j].subtree(id_)
             to_return._nodes.extend(subtree._nodes)
             new_n_args.extend(subtree._n_args)
         else:
-            to_return._nodes.append(individs[j]._nodes[id_])
-            new_n_args.append(individs[j]._n_args[id_])
+            to_return._nodes.append(all_members[j]._nodes[id_])
+            new_n_args.append(all_members[j]._n_args[id_])
+
+    to_return = to_return.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
+    return to_return
+
+
+def uniform_prop_crossoverSHAGP(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    to_return = Tree([], [])
+    new_n_args = []
+    weight = np.array([1 - CR, CR], dtype=np.float32)
+
+    all_members = np.append(individs, individ)
+    common, border = common_region(all_members)
+
+    pool_stage_1 = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+    pool_stage_2 = random_weighted_sample(weights=fitness, quantity=len(common[0]), replace=True)
+    all_members_pool = pool_stage_1 * pool_stage_2 + pool_stage_1
+
+    for i, common_0_i in enumerate(common[0]):
+        j = all_members_pool[i]
+        id_ = common[j][i]
+        if common_0_i in border[0]:
+            subtree = all_members[j].subtree(id_)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
+        else:
+            to_return._nodes.append(all_members[j]._nodes[id_])
+            new_n_args.append(all_members[j]._n_args[id_])
+
+    to_return = to_return.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
+    return to_return
+
+
+def uniform_rank_crossoverSHAGP(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    to_return = Tree([], [])
+    new_n_args = []
+    weight = np.array([1 - CR, CR], dtype=np.float32)
+
+    all_members = np.append(individs, individ)
+    common, border = common_region(all_members)
+
+    pool_stage_1 = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+    pool_stage_2 = random_weighted_sample(weights=fitness, quantity=len(common[0]), replace=True)
+    all_members_pool = pool_stage_1 * pool_stage_2 + pool_stage_1
+
+    for i, common_0_i in enumerate(common[0]):
+        j = all_members_pool[i]
+        id_ = common[j][i]
+        if common_0_i in border[0]:
+            subtree = all_members[j].subtree(id_)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
+        else:
+            to_return._nodes.append(all_members[j]._nodes[id_])
+            new_n_args.append(all_members[j]._n_args[id_])
+
+    to_return = to_return.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
+    return to_return
+
+
+def uniform_tour_crossoverSHAGP(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    to_return = Tree([], [])
+    new_n_args = []
+    weight = np.array([1 - CR, CR], dtype=np.float32)
+
+    all_members = np.append(individs, individ)
+    common, border = common_region(all_members)
+
+    pool_stage_1 = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+    pool_stage_2 = tournament_selection(fitness, rank, 2, len(common[0]))
+    all_members_pool = pool_stage_1 * pool_stage_2 + pool_stage_1
+
+    for i, common_0_i in enumerate(common[0]):
+        j = all_members_pool[i]
+        id_ = common[j][i]
+        if common_0_i in border[0]:
+            subtree = all_members[j].subtree(id_)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
+        else:
+            to_return._nodes.append(all_members[j]._nodes[id_])
+            new_n_args.append(all_members[j]._n_args[id_])
 
     to_return = to_return.copy()
     to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
@@ -599,6 +706,18 @@ def one_point_crossover_SHAGP(
         return offspring
     else:
         return individ
+
+
+def empty_crossover_SHAGP(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    offspring = individ.copy()
+    return offspring
 
 
 def one_point_crossoverGP(

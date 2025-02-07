@@ -1,6 +1,5 @@
 from collections import defaultdict
-from thefittest.optimizers import SelfCGP
-from thefittest.optimizers._cshagp import CSHAGP
+from thefittest.optimizers._selfcshagp import SelfCSHAGP
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -8,7 +7,6 @@ from thefittest.base import FunctionalNode
 from thefittest.base import TerminalNode
 from thefittest.base import EphemeralNode
 from thefittest.base import UniversalSet
-from thefittest.optimizers import GeneticProgramming, PDPGP
 from thefittest.tools.operators import Mul
 from thefittest.tools.operators import Add
 from thefittest.tools.operators import Div
@@ -20,7 +18,7 @@ from thefittest.tools.print import print_tree
 from thefittest.benchmarks.symbolicregression17 import problems_dict
 
 
-F = "F3"
+F = "F1"
 
 
 def generator1():
@@ -42,7 +40,7 @@ right_border = problems_dict[F]["bounds"][1]
 sample_size = 300
 n_dimension = problems_dict[F]["n_vars"]
 
-number_of_iterations = 700
+number_of_iterations = 100
 population_size = 100
 
 X = np.array([np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]).T
@@ -55,7 +53,7 @@ functional_set = (
     FunctionalNode(Neg()),
     FunctionalNode(Div()),
     FunctionalNode(Sin()),
-    FunctionalNode(Exp()),
+    # FunctionalNode(Exp()),
 )
 
 
@@ -72,7 +70,7 @@ def fitness_function(trees):
     return np.array(fitness, dtype=np.float32)
 
 
-optimizer = CSHAGP(
+optimizer = SelfCSHAGP(
     fitness_function=fitness_function,
     uniset=uniset,
     pop_size=population_size,
@@ -80,9 +78,9 @@ optimizer = CSHAGP(
     show_progress_each=10,
     minimization=False,
     keep_history=True,
-    selection="rank",
-    crossover="empty",
-    mutation="point",
+    # selection="rank",
+    # crossover="empty",
+    # mutation="point",
     # tour_size=10,
     # max_level=10,
 )
@@ -116,27 +114,34 @@ print("with fitness", fittest["fitness"])
 
 print(stats.keys())
 
-fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=2)
+fig, ax = plt.subplots(figsize=(14, 7), ncols=2, nrows=3)
 
+ax[0][0].plot(range(number_of_iterations), stats["max_fitness"])
+ax[0][0].set_title("Fitness")
+ax[0][0].set_ylabel("Fitness value")
+ax[0][0].set_xlabel("Iterations")
 
-ax[0][0].plot(X[:, 0], y, label="True y")
-ax[0][0].plot(X[:, 0], predict, label="Predict y")
-ax[0][0].legend()
+selectiom_proba = defaultdict(list)
+for i in range(number_of_iterations):
+    for key, value in stats["s_proba"][i].items():
+        selectiom_proba[key].append(value)
 
-ax[0][1].plot(range(number_of_iterations), stats["max_fitness"])
-ax[0][1].set_title("Fitness")
-ax[0][1].set_ylabel("Fitness value")
-ax[0][1].set_xlabel("Iterations")
+for key, value in selectiom_proba.items():
+    ax[0][1].plot(range(number_of_iterations), value, label=key)
+ax[0][1].legend()
 
-ax[1][0].plot(range(number_of_iterations), np.array(stats["H_MR"]).mean(axis=1))
-ax[1][0].set_title("Mean history of the H_MR")
-ax[1][0].set_ylabel("Mean H_MR")
-ax[1][0].set_xlabel("Iterations")
+crossover_proba = defaultdict(list)
+for i in range(number_of_iterations):
+    for key, value in stats["c_proba"][i].items():
+        crossover_proba[key].append(value)
 
-ax[1][1].plot(range(number_of_iterations), np.array(stats["H_CR"]).mean(axis=1))
-ax[1][1].set_title("Mean history of the CR")
-ax[1][1].set_ylabel("Mean CR")
-ax[1][1].set_xlabel("Iterations")
+for key, value in crossover_proba.items():
+    ax[1][0].plot(range(number_of_iterations), value, label=key)
+ax[1][0].legend()
+
+ax[1][1].plot(range(number_of_iterations), np.array(stats["H_MR"]).mean(axis=1))
+
+ax[2][1].plot(range(number_of_iterations), np.array(stats["H_CR"]).mean(axis=1))
 
 plt.tight_layout()
-plt.savefig("testgp.png")
+plt.savefig("selfcshagp.png")
