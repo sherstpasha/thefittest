@@ -6,12 +6,12 @@ from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
-
+from typing import List
 import numpy as np
 from numpy.typing import NDArray
 
 from ..base import Tree
-
+import random
 from ._geneticprogramming import GeneticProgramming
 from ._selfcga import SelfCGA
 from ..base import UniversalSet
@@ -91,9 +91,10 @@ from numpy.typing import NDArray
 from ._cshagp import CSHAGP
 from ..tools import donothing
 from ..tools.transformations import numpy_group_by
+from ..optimizers._selfcshagp import SelfCSHAGP
 
 
-class SelfCSHAGP(CSHAGP):
+class PDPSHAGP(SelfCSHAGP):
 
     def __init__(
         self,
@@ -130,7 +131,6 @@ class SelfCSHAGP(CSHAGP):
             "gp_uniform_tour_7",
         ),
         mutations: Tuple[str, ...] = ("point", "grow"),
-        K: float = 2,
         selection_threshold_proba: float = 0.05,
         crossover_threshold_proba: float = 0.05,
         mutation_threshold_proba: float = 0.05,
@@ -142,7 +142,7 @@ class SelfCSHAGP(CSHAGP):
         genotype_to_phenotype_args: Optional[Dict] = None,
     ):
 
-        CSHAGP.__init__(
+        SelfCSHAGP.__init__(
             self,
             fitness_function=fitness_function,
             uniset=uniset,
@@ -158,6 +158,12 @@ class SelfCSHAGP(CSHAGP):
             no_increase_num=no_increase_num,
             parents_num=parents_num,
             tour_size=tour_size,
+            selections=selections,
+            crossovers=crossovers,
+            mutations=mutations,
+            selection_threshold_proba=selection_threshold_proba,
+            crossover_threshold_proba=crossover_threshold_proba,
+            mutation_threshold_proba=mutation_threshold_proba,
             minimization=minimization,
             show_progress_each=show_progress_each,
             keep_history=keep_history,
@@ -166,122 +172,94 @@ class SelfCSHAGP(CSHAGP):
             genotype_to_phenotype_args=genotype_to_phenotype_args,
         )
 
-        self._K: float = K
-        self._thresholds: Dict[str, float] = {
-            "selection": selection_threshold_proba,
-            "crossover": crossover_threshold_proba,
-            "mutation": mutation_threshold_proba,
-        }
+        self._previous_fitness_i: List = []
+        self._success_i: NDArray[np.bool_]
 
-        self._selection_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
-        self._crossover_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
-        self._mutation_set: Dict[str, Tuple[Callable, Union[float, int], bool]] = {}
+    def _choice_parent(self: PDPSHAGP, fitness_i_selected: NDArray[np.float32]) -> np.float32:
+        # print(fitness_i_selected)
+        choosen = random.choice(list(fitness_i_selected))
+        return choosen
 
-        self._selection_proba: Dict[str, float]
-        self._crossover_proba: Dict[str, float]
-        self._mutation_proba: Dict[str, float]
-
-        for operator_name in selections:
-            self._selection_set[operator_name] = self._selection_pool[operator_name]
-        self._selection_set = dict(sorted(self._selection_set.items()))
-
-        for operator_name in crossovers:
-            self._crossover_set[operator_name] = self._crossover_pool[operator_name]
-        self._crossover_set = dict(sorted(self._crossover_set.items()))
-
-        for operator_name in mutations:
-            self._mutation_set[operator_name] = self._mutation_pool[operator_name]
-        self._mutation_set = dict(sorted(self._mutation_set.items()))
-
-        self._z_selection = len(self._selection_set)
-        self._z_crossover = len(self._crossover_set)
-        self._z_mutation = len(self._mutation_set)
-
-        self._selection_proba = dict(
-            zip(list(self._selection_set.keys()), np.full(self._z_selection, 1 / self._z_selection))
-        )
-        if "empty" in self._crossover_set.keys():
-            self._crossover_proba = dict(
-                zip(
-                    list(self._crossover_set.keys()),
-                    np.full(self._z_crossover, 0.9 / (self._z_crossover - 1)),
-                )
-            )
-            self._crossover_proba["empty"] = 0.1
-        else:
-            self._crossover_proba = dict(
-                zip(
-                    list(self._crossover_set.keys()),
-                    np.full(self._z_crossover, 1 / self._z_crossover),
-                )
-            )
-        self._mutation_proba = dict(
-            zip(list(self._mutation_set.keys()), np.full(self._z_mutation, 1 / self._z_mutation))
-        )
-
-        self._selection_operators: NDArray = self._choice_operators(
-            proba_dict=self._selection_proba
-        )
-        self._crossover_operators: NDArray = self._choice_operators(
-            proba_dict=self._crossover_proba
-        )
-        self._mutation_operators: NDArray = self._choice_operators(proba_dict=self._mutation_proba)
-
-    def _choice_operators(self: SelfCSHAGP, proba_dict: Dict["str", float]) -> NDArray:
-        operators = list(proba_dict.keys())
-        proba = list(proba_dict.values())
-        chosen_operator = np.random.choice(operators, self._pop_size, p=proba)
-        return chosen_operator
-
-    def _get_new_proba(
-        self: SelfCSHAGP,
+    def _get_new_proba_pdp(
+        self: PDPSHAGP,
         proba_dict: Dict["str", float],
-        operator: str,
+        operators: NDArray,
         threshold: float,
     ) -> Dict["str", float]:
-        proba_dict[operator] += self._K / self._iters
-        proba_value = np.array(list(proba_dict.values()))
-        proba_value -= self._K / (len(proba_dict) * self._iters)
-        proba_value = proba_value.clip(threshold, 1)
-        proba_value = proba_value / proba_value.sum()
-        new_proba_dict = dict(zip(proba_dict.keys(), proba_value))
+        n = len(proba_dict)
+        operators, r_values = self._culc_r_i(self._success_i, operators, list(proba_dict.keys()))
+        scale = np.sum(r_values)
+        proba_value = threshold + (r_values * ((1.0 - n * threshold) / scale))
+        new_proba_dict = dict(zip(operators, proba_value))
+        new_proba_dict = dict(sorted(new_proba_dict.items()))
         return new_proba_dict
 
-    def _find_fittest_operator(
-        self: SelfCSHAGP, operators: NDArray, fitness: NDArray[np.float32]
-    ) -> str:
-        keys, groups = numpy_group_by(group=fitness, by=operators)
-        mean_fit = np.array(list(map(np.mean, groups)))
-        fittest_operator = keys[np.argmax(mean_fit)]
-        return fittest_operator
+    def _culc_r_i(
+        self: PDPSHAGP, success: NDArray[np.bool_], operator: NDArray, operator_keys: List[str]
+    ) -> Tuple:
+        keys, groups = numpy_group_by(group=success, by=operator)
+        r_values = np.array(list(map(lambda x: (np.sum(x) ** 2 + 1) / (len(x) + 1), groups)))
+        for key in operator_keys:
+            if key not in keys:
+                keys = np.append(keys, key)
+                r_values = np.append(r_values, 0.0)
 
-    def _update_data(self: SelfCSHAGP) -> None:
-        super()._update_data()
-        self._update_stats(
-            s_proba=self._selection_proba,
-            c_proba=self._crossover_proba,
-            m_proba=self._mutation_proba,
+        return keys, r_values
+
+    def _adapt(self: PDPSHAGP) -> None:
+        if len(self._previous_fitness_i):
+            self._success_i = np.array(self._previous_fitness_i, dtype=np.float32) < self._fitness_i
+
+            self._selection_proba = self._get_new_proba_pdp(
+                self._selection_proba, self._selection_operators, self._thresholds["selection"]
+            )
+
+            self._crossover_proba = self._get_new_proba_pdp(
+                self._crossover_proba, self._crossover_operators, self._thresholds["crossover"]
+            )
+
+            self._mutation_proba = self._get_new_proba_pdp(
+                self._mutation_proba, self._mutation_operators, self._thresholds["mutation"]
+            )
+
+            self._previous_fitness_i = []
+
+    def _get_new_individ_g(
+        self: SHAGA,
+        specified_selection: str,
+        specified_crossover: str,
+        specified_mutation: str,
+        individ_g: NDArray[np.float32],
+        fitness_g_i: np.float32,
+        MR: float,
+        CR: float,
+    ) -> NDArray[np.float32]:
+        selection_func, tour_size = self._selection_pool[specified_selection]
+        crossover_func, quantity = self._crossover_pool[specified_crossover]
+        mutation_func = self._mutation_pool[specified_mutation]
+
+        selected_id = selection_func(
+            self._fitness_scale_i,
+            self._fitness_rank_i,
+            np.int64(tour_size),
+            np.int64(quantity),
         )
 
-    def _adapt(self: SelfCSHAGP) -> None:
-        s_fittest_oper = self._find_fittest_operator(self._selection_operators, self._fitness_i)
-        self._selection_proba = self._get_new_proba(
-            self._selection_proba, s_fittest_oper, self._thresholds["selection"]
-        )
+        previous_fitness = self._choice_parent(np.append(self._fitness_i[selected_id], fitness_g_i))
+        self._previous_fitness_i.append(previous_fitness)
 
-        c_fittest_oper = self._find_fittest_operator(self._crossover_operators, self._fitness_i)
-        self._crossover_proba = self._get_new_proba(
-            self._crossover_proba, c_fittest_oper, self._thresholds["crossover"]
-        )
+        second_parent = self._population_g_i[selected_id].copy()
 
-        m_fittest_oper = self._find_fittest_operator(self._mutation_operators, self._fitness_i)
-        self._mutation_proba = self._get_new_proba(
-            self._mutation_proba, m_fittest_oper, self._thresholds["mutation"]
+        offspring = crossover_func(
+            individ_g,
+            second_parent,
+            self._fitness_scale_i[selected_id],
+            self._fitness_rank_i[selected_id],
+            self._max_level,
+            CR,
         )
-
-        self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
-        self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
-        self._mutation_operators = self._choice_operators(proba_dict=self._mutation_proba)
+        mutant = mutation_func(offspring, self._uniset, MR, self._max_level)
+        return mutant
 
     def _get_new_population(self: SelfCSHAGP) -> None:
         get_new_individ_g = partial(
@@ -296,6 +274,7 @@ class SelfCSHAGP(CSHAGP):
                     specified_crossover=self._crossover_operators[i],
                     specified_mutation=self._mutation_operators[i],
                     individ_g=self._population_g_i[i],
+                    fitness_g_i=self._fitness_i[i],
                     MR=self._MR[i],
                     CR=self._CR[i],
                 )

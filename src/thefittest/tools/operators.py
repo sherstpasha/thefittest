@@ -627,7 +627,7 @@ def uniform_rank_crossoverSHAGP(
     common, border = common_region(all_members)
 
     pool_stage_1 = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
-    pool_stage_2 = random_weighted_sample(weights=fitness, quantity=len(common[0]), replace=True)
+    pool_stage_2 = random_weighted_sample(weights=rank, quantity=len(common[0]), replace=True)
     all_members_pool = pool_stage_1 * pool_stage_2 + pool_stage_1
 
     for i, common_0_i in enumerate(common[0]):

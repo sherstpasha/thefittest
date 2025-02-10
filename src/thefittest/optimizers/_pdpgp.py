@@ -41,7 +41,17 @@ class PDPGP(GeneticProgramming, PDPGA):
             "tournament_5",
             "tournament_7",
         ),
-        crossovers: Tuple[str, ...] = ("gp_standart", "gp_one_point", "gp_uniform_rank_2"),
+        crossovers: Tuple[str, ...] = (
+            "empty",
+            "gp_standart",
+            "gp_one_point",
+            "gp_uniform_2",
+            "gp_uniform_2",
+            "gp_uniform_rank_2",
+            "gp_uniform_rank_7",
+            "gp_uniform_tour_3",
+            "gp_uniform_tour_7",
+        ),
         mutations: Tuple[str, ...] = (
             "gp_weak_point",
             "gp_average_point",

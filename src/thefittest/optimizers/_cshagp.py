@@ -87,7 +87,7 @@ class CSHAGP(SHAGA):
         self._max_level: int = max_level
         self._init_level: int = init_level
         self._H_MR = np.full(self._H_size, 0.1, dtype=np.float32)
-        self._H_CR = np.full(self._H_size, 0.5, dtype=np.float32)
+        self._H_CR = np.full(self._H_size, 0.9, dtype=np.float32)
         self._parents_num: int = parents_num
         self._tour_size: int = tour_size
         self._specified_selection: str = selection

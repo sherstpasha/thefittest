@@ -1,5 +1,5 @@
 from collections import defaultdict
-from thefittest.optimizers._selfcshagp import SelfCSHAGP
+from thefittest.optimizers._pdpshagp import PDPSHAGP
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -70,7 +70,7 @@ def fitness_function(trees):
     return np.array(fitness, dtype=np.float32)
 
 
-optimizer = SelfCSHAGP(
+optimizer = PDPSHAGP(
     fitness_function=fitness_function,
     uniset=uniset,
     pop_size=population_size,
@@ -133,4 +133,4 @@ ax[2][0].plot(range(number_of_iterations), np.array(stats["H_MR"]).mean(axis=1))
 ax[2][1].plot(range(number_of_iterations), np.array(stats["H_CR"]).mean(axis=1))
 
 plt.tight_layout()
-plt.savefig("selfcshagp.png")
+plt.savefig("pdpshagp.png")

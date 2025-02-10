@@ -24,6 +24,7 @@ from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..tools.metrics import coefficient_determination
+from ..tools.metrics import root_mean_square_error
 from ..tools.operators import Add
 from ..tools.operators import Cos
 from ..tools.operators import Inv
@@ -37,7 +38,7 @@ def fitness_function(trees: NDArray, y: NDArray[np.float32]) -> NDArray[np.float
     fitness = []
     for tree in trees:
         y_pred = tree() * np.ones(len(y))
-        fitness.append(coefficient_determination(y, y_pred.astype(np.float32)))
+        fitness.append(root_mean_square_error(y, y_pred.astype(np.float32)))
     return np.array(fitness, dtype=np.float32)
 
 
@@ -137,6 +138,7 @@ class SymbolicRegressionGP(Model):
 
         optimizer_args["fitness_function"] = fitness_function
         optimizer_args["fitness_function_args"] = {"y": y}
+        optimizer_args["minimization"] = True
         optimizer_args["iters"] = self._iters
         optimizer_args["pop_size"] = self._pop_size
         optimizer_args["uniset"] = uniset
