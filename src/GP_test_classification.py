@@ -46,7 +46,7 @@ os.makedirs("results", exist_ok=True)
 # Параметры эксперимента
 # ---------------------------
 number_of_iterations = 1000  # для SymbolicClassificationGP
-population_size = 300        # для SymbolicClassificationGP
+population_size = 100        # для SymbolicClassificationGP
 num_runs = 100               # число запусков (итераций) для каждого датасета и каждого метода
 
 # ---------------------------
@@ -64,8 +64,16 @@ datasets = {
 # Методы из sklearn: словарь (название: класс)
 # ---------------------------
 sklearn_methods = {
-    # Здесь можно добавить методы из sklearn, если потребуется
-    # Например: "KNN": KNeighborsClassifier, и т.д.
+    "KNN": KNeighborsClassifier,
+    "DecisionTree": DecisionTreeClassifier,
+    "RandomForest": RandomForestClassifier,
+    "MLP": MLPClassifier,
+    "LogisticRegression": LogisticRegression,
+    "SVC": SVC,
+    "GradientBoosting": GradientBoostingClassifier,
+    "AdaBoost": AdaBoostClassifier,
+    "ExtraTrees": ExtraTreesClassifier,
+    "GaussianNB": GaussianNB,
 }
 
 # ---------------------------
@@ -84,7 +92,17 @@ abbr = {}
 abbr["SelfCSHAGP"] = "SCSH"
 abbr["PDPSHAGP"] = "PDPSH"
 abbr["SelfCGP"] = "SCGP"
-abbr["PDPGP"] = "PDPG"
+abbr["PDPGP"] = "PDPGP"
+abbr["KNN"] = "KNN"
+abbr["DecisionTree"] = "DT"
+abbr["RandomForest"] = "RF"
+abbr["MLP"] = "MLP"
+abbr["LogisticRegression"] = "LR"
+abbr["SVC"] = "SVC"
+abbr["GradientBoosting"] = "GB"
+abbr["AdaBoost"] = "AB"
+abbr["ExtraTrees"] = "ET"
+abbr["GaussianNB"] = "GNB"
 
 # Объединяем имена методов (в данном примере используются только символические)
 combined_methods = list(sklearn_methods.keys()) + list(symbolic_methods.keys())
@@ -146,14 +164,12 @@ def run_single_run_symbolic(dataset_name, iteration, method):
             iters=number_of_iterations,
             pop_size=population_size,
             optimizer=optimizer_class,
-            optimizer_args={"elitism": True, "keep_history": True},
+            optimizer_args={"elitism": False, "keep_history": True},
         )
         model.fit(X_train, y_train)
-        train_pred_cont = model.predict(X_train)
-        test_pred_cont = model.predict(X_test)
-        # Порог для преобразования непрерывных предсказаний в классы
-        train_pred = (train_pred_cont >= 0.5).astype(int)
-        test_pred = (test_pred_cont >= 0.5).astype(int)
+        train_pred = model.predict(X_train)
+        test_pred = model.predict(X_test)
+
         train_f1 = f1_score(y_train, train_pred, average='macro')
         test_f1 = f1_score(y_test, test_pred, average='macro')
         print(f"Symbolic: {dataset_name}, iter {iteration}, {method} -> train_f1: {train_f1:.4f}, test_f1: {test_f1:.4f}")

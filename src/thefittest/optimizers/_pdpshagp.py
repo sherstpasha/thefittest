@@ -120,11 +120,11 @@ class PDPSHAGP(SelfCSHAGP):
             "tournament_7",
         ),
         crossovers: Tuple[str, ...] = (
-            "empty",
+            #"empty",
             "gp_standart",
             "gp_one_point",
             "gp_uniform_2",
-            "gp_uniform_2",
+            "gp_uniform_7",
             "gp_uniform_rank_2",
             "gp_uniform_rank_7",
             "gp_uniform_tour_3",
