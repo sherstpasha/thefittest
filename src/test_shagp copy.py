@@ -32,8 +32,7 @@ noise_percentage = 0.1  # добавляем шум 5% (уровень шума)
 # Список тестовых функций: F1, F2, ..., F17
 functions_list = [f"F{i}" for i in range(1, 18)]
 # Список методов (оптимизаторов)
-#methods = ["SelfCGP", "PDPGP", "SelfCSHAGP", "PDPSHAGP"]
-methods = ["SelfCSHAGP_noadj", "PDPSHAGP_noadj"]
+methods = ["SelfCGP", "PDPGP", "SelfCSHAGP", "PDPSHAGP"]
 
 # Словарь сокращений для названий методов, чтобы итоговое имя листа не превышало 31 символа.
 abbr = {"SelfCGP": "SCGP", "PDPGP": "PDPG", "SelfCSHAGP_noadj": "SCSH", "PDPSHAGP_noadj": "PDPSH"}

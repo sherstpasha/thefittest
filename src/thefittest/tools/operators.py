@@ -1026,6 +1026,29 @@ class More(Operator):
         return result
 
 
+class Arcsin(Operator):
+    def __init__(self) -> None:
+        super().__init__(formula="arcsin({})", name="arcsin", sign="arcsin")
+
+    def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        # Арксинус определён только на промежутке [-1, 1].
+        # Используем np.clip, чтобы обрезать значения вне допустимого диапазона,
+        # что предотвратит появление NaN.
+        if isinstance(x, np.ndarray):
+            x_clipped = np.clip(x, -1, 1)
+        else:
+            x_clipped = max(min(x, 1), -1)
+        return np.arcsin(x_clipped)
+
+
+class Tanh(Operator):
+    def __init__(self) -> None:
+        super().__init__(formula="tanh({})", name="tanh", sign="tanh")
+
+    def __call__(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        return np.tanh(x)
+
+
 # Activation functions
 @njit(float32[:, :](float32[:, :]))
 def softmax_numba(X: NDArray[np.float32]) -> NDArray[np.float32]:

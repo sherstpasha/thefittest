@@ -120,7 +120,7 @@ class PDPSHAGP(SelfCSHAGP):
             "tournament_7",
         ),
         crossovers: Tuple[str, ...] = (
-            #"empty",
+            "empty",
             "gp_standart",
             "gp_one_point",
             "gp_uniform_2",
@@ -130,7 +130,7 @@ class PDPSHAGP(SelfCSHAGP):
             "gp_uniform_tour_3",
             "gp_uniform_tour_7",
         ),
-        mutations: Tuple[str, ...] = ("point", "grow"),
+        mutations: Tuple[str, ...] = ("point", "grow", "swap", "shrink"),
         selection_threshold_proba: float = 0.05,
         crossover_threshold_proba: float = 0.05,
         mutation_threshold_proba: float = 0.05,

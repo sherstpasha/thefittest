@@ -25,13 +25,17 @@ from ..optimizers import SelfCGP
 from ..optimizers import jDE
 from ..tools.metrics import coefficient_determination
 from ..tools.metrics import root_mean_square_error
-from ..tools.operators import Add
-from ..tools.operators import Cos
-from ..tools.operators import Inv
-from ..tools.operators import Mul
-from ..tools.operators import Neg
-from ..tools.operators import Pow2
-from ..tools.operators import Sin
+from thefittest.tools.operators import (
+    Mul,
+    Add,
+    Div,
+    Sin,
+    Exp,
+    Sub,
+    SqrtAbs,
+    LogAbs,
+    Cos,
+)
 
 
 def fitness_function(trees: NDArray, y: NDArray[np.float32]) -> NDArray[np.float32]:
@@ -79,12 +83,14 @@ class SymbolicRegressionGP(Model):
 
         functional_set = (
             FunctionalNode(Add()),
+            FunctionalNode(Sub()),
             FunctionalNode(Mul()),
-            FunctionalNode(Neg()),
-            FunctionalNode(Inv()),
-            FunctionalNode(Pow2()),
-            FunctionalNode(Cos()),
+            FunctionalNode(Div()),
+            FunctionalNode(SqrtAbs()),
+            FunctionalNode(Exp()),
+            FunctionalNode(LogAbs()),
             FunctionalNode(Sin()),
+            FunctionalNode(Cos()),
         )
         terminal_set = [TerminalNode(X[:, i], f"x{i}") for i in range(n_dimension)]
         terminal_set.extend([EphemeralNode(generator1), EphemeralNode(generator2)])

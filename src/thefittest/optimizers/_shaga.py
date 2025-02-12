@@ -165,7 +165,7 @@ class SHAGA(EvolutionaryAlgorithm):
 
         self._H_MR[next_k] = self._update_u(self._H_MR[self._k], succeses_MR, d_fitness)
         self._H_CR[next_k] = self._update_u(self._H_CR[self._k], succeses_CR, d_fitness)
-        print(self._H_CR[next_k])
+        # print(self._H_CR[next_k])
 
         if self._k == self._H_size - 1:
             self._k = 0
