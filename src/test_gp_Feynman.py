@@ -24,10 +24,10 @@ os.makedirs("results", exist_ok=True)
 # Параметры алгоритма и эксперимента
 number_of_iterations = 1000
 population_size = 100
-num_runs = 100  # число запусков для каждого файла (N)
+num_runs = 100 # число запусков для каждого файла (N)
 
 # Путь к папке с данными (файлы без расширения)
-data_folder = r"C:\Users\pasha\OneDrive\Рабочий стол\Feynman_with_units\Feynman_with_units"
+data_folder = r"C:\Users\USER\Desktop\Feynman120"
 # Получаем список файлов в папке (файлы не имеют расширения, но их можно прочитать с помощью np.loadtxt)
 files_list = [f for f in os.listdir(data_folder) if os.path.isfile(os.path.join(data_folder, f))]
 print("Найденные файлы:", files_list)
@@ -114,7 +114,7 @@ if __name__ == "__main__":
 
     # Формируем список задач: для каждого файла, для каждого запуска (итерация) и для каждого метода
     # Здесь для примера берутся первые 20 файлов (при необходимости можно обработать все)
-    for file_name in files_list[:20]:
+    for file_name in files_list[:]:
         for iteration in range(1, num_runs + 1):
             for method in methods:
                 tasks.append((file_name, iteration, method))
