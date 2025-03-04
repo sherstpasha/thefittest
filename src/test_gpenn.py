@@ -14,13 +14,14 @@ from thefittest.tools.print import print_nets
 from thefittest.tools.print import print_trees
 from thefittest.tools.print import print_ens
 from thefittest.optimizers import SelfCGP
+from thefittest.optimizers._selfcshagp import SelfCSHAGP
+from thefittest.optimizers._pdpshagp import PDPSHAGP
 from thefittest.optimizers import SelfCGA
 from thefittest.optimizers._selfcshaga import SelfCSHAGA
 from thefittest.benchmarks import UserKnowladgeDataset
 from thefittest.classifiers._gpnneclassifier_one_tree import (
     GeneticProgrammingNeuralNetStackingClassifier,
 )
-
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import minmax_scale
@@ -37,12 +38,12 @@ X_scaled = minmax_scale(X)
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
 
 model = GeneticProgrammingNeuralNetStackingClassifier(
-    iters=3,
-    pop_size=10,
-    optimizer=SelfCGP,
-    optimizer_args={"show_progress_each": 1, "n_jobs": 5},
+    iters=100,
+    pop_size=30,
+    optimizer=PDPSHAGP,
+    optimizer_args={"show_progress_each": 1, "n_jobs": 5, "max_level": 20},
     weights_optimizer=SHADE,
-    weights_optimizer_args={"iters": 100, "pop_size": 100, "no_increase_num": 10},
+    weights_optimizer_args={"iters": 300, "pop_size": 300, "no_increase_num": 30},
 )
 
 model.fit(X_train, y_train)

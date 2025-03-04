@@ -227,16 +227,24 @@ def train_ensemble(
     output_activation: str,
     offset: bool,
 ) -> NetEnsemble:
-    for net in ensemble._nets:
+
+    subsamples = create_bootstrap_subsamples(
+        X_train_ens, proba_train_ens, n_subsamples=len(ensemble._nets), seed=123
+    )
+
+    nets = []
+    for subsample, net in zip(subsamples, ensemble._nets):
         net = train_net(
             net=net,
-            X_train=X_train_ens,
-            proba_train=proba_train_ens,
+            X_train=subsample[0],
+            proba_train=subsample[1],
             weights_optimizer_args=weights_optimizer_args,
             weights_optimizer_class=weights_optimizer_class,
             fitness_function=fitness_function,
         )
+        nets.append(net)
 
+    ensemble._nets = nets
     X_meta = ensemble._get_meta_inputs(X_train_meta, offset=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X_meta = torch.tensor(X_meta, device=device, dtype=torch.float32)
@@ -287,6 +295,44 @@ def train_ensemble(
         )
 
         return ensemble.copy()
+
+
+def create_bootstrap_subsamples(X, y, n_subsamples, subsample_size=None, seed=42):
+    """
+    Создает n_subsamples бутстрап-подвыборок из данных X и y.
+
+    Аргументы:
+      X (torch.Tensor): Признаковая матрица.
+      y (torch.Tensor): Целевые значения.
+      n_subsamples (int): Число создаваемых подвыборок.
+      subsample_size (int, optional): Размер каждой подвыборки.
+                                      Если None, то берется полный размер X.
+      seed (int): Зерно для воспроизводимости разбиения.
+
+    Возвращает:
+      List[Tuple[torch.Tensor, torch.Tensor]]: Список кортежей (X_sub, y_sub)
+    """
+    n_samples = X.size(0)
+    if subsample_size is None:
+        subsample_size = n_samples
+
+    subsamples = []
+
+    # Основной генератор случайных чисел для воспроизводимости
+    base_generator = torch.Generator()
+    base_generator.manual_seed(seed)
+
+    # Получаем фиксированные стартовые состояния для каждой подвыборки,
+    # чтобы разбиение было одинаковым при одинаковом количестве подвыборок
+    seeds = [base_generator.seed() for _ in range(n_subsamples)]
+
+    for s in seeds:
+        gen = torch.Generator()
+        gen.manual_seed(s)
+        indices = torch.randint(0, n_samples, (subsample_size,), generator=gen)
+        subsamples.append((X[indices], y[indices]))
+
+    return subsamples
 
 
 class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetClassifier):

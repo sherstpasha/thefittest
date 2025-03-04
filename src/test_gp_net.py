@@ -15,8 +15,8 @@ y = data.get_y()
 
 X = torch.tensor(X, device=device, dtype=torch.float64)
 
-model = GeneticProgrammingNeuralNetClassifier(
-    iters=10,
+model = MLPEAClassifier(
+    iters=10000,
     pop_size=10,
     offset=True,
     optimizer_args={"show_progress_each": 1},
