@@ -95,13 +95,25 @@ def categorical_crossentropy3d(target, output3d, epsilon=1e-12):
     """
     Вычисляет категориальную кросс-энтропию для батча, где:
       - target имеет размер (n, m)
-      - output3d имеет размер (p, n, m) для p примеров
-    Возвращает тензор размера (p,), где для каждого примера считается:
-        loss[i] = -sum_{j,k} target[j,k] * log(output3d[i,j,k] + epsilon)
-    Параметр epsilon используется для численной устойчивости.
+      - output3d имеет размер (p, n, m) для p примеров.
+
+    Для каждого примера i считается:
+        loss[i] = mean( sum_{k} ( target[j,k] * (-log(output3d[i,j,k] + epsilon)) ) по k,
+                        усреднённое по j )
+
+    Это соответствует реализации на numba, где сначала берётся сумма по столбцам (axis=1),
+    а затем среднее по строкам.
+
+    Возвращается массив (тензор) размера (p,).
     """
-    # Если target имеет размер (n, m), а output3d – (p, n, m), PyTorch выполнит broadcast target до (p, n, m)
-    loss = -(target * torch.log(output3d + epsilon)).sum(dim=(1, 2))
+    # Обеспечиваем численную устойчивость
+    output3d = torch.clamp(output3d, 1e-7, 1 - 1e-7)
+    # Вычисляем потери для каждого элемента:
+    # 1. Вычисляем -log(output3d + epsilon)
+    # 2. Умножаем на target (broadcast до (p, n, m))
+    # 3. Суммируем по последней оси (axis=2) → получаем тензор размера (p, n)
+    # 4. Берём среднее по оси 1 → получаем тензор размера (p,)
+    loss = (target * (-torch.log(output3d + epsilon))).sum(dim=2).mean(dim=1)
     return loss.detach().cpu().numpy().astype(np.float32)
 
 

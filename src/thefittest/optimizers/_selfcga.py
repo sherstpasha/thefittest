@@ -66,6 +66,7 @@ class SelfCGA(GeneticAlgorithm):
         n_jobs: int = 1,
         fitness_function_args: Optional[Dict] = None,
         genotype_to_phenotype_args: Optional[Dict] = None,
+        fitness_update_eps: float = 0,
     ):
         GeneticAlgorithm.__init__(
             self,
@@ -88,6 +89,7 @@ class SelfCGA(GeneticAlgorithm):
             n_jobs=n_jobs,
             fitness_function_args=fitness_function_args,
             genotype_to_phenotype_args=genotype_to_phenotype_args,
+            fitness_update_eps=fitness_update_eps,
         )
 
         self._K: float = K

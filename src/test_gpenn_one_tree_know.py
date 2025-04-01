@@ -31,13 +31,18 @@ def run_experiment(run_id, output_dir):
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.1)
 
     model = GeneticProgrammingNeuralNetStackingClassifier(
-        iters=1,
-        pop_size=10,
+        iters=15,
+        pop_size=35,
         input_block_size=1,
         optimizer=SelfCGP,
-        optimizer_args={"show_progress_each": 1, "keep_history": True},
+        optimizer_args={"show_progress_each": 1, "keep_history": True, "n_jobs": 10},
         weights_optimizer=SelfCGA,
-        weights_optimizer_args={"iters": 300, "pop_size": 300, "no_increase_num": 100},
+        weights_optimizer_args={
+            "iters": 100000,
+            "pop_size": 300,
+            "no_increase_num": 50,
+            "fitness_update_eps": 0.0001,
+        },
         test_sample_ratio=0.25,
     )
 
@@ -121,5 +126,5 @@ def run_multiple_experiments(n_runs, output_dir):
 
 if __name__ == "__main__":
     output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\one_tree_know"
-    n_runs = 5  # Number of runs you want to perform
+    n_runs = 20  # Number of runs you want to perform
     run_multiple_experiments(n_runs, output_dir)

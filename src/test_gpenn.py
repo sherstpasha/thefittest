@@ -41,9 +41,9 @@ model = GeneticProgrammingNeuralNetStackingClassifier(
     iters=100,
     pop_size=30,
     optimizer=PDPSHAGP,
-    optimizer_args={"show_progress_each": 1, "n_jobs": 5, "max_level": 20},
+    optimizer_args={"show_progress_each": 1, "n_jobs": 5, "max_level": 20, "no_increase_num": 30},
     weights_optimizer=SHADE,
-    weights_optimizer_args={"iters": 300, "pop_size": 300, "no_increase_num": 30},
+    weights_optimizer_args={"iters": 500, "pop_size": 500, "no_increase_num": 30},
 )
 
 model.fit(X_train, y_train)

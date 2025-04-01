@@ -112,6 +112,7 @@ def run_multiple_experiments(n_runs, n_processes, output_dir):
         f.write(f"Average F1 Score: {avg_f1}\n")
 
 
+q
 if __name__ == "__main__":
     output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\two_tree_know"
     n_runs = 20  # Number of runs you want to perform

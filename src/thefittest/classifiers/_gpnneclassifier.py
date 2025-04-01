@@ -61,7 +61,7 @@ def fitness_function(
     fitness = np.empty(shape=len(population), dtype=np.float32)
     for i, ensemble in enumerate(population):
         output2d = ensemble.meta_output(X)
-        fitness[i] = categorical_crossentropy(targets, output2d)
+        fitness[i] = categorical_crossentropy(targets.cpu().numpy(), output2d.cpu().numpy())
 
     return fitness
 
@@ -169,6 +169,9 @@ def genotype_to_phenotype(
     return population_ph
 
 
+import torch
+
+
 def train_ensemble(
     ensemble: NetEnsemble,
     X_train_ens: NDArray[np.float32],
@@ -181,21 +184,38 @@ def train_ensemble(
     output_activation: str,
     offset: bool,
 ) -> NetEnsemble:
-    for net in ensemble._nets:
-        net = train_net(
+    # Создаем бутстрап-подвыборки для участников
+    subsamples = create_bootstrap_subsamples(
+        X_train_ens, proba_train_ens, n_subsamples=len(ensemble._nets), seed=123
+    )
+    print("Участники:")
+    nets = []
+    for subsample, net in zip(subsamples, ensemble._nets):
+        trained_net = train_net(
             net=net,
-            X_train=X_train_ens,
-            proba_train=proba_train_ens,
+            X_train=subsample[0],
+            proba_train=subsample[1],
             weights_optimizer_args=weights_optimizer_args,
             weights_optimizer_class=weights_optimizer_class,
             fitness_function=fitness_function,
         )
+        nets.append(trained_net)
+    ensemble._nets = nets
 
+    # Формируем метапризнаки
     X_meta = ensemble._get_meta_inputs(X_train_meta, offset=True)
-    y_meta = np.argmax(proba_train_meta, axis=1)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    X_meta = torch.tensor(X_meta, device=device, dtype=torch.float32)
+
+    # Преобразуем мета-таргеты для вычисления числа классов
+    if isinstance(proba_train_meta, torch.Tensor):
+        proba_train_meta_np = proba_train_meta.cpu().numpy()
+    else:
+        proba_train_meta_np = proba_train_meta
+    y_meta = np.argmax(proba_train_meta_np, axis=1)
 
     tree = ensemble._meta_tree
-
+    print("Мета-модель:")
     if tree is not None:
         meta_net = genotype_to_phenotype_tree(
             tree=tree,
@@ -204,9 +224,7 @@ def train_ensemble(
             output_activation=output_activation,
             offset=offset,
         )
-
         meta_net._offset = True
-
         ensemble._meta_algorithm = train_net(
             net=meta_net,
             X_train=X_meta,
@@ -215,10 +233,47 @@ def train_ensemble(
             weights_optimizer_class=weights_optimizer_class,
             fitness_function=fitness_function,
         )
-
         return ensemble.copy()
     else:
         raise ValueError("Meta_net is None")
+
+
+def create_bootstrap_subsamples(X, y, n_subsamples, subsample_size=None, seed=42):
+    """
+    Создает n_subsamples бутстрап-подвыборок из данных X и y.
+
+    Аргументы:
+      X (torch.Tensor): Признаковая матрица.
+      y (torch.Tensor): Целевые значения.
+      n_subsamples (int): Число создаваемых подвыборок.
+      subsample_size (int, optional): Размер каждой подвыборки.
+                                      Если None, то берется полный размер X.
+      seed (int): Зерно для воспроизводимости разбиения.
+
+    Возвращает:
+      List[Tuple[torch.Tensor, torch.Tensor]]: Список кортежей (X_sub, y_sub)
+    """
+    n_samples = X.size(0)
+    if subsample_size is None:
+        subsample_size = n_samples
+
+    subsamples = []
+
+    # Основной генератор случайных чисел для воспроизводимости
+    base_generator = torch.Generator()
+    base_generator.manual_seed(seed)
+
+    # Получаем фиксированные стартовые состояния для каждой подвыборки,
+    # чтобы разбиение было одинаковым при одинаковом количестве подвыборок
+    seeds = [base_generator.seed() for _ in range(n_subsamples)]
+
+    for s in seeds:
+        gen = torch.Generator()
+        gen.manual_seed(s)
+        indices = torch.randint(0, n_samples, (subsample_size,), generator=gen)
+        subsamples.append((X[indices], y[indices]))
+
+    return subsamples
 
 
 class TwoTreeGeneticProgramming(GeneticAlgorithm):
@@ -510,7 +565,7 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
 
         if self._offset:
             terminal_set.append(
-                TerminalNode(value={(n_dimension)}, name="in{}".format(len(variables_pool)))
+                TerminalNode(value={n_dimension}, name="in{}".format(len(variables_pool)))
             )
         terminal_set.append(EphemeralNode(random_hidden_block))
 
@@ -606,16 +661,22 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
         X: NDArray[np.float32],
         y: NDArray[Union[np.float32, np.int64]],
     ) -> GeneticProgrammingNeuralNetStackingClassifier:
+        # Если используется offset, добавляем столбец единиц
         if self._offset:
             X = np.hstack([X.copy(), np.ones((X.shape[0], 1))])
 
         n_outputs: int = len(set(y))
         eye: NDArray[np.float32] = np.eye(n_outputs, dtype=np.float32)
 
+        # Определяем устройство (GPU, если доступно)
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print("Device:", device)
+
+        # Делим данные на обучающие и тестовые
         X_train, X_test, y_train, y_test = train_test_split_stratified(
             X, y.astype(np.int64), self._test_sample_ratio
         )
-
+        # Дополнительное разделение для участников ансамбля и метамодели
         X_train_ens, X_train_meta, y_train_ens, y_train_meta = train_test_split_stratified(
             X_train, y_train, 0.5
         )
@@ -624,6 +685,16 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
         proba_train_ens: NDArray[np.float32] = eye[y_train_ens]
         proba_train_meta: NDArray[np.float32] = eye[y_train_meta]
 
+        # Преобразуем все данные в тензоры на нужном устройстве
+        X_train_ens = torch.tensor(X_train_ens, device=device, dtype=torch.float32)
+        X_train_meta = torch.tensor(X_train_meta, device=device, dtype=torch.float32)
+        X_test = torch.tensor(X_test, device=device, dtype=torch.float32)
+        proba_test = torch.tensor(proba_test, device=device, dtype=torch.float32)
+        proba_train_ens = torch.tensor(proba_train_ens, device=device, dtype=torch.float32)
+        proba_train_meta = torch.tensor(proba_train_meta, device=device, dtype=torch.float32)
+
+        # Здесь используется _get_uniset_1 – этот метод остаётся неизменным,
+        # также, если в коде есть _get_uniset_2, он сохраняется.
         self._optimizer = self._define_optimizer_ensembles(
             uniset_1=self._get_uniset_1(X),
             uniset_2=self._get_uniset_2(),
@@ -637,16 +708,19 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
             fitness_function=fitness_function,
             evaluate_nets=evaluate_nets,
         )
-
         self._optimizer.fit()
-
         return self
 
-    def _predict(self, X: NDArray[np.float32]) -> NDArray[Union[np.float32, np.int64]]:
+    def _predict(
+        self: GeneticProgrammingNeuralNetClassifier, X: NDArray[np.float32]
+    ) -> NDArray[Union[np.float32, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
-
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # Преобразуем входные данные в тензор
+        X_tensor = torch.tensor(X, device=device, dtype=torch.float32)
         fittest = self._optimizer.get_fittest()
-        output = fittest["phenotype"].meta_output(X)
-
-        return np.argmax(output, axis=1)
+        # Вычисляем выход модели через forward (предполагается, что метод forward возвращает кортеж, где первый элемент – выход)
+        output = fittest["phenotype"].forward(X_tensor)[0]
+        # Возвращаем предсказанные классы
+        return np.argmax(output.cpu().numpy(), axis=1)

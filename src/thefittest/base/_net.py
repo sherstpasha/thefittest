@@ -485,7 +485,7 @@ class NetEnsemble:
         if offset:
             X_input = np.hstack([X_input, np.ones((X_input.shape[0], 1))])
 
-        return X_input
+        return X_input, outputs
 
     def meta_output(
         self: NetEnsemble,
@@ -494,7 +494,7 @@ class NetEnsemble:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         if self._meta_algorithm is not None:
-            X_input = self._get_meta_inputs(X, offset=self._meta_algorithm._offset)
+            X_input, _ = self._get_meta_inputs(X, offset=self._meta_algorithm._offset)
             X_input = torch.tensor(X_input, device=device, dtype=torch.float32)
             output = self._meta_algorithm.forward(X=X_input)[0]
             return output

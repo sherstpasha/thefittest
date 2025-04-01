@@ -18,6 +18,7 @@ banknote_data = np.loadtxt(path + "banknote_dataset.txt", delimiter=",")
 twonorm_data = np.loadtxt(path + "twonorm_dataset.txt", delimiter=",")
 ringnorm_data = np.loadtxt(path + "ringnorm_dataset.txt", delimiter="\t")
 texture_data = np.loadtxt(path + "texture_dataset.txt", delimiter=",")
+adult_data = np.loadtxt(path + "processed_adult_data.txt", delimiter="\t", skiprows=1)
 
 
 class Dataset:
@@ -217,6 +218,23 @@ class TwoNormDataset(Dataset):
             y=twonorm_data[:, -1].astype(np.int64),
             X_names={i: f"A{i+1}" for i in range(twonorm_data.shape[1] - 1)},
             y_names={0: "Class 1", 1: "Class 2"},
+        )
+
+
+with open(path + "processed_adult_data.txt", "r") as f:
+    header = f.readline().strip().split("\t")
+
+
+class AdultCensusDataset(Dataset):
+    """Dataset class for the processed Adult Census Income data."""
+
+    def __init__(self) -> None:
+        Dataset.__init__(
+            self,
+            X=adult_data[:, :-1].astype(np.float32),
+            y=adult_data[:, -1].astype(np.int64),
+            X_names={i: header[i] for i in range(adult_data.shape[1] - 1)},
+            y_names={0: "≤50K", 1: ">50K"},
         )
 
 

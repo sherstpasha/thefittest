@@ -71,7 +71,7 @@ def _defitne_net(
     for n_layer in hidden_layers:
         start = end
         end = end + n_layer
-        inputs_id = {(n_inputs - 1)}
+        inputs_id = {n_inputs - 1}
         hidden_id = set(range(start, end))
         activs = dict(zip(hidden_id, [ACTIV_NAME_INV[activation]] * len(hidden_id)))
 
@@ -84,7 +84,7 @@ def _defitne_net(
 
     start = end
     end = end + n_outputs
-    inputs_id = {(n_inputs - 1)}
+    inputs_id = {n_inputs - 1}
     output_id = set(range(start, end))
     activs = dict(zip(output_id, [ACTIV_NAME_INV[output_activation]] * len(output_id)))
 
@@ -108,7 +108,7 @@ def fitness_function(
     for i, ensemble in enumerate(population):
         output2d = ensemble.meta_output(X)
         fitness[i] = categorical_crossentropy(targets.cpu().numpy(), output2d.cpu().numpy())
-
+        print(i, fitness[i])
     return fitness
 
 
@@ -231,7 +231,7 @@ def train_ensemble(
     subsamples = create_bootstrap_subsamples(
         X_train_ens, proba_train_ens, n_subsamples=len(ensemble._nets), seed=123
     )
-
+    print("Участники на обучении:")
     nets = []
     for subsample, net in zip(subsamples, ensemble._nets):
         net = train_net(
@@ -245,11 +245,15 @@ def train_ensemble(
         nets.append(net)
 
     ensemble._nets = nets
-    X_meta = ensemble._get_meta_inputs(X_train_meta, offset=True)
+    X_meta, outputs = ensemble._get_meta_inputs(X_train_meta, offset=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X_meta = torch.tensor(X_meta, device=device, dtype=torch.float32)
 
     y_meta = np.argmax(proba_train_meta.cpu().numpy(), axis=1)
+
+    print("Ошибки обученных участников на новых данных:")
+    for i, output in enumerate(outputs):
+        print(f"Участник {i}:", categorical_crossentropy(proba_train_meta.cpu().numpy(), output))
 
     tree = ensemble._meta_tree
 
@@ -263,7 +267,7 @@ def train_ensemble(
         )
 
         meta_net._offset = True
-
+        print("Обученная мета-модель на новых данных:")
         ensemble._meta_algorithm = train_net(
             net=meta_net,
             X_train=X_meta,
@@ -284,7 +288,7 @@ def train_ensemble(
             offset=True,
             output_activation="softmax",
         )
-
+        print("Мета-модель:")
         ensemble._meta_algorithm = train_net(
             net=meta_net,
             X_train=X_meta,
@@ -401,7 +405,7 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
 
         if self._offset:
             terminal_set.append(
-                TerminalNode(value={(n_dimension)}, name="in{}".format(len(variables_pool)))
+                TerminalNode(value={n_dimension}, name="in{}".format(len(variables_pool)))
             )
         terminal_set.append(EphemeralNode(random_hidden_block))
 
@@ -482,6 +486,7 @@ class GeneticProgrammingNeuralNetStackingClassifier(GeneticProgrammingNeuralNetC
         eye: NDArray[np.float32] = np.eye(n_outputs, dtype=np.float32)
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print(device)
 
         X_train, X_test, y_train, y_test = train_test_split_stratified(
             X, y.astype(np.int64), self._test_sample_ratio

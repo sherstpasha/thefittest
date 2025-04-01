@@ -170,6 +170,12 @@ def train_net(
     phenotype = optimizer.get_fittest()["phenotype"]
     net._weights = phenotype
 
+    print(
+        "optimizer.get_fittest()[fitnes]",
+        optimizer.get_fittest()["fitness"],
+        optimizer.get_remains_calls(),
+    )
+
     return net.copy()
 
 
@@ -235,7 +241,7 @@ class GeneticProgrammingNeuralNetClassifier(Model):
         ]
         if self._offset:
             terminal_set.append(
-                TerminalNode(value={(n_dimension)}, name="in{}".format(len(variables_pool)))
+                TerminalNode(value={n_dimension}, name="in{}".format(len(variables_pool)))
             )
         terminal_set.append(EphemeralNode(random_hidden_block))
 
