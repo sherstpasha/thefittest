@@ -106,11 +106,11 @@ def run_experiment(run_id, output_dir):
     return f1
 
 
-def run_multiple_experiments(n_runs, output_dir):
+def run_multiple_experiments(n_runs, output_dir, start_run=0):
     start_time = time.time()
 
     f1_scores = []
-    for i in range(n_runs):
+    for i in range(start_run, n_runs):
         f1 = run_experiment(i, output_dir)
         f1_scores.append(f1)
 
@@ -126,5 +126,5 @@ def run_multiple_experiments(n_runs, output_dir):
 
 if __name__ == "__main__":
     output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results2\one_tree_know"
-    n_runs = 20  # Number of runs you want to perform
-    run_multiple_experiments(n_runs, output_dir)
+    n_runs = 30  # Теперь у вас 30 запусков
+    run_multiple_experiments(n_runs, output_dir, start_run=20)  # Начинаем с 20 по 29
