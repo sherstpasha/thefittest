@@ -24,6 +24,8 @@ import cloudpickle
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from sklearn.preprocessing import MinMaxScaler
+
 
 INPUT_COLOR_CODE = (0.11, 0.67, 0.47, 1)
 HIDDEN_COLOR_CODE = (0.0, 0.74, 0.99, 1)
@@ -440,11 +442,13 @@ class HiddenBlock:
 
 
 class NetEnsemble:
-    def __init__(self, nets: NDArray, meta_algorithm: Optional[Net] = None):
+    def __init__(self, nets: NDArray, meta_algorithm: Optional[Net] = None, use_scale=False):
         self._nets = nets
         self._meta_algorithm = meta_algorithm
         self._meta_tree = None
         self._trees = None
+        self._use_scale = use_scale
+        self._meta_scaler = None
 
     def __len__(self) -> int:
         return len(self._nets)
@@ -478,12 +482,27 @@ class NetEnsemble:
         return np.array(to_return, dtype=np.float32)
 
     def _get_meta_inputs(
-        self: NetEnsemble, X: NDArray[np.float32], offset: bool = True
-    ) -> NDArray[np.float32]:
+        self: "NetEnsemble", X: NDArray[np.float32], offset: bool = True
+    ) -> Tuple[NDArray[np.float32], List[NDArray[np.float32]]]:
+        # Получаем выходы участников ансамбля
         outputs = self.forward(X)[:, 0]
         X_input = np.concatenate(outputs, axis=1)
+
         if offset:
             X_input = np.hstack([X_input, np.ones((X_input.shape[0], 1))])
+
+        # Если включено масштабирование (use_scale True)
+        if self._use_scale:
+            # print(self._meta_scaler)
+            if self._meta_scaler is None:
+                # Если масштабировщик ещё не создан, создаём и обучаем его
+                self._meta_scaler = MinMaxScaler()
+                X_input = self._meta_scaler.fit_transform(X_input)
+                # print("_meta_scaler создан")
+            else:
+                # Если масштабировщик уже существует, просто применяем его
+                # print("_meta_scaler используется")
+                X_input = self._meta_scaler.transform(X_input)
 
         return X_input, outputs
 
@@ -494,6 +513,7 @@ class NetEnsemble:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         if self._meta_algorithm is not None:
+            # print("meta_output", self._meta_scaler, self._use_scale)
             X_input, _ = self._get_meta_inputs(X, offset=self._meta_algorithm._offset)
             X_input = torch.tensor(X_input, device=device, dtype=torch.float32)
             output = self._meta_algorithm.forward(X=X_input)[0]
@@ -511,6 +531,11 @@ class NetEnsemble:
 
         if self._trees is not None:
             copy_._trees = self._trees
+
+        if self._meta_scaler is not None:
+            copy_._meta_scaler = self._meta_scaler
+
+        copy_._use_scale = self._use_scale
 
         return copy_
 
