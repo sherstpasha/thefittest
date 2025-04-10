@@ -10,38 +10,10 @@ from sklearn.model_selection import train_test_split
 from thefittest.optimizers import SelfCGP, SelfCGA
 from thefittest.regressors._gpnneregression_one_tree import GeneticProgrammingNeuralNetStackingRegressor
 from thefittest.tools.print import print_tree, print_trees, print_net, print_nets, print_ens
-from thefittest.benchmarks import Dataset
+from thefittest.benchmarks import CombinedCycleDataset
 
 
-class CombinedCycleDataset(Dataset):
-    """Energy dataset for regression task.
 
-    Features:
-    - AT: Temperature (°C)
-    - V: Exhaust Vacuum (cm Hg)
-    - AP: Ambient Pressure (milibar)
-    - RH: Relative Humidity (%)
-
-    Target:
-    - PE: Energy Output (MW)
-    """
-
-    def __init__(self) -> None:
-        current_dir = os.path.dirname(__file__)
-        path = os.path.join(current_dir, "energy_data.csv")
-        data = np.loadtxt(path, delimiter=",")
-
-        super().__init__(
-            X=data[:, :4].astype(np.float32),
-            y=data[:, 4].astype(np.float32),
-            X_names={
-                0: "AT (Temperature, °C)",
-                1: "V (Exhaust Vacuum, cm Hg)",
-                2: "AP (Ambient Pressure, milibar)",
-                3: "RH (Relative Humidity, %)"
-            },
-            y_names={0: "not original", 1: "original"}
-        )
 
 
 def run_experiment(run_id, output_dir):
