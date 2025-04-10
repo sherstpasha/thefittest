@@ -18,8 +18,8 @@ from thefittest.benchmarks import CombinedCycleDataset
 
 def run_experiment(run_id, output_dir):
     dataset = CombinedCycleDataset()
-    X = minmax_scale(dataset.X)
-    y = dataset.y
+    X = minmax_scale(dataset.get_X())
+    y = dataset.get_y()
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 
