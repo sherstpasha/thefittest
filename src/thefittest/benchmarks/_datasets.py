@@ -201,7 +201,8 @@ class CombinedCycleDataset(Dataset):
     """
 
     def __init__(self) -> None:
-        super().__init__(
+        Dataset.__init__(
+            self,
             X=energy_data[:, :4].astype(np.float32),
             y=energy_data[:, 4].astype(np.float32),
             X_names={
