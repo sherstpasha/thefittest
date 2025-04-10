@@ -200,10 +200,10 @@ class CombinedCycleDataset(Dataset):
     - PE: Energy Output (MW)
     """
 
-    def __init__(self, data: np.ndarray) -> None:
+    def __init__(self) -> None:
         super().__init__(
-            X=data[:, :4].astype(np.float32),
-            y=data[:, 4].astype(np.float32),
+            X=energy_data[:, :4].astype(np.float32),
+            y=energy_data[:, 4].astype(np.float32),
             X_names={
                 0: "AT (Temperature, °C)",
                 1: "V (Exhaust Vacuum, cm Hg)",
