@@ -7,10 +7,10 @@ from sklearn.metrics import r2_score
 from sklearn.preprocessing import minmax_scale
 from sklearn.model_selection import train_test_split
 
-from thefittest.benchmarks import Dataset
 from thefittest.optimizers import SelfCGP, SelfCGA
 from thefittest.regressors._gpnneregression_one_tree import GeneticProgrammingNeuralNetStackingRegressor
 from thefittest.tools.print import print_tree, print_trees, print_net, print_nets, print_ens
+from thefittest.benchmarks import Dataset
 
 
 class CombinedCycleDataset(Dataset):
@@ -26,7 +26,11 @@ class CombinedCycleDataset(Dataset):
     - PE: Energy Output (MW)
     """
 
-    def __init__(self, data: np.ndarray) -> None:
+    def __init__(self) -> None:
+        current_dir = os.path.dirname(__file__)
+        path = os.path.join(current_dir, "energy_data.csv")
+        data = np.loadtxt(path, delimiter=",")
+
         super().__init__(
             X=data[:, :4].astype(np.float32),
             y=data[:, 4].astype(np.float32),
@@ -40,8 +44,8 @@ class CombinedCycleDataset(Dataset):
         )
 
 
-def run_experiment(run_id, output_dir, data: np.ndarray):
-    dataset = CombinedCycleDataset(data)
+def run_experiment(run_id, output_dir):
+    dataset = CombinedCycleDataset()
     X = minmax_scale(dataset.X)
     y = dataset.y
 
@@ -118,12 +122,10 @@ def run_experiment(run_id, output_dir, data: np.ndarray):
     return r2
 
 
-def run_multiple_experiments(n_runs, output_dir, data_path, start_run=0):
-    data = np.loadtxt(data_path, delimiter=",")
+def run_multiple_experiments(n_runs, output_dir, start_run=0):
     r2_scores = []
-
     for i in range(start_run, n_runs):
-        r2 = run_experiment(i, output_dir, data)
+        r2 = run_experiment(i, output_dir)
         r2_scores.append(r2)
 
     avg_r2 = np.mean(r2_scores)
@@ -135,6 +137,5 @@ def run_multiple_experiments(n_runs, output_dir, data_path, start_run=0):
 
 if __name__ == "__main__":
     output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results_regression_combined"
-    data_path = "energy_data.csv"  # файл должен быть рядом со скриптом
     n_runs = 1
-    run_multiple_experiments(n_runs, output_dir, data_path)
+    run_multiple_experiments(n_runs, output_dir)
