@@ -19,7 +19,7 @@ twonorm_data = np.loadtxt(path + "twonorm_dataset.txt", delimiter=",")
 ringnorm_data = np.loadtxt(path + "ringnorm_dataset.txt", delimiter="\t")
 texture_data = np.loadtxt(path + "texture_dataset.txt", delimiter=",")
 adult_data = np.loadtxt(path + "processed_adult_data.txt", delimiter="\t", skiprows=1)
-energy_data = np.loadtxt(path + "Folds_pp_cut.csv", delimiter=",")
+energy_data = np.loadtxt(path + "Folds_pp_cut.csv", delimiter="\t")
 
 class Dataset:
     def __init__(
