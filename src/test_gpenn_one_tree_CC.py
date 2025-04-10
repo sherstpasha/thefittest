@@ -1,36 +1,51 @@
 import os
 import matplotlib.pyplot as plt
+import numpy as np
+import cloudpickle
+
 from sklearn.metrics import r2_score
 from sklearn.preprocessing import minmax_scale
 from sklearn.model_selection import train_test_split
-from concurrent.futures import ProcessPoolExecutor
-import numpy as np
-from sklearn.datasets import load_diabetes
-import cloudpickle
 
-from thefittest.optimizers import SelfCGP
-from thefittest.optimizers import SelfCGA
-from thefittest.regressors._gpnneregression_one_tree import (
-    GeneticProgrammingNeuralNetStackingRegressor,
-)
-from thefittest.tools.print import (
-    print_net,
-    print_tree,
-    print_nets,
-    print_trees,
-    print_ens,
-)
+from thefittest.benchmarks import Dataset
+from thefittest.optimizers import SelfCGP, SelfCGA
+from thefittest.regressors._gpnneregression_one_tree import GeneticProgrammingNeuralNetStackingRegressor
+from thefittest.tools.print import print_tree, print_trees, print_net, print_nets, print_ens
 
 
-def run_experiment(run_id, output_dir):
-    data = load_diabetes()
-    X = data.data
-    y = data.target
+class CombinedCycleDataset(Dataset):
+    """Energy dataset for regression task.
 
-    X_scaled = minmax_scale(X)
-    # y_scaled = minmax_scale(y.reshape(-1, 1)).flatten()  # Масштабируем y
+    Features:
+    - AT: Temperature (°C)
+    - V: Exhaust Vacuum (cm Hg)
+    - AP: Ambient Pressure (milibar)
+    - RH: Relative Humidity (%)
 
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.1, random_state=42)
+    Target:
+    - PE: Energy Output (MW)
+    """
+
+    def __init__(self, data: np.ndarray) -> None:
+        super().__init__(
+            X=data[:, :4].astype(np.float32),
+            y=data[:, 4].astype(np.float32),
+            X_names={
+                0: "AT (Temperature, °C)",
+                1: "V (Exhaust Vacuum, cm Hg)",
+                2: "AP (Ambient Pressure, milibar)",
+                3: "RH (Relative Humidity, %)"
+            },
+            y_names={0: "not original", 1: "original"}
+        )
+
+
+def run_experiment(run_id, output_dir, data: np.ndarray):
+    dataset = CombinedCycleDataset(data)
+    X = minmax_scale(dataset.X)
+    y = dataset.y
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 
     model = GeneticProgrammingNeuralNetStackingRegressor(
         iters=20,
@@ -49,7 +64,6 @@ def run_experiment(run_id, output_dir):
     )
 
     model.fit(X_train, y_train)
-
     predict = model.predict(X_test)
     optimizer = model.get_optimizer()
 
@@ -100,23 +114,27 @@ def run_experiment(run_id, output_dir):
     with open(os.path.join(run_dir, "stat.pkl"), "wb") as file:
         cloudpickle.dump(stat, file)
 
-    print(run_id, "done")
+    print(f"Run {run_id} done - R2: {r2:.4f}")
     return r2
 
 
-def run_multiple_experiments(n_runs, n_processes, output_dir):
-    f1_scores = []
-    for i in range(n_runs):
-        f1 = run_experiment(i, output_dir)
-        f1_scores.append(f1)
+def run_multiple_experiments(n_runs, output_dir, data_path, start_run=0):
+    data = np.loadtxt(data_path, delimiter=",")
+    r2_scores = []
 
-    avg_f1 = np.mean(f1_scores)
+    for i in range(start_run, n_runs):
+        r2 = run_experiment(i, output_dir, data)
+        r2_scores.append(r2)
 
+    avg_r2 = np.mean(r2_scores)
     with open(os.path.join(output_dir, "average_r2_score.txt"), "w") as f:
-        f.write(f"Average r2 Score: {avg_f1}\n")
-        
+        f.write(f"Average R2 Score: {avg_r2}\n")
+
+    print(f"\nAll runs complete. Average R2: {avg_r2:.4f}")
+
+
 if __name__ == "__main__":
-    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results3\one_tree_diabetes"
+    output_dir = r"C:\Users\pasha\OneDrive\Рабочий стол\results_regression_combined"
+    data_path = "energy_data.csv"  # файл должен быть рядом со скриптом
     n_runs = 1
-    n_processes = 1
-    run_multiple_experiments(n_runs, n_processes, output_dir)
+    run_multiple_experiments(n_runs, output_dir, data_path)

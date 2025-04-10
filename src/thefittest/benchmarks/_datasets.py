@@ -19,7 +19,7 @@ twonorm_data = np.loadtxt(path + "twonorm_dataset.txt", delimiter=",")
 ringnorm_data = np.loadtxt(path + "ringnorm_dataset.txt", delimiter="\t")
 texture_data = np.loadtxt(path + "texture_dataset.txt", delimiter=",")
 adult_data = np.loadtxt(path + "processed_adult_data.txt", delimiter="\t", skiprows=1)
-
+energy_data = np.loadtxt("Folds_pp_cut.csv", delimiter=",")
 
 class Dataset:
     def __init__(
@@ -187,7 +187,31 @@ class UserKnowladgeDataset(Dataset):
             y_names={0: "Very Low", 1: "Low", 2: "Middle", 3: "High "},
         )
 
+class CombinedCycleDataset(Dataset):
+    """Energy dataset for regression task.
 
+    Features:
+    - AT: Temperature (°C)
+    - V: Exhaust Vacuum (cm Hg)
+    - AP: Ambient Pressure (milibar)
+    - RH: Relative Humidity (%)
+
+    Target:
+    - PE: Energy Output (MW)
+    """
+
+    def __init__(self, data: np.ndarray) -> None:
+        super().__init__(
+            X=data[:, :4].astype(np.float32),
+            y=data[:, 4].astype(np.float32),
+            X_names={
+                0: "AT (Temperature, °C)",
+                1: "V (Exhaust Vacuum, cm Hg)",
+                2: "AP (Ambient Pressure, milibar)",
+                3: "RH (Relative Humidity, %)"
+            },
+            y_names={0: "not original", 1: "original"}
+        )
 class BanknoteDataset(Dataset):
     """
     Lohweg,Volker. (2013). banknote authentication.
