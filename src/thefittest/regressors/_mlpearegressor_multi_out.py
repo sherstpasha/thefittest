@@ -14,10 +14,40 @@ from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
 from ..optimizers import DifferentialEvolution
 from ..optimizers import SHADE
 from ..optimizers import jDE
-from ..tools.metrics import root_mean_square_error2d, root_mean_square_error3d
+from ..tools.metrics import root_mean_square_error3d
 from ..tools.random import float_population
 from ..tools.transformations import GrayCode
 from ..base._net import ACTIV_NAME_INV
+import torch
+
+def root_mean_square_error3d(
+    y_true: torch.Tensor,
+    y_pred_3d: torch.Tensor
+) -> torch.Tensor:
+    """
+    Compute RMSE for a batch of 2D predictions against a single ground truth 2D array.
+
+    Args:
+        y_true (torch.Tensor): Ground truth of shape (T, V),
+            where T is the sequence length and V is the number of variables.
+        y_pred_3d (torch.Tensor): Predictions of shape (N, T, V),
+            where N is the number of prediction sets.
+
+    Returns:
+        torch.Tensor: A tensor of shape (N,) containing the RMSE for each
+        prediction set.
+    """
+    # Ensure float computations (and same device)
+    y_true = y_true.to(dtype=y_pred_3d.dtype, device=y_pred_3d.device)
+    # Compute squared errors, shape (N, T, V)
+    se = (y_pred_3d - y_true.unsqueeze(0)).pow(2)
+    # Mean square error per variable: shape (N, V)
+    mse_per_var = se.mean(dim=1)
+    # Average over variables: shape (N,)
+    mse = mse_per_var.mean(dim=1)
+    # RMSE: shape (N,)
+    rmse = torch.sqrt(mse)
+    return rmse
 
 
 def fitness_function(
@@ -28,7 +58,7 @@ def fitness_function(
 ) -> NDArray[np.float32]:
     output3d = net.forward(X, weights)
     # print(output2d.shape, targets.shape)
-    error = root_mean_square_error3d(targets, output3d)
+    error = root_mean_square_error3d(targets, output3d).cpu().numpy()
     return error
 
 
@@ -167,14 +197,17 @@ class MLPEARegressorMO(MLPEAClassifier):
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         n_inputs: int = X.shape[1]
         n_outputs: int = y.shape[1]
+        X = torch.tensor(X, device=device, dtype=torch.float32)
+        y = torch.tensor(y, device=device, dtype=torch.float32)
 
         self._net = self._defitne_net(n_inputs, n_outputs)
 
         print(self._net)
 
-        self._net._weights = self._train_net(self._net, X, y.astype(np.float32))
+        self._net._weights = self._train_net(self._net, X, y)
         return self
 
     def _predict(
@@ -182,7 +215,8 @@ class MLPEARegressorMO(MLPEAClassifier):
     ) -> NDArray[Union[np.float32, np.int64]]:
         if self._offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
-
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        X = torch.tensor(X, device=device, dtype=torch.float32)
         output = self._net.forward(X)[0]
         y_pred = output
-        return y_pred
+        return y_pred.cpu().numpy()
