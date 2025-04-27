@@ -237,10 +237,8 @@ def root_mean_square_error2d(y_true: torch.Tensor, y_predict2d: torch.Tensor) ->
     rmse = torch.sqrt(mse)  # корень из MSE
     return rmse
 
-def root_mean_square_error3d(
-    y_true: torch.Tensor,
-    y_pred_3d: torch.Tensor
-) -> torch.Tensor:
+
+def root_mean_square_error3d(y_true: torch.Tensor, y_pred_3d: torch.Tensor) -> torch.Tensor:
     """
     Compute RMSE for a batch of 2D predictions against a single ground truth 2D array.
 
@@ -265,6 +263,7 @@ def root_mean_square_error3d(
     # RMSE: shape (N,)
     rmse = torch.sqrt(mse)
     return rmse
+
 
 def evaluate_nets(
     weights: NDArray[np.float32],
@@ -312,16 +311,13 @@ def train_ensemble(
     # print(0, ensemble._meta_scaler)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X_meta = torch.tensor(X_meta, device=device, dtype=torch.float32)
-    
 
     y_meta = proba_train_meta.cpu().numpy()
 
     print("Ошибки обученных участников на новых данных:")
     for i, output in enumerate(outputs):
         output = torch.tensor(output, device=device, dtype=torch.float32)
-        print(
-            f"Участник {i}:", root_mean_square_error2d(proba_train_meta, output)
-        )
+    #        print(f"Участник {i}:", root_mean_square_error2d(proba_train_meta, output))
 
     tree = ensemble._meta_tree
 
@@ -557,11 +553,11 @@ class GeneticProgrammingNeuralNetStackingRegressorMO(GeneticProgrammingNeuralNet
         print(device)
 
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y.astype(np.int64), test_size=self._test_sample_ratio
+            X, y.astype(np.int64), test_size=self._test_sample_ratio, shuffle=False
         )
 
         X_train_ens, X_train_meta, y_train_ens, y_train_meta = train_test_split(
-            X_train, y_train, test_size=0.5
+            X_train, y_train, test_size=0.5, shuffle=False
         )
 
         #     proba_test: NDArray[np.float32] = eye[y_test]
