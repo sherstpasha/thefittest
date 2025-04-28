@@ -109,4 +109,24 @@ for run_number in range(21):
 
     print(f"✅ {run_dir} успешно обработан.\n")
 
+        # === Вычисляем метрики на тесте ===
+    metrics_test = {}
+
+    for i, target_name in enumerate(all_output_cols):
+        y_true_i = y_test[target_name].values
+        y_pred_i = y_test_pred_NN[target_name].values
+
+        metrics_test[target_name] = calculate_metrics(
+            y_true=y_true_i,
+            y_pred=y_pred_i,
+            y_train=y_train[target_name].values
+        )
+
+    # Сохраняем метрики по тесту
+    metrics_test_path = os.path.join(run_dir, "metrics_test.json")
+    with open(metrics_test_path, "w") as f:
+        json.dump(metrics_test, f, indent=4)
+
+    print(f"✅ Метрики на тесте сохранены для {run_dir}.\n")
+
 print("Все расчеты завершены!")
