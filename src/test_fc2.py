@@ -56,6 +56,7 @@ def run_experiment(run_id: int, base_output_dir="results_regressor"):
     X_test_df  = pd.read_csv(os.path.join(gpenn_run_dir, "X_test_NN.csv"))
     y_train_df = pd.read_csv(os.path.join(gpenn_run_dir, "y_train_NN.csv"))
     y_test_df  = pd.read_csv(os.path.join(gpenn_run_dir, "y_test_NN.csv"))
+    y_test_orig_df  = pd.read_csv("src\lookback_1h\y_test.csv")
 
     # Убираем столбец времени для обучения
     feature_names = [c for c in X_train_df.columns if c != "time_YYMMDD_HHMMSS"]
@@ -85,8 +86,8 @@ def run_experiment(run_id: int, base_output_dir="results_regressor"):
     target_set_names = {name: labels7 for name in target_names}
 
     model = FuzzyRegressorTorch(
-        iters=800,
-        pop_size=200,
+        iters=4,
+        pop_size=40,
         n_features_fuzzy_sets=[7] * n_features,  # Изменено с 5 на 7
         n_target_fuzzy_sets=[7] * n_targets,     # Изменено с 5 на 7
         max_rules_in_base=6,
@@ -112,38 +113,63 @@ def run_experiment(run_id: int, base_output_dir="results_regressor"):
     r2_scores = [r2_score(Y_test[:, i], Y_pred[:, i]) for i in range(n_targets)]
     avg_r2 = float(np.mean(r2_scores))
 
-    # Метрики по целям
+    # Метрики по целям для Y_test
     all_metrics = {}
     for i, name in enumerate(target_names):
         all_metrics[name] = calculate_metrics(Y_test[:, i], Y_pred[:, i], Y_train[:, i])
 
-    # Средние метрики по всем целям
+    # Метрики по целям для y_test_orig_df
+    all_metrics_orig = {}
+    for i, name in enumerate(target_names):
+        all_metrics_orig[name] = calculate_metrics(y_test_orig_df[target_names[i]].values, Y_pred[:, i], Y_train[:, i])
+
+    # Средние метрики по всем целям для Y_test
     metric_names = all_metrics[target_names[0]].keys()
     avg_metrics = {
         metric: float(np.mean([m[metric] for m in all_metrics.values()]))
         for metric in metric_names
     }
 
+    # Средние метрики по всем целям для y_test_orig_df
+    avg_metrics_orig = {
+        metric: float(np.mean([m[metric] for m in all_metrics_orig.values()]))
+        for metric in metric_names
+    }
+
     # --- 5. Сохранение результатов ---
+    # Удаляем временные столбцы, если они не нужны
+    X_test_df.drop(columns=["time_YYMMDD_HHMMSS"], inplace=True, errors="ignore")
+
+    # Теперь preds_df создается без ошибки
+    preds_df = X_test_df.copy()  # Копируем все данные из X_test_df без столбца time_YYMMDD_HHMMSS
+
+    # Заполняем предсказания
+    for i, name in enumerate(target_names):
+        preds_df[f"{name}_true"] = Y_test[:, i]
+        preds_df[f"{name}_pred"] = Y_pred[:, i]
+
+    # Сохраняем предсказания в файл
+    preds_df.to_csv(os.path.join(output_dir, "predictions.csv"), index=False)
+
     # 5.1. Правила
     with open(os.path.join(output_dir, "rule_base.txt"), "w", encoding="utf-8") as f:
         f.write(model.get_text_rules(print_intervals=True))
     # 5.2. Модель
     with open(os.path.join(output_dir, "fuzzy_model.pkl"), "wb") as f:
         pickle.dump(model, f)
-    # 5.3. Предсказания
-    preds_df = X_test_df[["time_YYMMDD_HHMMSS"]].copy()
-    for i, name in enumerate(target_names):
-        preds_df[f"{name}_true"] = Y_test[:, i]
-        preds_df[f"{name}_pred"] = Y_pred[:, i]
-    preds_df.to_csv(os.path.join(output_dir, "predictions.csv"), index=False)
-    # 5.4. Метрики по целям
+    # 5.3. Метрики по целям для Y_test
     with open(os.path.join(output_dir, "metrics.json"), "w", encoding="utf-8") as f:
         json.dump(all_metrics, f, indent=4, ensure_ascii=False)
-    # 5.5. Средние метрики
+    # 5.4. Средние метрики для Y_test
     with open(os.path.join(output_dir, "average_metrics.json"), "w", encoding="utf-8") as f:
         json.dump(avg_metrics, f, indent=4, ensure_ascii=False)
-    # 5.6. Лог
+    # 5.5. Метрики по целям для y_test_orig_df
+    with open(os.path.join(output_dir, "metrics_orig.json"), "w", encoding="utf-8") as f:
+        json.dump(all_metrics_orig, f, indent=4, ensure_ascii=False)
+    # 5.6. Средние метрики для y_test_orig_df
+    with open(os.path.join(output_dir, "average_metrics_orig.json"), "w", encoding="utf-8") as f:
+        json.dump(avg_metrics_orig, f, indent=4, ensure_ascii=False)
+    # 5.7. Лог
     with open(os.path.join(output_dir, "run_log.txt"), "w", encoding="utf-8") as f:
         f.write(f"Run ID: {run_id}\n")
         f.write(f"Training time: {train_time:.2f} sec\n")
@@ -154,10 +180,11 @@ def run_experiment(run_id: int, base_output_dir="results_regressor"):
 
     print(f"[run_{run_id}] done: train {train_time:.1f}s, avg R2 {avg_r2:.4f}")
 
+
 if __name__ == "__main__":
     # Число прогонов и процессов
-    N_RUNS = 20
-    N_PROCESSES = 10  # None → mp.cpu_count()
+    N_RUNS = 4
+    N_PROCESSES = 4  # None → mp.cpu_count()
 
     os.makedirs("results_regressor", exist_ok=True)
     with mp.Pool(processes=N_PROCESSES) as pool:
