@@ -208,9 +208,8 @@ class FuzzyRegressor(FuzzyBase):
             iters=self.iters,
             pop_size=self.pop_size,
             str_len=sum(grid.parts),
-            show_progress_each=100,
+            show_progress_each=1,
             no_increase_num=100,
-            # n_jobs=10,
         )
         optimizer.fit()
         self.base = optimizer.get_fittest()["phenotype"]

@@ -98,6 +98,76 @@ class FuzzyRegressorTorch(FuzzyBaseTorch):
         )
         self.target_grid_volume = target_grid_volume
 
+    def get_text_rules(
+        self,
+        print_intervals: bool = False,
+        set_names: Optional[Dict[str, List[str]]] = None,
+        target_set_names: Optional[Dict[str, List[str]]] = None,
+    ) -> str:
+        """Генерирует текстовое представление правил нечеткой системы.
+        
+        Args:
+            print_intervals: Если True, добавляет интервалы термов для выходных переменных
+            set_names: Словарь с именами термов для входных переменных
+            target_set_names: Словарь с именами термов для выходных переменных
+            
+        Returns:
+            Строка с текстовым представлением правил
+        """
+        # Используем сохраненные имена, если не переданы явно
+        feat_names = set_names or self.set_names
+        targ_names = target_set_names or self.target_set_names
+        
+        texts = []
+        ignore_terms_np = self.ignore_terms_id.cpu().numpy()
+        
+        for rule in self.base:
+            ant = rule[:self.n_features]
+            cons = rule[self.n_features:]
+            
+            # Формируем антецедент
+            parts = []
+            for j, t in enumerate(ant):
+                if t == ignore_terms_np[j]:
+                    continue
+                fname = self.feature_names[j]
+                label = feat_names.get(fname, [])[t] if fname in feat_names else f"s{j}"
+                parts.append(f"({fname} is {label})")
+            
+            head = " and ".join(parts) or "always"
+            
+            # Формируем консеквент
+            tails = []
+            for d, c in enumerate(cons):
+                tname = self.target_names[d]
+                label = targ_names.get(tname, [])[c] if tname in targ_names else f"s{c}"
+                
+                if print_intervals:
+                    inter = self.target_terms_point[d][c].cpu().numpy()
+                    tails.append(f"{tname} ≈ {label} ({inter[0]:.3f},{inter[2]:.3f})")
+                else:
+                    tails.append(f"{tname} is {label}")
+            
+            texts.append(f"if {head} then " + ", ".join(tails))
+        
+        return "\n".join(texts)
+
+    def count_antecedents(self) -> List[int]:
+        """Подсчитывает количество активных условий в антецедентах правил.
+        
+        Returns:
+            Список с количеством активных условий для каждого правила
+        """
+        ignore_terms_np = self.ignore_terms_id.cpu().numpy()
+        counts = []
+        
+        for rule in self.base:
+            ant = rule[:self.n_features]
+            count = np.sum(ant != ignore_terms_np)
+            counts.append(int(count))
+            
+        return counts
+
     def define_sets(
         self,
         X: np.ndarray,
@@ -207,7 +277,7 @@ class FuzzyRegressorTorch(FuzzyBaseTorch):
             iters=self.iters,
             pop_size=self.pop_size,
             str_len=sum(sampler.parts),
-            show_progress_each=100,
+            show_progress_each=1,
             no_increase_num=100,
         )
         opt.fit()
