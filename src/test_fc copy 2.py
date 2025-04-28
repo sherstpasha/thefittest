@@ -38,20 +38,26 @@ def calculate_metrics(y_true, y_pred, y_train):
 
 def run_experiment(run_id: int, base_output_dir="results_regressor"):
     """
-    Запускает один эксперимент (fit + predict + save) и сохраняет результаты в папке run_{run_id}.
+    Запускает один эксперимент (fit + predict + save) и сохраняет результаты в папке results_regressor/run_{run_id}.
     """
     np.random.seed(run_id)
 
-    # Папка для этого прогона
+    # Путь к данным для этого прогона
+    gpenn_run_dir = os.path.join(
+        r"C:\Users\USER\Desktop\Расчеты по нейросетям\расчеты сетей метео\GPENN", f"run_{run_id}"
+    )
+
+    # Папка для сохранения результатов
     output_dir = os.path.join(base_output_dir, f"run_{run_id}")
     os.makedirs(output_dir, exist_ok=True)
 
     # --- 1. Загрузка данных ---
-    X_train_df = pd.read_csv("src/lookback_1h/X_train.csv", parse_dates=["time_YYMMDD_HHMMSS"])
-    X_test_df  = pd.read_csv("src/lookback_1h/X_test.csv",  parse_dates=["time_YYMMDD_HHMMSS"])
-    y_train_df = pd.read_csv("src/lookback_1h/y_train.csv")
-    y_test_df  = pd.read_csv("src/lookback_1h/y_test.csv")
+    X_train_df = pd.read_csv(os.path.join(gpenn_run_dir, "X_train_NN.csv"))
+    X_test_df  = pd.read_csv(os.path.join(gpenn_run_dir, "X_test_NN.csv"))
+    y_train_df = pd.read_csv(os.path.join(gpenn_run_dir, "y_train_NN.csv"))
+    y_test_df  = pd.read_csv(os.path.join(gpenn_run_dir, "y_test_NN.csv"))
 
+    # Убираем столбец времени для обучения
     feature_names = [c for c in X_train_df.columns if c != "time_YYMMDD_HHMMSS"]
     target_names  = y_train_df.columns.tolist()
 
