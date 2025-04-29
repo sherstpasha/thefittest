@@ -184,8 +184,8 @@ def run_experiment(run_id: int, base_output_dir="results_regressor"):
 if __name__ == "__main__":
     # Число прогонов и процессов
     N_RUNS = 20
-    N_PROCESSES = 10  # None → mp.cpu_count()
+    N_PROCESSES = 8  # None → mp.cpu_count()
 
     os.makedirs("results_regressor", exist_ok=True)
     with mp.Pool(processes=N_PROCESSES) as pool:
-        pool.map(run_experiment, range(N_RUNS))
+        pool.map(run_experiment, [2, 3, 4, 5, 6, 10, 11, 13, 15, 16, 17, 18])
