@@ -86,8 +86,8 @@ def run_experiment(run_id: int, base_output_dir="results_regressor"):
     target_set_names = {name: labels7 for name in target_names}
 
     model = FuzzyRegressorTorch(
-        iters=4,
-        pop_size=40,
+        iters=400,
+        pop_size=200,
         n_features_fuzzy_sets=[7] * n_features,  # Изменено с 5 на 7
         n_target_fuzzy_sets=[7] * n_targets,     # Изменено с 5 на 7
         max_rules_in_base=6,
@@ -183,8 +183,8 @@ def run_experiment(run_id: int, base_output_dir="results_regressor"):
 
 if __name__ == "__main__":
     # Число прогонов и процессов
-    N_RUNS = 4
-    N_PROCESSES = 4  # None → mp.cpu_count()
+    N_RUNS = 20
+    N_PROCESSES = 10  # None → mp.cpu_count()
 
     os.makedirs("results_regressor", exist_ok=True)
     with mp.Pool(processes=N_PROCESSES) as pool:

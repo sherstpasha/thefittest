@@ -249,26 +249,30 @@ class FuzzyRegressorTorch(FuzzyBaseTorch):
             fits = []
             X_t = torch.tensor(X, device=self.device)
             for rules in pop_ph:
-                if len(rules) == 0:
-                    fits.append(-np.inf)
-                    continue
-                ant = torch.tensor(rules[:, : self.n_features], device=self.device)
-                cons = torch.tensor(rules[:, self.n_features :], device=self.device)
-                acts = torch.stack([self.inference(self.fuzzification(X_t, a)) for a in ant], dim=0)
-                preds = []
-                for d in range(self.n_outputs):
-                    interp = self.interpolate_memberships[d]
-                    gridv = self.target_grids[d]
-                    mem = interp[cons[:, d]]  # (n_rules, grid_pts)
-                    cut = torch.min(acts[:, :, None], mem[:, None, :])  # correct dims
-                    agg = cut.max(dim=0).values
-                    num = (agg * gridv).sum(dim=1)
-                    den = agg.sum(dim=1)
-                    y_pred = torch.where(den != 0, num / den, self._y_mean[d])
-                    preds.append(y_pred)
-                preds_t = torch.stack(preds, dim=1)
-                r2 = r2_score(y_np, preds_t.cpu().numpy(), multioutput="uniform_average")
-                fits.append(r2 - (len(rules) / self.max_rules_in_base) * 1e-10)
+                try:
+                    if len(rules) == 0:
+                        fits.append(-np.inf)
+                        continue
+                    ant = torch.tensor(rules[:, :self.n_features], device=self.device)
+                    cons = torch.tensor(rules[:, self.n_features:], device=self.device)
+                    acts = torch.stack([self.inference(self.fuzzification(X_t, a)) for a in ant], dim=0)
+                    preds = []
+                    for d in range(self.n_outputs):
+                        interp = self.interpolate_memberships[d]
+                        gridv = self.target_grids[d]
+                        mem = interp[cons[:, d]]  # (n_rules, grid_pts)
+                        cut = torch.min(acts[:, :, None], mem[:, None, :])  # correct dims
+                        agg = cut.max(dim=0).values
+                        num = (agg * gridv).sum(dim=1)
+                        den = agg.sum(dim=1)
+                        y_pred = torch.where(den != 0, num / den, self._y_mean[d])
+                        preds.append(y_pred)
+                    preds_t = torch.stack(preds, dim=1)
+                    r2 = r2_score(y_np, preds_t.cpu().numpy(), multioutput="uniform_average")
+                    fits.append(r2 - (len(rules) / self.max_rules_in_base) * 1e-10)
+                except Exception as e:
+                    print(f"Error occurred for rule: {rules} -> {e}")
+                    fits.append(-np.inf)  # или -10
             return np.array(fits)
 
         opt = SelfCSHAGA(
@@ -278,7 +282,7 @@ class FuzzyRegressorTorch(FuzzyBaseTorch):
             pop_size=self.pop_size,
             str_len=sum(sampler.parts),
             show_progress_each=1,
-            no_increase_num=100,
+            no_increase_num=50,
         )
         opt.fit()
         self.base = opt.get_fittest()["phenotype"]
