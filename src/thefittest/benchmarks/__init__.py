@@ -10,6 +10,7 @@ from ._datasets import RingNormDataset
 from ._datasets import TextureDataset
 from ._datasets import AdultCensusDataset
 from ._datasets import CombinedCycleDataset
+from ._datasets import SolarBatteryDegradationDataset
 from ._optproblems import Ackley
 from ._optproblems import Griewank
 from ._optproblems import HighConditionedElliptic

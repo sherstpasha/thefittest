@@ -20,6 +20,7 @@ ringnorm_data = np.loadtxt(path + "ringnorm_dataset.txt", delimiter="\t")
 texture_data = np.loadtxt(path + "texture_dataset.txt", delimiter=",")
 adult_data = np.loadtxt(path + "processed_adult_data.txt", delimiter="\t", skiprows=1)
 energy_data = np.loadtxt(path + "Folds_pp_cut.csv", delimiter="\t")
+solar_data = np.loadtxt(path + "solar_battery_degradation_training.txt", delimiter=None, skiprows=1)
 
 class Dataset:
     def __init__(
@@ -290,4 +291,42 @@ class TextureDataset(Dataset):
             y_names={
                 i: f"Class {original_label}" for i, original_label in enumerate(original_labels)
             },
+        )
+
+class SolarBatteryDegradationDataset(Dataset):
+    """Dataset для задачи деградации солнечной батареи.
+
+    Признаки (X):
+    - fluence_p_1MeV
+    - fluence_p_10MeV
+    - fluence_p_100MeV
+    - fluence_e_0.6MeV
+    - fluence_e_2MeV
+    - resource_days
+    - illumination_coeff
+
+    Цели (y):
+    - Uxx (V)
+    - Ikz (A)
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            X=solar_data[:, :7].astype(np.float32),
+            y=solar_data[:, 7:].astype(np.float32),
+            X_names={
+                0: "x1",
+                1: "x2",
+                2: "x3",
+                3: "x4",
+                4: "x5",
+                5: "x6",
+                6: "x7",
+            },
+            y_names={
+                0: "y1",
+                1: "y2",
+                2: "y3",
+                3: "y4",
+            }
         )

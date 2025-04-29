@@ -3,14 +3,14 @@ import os
 from collections import defaultdict
 
 # Путь к папке с файлами
-base_path = r"C:\Users\USER\Desktop\Расчеты по нейросетям\расчеты сетей метео\FLS"
+base_path = r"C:\Users\USER\Desktop\Расчеты по нейросетям\расчеты сетей метео\FLS2"
 
 # Инициализация структуры для накопления данных
 aggregated_metrics = defaultdict(lambda: defaultdict(list))
 
 # Чтение всех файлов
 for i in range(20):
-    file_path = os.path.join(base_path, f"run_{i}", "metrics.json")
+    file_path = os.path.join(base_path, f"run_{i}", "metrics_orig.json")
     with open(file_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
     
@@ -26,7 +26,7 @@ for wind_key, metrics in aggregated_metrics.items():
         mean_metrics[wind_key][metric_name] = sum(values) / len(values)
 
 # Сохранение среднего по каждому WindSpeed_t+i
-average_metrics_path = os.path.join(base_path, "average_metrics.json")
+average_metrics_path = os.path.join(base_path, "average_metrics_orig.json")
 with open(average_metrics_path, 'w', encoding='utf-8') as f:
     json.dump(mean_metrics, f, indent=4, ensure_ascii=False)
 
@@ -42,7 +42,7 @@ for wind_key, metrics in mean_metrics.items():
 final_average_metrics = {metric_name: sum(values)/len(values) for metric_name, values in final_metrics.items()}
 
 # Сохранение финального среднего по всем 12 шагам
-final_average_metrics_path = os.path.join(base_path, "final_average_metrics.json")
+final_average_metrics_path = os.path.join(base_path, "final_average_metrics_orig.json")
 with open(final_average_metrics_path, 'w', encoding='utf-8') as f:
     json.dump(final_average_metrics, f, indent=4, ensure_ascii=False)
 
