@@ -6,9 +6,10 @@ import multiprocessing as mp
 
 import numpy as np
 import pandas as pd
-from thefittest.fuzzy_gpu import FuzzyRegressorTorch
+from thefittest.fuzzy import FuzzyRegressor
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 import warnings
+
 warnings.filterwarnings("ignore")
 
 
@@ -19,22 +20,23 @@ def calculate_metrics(y_true, y_pred, y_train):
     mae_naive = np.mean(np.abs(y_train[1:] - naive))
 
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
-    mae  = mean_absolute_error(y_true, y_pred)
-    r2   = r2_score(y_true, y_pred)
-    mse  = mean_squared_error(y_true, y_pred)
+    mae = mean_absolute_error(y_true, y_pred)
+    r2 = r2_score(y_true, y_pred)
+    mse = mean_squared_error(y_true, y_pred)
     mape = 100 * np.mean(np.abs((y_true - y_pred) / y_true))
     smape = 100 * np.mean(2 * np.abs(y_pred - y_true) / (np.abs(y_true) + np.abs(y_pred)))
-    mase  = np.mean(np.abs(y_true - y_pred)) / mae_naive
+    mase = np.mean(np.abs(y_true - y_pred)) / mae_naive
 
     return {
-        "MASE":  mase,
+        "MASE": mase,
         "sMAPE": smape,
-        "RMSE":  rmse,
-        "MAE":   mae,
-        "R2":    r2,
-        "MSE":   mse,
-        "MAPE":  mape,
+        "RMSE": rmse,
+        "MAE": mae,
+        "R2": r2,
+        "MSE": mse,
+        "MAPE": mape,
     }
+
 
 def run_experiment(run_id: int, base_output_dir="results_regressor"):
     """
@@ -48,46 +50,45 @@ def run_experiment(run_id: int, base_output_dir="results_regressor"):
 
     # --- 1. Загрузка данных ---
     X_train_df = pd.read_csv("src/lookback_1h/X_train.csv", parse_dates=["time_YYMMDD_HHMMSS"])
-    X_test_df  = pd.read_csv("src/lookback_1h/X_test.csv",  parse_dates=["time_YYMMDD_HHMMSS"])
+    X_test_df = pd.read_csv("src/lookback_1h/X_test.csv", parse_dates=["time_YYMMDD_HHMMSS"])
     y_train_df = pd.read_csv("src/lookback_1h/y_train.csv")
-    y_test_df  = pd.read_csv("src/lookback_1h/y_test.csv")
+    y_test_df = pd.read_csv("src/lookback_1h/y_test.csv")
 
     feature_names = [c for c in X_train_df.columns if c != "time_YYMMDD_HHMMSS"]
-    target_names  = y_train_df.columns.tolist()
+    target_names = y_train_df.columns.tolist()
 
     X_train = X_train_df[feature_names].values
-    X_test  = X_test_df[feature_names].values
+    X_test = X_test_df[feature_names].values
     Y_train = y_train_df[target_names].values
-    Y_test  = y_test_df[target_names].values
+    Y_test = y_test_df[target_names].values
 
     # --- 2. Настройка модели ---
     n_features = X_train.shape[1]
-    n_targets  = Y_train.shape[1]
+    n_targets = Y_train.shape[1]
 
     # Обновленные названия для 7 термов
     labels7 = [
-        "крайне низкое", 
-        "очень низкое", 
-        "низкое", 
-        "среднее", 
-        "высокое", 
-        "очень высокое", 
-        "крайне высокое"
+        "очень низкое",
+        "низкое",
+        "среднее",
+        "высокое",
+        "очень высокое",
     ]
-    
-    set_names        = {name: labels7 for name in feature_names}
+
+    set_names = {name: labels7 for name in feature_names}
     target_set_names = {name: labels7 for name in target_names}
 
-    model = FuzzyRegressorTorch(
+    model = FuzzyRegressor(
         iters=800,
         pop_size=200,
         n_features_fuzzy_sets=[7] * n_features,  # Изменено с 5 на 7
-        n_target_fuzzy_sets=[7] * n_targets,     # Изменено с 5 на 7
+        n_target_fuzzy_sets=[7] * n_targets,  # Изменено с 5 на 7
         max_rules_in_base=6,
         target_grid_volume=50,
     )
     model.define_sets(
-        X_train, Y_train,
+        X_train,
+        Y_train,
         feature_names=feature_names,
         set_names=set_names,
         target_names=target_names,
@@ -114,8 +115,7 @@ def run_experiment(run_id: int, base_output_dir="results_regressor"):
     # Средние метрики по всем целям
     metric_names = all_metrics[target_names[0]].keys()
     avg_metrics = {
-        metric: float(np.mean([m[metric] for m in all_metrics.values()]))
-        for metric in metric_names
+        metric: float(np.mean([m[metric] for m in all_metrics.values()])) for metric in metric_names
     }
 
     # --- 5. Сохранение результатов ---
@@ -147,6 +147,7 @@ def run_experiment(run_id: int, base_output_dir="results_regressor"):
             f.write(f"  {name}: {r2v:.4f}\n")
 
     print(f"[run_{run_id}] done: train {train_time:.1f}s, avg R2 {avg_r2:.4f}")
+
 
 if __name__ == "__main__":
     # Число прогонов и процессов

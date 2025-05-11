@@ -1,8 +1,9 @@
 from typing import Optional, Union, List, Dict
 import numpy as np
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, f1_score
 from thefittest.tools.transformations import SamplingGrid
 from thefittest.optimizers._selfcshaga import SelfCSHAGA
+from thefittest.optimizers import SelfCGA
 
 
 class FuzzyBase:
@@ -285,3 +286,194 @@ class FuzzyRegressor(FuzzyBase):
 
     def count_antecedents(self) -> List[int]:
         return [int(np.sum(rule[: self.n_features] != self.ignore_terms_id)) for rule in self.base]
+
+
+class FuzzyClassifier(FuzzyBase):
+
+    def __init__(self, iters, pop_size, n_features_fuzzy_sets, max_rules_in_base):
+        FuzzyBase.__init__(
+            self,
+            iters=iters,
+            pop_size=pop_size,
+            n_features_fuzzy_sets=n_features_fuzzy_sets,
+            max_rules_in_base=max_rules_in_base,
+        )
+
+    def define_sets(
+        self,
+        X,
+        y,
+        set_names: Optional[dict[str, list[str]]] = None,
+        feature_names: Optional[list[str]] = None,
+        target_names: Optional[list[str]] = None,
+    ):
+
+        self.n_features = X.shape[1]
+        self.n_classes = len(np.unique(y))
+        print(self.n_classes)
+
+        self.n_features_fuzzy_sets_classes = self.n_features_fuzzy_sets + [self.n_classes]
+        self.fuzzy_sets_max_value = np.array(self.n_features_fuzzy_sets_classes)
+        self.fuzzy_sets_max_value[-1] = self.fuzzy_sets_max_value[-1] - 1
+
+        assert self.n_features == len(self.n_features_fuzzy_sets)
+
+        if feature_names is None:
+            self.feature_names = [f"X_{i}" for i in range(self.n_features)]
+        else:
+            self.feature_names = feature_names
+
+        if set_names is None:
+            self.set_names = {
+                feature_name: [f"set_{i}" for i in range(n_sets)]
+                for feature_name, n_sets in zip(self.feature_names, self.n_features_fuzzy_sets)
+            }
+        else:
+            self.set_names = set_names
+
+        if target_names is None:
+            self.target_names = [f"Y_{i}" for i in range(self.n_classes)]
+        else:
+            self.target_names = target_names
+
+        self.create_features_terms(X)
+
+    def fit(self, X, y):
+        y = y.astype(np.int64)
+
+        number_bits = np.array(
+            [
+                self.find_number_bits(n_sets + 1)
+                for n_sets in self.n_features_fuzzy_sets_classes + [1]
+            ]
+            * self.max_rules_in_base,
+            dtype=np.int64,
+        )
+
+        number_bits = np.array(number_bits, dtype=np.int64)
+
+        left = np.full(shape=len(number_bits), fill_value=0, dtype=np.float64)
+        right = np.array(2**number_bits - 1, dtype=np.float64)
+
+        grid = SamplingGrid(fit_by="parts").fit(left=left, right=right, arg=number_bits)
+
+        def genotype_to_phenotype(population_g):
+
+            population_ph = []
+            population_g_int = grid.transform(population_g).astype(np.int64)
+
+            for population_g_int_i in population_g_int:
+                rulebase_switch = population_g_int_i.reshape(self.max_rules_in_base, -1)
+
+                rulebase, switch = rulebase_switch[:, :-1], rulebase_switch[:, -1]
+                rulebase = rulebase[switch == 1]
+
+                overborder_cond = rulebase > self.fuzzy_sets_max_value
+                rulebase[overborder_cond] = (rulebase - self.fuzzy_sets_max_value)[overborder_cond]
+
+                rulebase_u = np.unique(rulebase, axis=0)
+
+                empty_cond = np.all(
+                    rulebase_u[:, :-1] == self.ignore_terms_id[np.newaxis :,], axis=1
+                )
+
+                rulebase_u_not_empty = rulebase_u[~empty_cond]
+
+                population_ph.append(rulebase_u_not_empty)
+
+            population_ph = np.array(population_ph, dtype=object)
+
+            return population_ph
+
+        def fitness_function(population_ph):
+
+            fitness = np.zeros(shape=len(population_ph), dtype=np.float64)
+
+            for i, rulebase_i in enumerate(population_ph):
+                antecedents, consequents = rulebase_i[:, :-1], rulebase_i[:, -1]
+                n_rules = len(rulebase_i)
+
+                if n_rules < 2:
+                    continue
+
+                elif n_rules == 2:
+                    y_predict = np.full(shape=len(y), fill_value=consequents[0], dtype=np.int64)
+
+                else:
+                    activation_degrees = np.array(
+                        [
+                            self.inference(self.fuzzification(X, antecedent))
+                            for antecedent in antecedents
+                        ]
+                    )
+
+                    argmax = np.argmax(activation_degrees, axis=0)
+                    y_predict = consequents[argmax].astype(np.int64)
+
+                n_rules_fine = (n_rules / self.max_rules_in_base) * 1e-10
+
+                fitness[i] = f1_score(y, y_predict, average="macro") - n_rules_fine
+
+            return fitness
+
+        optimizer = SelfCGA(
+            fitness_function=fitness_function,
+            genotype_to_phenotype=genotype_to_phenotype,
+            iters=self.iters,
+            pop_size=self.pop_size,
+            str_len=sum(grid.parts),
+            show_progress_each=1,
+        )
+
+        optimizer.fit()
+
+        self.base = optimizer.get_fittest()["phenotype"]
+
+        return self
+
+    def predict(self, X):
+
+        rulebase = self.base
+        antecedents, consequents = rulebase[:, :-1], rulebase[:, -1]
+
+        activation_degrees = np.array(
+            [self.inference(self.fuzzification(X, antecedent)) for antecedent in antecedents]
+        )
+
+        argmax = np.argmax(activation_degrees, axis=0)
+        y_predict = consequents[argmax].astype(np.int64)
+
+        return y_predict
+
+    def get_text_rules(self):
+
+        text_rules = []
+        for rule_i in self.base:
+            rule_text = "if "
+            for j, rule_i_j in enumerate(rule_i[:-1]):
+                if rule_i_j == self.ignore_terms_id[j]:
+                    continue
+                else:
+                    rule_text += f"({self.feature_names[j]} is {self.set_names[self.feature_names[j]][rule_i_j]}) and "
+
+            rule_text = rule_text[:-4]
+
+            rule_text += f"then class is {self.target_names[rule_i[-1]]}"
+            text_rules.append(rule_text)
+
+        text_rules = "\n".join(text_rules)
+        return text_rules
+
+    def count_antecedents(self):
+        antecedent_counts = []
+
+        for rule_i in self.base:
+            antecedent_count = 0
+
+            for j, rule_i_j in enumerate(rule_i[:-1]):
+                if rule_i_j != self.ignore_terms_id[j]:
+                    antecedent_count += 1
+
+            antecedent_counts.append(antecedent_count)
+
+        return antecedent_counts

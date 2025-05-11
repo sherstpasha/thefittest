@@ -4,7 +4,9 @@ import numpy as np
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from thefittest.regressors._gpnneregression_one_tree_mo import GeneticProgrammingNeuralNetStackingRegressorMO
+from thefittest.regressors._gpnneregression_one_tree_mo import (
+    GeneticProgrammingNeuralNetStackingRegressorMO,
+)
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from thefittest.optimizers._pdpshagp import PDPSHAGP
 from thefittest.optimizers import SHADE
@@ -42,6 +44,7 @@ def calculate_metrics(y_true, y_pred, y_train):
 
     return metrics
 
+
 # Генерируем синтетические данные
 # n_samples — количество объектов; n_features — число признаков; n_targets — число выходов
 dataset = SolarBatteryDegradationDataset()
@@ -50,9 +53,8 @@ y = dataset.get_y()
 
 
 # Разбиваем на train/test
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, shuffle = False
-)
+X_train, X_test = X[:169], X[169:]
+y_train, y_test = y[:169], y[169:]
 
 # Масштабируем X
 scaler_X = StandardScaler()
@@ -66,20 +68,20 @@ y_test_scaled = scaler_y.transform(y_test)
 
 # Инициализируем и обучаем модель
 model = GeneticProgrammingNeuralNetStackingRegressorMO(
-        iters=10,
-        pop_size=10,
-        input_block_size=1,
-        optimizer=PDPSHAGP,
-        optimizer_args={"show_progress_each": 1, "keep_history": True, "n_jobs": 5},
-        weights_optimizer=SHADE,
-        weights_optimizer_args={
-            "iters": 500,
-            "pop_size": 300,
-            "no_increase_num": 100,
-            "fitness_update_eps": 0.0001,
-        },
-        test_sample_ratio=0.25,
-    )
+    iters=10,
+    pop_size=10,
+    input_block_size=1,
+    optimizer=PDPSHAGP,
+    optimizer_args={"show_progress_each": 1, "keep_history": True, "n_jobs": 5},
+    weights_optimizer=SHADE,
+    weights_optimizer_args={
+        "iters": 500,
+        "pop_size": 300,
+        "no_increase_num": 100,
+        "fitness_update_eps": 0.0001,
+    },
+    test_sample_ratio=0.25,
+)
 model.fit(X_train_scaled, y_train_scaled)
 
 # Делаем предсказания и возвращаем их к исходному масштабу
@@ -104,8 +106,8 @@ n_outputs = y_test.shape[1]
 # Строим графики
 for i in range(n_outputs):
     plt.figure(figsize=(10, 5))
-    plt.plot(y_test[:, i], label=f"True Target {i+1}", marker='o')
-    plt.plot(y_pred[:, i], label=f"Predicted Target {i+1}", marker='x')
+    plt.plot(y_test[:, i], label=f"True Target {i+1}", marker="o")
+    plt.plot(y_pred[:, i], label=f"Predicted Target {i+1}", marker="x")
     plt.title(f"Comparison for Target {i+1}")
     plt.xlabel("Sample index")
     plt.ylabel("Value")

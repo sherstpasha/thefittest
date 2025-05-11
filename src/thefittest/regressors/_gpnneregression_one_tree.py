@@ -292,6 +292,8 @@ def train_ensemble(
         print(
             f"Участник {i}:", root_mean_square_error(proba_train_meta.cpu().numpy(), output[:, 0])
         )
+        # print(proba_train_meta.cpu().numpy())
+        # print(output[:, 0])
 
     tree = ensemble._meta_tree
 
@@ -527,13 +529,14 @@ class GeneticProgrammingNeuralNetStackingRegressor(GeneticProgrammingNeuralNetRe
         print(device)
 
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y.astype(np.int64), test_size=self._test_sample_ratio
+            X, y.astype(np.float64), test_size=self._test_sample_ratio, shuffle=False
         )
+        # print("y_train 1", y_train)
 
         X_train_ens, X_train_meta, y_train_ens, y_train_meta = train_test_split(
-            X_train, y_train, test_size=0.5
+            X_train, y_train, test_size=0.25, shuffle=True
         )
-
+        # print("y_train_ens 1", y_train_ens)
         #     proba_test: NDArray[np.float32] = eye[y_test]
         #     proba_train_ens: NDArray[np.float32] = eye[y_train_ens]
         #     proba_train_meta: NDArray[np.float32] = eye[y_train_meta]
@@ -544,6 +547,8 @@ class GeneticProgrammingNeuralNetStackingRegressor(GeneticProgrammingNeuralNetRe
         y_test = torch.tensor(y_test, dtype=torch.float32, device=device)
         y_train_ens = torch.tensor(y_train_ens, dtype=torch.float32, device=device)
         y_train_meta = torch.tensor(y_train_meta, dtype=torch.float32, device=device)
+
+        # print("y_train_ens 2", y_train_ens)
 
         #     proba_test = torch.tensor(proba_test, dtype=torch.float32, device=device)
         #     proba_train_ens = torch.tensor(proba_train_ens, dtype=torch.float32, device=device)

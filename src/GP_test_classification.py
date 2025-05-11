@@ -8,15 +8,25 @@ from sklearn.datasets import load_breast_cancer, make_moons, make_circles, fetch
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score
 from scipy.stats import ttest_ind
-from thefittest.benchmarks import BanknoteDataset, BreastCancerDataset, CreditRiskDataset, TwoNormDataset, RingNormDataset
+from thefittest.benchmarks import (
+    BanknoteDataset,
+    BreastCancerDataset,
+    CreditRiskDataset,
+    TwoNormDataset,
+    RingNormDataset,
+)
 
 # ---------------------------
 # Методы из sklearn
 # ---------------------------
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import (RandomForestClassifier, GradientBoostingClassifier,
-                              AdaBoostClassifier, ExtraTreesClassifier)
+from sklearn.ensemble import (
+    RandomForestClassifier,
+    GradientBoostingClassifier,
+    AdaBoostClassifier,
+    ExtraTreesClassifier,
+)
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -37,6 +47,7 @@ from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import PDPGP
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 # Создаем папку для результатов, если её еще нет
@@ -45,9 +56,9 @@ os.makedirs("results", exist_ok=True)
 # ---------------------------
 # Параметры эксперимента
 # ---------------------------
-number_of_iterations = 1000  # для SymbolicClassificationGP
-population_size = 100        # для SymbolicClassificationGP
-num_runs = 100               # число запусков (итераций) для каждого датасета и каждого метода
+number_of_iterations = 100  # для SymbolicClassificationGP
+population_size = 100  # для SymbolicClassificationGP
+num_runs = 30  # число запусков (итераций) для каждого датасета и каждого метода
 
 # ---------------------------
 # Глобальное определение датасетов (они будут доступны дочерним процессам)
@@ -55,6 +66,7 @@ num_runs = 100               # число запусков (итераций) д
 datasets = {
     "Banknote": (BanknoteDataset().get_X(), BanknoteDataset().get_y()),
     "BreastCancer": (BreastCancerDataset().get_X(), BreastCancerDataset().get_y()),
+    "BreastCancer2": (load_breast_cancer().data, load_breast_cancer().target),
     "CreditRisk": (CreditRiskDataset().get_X(), CreditRiskDataset().get_y()),
     "TwoNorm": (TwoNormDataset().get_X(), TwoNormDataset().get_y()),
     "RingNorm": (RingNormDataset().get_X(), RingNormDataset().get_y()),
@@ -64,16 +76,16 @@ datasets = {
 # Методы из sklearn: словарь (название: класс)
 # ---------------------------
 sklearn_methods = {
-    "KNN": KNeighborsClassifier,
-    "DecisionTree": DecisionTreeClassifier,
-    "RandomForest": RandomForestClassifier,
-    "MLP": MLPClassifier,
-    "LogisticRegression": LogisticRegression,
-    "SVC": SVC,
-    "GradientBoosting": GradientBoostingClassifier,
-    "AdaBoost": AdaBoostClassifier,
-    "ExtraTrees": ExtraTreesClassifier,
-    "GaussianNB": GaussianNB,
+    # "KNN": KNeighborsClassifier,
+    # "DecisionTree": DecisionTreeClassifier,
+    # "RandomForest": RandomForestClassifier,
+    # "MLP": MLPClassifier,
+    # "LogisticRegression": LogisticRegression,
+    # "SVC": SVC,
+    # "GradientBoosting": GradientBoostingClassifier,
+    # "AdaBoost": AdaBoostClassifier,
+    # "ExtraTrees": ExtraTreesClassifier,
+    # "GaussianNB": GaussianNB,
 }
 
 # ---------------------------
@@ -107,6 +119,7 @@ abbr["GaussianNB"] = "GNB"
 # Объединяем имена методов (в данном примере используются только символические)
 combined_methods = list(sklearn_methods.keys()) + list(symbolic_methods.keys())
 
+
 # ---------------------------
 # Функция для одного запуска эксперимента для метода из sklearn
 # (если понадобится, можно добавить реализацию)
@@ -129,15 +142,25 @@ def run_single_run_sklearn(dataset_name, iteration, method_name):
         clf.fit(X_train, y_train)
         train_pred = clf.predict(X_train)
         test_pred = clf.predict(X_test)
-        train_f1 = f1_score(y_train, train_pred, average='macro')
-        test_f1 = f1_score(y_test, test_pred, average='macro')
-        print(f"Sklearn: {dataset_name}, iter {iteration}, {method_name} -> train_f1: {train_f1:.4f}, test_f1: {test_f1:.4f}")
-        return {"dataset": dataset_name, "iteration": iteration, "method": method_name,
-                "train_f1": train_f1, "test_f1": test_f1}
+        train_f1 = f1_score(y_train, train_pred, average="macro")
+        test_f1 = f1_score(y_test, test_pred, average="macro")
+        print(
+            f"Sklearn: {dataset_name}, iter {iteration}, {method_name} -> train_f1: {train_f1:.4f}, test_f1: {test_f1:.4f}"
+        )
+        return {
+            "dataset": dataset_name,
+            "iteration": iteration,
+            "method": method_name,
+            "train_f1": train_f1,
+            "test_f1": test_f1,
+        }
     except Exception as e:
-        print(f"Error in run_single_run_sklearn for {dataset_name}, iter {iteration}, method {method_name}: {e}")
+        print(
+            f"Error in run_single_run_sklearn for {dataset_name}, iter {iteration}, method {method_name}: {e}"
+        )
         traceback.print_exc()
         return None
+
 
 # ---------------------------
 # Функция для одного запуска эксперимента для метода на базе SymbolicClassificationGP
@@ -170,15 +193,25 @@ def run_single_run_symbolic(dataset_name, iteration, method):
         train_pred = model.predict(X_train)
         test_pred = model.predict(X_test)
 
-        train_f1 = f1_score(y_train, train_pred, average='macro')
-        test_f1 = f1_score(y_test, test_pred, average='macro')
-        print(f"Symbolic: {dataset_name}, iter {iteration}, {method} -> train_f1: {train_f1:.4f}, test_f1: {test_f1:.4f}")
-        return {"dataset": dataset_name, "iteration": iteration, "method": method,
-                "train_f1": train_f1, "test_f1": test_f1}
+        train_f1 = f1_score(y_train, train_pred, average="macro")
+        test_f1 = f1_score(y_test, test_pred, average="macro")
+        print(
+            f"Symbolic: {dataset_name}, iter {iteration}, {method} -> train_f1: {train_f1:.4f}, test_f1: {test_f1:.4f}"
+        )
+        return {
+            "dataset": dataset_name,
+            "iteration": iteration,
+            "method": method,
+            "train_f1": train_f1,
+            "test_f1": test_f1,
+        }
     except Exception as e:
-        print(f"Error in run_single_run_symbolic for {dataset_name}, iter {iteration}, method {method}: {e}")
+        print(
+            f"Error in run_single_run_symbolic for {dataset_name}, iter {iteration}, method {method}: {e}"
+        )
         traceback.print_exc()
         return None
+
 
 # ---------------------------
 # Унифицированная функция запуска эксперимента
@@ -194,20 +227,22 @@ def run_single_run(task):
         print(f"Unknown method: {method}")
         return None
 
+
 # ---------------------------
 # Основной блок (не забудьте, что все должно быть внутри if __name__ == '__main__')
 # ---------------------------
-if __name__ == '__main__':
+if __name__ == "__main__":
     import multiprocessing
-    multiprocessing.set_start_method('spawn', force=True)
-    
+
+    multiprocessing.set_start_method("spawn", force=True)
+
     # Формируем общий список задач для всех методов (sklearn и symbolic)
     tasks = []
     for dataset_name in datasets.keys():
         for iteration in range(1, num_runs + 1):
             for method in combined_methods:
                 tasks.append((dataset_name, iteration, method))
-    
+
     results = []
     # Запускаем все задачи параллельно с помощью ProcessPoolExecutor
     with concurrent.futures.ProcessPoolExecutor() as executor:
@@ -220,25 +255,29 @@ if __name__ == '__main__':
             except Exception as e:
                 print("Error in executor:", e)
                 traceback.print_exc()
-    
+
     # Преобразуем результаты в DataFrame
     df_results = pd.DataFrame(results)
     print("Results DataFrame:")
     print(df_results.head())
-    
+
     if df_results.empty:
         print("No results collected, terminating.")
     else:
         # ---------------------------
         # Агрегация результатов
         # ---------------------------
-        agg_by_dataset_method_test = df_results.groupby(["dataset", "method"])["test_f1"].mean().unstack("method")
-        agg_by_dataset_method_train = df_results.groupby(["dataset", "method"])["train_f1"].mean().unstack("method")
+        agg_by_dataset_method_test = (
+            df_results.groupby(["dataset", "method"])["test_f1"].mean().unstack("method")
+        )
+        agg_by_dataset_method_train = (
+            df_results.groupby(["dataset", "method"])["train_f1"].mean().unstack("method")
+        )
         agg_by_iterations_test = df_results.groupby("method")["test_f1"].mean().to_frame().T
         agg_by_iterations_test.index = ["Average"]
         agg_by_iterations_train = df_results.groupby("method")["train_f1"].mean().to_frame().T
         agg_by_iterations_train.index = ["Average"]
-    
+
         # ---------------------------
         # Сохранение результатов в Excel с подробной статистикой
         # ---------------------------
@@ -248,11 +287,13 @@ if __name__ == '__main__':
             df_results.to_excel(writer, sheet_name="Raw Results", index=False)
             # Агрегированные результаты по датасетам
             agg_by_dataset_method_test.to_excel(writer, sheet_name="Agg_By_Dataset_Method_Test_F1")
-            agg_by_dataset_method_train.to_excel(writer, sheet_name="Agg_By_Dataset_Method_Train_F1")
+            agg_by_dataset_method_train.to_excel(
+                writer, sheet_name="Agg_By_Dataset_Method_Train_F1"
+            )
             # Агрегированные результаты по итерациям (усреднение по всем датасетам)
             agg_by_iterations_test.to_excel(writer, sheet_name="Agg_By_Iterations_Test_F1")
             agg_by_iterations_train.to_excel(writer, sheet_name="Agg_By_Iterations_Train_F1")
-    
+
             # Добавляем листы со статистической проверкой (p-value) для каждой пары алгоритмов.
             for i in range(len(combined_methods)):
                 for j in range(i + 1, len(combined_methods)):
@@ -262,26 +303,32 @@ if __name__ == '__main__':
                     for dataset_name in datasets.keys():
                         df_ds = df_results[df_results["dataset"] == dataset_name]
                         df_pair = df_ds[df_ds["method"].isin([method1, method2])]
-                        pivot_df = df_pair.pivot(index="iteration", columns="method", values="test_f1")
+                        pivot_df = df_pair.pivot(
+                            index="iteration", columns="method", values="test_f1"
+                        )
                         if method1 in pivot_df.columns and method2 in pivot_df.columns:
                             d = pivot_df[method1] - pivot_df[method2]
                             diff_dict[dataset_name] = d.values
                         else:
                             diff_dict[dataset_name] = np.array([])
-                    pval_matrix = pd.DataFrame(index=list(datasets.keys()), columns=list(datasets.keys()), dtype=float)
+                    pval_matrix = pd.DataFrame(
+                        index=list(datasets.keys()), columns=list(datasets.keys()), dtype=float
+                    )
                     for ds1 in datasets.keys():
                         for ds2 in datasets.keys():
                             if diff_dict[ds1].size > 0 and diff_dict[ds2].size > 0:
-                                stat, pval = ttest_ind(diff_dict[ds1], diff_dict[ds2], equal_var=False)
+                                stat, pval = ttest_ind(
+                                    diff_dict[ds1], diff_dict[ds2], equal_var=False
+                                )
                                 pval_matrix.loc[ds1, ds2] = pval
                             else:
                                 pval_matrix.loc[ds1, ds2] = np.nan
                     sheet_name = f"pv_{abbr[method1]}_{abbr[method2]}"
                     sheet_name = sheet_name[:31]  # ограничение Excel
                     pval_matrix.to_excel(writer, sheet_name=sheet_name)
-    
+
         print(f"Эксперимент завершен. Результаты сохранены в '{excel_path}'.")
-    
+
         # ---------------------------
         # Построение графиков распределения F1-score для каждого датасета
         # ---------------------------
@@ -302,5 +349,5 @@ if __name__ == '__main__':
             fig_path = os.path.join("results", f"{dataset_name}_f1_distribution.png")
             fig.savefig(fig_path)
             plt.close(fig)
-    
+
         print("Графики распределения F1-score сохранены в папке 'results'.")
