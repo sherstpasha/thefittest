@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from thefittest.tools.transformations import SamplingGrid
 from thefittest.optimizers._selfcshaga import SelfCSHAGA
 from thefittest.fuzzy import FuzzyClassifier
-from thefittest.benchmarks import BreastCancerDataset, IrisDataset
+from thefittest.benchmarks import BreastCancerDataset, IrisDataset, BanknoteDataset
 from sklearn.metrics import f1_score, accuracy_score
 import warnings
 
@@ -39,9 +39,9 @@ def run_experiment(run_id: int, base_output_dir="results_classifier"):
     os.makedirs(output_dir, exist_ok=True)
 
     # --- 1. Загрузка данных ---
-    data = load_breast_cancer()
-    X = data.data
-    y = data.target
+    data = BanknoteDataset()
+    X = data.get_X()
+    y = data.get_y()
 
     # масштабирование и сплит
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=run_id)
@@ -53,7 +53,7 @@ def run_experiment(run_id: int, base_output_dir="results_classifier"):
 
     # --- 2. Настройка модели классификации ---
     # количество термов на признак фиксированное
-    n_sets = 7
+    n_sets = 3
     n_features_sets = [n_sets] * n_features
     max_rules = 10
 
@@ -61,7 +61,7 @@ def run_experiment(run_id: int, base_output_dir="results_classifier"):
     set_names = {name: labels for name in feature_names}
 
     model = FuzzyClassifier(
-        iters=15, pop_size=500, n_features_fuzzy_sets=n_features_sets, max_rules_in_base=max_rules
+        iters=150, pop_size=500, n_features_fuzzy_sets=n_features_sets, max_rules_in_base=max_rules
     )
     model.define_sets(
         X_train,
