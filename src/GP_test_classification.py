@@ -40,6 +40,7 @@ from thefittest.classifiers._symbolicclassificationgp import SymbolicClassificat
 from thefittest.optimizers._selfcshagp import SelfCSHAGP
 from thefittest.optimizers._pdpshagp import PDPSHAGP
 from thefittest.optimizers import SelfCGP, PDPGP
+from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
 
 import warnings
 
@@ -51,9 +52,9 @@ os.makedirs("results", exist_ok=True)
 # ---------------------------
 # Параметры эксперимента
 # ---------------------------
-number_of_iterations = 1000  # для SymbolicClassificationGP
-population_size = 1000  # для SymbolicClassificationGP
-num_runs = 1  # число запусков (итераций) для каждого датасета и каждого метода
+number_of_iterations = 200  # для SymbolicClassificationGP
+population_size = 100  # для SymbolicClassificationGP
+num_runs = 30  # число запусков (итераций) для каждого датасета и каждого метода
 
 # ---------------------------
 # Глобальное определение датасетов
@@ -61,7 +62,6 @@ num_runs = 1  # число запусков (итераций) для каждо
 datasets = {
     "Banknote": (BanknoteDataset().get_X(), BanknoteDataset().get_y()),
     "BreastCancer": (BreastCancerDataset().get_X(), BreastCancerDataset().get_y()),
-    "BreastCancer2": (load_breast_cancer().data, load_breast_cancer().target),
     "CreditRisk": (CreditRiskDataset().get_X(), CreditRiskDataset().get_y()),
     "TwoNorm": (TwoNormDataset().get_X(), TwoNormDataset().get_y()),
     "RingNorm": (RingNormDataset().get_X(), RingNormDataset().get_y()),
@@ -179,11 +179,12 @@ def run_single_run_symbolic(dataset_name, iteration, method):
         else:
             raise ValueError(f"Unknown symbolic method: {method}")
 
-        model = SymbolicClassificationGP(
+        model = GeneticProgrammingNeuralNetClassifier(
             iters=number_of_iterations,
             pop_size=population_size,
             optimizer=optimizer_class,
-            optimizer_args={"elitism": False, "keep_history": True, "show_progress_each": 1},
+            optimizer_args={"elitism": False, "keep_history": True, "max_level": 10},
+            weights_optimizer_args={"iters": 300, "pop_size": 300}
         )
         model.fit(X_train, y_train)
         train_pred = model.predict(X_train)
@@ -246,6 +247,92 @@ if __name__ == "__main__":
 
     df_results = pd.DataFrame(results)
     if df_results.empty:
-        print("No results, terminating.")
-        exit()
-    # ... (остальной код без изменений) ...
+        print("No results collected, terminating.")
+    else:
+        # ---------------------------
+        # Агрегация результатов
+        # ---------------------------
+        agg_by_dataset_method_test = (
+            df_results.groupby(["dataset", "method"])["test_f1"].mean().unstack("method")
+        )
+        agg_by_dataset_method_train = (
+            df_results.groupby(["dataset", "method"])["train_f1"].mean().unstack("method")
+        )
+        agg_by_iterations_test = df_results.groupby("method")["test_f1"].mean().to_frame().T
+        agg_by_iterations_test.index = ["Average"]
+        agg_by_iterations_train = df_results.groupby("method")["train_f1"].mean().to_frame().T
+        agg_by_iterations_train.index = ["Average"]
+
+        # ---------------------------
+        # Сохранение результатов в Excel с подробной статистикой
+        # ---------------------------
+        excel_path = os.path.join("results", "results.xlsx")
+        with pd.ExcelWriter(excel_path, engine="xlsxwriter") as writer:
+            # Лист с сырыми результатами
+            df_results.to_excel(writer, sheet_name="Raw Results", index=False)
+            # Агрегированные результаты по датасетам
+            agg_by_dataset_method_test.to_excel(writer, sheet_name="Agg_By_Dataset_Method_Test_F1")
+            agg_by_dataset_method_train.to_excel(
+                writer, sheet_name="Agg_By_Dataset_Method_Train_F1"
+            )
+            # Агрегированные результаты по итерациям (усреднение по всем датасетам)
+            agg_by_iterations_test.to_excel(writer, sheet_name="Agg_By_Iterations_Test_F1")
+            agg_by_iterations_train.to_excel(writer, sheet_name="Agg_By_Iterations_Train_F1")
+
+            # Добавляем листы со статистической проверкой (p-value) для каждой пары алгоритмов.
+            for i in range(len(combined_methods)):
+                for j in range(i + 1, len(combined_methods)):
+                    method1 = combined_methods[i]
+                    method2 = combined_methods[j]
+                    diff_dict = {}
+                    for dataset_name in datasets.keys():
+                        df_ds = df_results[df_results["dataset"] == dataset_name]
+                        df_pair = df_ds[df_ds["method"].isin([method1, method2])]
+                        pivot_df = df_pair.pivot(
+                            index="iteration", columns="method", values="test_f1"
+                        )
+                        if method1 in pivot_df.columns and method2 in pivot_df.columns:
+                            d = pivot_df[method1] - pivot_df[method2]
+                            diff_dict[dataset_name] = d.values
+                        else:
+                            diff_dict[dataset_name] = np.array([])
+                    pval_matrix = pd.DataFrame(
+                        index=list(datasets.keys()), columns=list(datasets.keys()), dtype=float
+                    )
+                    for ds1 in datasets.keys():
+                        for ds2 in datasets.keys():
+                            if diff_dict[ds1].size > 0 and diff_dict[ds2].size > 0:
+                                stat, pval = ttest_ind(
+                                    diff_dict[ds1], diff_dict[ds2], equal_var=False
+                                )
+                                pval_matrix.loc[ds1, ds2] = pval
+                            else:
+                                pval_matrix.loc[ds1, ds2] = np.nan
+                    sheet_name = f"pv_{abbr[method1]}_{abbr[method2]}"
+                    sheet_name = sheet_name[:31]  # ограничение Excel
+                    pval_matrix.to_excel(writer, sheet_name=sheet_name)
+
+        print(f"Эксперимент завершен. Результаты сохранены в '{excel_path}'.")
+
+        # ---------------------------
+        # Построение графиков распределения F1-score для каждого датасета
+        # ---------------------------
+        for dataset_name in datasets.keys():
+            df_ds = df_results[df_results["dataset"] == dataset_name]
+            fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+            df_ds.boxplot(column="train_f1", by="method", ax=ax[0])
+            ax[0].set_title("Train F1-score")
+            ax[0].set_xlabel("Method")
+            ax[0].set_ylabel("F1-score")
+            df_ds.boxplot(column="test_f1", by="method", ax=ax[1])
+            ax[1].set_title("Test F1-score")
+            ax[1].set_xlabel("Method")
+            ax[1].set_ylabel("F1-score")
+            fig.suptitle(f"Distribution of F1-score for {dataset_name}")
+            plt.suptitle("")
+            plt.tight_layout()
+            fig_path = os.path.join("results", f"{dataset_name}_f1_distribution.png")
+            fig.savefig(fig_path)
+            plt.close(fig)
+
+        print("Графики распределения F1-score сохранены в папке 'results'.")
