@@ -18,7 +18,7 @@ from thefittest.benchmarks import (
     TwoNormDataset,
     RingNormDataset,
 )
-from thefittest.optimizers import GeneticAlgorithm
+from thefittest.optimizers import SelfCGA
 from thefittest.tools.transformations import GrayCode
 import warnings
 warnings.filterwarnings("ignore")
@@ -38,21 +38,6 @@ datasets = {
 # Методы и их пространства гиперпараметров
 # Методы и их пространства гиперпараметров
 methods = {
-    "SVC": {
-        "cls": SVC,
-        "param_space": {
-            "C":      ("float",       1e-3,       1e3),
-            "degree": ("int",         2,          5),
-            "kernel": ("categorical", ["linear","poly","rbf","sigmoid"]),
-            "gamma":  ("categorical", ["scale","auto"]),
-        },
-        "gc_bounds": {
-            "left":  np.array([1e-3, 2.0, 0.0, 0.0]),
-            "right": np.array([1e3,  5.0, 3.0, 1.0]),
-            # шаг: 0.01 для C, 1 для degree, 1 для kernel и 1 для gamma
-            "arg":   np.array([0.01, 1.0, 1.0, 1.0])
-        }
-    },
     "RandomForest": {
         "cls": RandomForestClassifier,
         "param_space": {
@@ -138,7 +123,7 @@ def run_hp(method_cfg, ds_name, iteration, X_params, mode='train'):
         params=to_params(x)
         clf=method_cfg["cls"](random_state=iteration,**params)
         if mode=='train':
-            cv=KFold(n_splits=3,shuffle=True,random_state=iteration)
+            cv=KFold(n_splits=2,shuffle=True,random_state=iteration)
             scores=cross_val_score(clf,X_train,y_train,cv=cv,scoring='f1_macro')
             results.append(scores.mean())
         else:
@@ -162,7 +147,7 @@ def optimize_single(args):
     # Baseline default params
     base_clf = cfg["cls"](random_state=iteration)
     # train baseline CV
-    cv = KFold(n_splits=3, shuffle=True, random_state=iteration)
+    cv = KFold(n_splits=2, shuffle=True, random_state=iteration)
     base_train = cross_val_score(base_clf, X_train, y_train, cv=cv, scoring='f1_macro').mean()
     # test baseline
     base_clf.fit(X_train, y_train)
@@ -173,14 +158,14 @@ def optimize_single(args):
     g2p = GrayCode(fit_by="h").fit(left=gb["left"], right=gb["right"], arg=gb["arg"])
     str_len = sum(g2p.parts)
     fitness_fn = lambda pop: run_hp(cfg, ds_name, iteration, pop, 'train')
-    opt = GeneticAlgorithm(
+    opt = SelfCGA(
         fitness_function      = fitness_fn,
         genotype_to_phenotype = g2p.transform,
-        iters                 = 100,
-        pop_size              = 100,
+        iters                 = 30,
+        pop_size              = 30,
         str_len               = str_len,
         optimal_value         = 1.0,
-        no_increase_num=10,
+        no_increase_num=5,
     )
     opt.fit()
 
@@ -208,7 +193,7 @@ def optimize_single(args):
     return result
 
 if __name__ == "__main__":
-    tasks = [(ds, m, i) for ds in datasets for m in methods for i in range(1, 2)]
+    tasks = [(ds, m, i) for ds in datasets for m in methods for i in range(1, 21)]
     summary = []
     with ProcessPoolExecutor() as executor:
         futures = {executor.submit(optimize_single, t): t for t in tasks}
