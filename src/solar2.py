@@ -36,6 +36,8 @@ target_names = list(dataset.get_y_names())
 print(X.shape, y.shape)
 X_train, X_test = X[:169], X[169:]
 y_train, y_test = y[:169], y[169:]
+X_train, X_test = X, X
+y_train, y_test = y, y
 
 # === Модели и гиперпараметры ===
 models_and_params = {
@@ -93,15 +95,18 @@ def train_model(model_name, model, param_grid, target_index, target_name):
     model_path = f"results/{model_name}_{target_name}.joblib"
     joblib.dump(best_model, model_path)
 
-    # Сохраняем график с точками
+    # Сохраняем график с точками и кривыми
     plt.figure(figsize=(12, 5))
     indices_train = np.arange(len(y_train_i))
     indices_test = np.arange(len(y_train_i), len(y_train_i) + len(y_test_i))
 
-    plt.scatter(indices_train, y_train_i, label="Train True", s=30, alpha=0.7, marker="x")
-    plt.scatter(indices_train, y_train_pred, label="Train Pred", s=30, marker="x")
-    plt.scatter(indices_test, y_test_i, label="Test True", s=30, alpha=0.7, marker="x")
-    plt.scatter(indices_test, y_test_pred, label="Test Pred", s=30, marker="x")
+    # True values — точки
+    plt.scatter(indices_train, y_train_i, label="Train True", s=30, alpha=0.7, marker="o")
+    plt.scatter(indices_test, y_test_i, label="Test True",  s=30, alpha=0.7, marker="o")
+
+    # Predictions — кривые
+    plt.plot(indices_train, y_train_pred, label="Train Pred", linestyle='-', linewidth=2)
+    plt.plot(indices_test, y_test_pred,   label="Test Pred",  linestyle='--', linewidth=2)
 
     plt.axvline(len(y_train_i), color="gray", linestyle=":", label="Train/Test Split")
     plt.title(f"{target_name} — {model_name}")

@@ -8,7 +8,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, accuracy_score
 from sklearn.preprocessing import StandardScaler
 from thefittest.benchmarks import BanknoteDataset
-from thefittest.classifiers._symbolicclassificationgp import SymbolicClassificationGP
+
+from thefittest.regressors import SymbolicRegressionGP
 from thefittest.optimizers._selfcshagp import SelfCSHAGP
 
 
