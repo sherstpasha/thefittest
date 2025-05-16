@@ -7,45 +7,71 @@ from sklearn.metrics import r2_score
 from sklearn.preprocessing import minmax_scale
 from sklearn.model_selection import train_test_split
 
-from thefittest.optimizers import SelfCGP, SelfCGA
-from thefittest.regressors._gpnneregression_one_tree import (
-    GeneticProgrammingNeuralNetStackingRegressor,
+from thefittest.optimizers._pdpshagp import PDPSHAGP
+from thefittest.optimizers import SelfCGP, SHADE
+from thefittest.regressors._gpnneregression_one_tree_mo import (
+    GeneticProgrammingNeuralNetStackingRegressorMO,
 )
 from thefittest.tools.print import print_tree, print_trees, print_net, print_nets, print_ens
 from thefittest.benchmarks import SolarBatteryDegradationDataset
+import warnings
+
+# Игнорируем все предупреждения
+warnings.filterwarnings("ignore")
 
 
-def calculate_gne(y_true, y_pred):
-    s = len(y_true)
-    y_max = np.max(y_true)
-    y_min = np.min(y_true)
-    denom = y_max - y_min if y_max != y_min else 1.0
-    error = np.sum(np.abs(y_true - y_pred)) / denom
-    return 100 * error / s
+import torch
+import numpy as np
+
+
+def calculate_fitness_for_ensemble(y_true, y_pred) -> float:
+    # Преобразуем данные в тензоры PyTorch
+    targets_tensor = torch.tensor(y_true, dtype=torch.float32)
+    output_tensor = torch.tensor(y_pred, dtype=torch.float32)
+
+    # Находим минимальные и максимальные значения для целевых значений
+    y_min, _ = torch.min(targets_tensor, dim=0)
+    y_max, _ = torch.max(targets_tensor, dim=0)
+
+    s = len(targets_tensor)  # Размер тестовой выборки
+    m = targets_tensor.shape[1]  # Количество выходных значений (например, 4)
+
+    # Инициализируем переменную для суммы ошибок
+    error_sum = 0
+
+    # Вычисляем ошибку для каждого выхода
+    for j in range(m):  # Для каждого выхода (столбца)
+        y_diff = y_max[j] - y_min[j]  # Нормализация по максимуму и минимуму
+        error_sum += torch.sum(torch.abs(targets_tensor[:, j] - output_tensor[:, j])) / y_diff
+
+    # Рассчитываем итоговую ошибку
+    error = (100 / s) * error_sum
+    return error.item()  # Возвращаем ошибку как скалярное значение
 
 
 def run_experiment(run_id, output_dir):
     # === Подготовка данных ===
     dataset = SolarBatteryDegradationDataset()
     X = minmax_scale(dataset.get_X())  # Нормализация входов от 0 до 1
-    y = dataset.get_y()[:, 1]  # Только первый выход
+    y = dataset.get_y()  # Только первый выход
 
     X_train, X_test = X[:169], X[169:]
     y_train, y_test = y[:169], y[169:]
 
     # === Обучение модели ===
-    model = GeneticProgrammingNeuralNetStackingRegressor(
-        iters=20,
-        pop_size=50,
-        input_block_size=1,
-        optimizer=SelfCGP,
-        optimizer_args={"show_progress_each": 1, "keep_history": True, "n_jobs": 10},
-        weights_optimizer=SelfCGA,
+    model = GeneticProgrammingNeuralNetStackingRegressorMO(
+        iters=30,
+        pop_size=10,
+        input_block_size=7,
+        optimizer=PDPSHAGP,
+        optimizer_args={"show_progress_each": 1, "keep_history": True, "n_jobs": 1},
+        weights_optimizer=SHADE,
         weights_optimizer_args={
-            "iters": 100000,
-            "pop_size": 1000,
+            "iters": 20000,
+            "pop_size": 20000,
             "no_increase_num": 100,
-            "fitness_update_eps": 0.0001,
+            "fitness_update_eps": 0.01,
+            "show_progress_each": 1,
         },
         test_sample_ratio=0.33,
     )
@@ -60,18 +86,10 @@ def run_experiment(run_id, output_dir):
 
     r2 = r2_score(y_test, y_test_pred)
 
-    # === Вычисление GNE по формуле ===
-    def calculate_gne(y_true, y_pred):
-        s = len(y_true)
-        y_max = np.max(y_true)
-        y_min = np.min(y_true)
-        denom = y_max - y_min if y_max != y_min else 1.0
-        error = np.sum(np.abs(y_true - y_pred)) / denom
-        return 100 * error / s
-
-    gne_train = calculate_gne(y_train, y_train_pred)
-    gne_test = calculate_gne(y_test, y_test_pred)
-    gne_full = calculate_gne(y_all_true, y_all_pred)
+    # === Вычисление GNE по формуле для каждого выхода ===
+    gne_train = calculate_fitness_for_ensemble(y_train, y_train_pred)
+    gne_test = calculate_fitness_for_ensemble(y_test, y_test_pred)
+    gne_full = calculate_fitness_for_ensemble(y_all_true, y_all_pred)
 
     # === Сохранение результатов ===
     run_dir = os.path.join(output_dir, f"run_{run_id}")
@@ -79,9 +97,9 @@ def run_experiment(run_id, output_dir):
 
     with open(os.path.join(run_dir, "r2_score.txt"), "w") as f:
         f.write(f"R2 Score: {r2:.6f}\n")
-        f.write(f"GNE Train: {gne_train:.6f}%\n")
-        f.write(f"GNE Test: {gne_test:.6f}%\n")
-        f.write(f"GNE Full: {gne_full:.6f}%\n")
+        f.write(f"GNE Train: {gne_train:.6f}\n")
+        f.write(f"GNE Test: {gne_test:.6f}\n")
+        f.write(f"GNE Full: {gne_full:.6f}\n")
 
     np.savetxt(os.path.join(run_dir, "X_train.txt"), X_train)
     np.savetxt(os.path.join(run_dir, "X_test.txt"), X_test)
@@ -92,19 +110,20 @@ def run_experiment(run_id, output_dir):
     np.savetxt(os.path.join(run_dir, "full_true.txt"), y_all_true)
     np.savetxt(os.path.join(run_dir, "full_pred.txt"), y_all_pred)
 
-    # === График: Истина и Предсказание ===
-    plt.figure(figsize=(14, 5))
-    plt.plot(y_all_true, label="True", linewidth=2)
-    plt.plot(y_all_pred, label="Predicted", linestyle="--")
-    plt.axvline(split_index, color="gray", linestyle=":", label="Train/Test Split")
-    plt.title("Prediction — Train/Test")
-    plt.xlabel("Sample Index")
-    plt.ylabel("Target")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig(os.path.join(run_dir, "6_prediction_curve.png"))
-    plt.close()
+    # === Графики для каждого выхода ===
+    for i in range(y_all_true.shape[1]):  # Для каждого выхода создадим график
+        plt.figure(figsize=(14, 5))
+        plt.plot(y_all_true[:, i], label="True", linewidth=2)
+        plt.plot(y_all_pred[:, i], label="Predicted", linestyle="--")
+        plt.axvline(split_index, color="gray", linestyle=":", label="Train/Test Split")
+        plt.title(f"Prediction for Output {i+1} — Train/Test")
+        plt.xlabel("Sample Index")
+        plt.ylabel("Target")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig(os.path.join(run_dir, f"prediction_curve_output_{i+1}.png"))
+        plt.close()
 
     # === Структуры модели ===
     optimizer = model.get_optimizer()
@@ -141,7 +160,7 @@ def run_experiment(run_id, output_dir):
     with open(os.path.join(run_dir, "stat.pkl"), "wb") as file:
         cloudpickle.dump(stat, file)
 
-    print(f"✅ Run {run_id} done — R2: {r2:.4f} | GNE test: {gne_test:.2f}%")
+    print(f"✅ Run {run_id} done — R2: {r2:.4f} | GNE test: {gne_test:.6f}\n")
     return r2
 
 

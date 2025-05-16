@@ -45,7 +45,10 @@ from sklearn.model_selection import train_test_split
 from ..base._net import ACTIV_NAME_INV
 import torch
 
+import warnings
 
+# Игнорируем все предупреждения
+warnings.filterwarnings("ignore")
 weights_type_optimizer_alias = Union[
     Type[DifferentialEvolution],
     Type[jDE],
@@ -117,10 +120,33 @@ def fitness_function(
 ) -> NDArray[np.float32]:
     fitness = np.empty(shape=len(population), dtype=np.float32)
     for i, ensemble in enumerate(population):
-        # print(2, ensemble._meta_scaler)
         output2d = ensemble.meta_output(X)
-        fitness[i] = root_mean_square_error3d(targets, output2d)
-        print(i, fitness[i])
+
+        # Convert targets to torch tensor if they aren't already
+        targets_tensor = torch.tensor(targets, dtype=torch.float32)
+
+        # Get the min and max values for the actual outputs using torch
+        y_min, _ = torch.min(targets_tensor, dim=0)
+        y_max, _ = torch.max(targets_tensor, dim=0)
+
+        s = len(targets)  # Test sample size (number of data points)
+        m = targets.shape[1]  # Number of outputs
+
+        # Ensure the tensors are moved to the CPU before performing PyTorch operations
+        output2d_cpu = output2d.cpu()  # Ensure it's on CPU before converting to NumPy
+        targets_cpu = targets_tensor.cpu()  # Ensure it's on CPU before converting to NumPy
+
+        # Compute the new error based on the provided formula
+        error_sum = 0
+        for j in range(m):
+            y_diff = y_max[j] - y_min[j]
+            # Now we use torch.sum() instead of np.sum() for PyTorch tensors
+            error_sum += torch.sum(torch.abs(targets_cpu[:, j] - output2d_cpu[:, j])) / y_diff
+
+        # Compute the final error
+        error = (100 / s) * error_sum
+        fitness[i] = error.item()  # Convert to a scalar value for NumPy storage
+
     return fitness
 
 
@@ -272,9 +298,38 @@ def evaluate_nets(
     targets: NDArray[Union[np.float32, np.int64]],
 ) -> NDArray[np.float32]:
 
+    # Получаем предсказания от 100 нейросетей (output3d)
     output3d = net.forward(X, weights)
-    error = root_mean_square_error3d(targets, output3d).cpu().numpy()
-    return error
+
+    # Преобразуем targets в тензор PyTorch
+    targets_tensor = torch.tensor(targets, dtype=torch.float32)
+
+    # Убедимся, что тензоры находятся на CPU перед выполнением операций
+    output3d_cpu = output3d.cpu()  # Предсказания на CPU
+    targets_cpu = targets_tensor.cpu()  # Целевые значения на CPU
+
+    # Получаем минимальные и максимальные значения для целевых значений
+    y_min, _ = torch.min(targets_cpu, dim=0)
+    y_max, _ = torch.max(targets_cpu, dim=0)
+
+    s = len(targets_cpu)  # Размер тестовой выборки (169 примеров)
+    m = targets_cpu.shape[1]  # Количество выходных значений (4)
+
+    # Вектор ошибок для всех нейросетей
+    errors = torch.zeros(output3d_cpu.shape[0])  # 100 нейросетей
+
+    # Вычисляем ошибку для каждой нейросети
+    for i in range(output3d_cpu.shape[0]):  # Перебираем все 100 нейросетей
+        error_sum = 0
+        for j in range(m):  # Перебираем все выходные значения (4)
+            y_diff = y_max[j] - y_min[j]
+            error_sum += torch.sum(torch.abs(targets_cpu[:, j] - output3d_cpu[i, :, j])) / y_diff
+
+        # Записываем ошибку для текущей нейросети
+        errors[i] = (100 / s) * error_sum
+
+    # Возвращаем вектор ошибок для всех нейросетей
+    return errors.cpu().numpy()  # Преобразуем обратно в NumPy для дальнейшего использования
 
 
 def train_ensemble(
@@ -553,13 +608,14 @@ class GeneticProgrammingNeuralNetStackingRegressorMO(GeneticProgrammingNeuralNet
         print(device)
 
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y.astype(np.int64), test_size=self._test_sample_ratio, shuffle=False
+            X, y.astype(np.float32), test_size=self._test_sample_ratio, shuffle=False
         )
 
         X_train_ens, X_train_meta, y_train_ens, y_train_meta = train_test_split(
             X_train, y_train, test_size=0.5, shuffle=False
         )
-
+        # X_train, X_test = X[:169], X[169:]
+        # y_train, y_test = y[:169], y[169:]
         #     proba_test: NDArray[np.float32] = eye[y_test]
         #     proba_train_ens: NDArray[np.float32] = eye[y_train_ens]
         #     proba_train_meta: NDArray[np.float32] = eye[y_train_meta]
