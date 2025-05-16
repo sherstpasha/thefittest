@@ -56,7 +56,7 @@ def run_experiment(run_id, output_dir):
 
     # === Модель ===
     model = GeneticProgrammingNeuralNetStackingRegressorMO(
-        iters=30,
+        iters=10,
         pop_size=10,
         input_block_size=1,
         optimizer=PDPSHAGP,
@@ -71,7 +71,7 @@ def run_experiment(run_id, output_dir):
         test_sample_ratio=0.33,
     )
 
-    # обучение на масштабированных y
+        # обучение на масштабированных y
     model.fit(X, y)
 
     # предсказание масштабированных значений
@@ -144,15 +144,15 @@ def run_experiment(run_id, output_dir):
     cloudpickle.dump(ensembling, open(os.path.join(run_dir, "ens.pkl"), "wb"))
 
     # === Сохраняем CSV входов, используемых ансамблем, и предсказаний ===
-    # определяем индексы входов в ансамбле
+        # определяем индексы входов в ансамбле
     used_inputs = set()
     for net in ensembling._nets:
         used_inputs.update(net._inputs)
-    # убрать последний индекс, добавленный для тренировки смешения
-    if used_inputs:
-        used_inputs.discard(max(used_inputs))
+    # убрать смещение: индекс равный числу фич
+    bias_idx = X_raw.shape[1]
+    if bias_idx in used_inputs:
+        used_inputs.discard(bias_idx)
     used_indices = sorted(used_inputs)
-    print(used_indices)
 
     # получаем имена признаков
     x_names = dataset.get_X_names()  # должно возвращать dict {idx: name}
