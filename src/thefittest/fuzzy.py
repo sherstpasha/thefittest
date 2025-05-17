@@ -159,8 +159,9 @@ class FuzzyRegressor(FuzzyBase):
         genes = num_vars + 1
 
         def genotype_to_phenotype(pop_g: np.ndarray) -> np.ndarray:
-            pop_ph = []
+            pop_ph_list = []
             int_g = grid.transform(pop_g).astype(int)
+
             for indiv in int_g:
                 mat = indiv.reshape(self.max_rules_in_base, genes)
                 rule_ids = mat[:, :num_vars]
@@ -173,36 +174,57 @@ class FuzzyRegressor(FuzzyBase):
                         mod = self.n_target_fuzzy_sets[j - self.n_features]
                     rule_ids[:, j] %= mod
                 uniq = np.unique(rule_ids, axis=0)
-                non_empty = [
-                    r for r in uniq if not np.all(r[: self.n_features] == self.ignore_terms_id)
-                ]
-                pop_ph.append(np.array(non_empty, dtype=int))
-            return np.array(pop_ph, dtype=object)
+                non_empty = [r for r in uniq if not np.all(r[:self.n_features] == self.ignore_terms_id)]
+                pop_ph_list.append(np.array(non_empty, dtype=int))
 
+            # безопасное преобразование в 1D object array
+            pop_ph = np.empty(len(pop_ph_list), dtype=object)
+            for i, val in enumerate(pop_ph_list):
+                pop_ph[i] = val
+            return pop_ph
+            
         def fitness(ph_population: List[np.ndarray]) -> np.ndarray:
             fit = np.zeros(len(ph_population), dtype=float)
             for i, rules in enumerate(ph_population):
-                if len(rules) < 1:
-                    fit[i] = -np.inf
-                    continue
-                ant = rules[:, : self.n_features]
-                cons = rules[:, self.n_features :].astype(int)
-                acts = np.array([self.inference(self.fuzzification(X, a)) for a in ant])
-                preds = np.zeros((self.n_samples, self.n_outputs), dtype=float)
-                for d in range(self.n_outputs):
-                    interp = self.interpolate_memberships[d]
-                    grid_vals = self.target_grids[d]
-                    mem = interp[cons[:, d]]
-                    cut = np.minimum(acts[:, :, None], mem[:, None, :])
-                    agg = np.max(cut, axis=0)
-                    num = (agg * grid_vals).sum(axis=1)
-                    den = agg.sum(axis=1)
-                    den[den == 0] = 1
-                    preds[:, d] = num / den
-                score = r2_score(y, preds, multioutput="uniform_average")
-                penalty = (len(rules) / self.max_rules_in_base) * 1e-10
-                fit[i] = score - penalty
+                try:
+                    if len(rules) < 1:
+                        fit[i] = -np.inf
+                        continue
+
+                    ant = rules[:, : self.n_features]
+                    cons = rules[:, self.n_features :].astype(int)
+
+                    acts = np.array([
+                        self.inference(self.fuzzification(X, a))
+                        for a in ant
+                    ])  # (n_rules, n_samples)
+
+                    preds = np.zeros((self.n_samples, self.n_outputs), dtype=float)
+
+                    for d in range(self.n_outputs):
+                        interp = self.interpolate_memberships[d]  # (n_sets, grid_pts)
+                        grid_vals = self.target_grids[d]          # (grid_pts,)
+                        mem = interp[cons[:, d]]                  # (n_rules, grid_pts)
+
+                        # Форма: (n_rules, n_samples, grid_pts)
+                        cut = np.minimum(acts[:, :, None], mem[:, None, :])
+                        agg = np.max(cut, axis=0)  # (n_samples, grid_pts)
+
+                        num = (agg * grid_vals).sum(axis=1)
+                        den = agg.sum(axis=1)
+                        den[den == 0] = 1
+                        preds[:, d] = num / den
+
+                    score = r2_score(y, preds, multioutput="uniform_average")
+                    penalty = (len(rules) / self.max_rules_in_base) * 1e-8
+                    fit[i] = score 
+
+                except Exception as e:
+                    # В случае любой ошибки — задаем плохую пригодность
+                    print(f"[fitness warning] Individual {i} error: {e}")
+                    fit[i] = -10.0
             return fit
+
 
         optimizer = SelfCSHAGA(
             fitness_function=fitness,
@@ -211,7 +233,6 @@ class FuzzyRegressor(FuzzyBase):
             pop_size=self.pop_size,
             str_len=sum(grid.parts),
             show_progress_each=1,
-            no_increase_num=100,
         )
         optimizer.fit()
         self.base = optimizer.get_fittest()["phenotype"]

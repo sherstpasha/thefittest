@@ -51,9 +51,9 @@ def run_fuzzy_solar_single(run_id: int, base_dir="results_fuzzy_solar"):
     # === модель ===
     n_f, n_o = X.shape[1], y.shape[1]
     model = FuzzyRegressor(
-        iters=2000, pop_size=100,
-        n_features_fuzzy_sets=[5]*n_f,
-        n_target_fuzzy_sets=[5]*n_o,
+        iters=1000, pop_size=10,
+        n_features_fuzzy_sets=[3]*n_f,
+        n_target_fuzzy_sets=[3]*n_o,
         max_rules_in_base=50,
         target_grid_volume=100,
     )
@@ -66,10 +66,10 @@ def run_fuzzy_solar_single(run_id: int, base_dir="results_fuzzy_solar"):
 
     model.define_sets(
         X, y,
-        feature_names=Xnames,
-        set_names=set_names,
-        target_names=target_names,
-        target_set_names=target_set_names,
+        #feature_names=Xnames,
+        #set_names=set_names,
+        #target_names=target_names,
+        #target_set_names=target_set_names,
     )
 
     # тренировка
@@ -123,14 +123,16 @@ def run_fuzzy_solar_single(run_id: int, base_dir="results_fuzzy_solar"):
 
 
 def worker(run_id, base_dir):
-    # при ошибке — бесконечный ретрай с паузой
+    import traceback
     while True:
         try:
             run_fuzzy_solar_single(run_id, base_dir)
             break
         except Exception as e:
             print(f"[run_{run_id}] Error: {e}. Retrying in 5s...")
+            traceback.print_exc()
             time.sleep(5)
+
 
 
 if __name__ == "__main__":
