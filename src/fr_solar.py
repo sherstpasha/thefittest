@@ -51,10 +51,10 @@ def run_fuzzy_solar_single(run_id: int, base_dir="results_fuzzy_solar"):
     # === модель ===
     n_f, n_o = X.shape[1], y.shape[1]
     model = FuzzyRegressor(
-        iters=1000, pop_size=1000,
+        iters=2000, pop_size=100,
         n_features_fuzzy_sets=[5]*n_f,
         n_target_fuzzy_sets=[5]*n_o,
-        max_rules_in_base=10,
+        max_rules_in_base=50,
         target_grid_volume=100,
     )
     # задаём имена множеств
@@ -135,7 +135,7 @@ def worker(run_id, base_dir):
 
 if __name__ == "__main__":
     BASE_DIR = "results_fuzzy_solar"
-    N_RUNS = 40  # сколько параллельных экспериментов
+    N_RUNS = 1  # сколько параллельных экспериментов
 
     os.makedirs(BASE_DIR, exist_ok=True)
     with mp.Pool(processes=min(mp.cpu_count(), N_RUNS)) as pool:

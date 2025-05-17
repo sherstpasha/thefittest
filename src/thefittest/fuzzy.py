@@ -92,6 +92,7 @@ class FuzzyRegressor(FuzzyBase):
         target_names: Optional[List[str]] = None,
         target_set_names: Optional[Dict[str, List[str]]] = None,
     ):
+        
         # Размерности
         self.n_samples, self.n_features = X.shape
         self.n_outputs = y.shape[1]
