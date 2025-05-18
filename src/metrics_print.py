@@ -3,7 +3,7 @@ import json
 from glob import glob
 
 # Путь к корневой папке с результатами
-base_dir = r"C:\Users\USER\clones\thefittest\results_fuzzy_solar"
+base_dir = r"C:\Users\pasha\thefittest\FL"
 
 # Шаблон для поиска всех metrics.json в папках run_*
 pattern = os.path.join(base_dir, "run_*", "metrics.json")

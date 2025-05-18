@@ -26,7 +26,7 @@ def calculate_global_normalized_error(y_true, y_pred, y_min_global, y_max_global
 
 def run_fuzzy_solar_single(run_id: int, base_dir="results_fuzzy_solar"):
     """
-    Один запуск: создаёт папку base_dir/run_<run_id>, 
+    Один запуск: создаёт папку base_dir/run_<run_id>,
     тренирует модель, сохраняет результаты и кривые.
     """
     output_dir = os.path.join(base_dir, f"run_{run_id}")
@@ -37,7 +37,8 @@ def run_fuzzy_solar_single(run_id: int, base_dir="results_fuzzy_solar"):
     X_raw, y_raw = ds.get_X(), ds.get_y()
     target_names = ds.get_y_names()
 
-    scaler_X = MinMaxScaler(); scaler_y = MinMaxScaler()
+    scaler_X = MinMaxScaler()
+    scaler_y = MinMaxScaler()
     X = scaler_X.fit_transform(X_raw)
     y = scaler_y.fit_transform(y_raw)
     y_min_g, y_max_g = y_raw.min(axis=0), y_raw.max(axis=0)
@@ -51,25 +52,27 @@ def run_fuzzy_solar_single(run_id: int, base_dir="results_fuzzy_solar"):
     # === модель ===
     n_f, n_o = X.shape[1], y.shape[1]
     model = FuzzyRegressor(
-        iters=1000, pop_size=10,
-        n_features_fuzzy_sets=[3]*n_f,
-        n_target_fuzzy_sets=[3]*n_o,
-        max_rules_in_base=50,
+        iters=3000,
+        pop_size=200,
+        n_features_fuzzy_sets=[5] * n_f,
+        n_target_fuzzy_sets=[7] * n_o,
+        max_rules_in_base=20,
         target_grid_volume=100,
     )
     # задаём имена множеств
-    labels5 = ["очень низкое","низкое","среднее","высокое","очень высокое"]
-    labels3 = ["низкое","среднее","высокое"]
+    labels5 = ["очень низкое", "низкое", "среднее", "высокое", "очень высокое"]
+    labels3 = ["низкое", "среднее", "высокое"]
     Xnames = [ds.get_X_names()[i] for i in range(n_f)]
     set_names = {nm: labels5 for nm in Xnames}
     target_set_names = {nm: labels5 for nm in target_names}
 
     model.define_sets(
-        X, y,
-        #feature_names=Xnames,
-        #set_names=set_names,
-        #target_names=target_names,
-        #target_set_names=target_set_names,
+        X,
+        y,
+        # feature_names=Xnames,
+        # set_names=set_names,
+        # target_names=target_names,
+        # target_set_names=target_set_names,
     )
 
     # тренировка
@@ -92,25 +95,25 @@ def run_fuzzy_solar_single(run_id: int, base_dir="results_fuzzy_solar"):
     # --- сохраняем таблицу предсказаний ---
     cols = [str(n) for n in target_names]
     df_true = pd.DataFrame(y_test_raw, columns=cols)
-    df_pred = pd.DataFrame(y_pred, columns=[c+"_pred" for c in cols])
+    df_pred = pd.DataFrame(y_pred, columns=[c + "_pred" for c in cols])
     pd.concat([df_true, df_pred], axis=1).to_csv(
         os.path.join(output_dir, "predictions.csv"), index=False
     )
 
     # --- строим графики True vs Pred ---
     y_all_true = np.vstack([y_train_raw, y_test_raw])
-    y_all_pred = np.vstack([
-        scaler_y.inverse_transform(model.predict(X_train)),
-        y_pred
-    ])
+    y_all_pred = np.vstack([scaler_y.inverse_transform(model.predict(X_train)), y_pred])
     for j, name in enumerate(cols):
-        plt.figure(figsize=(10,4))
+        plt.figure(figsize=(10, 4))
         plt.plot(y_all_true[:, j], label="True", linewidth=2)
         plt.plot(y_all_pred[:, j], label="Pred", linestyle="--")
-        plt.axvline(len(y_train_raw), color='gray', linestyle=':')
+        plt.axvline(len(y_train_raw), color="gray", linestyle=":")
         plt.title(f"{name}: True vs Pred")
-        plt.xlabel("Index"); plt.ylabel(name)
-        plt.legend(); plt.grid(True); plt.tight_layout()
+        plt.xlabel("Index")
+        plt.ylabel(name)
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
         plt.savefig(os.path.join(output_dir, f"curve_{j+1}.png"))
         plt.close()
 
@@ -124,6 +127,7 @@ def run_fuzzy_solar_single(run_id: int, base_dir="results_fuzzy_solar"):
 
 def worker(run_id, base_dir):
     import traceback
+
     while True:
         try:
             run_fuzzy_solar_single(run_id, base_dir)
@@ -134,10 +138,9 @@ def worker(run_id, base_dir):
             time.sleep(5)
 
 
-
 if __name__ == "__main__":
     BASE_DIR = "results_fuzzy_solar"
-    N_RUNS = 1  # сколько параллельных экспериментов
+    N_RUNS = 100  # сколько параллельных экспериментов
 
     os.makedirs(BASE_DIR, exist_ok=True)
     with mp.Pool(processes=min(mp.cpu_count(), N_RUNS)) as pool:
