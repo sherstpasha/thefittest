@@ -92,7 +92,7 @@ class FuzzyRegressor(FuzzyBase):
         target_names: Optional[List[str]] = None,
         target_set_names: Optional[Dict[str, List[str]]] = None,
     ):
-        
+
         # Размерности
         self.n_samples, self.n_features = X.shape
         self.n_outputs = y.shape[1]
@@ -174,7 +174,9 @@ class FuzzyRegressor(FuzzyBase):
                         mod = self.n_target_fuzzy_sets[j - self.n_features]
                     rule_ids[:, j] %= mod
                 uniq = np.unique(rule_ids, axis=0)
-                non_empty = [r for r in uniq if not np.all(r[:self.n_features] == self.ignore_terms_id)]
+                non_empty = [
+                    r for r in uniq if not np.all(r[: self.n_features] == self.ignore_terms_id)
+                ]
                 pop_ph_list.append(np.array(non_empty, dtype=int))
 
             # безопасное преобразование в 1D object array
@@ -182,7 +184,7 @@ class FuzzyRegressor(FuzzyBase):
             for i, val in enumerate(pop_ph_list):
                 pop_ph[i] = val
             return pop_ph
-            
+
         def fitness(ph_population: List[np.ndarray]) -> np.ndarray:
             fit = np.zeros(len(ph_population), dtype=float)
             for i, rules in enumerate(ph_population):
@@ -194,17 +196,16 @@ class FuzzyRegressor(FuzzyBase):
                     ant = rules[:, : self.n_features]
                     cons = rules[:, self.n_features :].astype(int)
 
-                    acts = np.array([
-                        self.inference(self.fuzzification(X, a))
-                        for a in ant
-                    ])  # (n_rules, n_samples)
+                    acts = np.array(
+                        [self.inference(self.fuzzification(X, a)) for a in ant]
+                    )  # (n_rules, n_samples)
 
                     preds = np.zeros((self.n_samples, self.n_outputs), dtype=float)
 
                     for d in range(self.n_outputs):
                         interp = self.interpolate_memberships[d]  # (n_sets, grid_pts)
-                        grid_vals = self.target_grids[d]          # (grid_pts,)
-                        mem = interp[cons[:, d]]                  # (n_rules, grid_pts)
+                        grid_vals = self.target_grids[d]  # (grid_pts,)
+                        mem = interp[cons[:, d]]  # (n_rules, grid_pts)
 
                         # Форма: (n_rules, n_samples, grid_pts)
                         cut = np.minimum(acts[:, :, None], mem[:, None, :])
@@ -217,14 +218,13 @@ class FuzzyRegressor(FuzzyBase):
 
                     score = r2_score(y, preds, multioutput="uniform_average")
                     penalty = (len(rules) / self.max_rules_in_base) * 1e-8
-                    fit[i] = score 
+                    fit[i] = score
 
                 except Exception as e:
                     # В случае любой ошибки — задаем плохую пригодность
                     print(f"[fitness warning] Individual {i} error: {e}")
                     fit[i] = -10.0
             return fit
-
 
         optimizer = SelfCSHAGA(
             fitness_function=fitness,
@@ -281,26 +281,26 @@ class FuzzyRegressor(FuzzyBase):
         target_set_names: Optional[Dict[str, List[str]]] = None,
     ) -> str:
         """Генерирует текстовое представление правил нечеткой системы.
-        
+
         Args:
             print_intervals: Если True, добавляет интервалы термов для выходных переменных
             set_names: Словарь с именами термов для входных переменных
             target_set_names: Словарь с именами термов для выходных переменных
-            
+
         Returns:
             Строка с текстовым представлением правил
         """
         # Используем сохраненные имена, если не переданы явно
         feat_names = set_names or self.set_names
         targ_names = target_set_names or self.target_set_names
-        
+
         texts = []
         ignore_terms_np = self.ignore_terms_id
-        
+
         for rule in self.base:
-            ant = rule[:self.n_features]
-            cons = rule[self.n_features:]
-            
+            ant = rule[: self.n_features]
+            cons = rule[self.n_features :]
+
             # Формируем антецедент
             parts = []
             for j, t in enumerate(ant):
@@ -309,29 +309,36 @@ class FuzzyRegressor(FuzzyBase):
                 fname = self.feature_names[j]
                 label = feat_names.get(fname, [])[t] if fname in feat_names else f"s{j}"
                 parts.append(f"({fname} is {label})")
-            
+
             head = " and ".join(parts) or "always"
-            
+
             # Формируем консеквент
             tails = []
             for d, c in enumerate(cons):
                 tname = self.target_names[d]
                 label = targ_names.get(tname, [])[c] if tname in targ_names else f"s{c}"
-                
+
                 if print_intervals:
                     inter = self.target_terms_point[d][c].cpu().numpy()
                     tails.append(f"{tname} ≈ {label} ({inter[0]:.3f},{inter[2]:.3f})")
                 else:
                     tails.append(f"{tname} is {label}")
-            
+
             texts.append(f"if {head} then " + ", ".join(tails))
-        
+
         return "\n".join(texts)
 
 
 class FuzzyClassifier(FuzzyBase):
 
-    def __init__(self, iters, pop_size, n_features_fuzzy_sets, max_rules_in_base):
+    def __init__(
+        self,
+        iters,
+        pop_size,
+        n_features_fuzzy_sets,
+        max_rules_in_base,
+        optimizer=SelfCGA,
+    ):
         FuzzyBase.__init__(
             self,
             iters=iters,
@@ -339,6 +346,7 @@ class FuzzyClassifier(FuzzyBase):
             n_features_fuzzy_sets=n_features_fuzzy_sets,
             max_rules_in_base=max_rules_in_base,
         )
+        self.optimizer = optimizer
 
     def define_sets(
         self,
@@ -422,7 +430,13 @@ class FuzzyClassifier(FuzzyBase):
 
                 population_ph.append(rulebase_u_not_empty)
 
-            population_ph = np.array(population_ph, dtype=object)
+            pop_list = population_ph
+
+            # allocate a 1-D object array of length N
+            population_ph = np.empty((len(pop_list),), dtype=object)
+
+            # copy each element in
+            population_ph[:] = pop_list
 
             return population_ph
 
@@ -457,7 +471,7 @@ class FuzzyClassifier(FuzzyBase):
 
             return fitness
 
-        optimizer = SelfCGA(
+        optimizer = self.optimizer(
             fitness_function=fitness_function,
             genotype_to_phenotype=genotype_to_phenotype,
             iters=self.iters,
