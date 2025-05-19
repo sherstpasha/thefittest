@@ -467,7 +467,7 @@ class FuzzyClassifier(FuzzyBase):
 
                 n_rules_fine = (n_rules / self.max_rules_in_base) * 1e-10
 
-                fitness[i] = f1_score(y, y_predict, average="macro") - n_rules_fine
+                fitness[i] = f1_score(y, y_predict, average="macro") 
 
             return fitness
 

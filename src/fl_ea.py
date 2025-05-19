@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import concurrent.futures
 import traceback
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import f1_score
 from thefittest.benchmarks import (
     BanknoteDataset,
@@ -20,16 +21,16 @@ from thefittest.optimizers import SelfCGA
 from thefittest.optimizers._pdpshaga import PDPSHAGA
 from thefittest.optimizers import PDPGA
 
-from thefittest.fuzzy import FuzzyClassifier  # замените на путь к вашему коду
+from thefittest.fl2 import FCSelfCGA  # замените на путь к вашему коду
 
 # ---------------------------
 # Параметры эксперимента
 # ---------------------------
 iters = 1000
 pop_size = 100
-n_features_fuzzy_sets = [5]  # пример: 3 терма на каждый признак
+n_features_fuzzy_sets = [3]  # пример: 3 терма на каждый признак
 max_rules_in_base = 10
-num_runs = 20  # число повторов
+num_runs = 30  # число повторов
 
 # Словарь оптимизаторов для эксперимента
 optimizers = {
@@ -50,7 +51,6 @@ datasets = {
     "RingNorm": (RingNormDataset().get_X(), RingNormDataset().get_y()),
 }
 
-
 # ---------------------------
 # Функция для одного запуска с FuzzyClassifier
 # ---------------------------
@@ -60,23 +60,30 @@ def run_single_run_fuzzy(task):
         X, y = datasets[dataset_name]
         X = X.astype(np.float32)
         y = y.astype(int)
+        # Разбиение на train и test
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, train_size=0.75, random_state=iteration
         )
+        # Минимакс-нормализация на основе train
+        scaler = MinMaxScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+
         # Создаем классификатор с выбранным оптимизатором
-        clf = FuzzyClassifier(
+        clf = FCSelfCGA(
             iters=iters,
             pop_size=pop_size,
-            n_features_fuzzy_sets=[n_features_fuzzy_sets[0]] * X.shape[1],
-            max_rules_in_base=max_rules_in_base,
-            optimizer=optimizers[opt_name],
+            #n_features_fuzzy_sets=[n_features_fuzzy_sets[0]] * X.shape[1],
+            #max_rules_in_base=max_rules_in_base,
+            n_fsets = 5, n_rules = 10,
+        #    optimizer=optimizers[opt_name],
         )
-        clf.define_sets(
-            X_train,
-            y_train,
-            feature_names=[f"X_{i}" for i in range(X.shape[1])],
-            target_names=[f"Y_{i}" for i in range(len(np.unique(y_train)))],
-        )
+#        clf.define_sets(
+#            X,
+#            y,
+#            feature_names=[f"X_{i}" for i in range(X.shape[1])],
+#            target_names=[f"Y_{i}" for i in range(len(np.unique(y_train)))],
+#        )
         clf.fit(X_train, y_train)
         y_pred_train = clf.predict(X_train)
         y_pred_test = clf.predict(X_test)
@@ -126,8 +133,8 @@ if __name__ == "__main__":
 
     # Агрегация по датасетам и оптимизаторам
     agg = (
-        df_results.groupby(["dataset", "optimizer"])["test_f1"]
-        .agg(["mean", "std", "count"])
+        df_results.groupby(["dataset", "optimizer"])['test_f1']
+        .agg(["mean", "std", "count"])  #
         .unstack("optimizer")
     )
     print("Aggregated results:")

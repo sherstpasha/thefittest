@@ -14,7 +14,7 @@ from tqdm import tqdm
 warnings.filterwarnings("ignore")
 
 # Root directory containing run_0, run_1, ..., run_19 subfolders
-ROOT = r"C:\Users\pasha\OneDrive\Рабочий стол\solar_res\ANN"
+ROOT = r"C:\Users\USER\Desktop\ANN2"
 
 
 def calculate_global_normalized_error(y_true, y_pred, y_min_global, y_max_global):
@@ -32,8 +32,8 @@ def run_fuzzy_on_selected(base_dir, input_csv, full_pred_txt, full_true_txt, tes
     # Load features and targets
     df = pd.read_csv(input_csv)
     n_targets = 4
-    feature_names = list(df.columns[:-n_targets])
-    target_names = [f"out_{i}" for i in range(n_targets)]
+    feature_names = ["Ресурс", "Интегральный флюенс протонов с энергией менее 1 МэВ", "Интегральный флюенс протонов с энергией менее 10 МэВ", "Коэффициент освещённости"]
+    target_names = ["Uxx_1", "Iкз_1", "Uxx_2", "Iкз_2"]
     X_raw = df.iloc[:, :-n_targets].values
 
     # Load predictions and ground truth
@@ -60,15 +60,18 @@ def run_fuzzy_on_selected(base_dir, input_csv, full_pred_txt, full_true_txt, tes
 
     # Initialize and train FuzzyRegressor
     model = FuzzyRegressor(
-        iters=3000,
+        iters=300,
         pop_size=200,
         n_features_fuzzy_sets=[5] * X_scaled.shape[1],
         n_target_fuzzy_sets=[7] * y_net_scaled.shape[1],
-        max_rules_in_base=20,
+        max_rules_in_base=10,
         target_grid_volume=100,
     )
+    set_names = ["Очень маленький", "Маленький", "Средний", "Большой", "Очень большой"]
+
+    target_set_names = ["Минимальный", "Очень маленький", "Маленький", "Средний", "Большой", "Очень большой", "Максимальный"]
     model.define_sets(
-        X_scaled, y_net_scaled, feature_names=feature_names, target_names=target_names
+        X_scaled, y_net_scaled, feature_names=feature_names, target_names=target_names, set_names = set_names, target_set_names=target_set_names
     )
     start = time.time()
     model.fit(X_scaled, y_net_scaled)
