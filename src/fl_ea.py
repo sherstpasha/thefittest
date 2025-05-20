@@ -26,11 +26,11 @@ from thefittest.fl2 import FCSelfCGA  # замените на путь к ваш
 # ---------------------------
 # Параметры эксперимента
 # ---------------------------
-iters = 1000
-pop_size = 100
-n_features_fuzzy_sets = [3]  # пример: 3 терма на каждый признак
-max_rules_in_base = 10
-num_runs = 30  # число повторов
+iters = 300
+pop_size = 300
+n_features_fuzzy_sets = [7]  # пример: 3 терма на каждый признак
+max_rules_in_base = 20
+num_runs = 5  # число повторов
 
 # Словарь оптимизаторов для эксперимента
 optimizers = {
@@ -75,8 +75,8 @@ def run_single_run_fuzzy(task):
             pop_size=pop_size,
             #n_features_fuzzy_sets=[n_features_fuzzy_sets[0]] * X.shape[1],
             #max_rules_in_base=max_rules_in_base,
-            n_fsets = 5, n_rules = 10,
-        #    optimizer=optimizers[opt_name],
+            n_fsets = 7, n_rules = 20,
+            optimizer=optimizers[opt_name],
         )
 #        clf.define_sets(
 #            X,

@@ -151,11 +151,11 @@ def worker(run_idx: int, trial_idx: int):
 
 
 def main():
-    num_runs = 20
+    num_runs = 1
     trials_per_run = 5
     max_workers = os.cpu_count() or 4
 
-    tasks = [(i, j) for i in range(num_runs) for j in range(trials_per_run)]
+    tasks = [(i, j) for i in [18] for j in range(trials_per_run)]
 
     # Launch tasks in parallel and show progress
     with ProcessPoolExecutor(max_workers=max_workers) as executor:

@@ -168,6 +168,7 @@ class FCSelfCGA(BaseEstimator, ClassifierMixin):
         self.opt_model = self.optimizer(fitness_function=opt_func, iters=self.iters,
                                           pop_size=self.pop_size, str_len=self.len_,
                                           show_progress_each=1,
+                                          no_increase_num=100,
                                           )
         self.opt_model.fit()
         self.base = self.grid_and_cut(
