@@ -614,15 +614,13 @@ class GeneticProgrammingNeuralNetStackingRegressorMO(GeneticProgrammingNeuralNet
         X_train_ens, X_train_meta, y_train_ens, y_train_meta = train_test_split(
             X_train, y_train, test_size=0.5, shuffle=False
         )
-        X_train, X_test = X[:169], X[169:]
-        y_train, y_test = y[:169], y[169:]
 
-        X_train_ens = torch.tensor(X_train, device=device, dtype=torch.float32)
-        X_train_meta = torch.tensor(X_train, device=device, dtype=torch.float32)
-        X_test = torch.tensor(X_test, device=device, dtype=torch.float32)
-        y_test = torch.tensor(y_test, dtype=torch.float32, device=device)
-        y_train_ens = torch.tensor(y_train, dtype=torch.float32, device=device)
-        y_train_meta = torch.tensor(y_train, dtype=torch.float32, device=device)
+        X_train_ens = torch.tensor(X, device=device, dtype=torch.float32)
+        X_train_meta = torch.tensor(X, device=device, dtype=torch.float32)
+        X_test = torch.tensor(X, device=device, dtype=torch.float32)
+        y_test = torch.tensor(y, dtype=torch.float32, device=device)
+        y_train_ens = torch.tensor(y, dtype=torch.float32, device=device)
+        y_train_meta = torch.tensor(y, dtype=torch.float32, device=device)
 
         #     proba_test = torch.tensor(proba_test, dtype=torch.float32, device=device)
         #     proba_train_ens = torch.tensor(proba_train_ens, dtype=torch.float32, device=device)
