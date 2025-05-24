@@ -105,7 +105,12 @@ def genotype_to_phenotype(x):
             trees.append(remain_tree)
         phenotypes.append(trees)
 
-    return np.array(phenotypes, dtype=object)
+    # Безопасное построение одномерного массива объектов
+    arr = np.empty(len(phenotypes), dtype=object)
+    for i, item in enumerate(phenotypes):
+        arr[i] = item
+    return arr
+
 
 
 class SymbolicRegressionGP_DUAL(Model):
