@@ -9,7 +9,7 @@ from thefittest.optimizers import SelfCGP
 from thefittest.optimizers import PDPGP
 from thefittest.optimizers._selfcshagp import SelfCSHAGP
 from thefittest.optimizers._pdpshagp import PDPSHAGP
-from thefittest.regressors import SymbolicRegressionGP
+from thefittest.regressors._symbolicregressiongp_dual import SymbolicRegressionGP_DUAL
 import concurrent.futures
 from scipy.stats import ttest_ind  # Для статистической проверки
 from tqdm import tqdm  # Импорт прогресс-бара
@@ -24,10 +24,10 @@ os.makedirs("results", exist_ok=True)
 # Параметры алгоритма и эксперимента
 number_of_iterations = 1000
 population_size = 100
-num_runs = 100 # число запусков для каждого файла (N)
+num_runs = 100  # число запусков для каждого файла (N)
 
 # Путь к папке с данными (файлы без расширения)
-data_folder = r"C:\Users\USER\Desktop\Feynman120"
+data_folder = r"C:\Users\pasha\OneDrive\Рабочий стол\Feynman120"
 # Получаем список файлов в папке (файлы не имеют расширения, но их можно прочитать с помощью np.loadtxt)
 files_list = [f for f in os.listdir(data_folder) if os.path.isfile(os.path.join(data_folder, f))]
 print("Найденные файлы:", files_list)
@@ -76,7 +76,7 @@ def run_single_run(file_name, iteration, number_of_iterations, population_size, 
         raise ValueError(f"Unknown method: {method}")
 
     # Инициализируем и обучаем модель символической регрессии
-    model = SymbolicRegressionGP(
+    model = SymbolicRegressionGP_DUAL(
         iters=number_of_iterations,
         pop_size=population_size,
         optimizer=optimizer_class,
