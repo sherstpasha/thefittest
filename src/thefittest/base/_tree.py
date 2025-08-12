@@ -113,9 +113,11 @@ class UniversalSet:
         self,
         functional_set: Tuple[FunctionalNode, ...],
         terminal_set: Tuple[Union[TerminalNode, EphemeralNode], ...],
+        p_dual: float = 1.0,
     ) -> None:
         self._functional_set = self._define_functional_set(functional_set)
         self._terminal_set = tuple(terminal_set)
+        self._p_dual = p_dual
 
     def _define_functional_set(self, functional_set: Tuple[FunctionalNode, ...]) -> defaultdict:
         _functional_set_list = defaultdict(list, {-1: list(functional_set)})
@@ -134,9 +136,37 @@ class UniversalSet:
             return choosen
 
     def _random_functional(self, n_args: int = -1) -> FunctionalNode:
-        n_args_functionals = self._functional_set[n_args]
-        node = random.choice(n_args_functionals)
-        return node
+        from random import random, choice
+
+        # Все узлы нужной арности
+        candidates = list(self._functional_set.get(n_args, ()))
+        if not candidates:
+            candidates = list(self._functional_set.get(-1, ()))
+
+        # Разделим на обычные и DualNode
+        dual_candidates = [f for f in candidates if isinstance(f._value, DualNode)]
+        base_candidates = [f for f in candidates if not isinstance(f._value, DualNode)]
+
+        # Выбор по вероятности
+        chosen = None
+        if random() < self._p_dual and dual_candidates:
+            chosen = choice(dual_candidates)
+        elif base_candidates:
+            chosen = choice(base_candidates)
+        elif dual_candidates:
+            chosen = choice(dual_candidates)
+        else:
+            raise ValueError("Нет доступных функциональных узлов")
+
+        # 💡 NEW: если DualNode содержит EphemeralNode — вызвать его
+        if isinstance(chosen._value, DualNode):
+            top = chosen._value._top_node
+            if isinstance(top, EphemeralNode):
+                const_top = top()
+                new_dual = DualNode(top_node=const_top, bottom_node=chosen._value._bottom_node)
+                return FunctionalNode(new_dual)
+
+        return chosen
 
 
 class EnsembleUniversalSet(UniversalSet):
