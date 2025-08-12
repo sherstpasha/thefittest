@@ -28,11 +28,16 @@ from ..optimizers import SHADE
 from ..optimizers import SHAGA
 from ..optimizers import SelfCGA
 from ..optimizers import jDE
-from ..utils import array_like_to_numpy_X_y
+from ..utils import (
+    _snapshot_tensor_meta,
+    _to_numpy_for_validation,
+    _back_to_torch,
+)
 from ..utils._metrics import categorical_crossentropy3d
 from ..utils._metrics import root_mean_square_error2d
 from ..utils.random import check_random_state
 from ..utils.transformations import GrayCode
+import torch
 
 
 weights_type_optimizer_alias = Union[
@@ -63,50 +68,71 @@ def check_optimizer_args(
             ), f"Do not set '{arg}' in 'optimizer_args'. Instead, use the arguments of the class."
 
 
+def _ce_from_probs_torch(
+    probs: torch.Tensor, targets: torch.Tensor, eps: float = 1e-12
+) -> torch.Tensor:
+    """
+    Кросс-энтропия для one-hot targets по вероятностям (probs уже после softmax).
+    Возвращает скалярный loss (mean по сэмплам).
+    """
+    # Сгладим распространённые формы вывода сети: (N,C,1) -> (N,C); (N,C,K) -> (N*K,C)
+    if probs.ndim == 3 and probs.size(-1) == 1:
+        probs = probs.squeeze(-1)
+    if targets.ndim == 3 and targets.size(-1) == 1:
+        targets = targets.squeeze(-1)
+    if probs.ndim == 3:
+        probs = probs.reshape(-1, probs.size(-1))
+        targets = targets.reshape(-1, targets.size(-1))
+    # безопасный лог
+    probs = probs.clamp_min(eps)
+    loss_vec = -(targets * probs.log()).sum(dim=-1)
+    return loss_vec.mean()
+
+
+def _rmse_torch(pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    """
+    RMSE, аккуратно выжимаем размерности вида (N,1) / (N,1,1).
+    Возвращает скалярный loss (mean по сэмплам).
+    """
+    for t in ("pred", "target"):
+        pass
+    if pred.ndim == 3 and pred.size(-1) == 1:
+        pred = pred.squeeze(-1)
+    if target.ndim == 3 and target.size(-1) == 1:
+        target = target.squeeze(-1)
+    if pred.ndim == 2 and pred.size(-1) == 1:
+        pred = pred.squeeze(-1)
+    if target.ndim == 2 and target.size(-1) == 1:
+        target = target.squeeze(-1)
+    return torch.sqrt(torch.mean((pred - target) ** 2))
+
+
 def fitness_function_weights(
     weights: NDArray[np.float64],
     net: "Net",
-    X: NDArray[np.float64],
-    targets: NDArray[np.float64],
+    X: torch.Tensor,
+    targets: torch.Tensor,
     task_type: str = "regression",
 ) -> NDArray[np.float64]:
-    """
-    Evaluate the fitness of a neural network's weights for a given task.
 
-    This function computes the error between the network's predictions and the actual targets. It supports both classification and regression tasks, determined by the `task_type` parameter.
+    weights_t = torch.as_tensor(weights, dtype=X.dtype, device=X.device)
+    pop_size = weights.shape[0]
+    losses = np.empty(pop_size, dtype=np.float64)
 
-    Parameters
-    ----------
-    weights : NDArray[np.float64]
-        The weights of the neural network to be evaluated.
-    net : Net
-        The neural network instance. It must have a `forward` method that accepts input data and weights, and returns the network's output.
-    X : NDArray[np.float64]
-        The input data for which predictions are to be made. It should be in a format compatible with the `net`'s `forward` method.
-    targets : NDArray[np.float64]
-        The actual target values for the input data. For classification, this should be one-hot encoded.
-    task_type : str, optional
-        The type of task for which the fitness is being evaluated. Should be 'classification' for classification tasks and 'regression' for regression tasks. Defaults to 'regression'.
-
-    Returns
-    -------
-    NDArray[np.float64]
-        The computed error for the given weights and input data. For classification, this is the categorical cross-entropy error. For regression, it's the root mean square error.
-
-    Raises
-    ------
-    ValueError
-        If `task_type` is not 'classification' or 'regression'.
-    """
-    if task_type == "classification":
-        output3d = net.forward(X, weights)
-        error = categorical_crossentropy3d(targets, output3d)
-    elif task_type == "regression":
-        output2d = net.forward(X, weights)[:, :, 0]
-        error = root_mean_square_error2d(targets, output2d)
-    else:
-        raise ValueError("task_type must be 'classification' or 'regression'")
-    return error
+    with torch.no_grad():
+        if task_type == "classification":
+            for i in range(pop_size):
+                out = net.forward(X, weights_t[i])
+                loss = _ce_from_probs_torch(out, targets)
+                losses[i] = float(loss.item())
+        elif task_type == "regression":
+            for i in range(pop_size):
+                out = net.forward(X, weights_t[i])
+                loss = _rmse_torch(out, targets)
+                losses[i] = float(loss.item())
+        else:
+            raise ValueError("task_type must be 'classification' or 'regression'")
+    return losses
 
 
 def train_net_weights(
@@ -120,6 +146,7 @@ def train_net_weights(
 ) -> Net:
 
     net = net.copy()
+    net.compile_torch(X_train.device)
     weights_optimizer_args = weights_optimizer_args.copy()
 
     weights_optimizer_args["fitness_function"] = fitness_function
@@ -135,7 +162,7 @@ def train_net_weights(
             weights_optimizer_args["pop_size"], -10, 10, len(net._weights)
         )
     )
-    initial_population[0] = net._weights.copy()
+    initial_population[0] = net._weights.cpu().numpy().copy()
 
     if weights_optimizer in (SHADE, DifferentialEvolution, jDE):
         weights_optimizer_args["left_border"] = -10
@@ -155,9 +182,11 @@ def train_net_weights(
     optimizer = weights_optimizer(**weights_optimizer_args)
     optimizer.fit()
 
-    net = optimizer.get_fittest()["phenotype"]
+    weights = torch.as_tensor(
+        optimizer.get_fittest()["phenotype"], dtype=X_train.dtype, device=X_train.device
+    )
 
-    return net, optimizer._stats
+    return weights, optimizer._stats
 
 
 class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
@@ -201,7 +230,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         for n_layer in self.hidden_layers:
             start = end
             end = end + n_layer
-            inputs_id = {(n_inputs - 1)}
+            inputs_id = {n_inputs - 1}
             hidden_id = set(range(start, end))
             activs = dict(zip(hidden_id, [ACTIV_NAME_INV[self.activation]] * len(hidden_id)))
 
@@ -214,7 +243,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
 
         start = end
         end = end + n_outputs
-        inputs_id = {(n_inputs - 1)}
+        inputs_id = {n_inputs - 1}
         output_id = set(range(start, end))
 
         if isinstance(self, ClassifierMixin):
@@ -239,8 +268,8 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
     def get_net(self) -> Net:
         return self.net_
 
-    def fit(self, X: ArrayLike, y: ArrayLike):
-
+    def fit(self, X, y):
+        # === 1) подготовка аргументов оптимизатора (как было) ===
         if self.weights_optimizer_args is not None:
             weights_optimizer_args = self.weights_optimizer_args.copy()
             check_optimizer_args(
@@ -267,48 +296,65 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
 
         check_random_state(self.random_state)
 
+        # === 2) снимем метаданные тензоров, временно переведём в NumPy для валидации ===
+        Xm, ym = _snapshot_tensor_meta(X), _snapshot_tensor_meta(y)
+        X_np = _to_numpy_for_validation(X)
+        y_np = _to_numpy_for_validation(y)
+
+        # === 3) валидация/предобработка как раньше ===
         if isinstance(self, ClassifierMixin):
-            X, y = self._validate_data(X, y, y_numeric=False, reset=True)
-            check_classification_targets(y)
+            X_np, y_np = self._validate_data(X_np, y_np, y_numeric=False, reset=True)
+            check_classification_targets(y_np)
+
             self._label_encoder = LabelEncoder()
             self._one_hot_encoder = OneHotEncoder(
                 sparse_output=False, categories="auto", dtype=np.float64
             )
 
-            numeric_labels = self._label_encoder.fit_transform(y)
-            y = self._one_hot_encoder.fit_transform(np.array(numeric_labels).reshape(-1, 1))
+            numeric_labels = self._label_encoder.fit_transform(y_np)
+            y_np = self._one_hot_encoder.fit_transform(np.array(numeric_labels).reshape(-1, 1))
             self.classes_ = self._label_encoder.classes_
             self.n_classes_ = len(self.classes_)
         else:
-            X, y = self._validate_data(X, y, y_numeric=True, reset=True)
+            X_np, y_np = self._validate_data(X_np, y_np, y_numeric=True, reset=True)
 
-        X, y = array_like_to_numpy_X_y(X, y)
-
+        # === 4) offset как было ===
         if self.offset:
-            X = np.hstack([X, np.ones((X.shape[0], 1))])
+            X_np = np.hstack([X_np, np.ones((X_np.shape[0], 1))])
 
+        # === 5) вернёмся в torch на исходные device/dtype ===
+        X_t = _back_to_torch(X_np.astype(np.float32, copy=False), Xm, dtype=torch.float32)
         if isinstance(self, ClassifierMixin):
-            self.net_ = self._defitne_net(X.shape[1], len(self.classes_))
+            # one-hot уже в y_np
+            y_t = _back_to_torch(y_np.astype(np.float32, copy=False), ym, dtype=torch.float32)
+        else:
+            # регрессия — числовой вектор/столбец
+            y_t = _back_to_torch(np.asarray(y_np, dtype=np.float32), ym, dtype=torch.float32)
+
+        # === 6) создание сети и обучение (как было) ===
+        if isinstance(self, ClassifierMixin):
+            self.net_ = self._defitne_net(X_t.shape[1], len(self.classes_))
             self.net_._weights, self.optimizer_stats_ = train_net_weights(
                 self.net_,
-                X,
-                y,
+                X_t,
+                y_t,
                 weights_optimizer_args,
                 self.weights_optimizer,
                 fitness_function_weights,
                 task_type="classification",
             )
-
         else:
-            self.net_ = self._defitne_net(X.shape[1], 1)
+            self.net_ = self._defitne_net(X_t.shape[1], 1)
             self.net_._weights, self.optimizer_stats_ = train_net_weights(
                 self.net_,
-                X,
-                y,
+                X_t,
+                y_t,
                 weights_optimizer_args,
                 self.weights_optimizer,
                 fitness_function_weights,
                 task_type="regression",
             )
-
+        self.net_.compile_torch()
+        # === 7) совместимость со sklearn ===
+        self.n_features_in_ = X_np.shape[1]
         return self

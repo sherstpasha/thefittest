@@ -12,9 +12,16 @@ from sklearn.base import ClassifierMixin
 from sklearn.utils.validation import check_array
 from sklearn.utils.validation import check_is_fitted
 
+import torch
+
 from ..base._mlp import BaseMLPEA
 from ..base._mlp import weights_type_optimizer_alias
 from ..optimizers import SHADE
+from ..utils import (
+    _snapshot_tensor_meta,
+    _to_numpy_for_validation,
+    _back_to_torch,
+)
 
 
 class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
@@ -42,10 +49,15 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
         )
 
     def predict_proba(self, X: NDArray[np.float64]) -> NDArray[np.float64]:
+
         check_is_fitted(self)
 
-        X = check_array(X)
-        n_features = X.shape[1]
+        Xm = _snapshot_tensor_meta(X)
+        X_np = _to_numpy_for_validation(X)
+        X_np = check_array(X_np)
+
+        X_np = check_array(X_np)
+        n_features = X_np.shape[1] + 1
 
         if self.n_features_in_ != n_features:
             raise ValueError(
@@ -54,17 +66,20 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
                 f"n_features is {n_features}."
             )
 
-        if self.offset:
-            X = np.hstack([X, np.ones((X.shape[0], 1))])
+        X_t = _back_to_torch(X_np.astype(np.float32, copy=False), Xm, dtype=torch.float32)
 
-        proba = self.net_.forward(X)[0]
-        return proba
+        if self.offset:
+            ones = torch.ones((X_t.shape[0], 1), dtype=X_t.dtype, device=X_t.device)
+            X_t = torch.cat([X_t, ones], dim=1)
+
+        with torch.no_grad():
+            out = self.net_.forward(X_t)
+        return out
 
     def predict(self, X: NDArray[np.float64]):
 
-        proba = self.predict_proba(X)
-
-        indeces = np.argmax(proba, axis=1)
-        y_predict = self._label_encoder.inverse_transform(indeces)
+        out_t = self.predict_proba(X)
+        indices = torch.argmax(out_t, dim=1).cpu().numpy()
+        y_predict = self._label_encoder.inverse_transform(indices)
 
         return y_predict

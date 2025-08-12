@@ -14,9 +14,10 @@ torch.manual_seed(0)
 
 # ==== данные ====
 data = IrisDataset()
-X = data.get_X()                   # (150, 4)
+X = data.get_X()  # (150, 4)
 y = data.get_y()
 from sklearn.preprocessing import minmax_scale
+
 X_scaled = minmax_scale(X)
 
 # ==== эволюционная часть (генерим одну особь и строим две сети) ====
@@ -33,12 +34,10 @@ pop = GeneticProgramming.half_and_half(100, uniset, 15)
 
 # строим новую и старую версии сети из одного и того же генотипа
 net = model.genotype_to_phenotype_tree(
-    tree=pop[0], n_variables=X.shape[1], n_outputs=3,
-    output_activation='softmax', offset=True
+    tree=pop[0], n_variables=X.shape[1], n_outputs=3, output_activation="softmax", offset=True
 )
 net_old = model.genotype_to_phenotype_tree_old(
-    tree=pop[0], n_variables=X.shape[1], n_outputs=3,
-    output_activation='softmax', offset=True
+    tree=pop[0], n_variables=X.shape[1], n_outputs=3, output_activation="softmax", offset=True
 )
 
 # чтобы сравнение было корректным — копируем веса в старую сеть
@@ -46,8 +45,12 @@ net_old._weights = net._weights.detach().cpu().numpy().astype(np.float64)
 
 # ==== отрисовка графов (слева new, справа old) ====
 fig, axes = plt.subplots(1, 2, figsize=(12, 5), constrained_layout=True)
-net.plot(ax=axes[0]); axes[0].set_title("New Net"); axes[0].axis("off")
-net_old.plot(ax=axes[1]); axes[1].set_title("Old Net"); axes[1].axis("off")
+net.plot(ax=axes[0])
+axes[0].set_title("New Net")
+axes[0].axis("off")
+net_old.plot(ax=axes[1])
+axes[1].set_title("Old Net")
+axes[1].axis("off")
 plt.show()
 
 # ==== один раз переводим данные в тензор (dtype/девайс весов) ====
@@ -59,7 +62,7 @@ with torch.no_grad():
     y_new = net.forward(X_t)  # torch, shape (N, C)
 
 # старый возвращает numpy (1, N, C) -> в torch, на тот же девайс/тип
-y_old_np = net_old.forward(X_scaled)             # (1, N, C)
+y_old_np = net_old.forward(X_scaled)  # (1, N, C)
 y_old = torch.from_numpy(y_old_np).squeeze(0).to(device=y_new.device, dtype=y_new.dtype)
 
 # метрики расхождения

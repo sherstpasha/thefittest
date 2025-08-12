@@ -274,8 +274,8 @@ def forward(
         out = np.dot(nodes[from_i].T, weights_i.T)
         nodes[to_i] = out.T
 
-#        for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
-#            nodes[a_nodes_i_i] = multiactivation2d(nodes[a_nodes_i_i].T, a_code_i_i).T
+        for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
+            nodes[a_nodes_i_i] = multiactivation2d(nodes[a_nodes_i_i].T, a_code_i_i).T
 
     return nodes
 
@@ -484,3 +484,29 @@ def if_single_or_array_to_int_array(
         array = single_or_array.astype(np.int64)
 
     return array
+
+
+import torch
+
+
+def _snapshot_tensor_meta(x):
+    if isinstance(x, torch.Tensor):
+        return dict(is_tensor=True, device=x.device, dtype=x.dtype)
+    return dict(is_tensor=False, device=None, dtype=None)
+
+
+def _to_numpy_for_validation(a):
+    if isinstance(a, torch.Tensor):
+        if a.requires_grad:
+            a = a.detach()
+        return a.cpu().numpy()
+    return np.asarray(a)
+
+
+def _back_to_torch(a_np, meta, dtype=torch.float32):
+    if not meta["is_tensor"]:
+        return a_np
+    a = torch.from_numpy(a_np)
+    if a.dtype != dtype:
+        a = a.to(dtype)
+    return a.to(meta["device"])

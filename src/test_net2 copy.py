@@ -1,135 +1,134 @@
+# ==== imports & setup ====
+from thefittest.optimizers import GeneticProgramming
+from thefittest.benchmarks import DigitsDataset
+from thefittest.classifiers import GeneticProgrammingNeuralNetClassifier
+from thefittest.base._tree import init_net_uniset
+
 import numpy as np
 import torch
-from thefittest.base._net import Net, Net_old
+import torch.nn.functional as F
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import minmax_scale
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 
-def _sorted_idx_map(sorted_ids, other_ids):
-    pos = {n:i for i,n in enumerate(sorted_ids)}
-    return [pos[n] for n in other_ids]
+# воспроизводимость
+np.random.seed(0)
+torch.manual_seed(0)
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+# device = "cpu"
+print(device)
+dtype = torch.float32
+
+# ==== данные ====
+data = DigitsDataset()
+X = data.get_X()  # (150, 4)
+y = data.get_y().astype(np.int64)  # классы 0..2
+
+X_scaled = minmax_scale(X)
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# ---- тензоры ----
+Xtr_t = torch.as_tensor(X_train, dtype=dtype, device=device)
+ytr_t = torch.as_tensor(y_train, dtype=torch.long, device=device)
+Xte_t = torch.as_tensor(X_test, dtype=dtype, device=device)
+yte_t = torch.as_tensor(y_test, dtype=torch.long, device=device)
+
+# ==== генерим архитектуру через GP (одна особь) ====
+model = GeneticProgrammingNeuralNetClassifier(n_iter=1, pop_size=1)  # тут GP только ради формы сети
+uniset = init_net_uniset(
+    n_variables=X.shape[1],
+    input_block_size=3,
+    max_hidden_block_size=8,
+    offset=True,
+)
+
+pop = GeneticProgramming.half_and_half(1, uniset, 15)
+
+# строим сеть с ЛИНЕЙНЫМ выходом (логиты)
+net = model.genotype_to_phenotype_tree(
+    tree=pop[0],
+    n_variables=X.shape[1],
+    n_outputs=10,
+    output_activation="ln",  # <--- важно: без softmax
+    offset=True,
+)
+
+# переносим на девайс/тип и компилим план
+net.to(device=device, dtype=dtype)
+net.compile_torch()
+
+# ==== обучение весов ====
+# делаем веса обучаемыми
+net._weights.requires_grad_(True)
+
+optimizer = torch.optim.Adam([net._weights], lr=1e-2, weight_decay=1e-4)
+criterion = torch.nn.CrossEntropyLoss()
+
+EPOCHS = 3000
+PRINT_EVERY = 1
+BATCH = None  # мини-батчи, можно поставить None для фулл-батча
+
+
+def iterate_minibatches(Xt, yt, batch):
+    if batch is None or batch >= Xt.shape[0]:
+        yield Xt, yt
+        return
+    idx = torch.randperm(Xt.shape[0], device=Xt.device)
+    for i in range(0, Xt.shape[0], batch):
+        j = idx[i : i + batch]
+        yield Xt[j], yt[j]
+
 
 @torch.no_grad()
-def compare_old_new_once(
-    inputs: set[int],
-    hidden_layers: list[set[int]],
-    outputs: set[int],
-    connects: np.ndarray,
-    activs: dict[int,int],
-    B: int = 8,
-    Wcases: int | None = None,
-    device: str | torch.device = None,
-    atol: float = 1e-6,
-    rtol: float = 1e-5,
-) -> dict:
-    """
-    Возвращает словарь с метриками расхождения.
-    """
-    device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
+def evaluate():
+    # логиты -> метрики
+    logits_tr = net.forward(Xtr_t)
+    loss_tr = criterion(logits_tr, ytr_t).item()
+    pred_tr = logits_tr.argmax(dim=1).detach().cpu().numpy()
+    acc_tr = accuracy_score(y_train, pred_tr)
+    f1_tr = f1_score(y_train, pred_tr, average="macro")
 
-    E = int(connects.shape[0])
-    # один и тот же набор весов
-    if Wcases is None:
-        w_np = np.random.randn(E).astype(np.float64)
-        w_t  = torch.tensor(w_np, dtype=torch.float32, device=device)
-    else:
-        w_np = np.random.randn(Wcases, E).astype(np.float64)
-        w_t  = torch.tensor(w_np, dtype=torch.float32, device=device)
+    logits_te = net.forward(Xte_t)
+    loss_te = criterion(logits_te, yte_t).item()
+    pred_te = logits_te.argmax(dim=1).detach().cpu().numpy()
+    acc_te = accuracy_score(y_test, pred_te)
+    f1_te = f1_score(y_test, pred_te, average="macro")
+    return (loss_tr, acc_tr, f1_tr), (loss_te, acc_te, f1_te)
 
-    # входы делаем в КАНОНИЧЕСКОМ порядке = sorted(inputs)
-    in_sorted = sorted(inputs)
-    X_base = torch.randn(B, len(in_sorted), device=device, dtype=torch.float32)
 
-    # --- NEW ---
-    net_new = Net(inputs=inputs, hidden_layers=hidden_layers, outputs=outputs,
-                  connects=connects, weights=(w_t if Wcases is None else torch.randn(E, device=device)),
-                  activs=activs)
-    net_new.compile_torch()
-    y_new = net_new.forward(X_base, weights=(None if Wcases is None else w_t))  # (B,n_out) or (W,B,n_out)
+for epoch in range(1, EPOCHS + 1):
+    net._weights.grad = None
+    total_loss = 0.0
 
-    # --- OLD ---
-    net_old = Net_old(inputs=inputs, hidden_layers=hidden_layers, outputs=outputs,
-                      connects=connects, weights=(w_np if Wcases is None else np.random.randn(E)),
-                      activs=activs)
-    # старый forward сам вызовет _get_order при первом запуске, но нам нужно знать его внутренний порядок
-    _ = net_old.forward(np.zeros((1, len(in_sorted)), dtype=np.float64))  # прогреем порядок
-    old_in_order  = list(net_old._numpy_inputs)      # порядок входов у старой модели
-    old_out_order = list(net_old._numpy_outputs)     # порядок выходов у старой модели
+    for xb, yb in iterate_minibatches(Xtr_t, ytr_t, BATCH):
+        logits = net.forward(xb)  # (B, 3), логиты
+        loss = criterion(logits, yb)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item() * xb.shape[0]
 
-    # переставим столбцы X_base под порядок старой
-    cols_for_old = _sorted_idx_map(in_sorted, old_in_order)
-    X_old = X_base[:, cols_for_old].cpu().numpy().astype(np.float64)
+    if epoch % PRINT_EVERY == 0 or epoch == 1:
+        (l_tr, a_tr, f_tr), (l_te, a_te, f_te) = evaluate()
+        print(
+            f"epoch {epoch:4d} | train loss {l_tr:.4f} acc {a_tr:.3f} f1 {f_tr:.3f} "
+            f"| test loss {l_te:.4f} acc {a_te:.3f} f1 {f_te:.3f}"
+        )
 
-    # прогоним старую (с теми же весами)
-    y_old = net_old.forward(X_old, weights=(w_np if Wcases is not None else None))  # (B,n_out) или (W,B,n_out)
-    # приведём к torch и к порядку ВЫХОДОВ как у новой (у новой — sorted(outputs))
-    out_sorted = sorted(outputs)
-    cols_old2sorted = _sorted_idx_map(old_out_order, out_sorted)
-    if y_old.ndim == 2:     # (B,n_out)
-        y_old_sorted = torch.from_numpy(y_old[:, cols_old2sorted]).to(device=device, dtype=y_new.dtype)
-    else:                   # (W,B,n_out)
-        y_old_sorted = torch.from_numpy(y_old[:, :, cols_old2sorted]).to(device=device, dtype=y_new.dtype)
+# ==== финальная оценка + матрица ошибок ====
+with torch.no_grad():
+    logits_te = net.forward(Xte_t)
+    y_pred = logits_te.argmax(dim=1).cpu().numpy()
 
-    # --- сравнение ---
-    diff = (y_new - y_old_sorted).abs()
-    max_abs = diff.max().item()
-    mean_abs = diff.mean().item()
-    ok = torch.allclose(y_new, y_old_sorted, atol=atol, rtol=rtol)
+print("\nConfusion matrix (test):")
+print(confusion_matrix(y_test, y_pred))
+print("Test accuracy:", accuracy_score(y_test, y_pred))
+print("Test F1-macro:", f1_score(y_test, y_pred, average="macro"))
 
-    return {
-        "ok": ok,
-        "max_abs": max_abs,
-        "mean_abs": mean_abs,
-        "shape_new": tuple(y_new.shape),
-        "shape_old": tuple(y_old_sorted.shape),
-    }
-# 1) ромб + скипы
-inputs  = {0}
-h1, h2  = {1,2}, {3,4,5}
-outputs = {6,7}
-connects = np.array([
-    [0,1],[0,2],
-    [1,3],[1,4],
-    [2,4],[2,5],
-    [0,5],          # skip
-    [3,6],[4,6],[5,7],
-    [0,7],          # skip
-], dtype=np.int64)
-RELU, TANH, LN = 1, 3, 4
-activs = {1:RELU,2:TANH,3:TANH,4:RELU,5:TANH,6:LN,7:LN}
-print("diamond:", compare_old_new_once(inputs,[h1,h2],outputs,connects,activs, B=8))
 
-# 2) softmax-группа (два узла с одинаковым множеством родителей)
-SOFTMAX=5
-inputs  = {0,1}
-h1      = {2,3}
-outputs = {4}
-connects = np.array([
-    [0,2],[1,2],
-    [0,3],[1,3],   # одинаковые родители → одна группа softmax
-    [2,4],[3,4],
-], dtype=np.int64)
-activs = {2:SOFTMAX, 3:SOFTMAX, 4:LN}
-print("softmax:", compare_old_new_once(inputs,[h1],outputs,connects,activs, B=5))
+import matplotlib.pyplot as plt
 
-# 3) MLP 1-16-16-1 с батчем весов
-def build_mlp_graph(n_in, hidden, n_out, hidden_act=TANH, out_act=LN):
-    node=0
-    inputs=set(range(node,node+n_in)); node+=n_in
-    hs=[]
-    for h in hidden:
-        layer=set(range(node,node+h)); node+=h
-        hs.append(layer)
-    outputs=set(range(node,node+n_out)); node+=n_out
-    layers=[inputs]+hs+[outputs]
-    edges=[]
-    for L,R in zip(layers[:-1],layers[1:]):
-        for u in L:
-            for v in R:
-                edges.append((u,v))
-    connects=np.array(edges,dtype=np.int64)
-    activs={}
-    for L in hs:
-        for u in L: activs[u]=hidden_act
-    for u in outputs: activs[u]=out_act
-    return inputs,hs,outputs,connects,activs
-
-inputs, hs, outputs, connects, activs = build_mlp_graph(1,[16,16],1)
-print("mlp W=3:", compare_old_new_once(inputs,hs,outputs,connects,activs, B=7, Wcases=3))
+net.plot()
+plt.show()
