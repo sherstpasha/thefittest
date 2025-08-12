@@ -21,6 +21,7 @@ from sklearn.utils.multiclass import check_classification_targets
 
 from ..base import FunctionalNode
 from ..base import Net
+from ..base._net import Net_old
 from ..base import TerminalNode
 from ..base import Tree
 from ..base import UniversalSet
@@ -278,6 +279,38 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         output_id = set(range(n, end))
         activs = dict(zip(output_id, [ACTIV_NAME_INV[output_activation]] * len(output_id)))
         to_return = pack[0] > Net(outputs=output_id, activs=activs)
+        to_return = to_return._fix(set(range(n_variables)))
+        to_return._offset = offset
+
+        return to_return
+    
+    @staticmethod
+    def genotype_to_phenotype_tree_old(
+        tree: Tree, n_variables: int, n_outputs: int, output_activation: str, offset: bool
+    ) -> Net_old:
+        pack: Any = []
+
+        n = n_variables
+        for node in reversed(tree._nodes):
+            args = []
+            for _ in range(node._n_args):
+                args.append(pack.pop())
+            if isinstance(node, FunctionalNode):
+                pack.append(node._value(*args))
+            else:
+                if type(node) is TerminalNode:
+                    unit = Net_old(inputs=node._value)
+                else:
+                    end = n + node._value._size
+                    hidden_id = set(range(n, end))
+                    activs = dict(zip(hidden_id, [node._value._activ] * len(hidden_id)))
+                    n = end
+                    unit = Net_old(hidden_layers=[hidden_id], activs=activs)
+                pack.append(unit)
+        end = n + n_outputs
+        output_id = set(range(n, end))
+        activs = dict(zip(output_id, [ACTIV_NAME_INV[output_activation]] * len(output_id)))
+        to_return = pack[0] > Net_old(outputs=output_id, activs=activs)
         to_return = to_return._fix(set(range(n_variables)))
         to_return._offset = offset
 

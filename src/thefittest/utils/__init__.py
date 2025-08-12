@@ -274,8 +274,8 @@ def forward(
         out = np.dot(nodes[from_i].T, weights_i.T)
         nodes[to_i] = out.T
 
-        for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
-            nodes[a_nodes_i_i] = multiactivation2d(nodes[a_nodes_i_i].T, a_code_i_i).T
+#        for a_code_i_i, a_nodes_i_i in zip(a_code_i, a_nodes_i):
+#            nodes[a_nodes_i_i] = multiactivation2d(nodes[a_nodes_i_i].T, a_code_i_i).T
 
     return nodes
 
