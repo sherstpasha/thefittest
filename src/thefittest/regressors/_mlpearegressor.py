@@ -6,15 +6,16 @@ from typing import Tuple
 from typing import Union
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike
 
 from sklearn.base import RegressorMixin
-from sklearn.utils.validation import check_array
 from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import validate_data
 
 from ..base._mlp import BaseMLPEA
-from ..classifiers._gpnnclassifier import weights_type_optimizer_alias
+from ..base._mlp import weights_type_optimizer_alias
 from ..optimizers import SHADE
+import torch
 
 
 class MLPEARegressor(RegressorMixin, BaseMLPEA):
@@ -41,24 +42,30 @@ class MLPEARegressor(RegressorMixin, BaseMLPEA):
             random_state=random_state,
         )
 
-    def predict(self, X: NDArray[np.float64]):
-
+    def predict(self, X: ArrayLike):
         check_is_fitted(self)
 
-        X = check_array(X)
-        n_features = X.shape[1]
+        X = validate_data(self, X, reset=False)
 
-        if self.n_features_in_ != n_features:
+        if X.shape[1] != self.n_features_in_:
             raise ValueError(
-                "Number of features of the model must match the "
-                f"input. Model n_features is {self.n_features_in_} and input "
-                f"n_features is {n_features}."
+                "Number of features of the model must match the input. "
+                f"Model n_features is {self.n_features_in_} and input n_features is {X.shape[1]}."
             )
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        output = self.net_.forward(X)[0]
-        y_predict = output[:, 0]
+        device = torch.device(self.device)
+        X_t = torch.as_tensor(X, dtype=torch.float32, device=device)
 
-        return y_predict
+        with torch.no_grad():
+            out = self.net_.forward(X_t)
+
+        if isinstance(out, torch.Tensor):
+            out = out.detach().cpu().numpy()
+        if out.ndim == 3 and out.shape[-1] == 1:
+            out = out.squeeze(-1)
+        if out.ndim == 2 and out.shape[-1] == 1:
+            out = out.squeeze(-1)
+        return out.reshape(-1)

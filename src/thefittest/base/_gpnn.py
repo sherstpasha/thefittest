@@ -19,6 +19,8 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.multiclass import check_classification_targets
 
+import torch
+
 from ..base import FunctionalNode
 from ..base import Net
 from ..base import TerminalNode
@@ -38,55 +40,41 @@ from ..utils import array_like_to_numpy_X_y
 from ..utils._metrics import categorical_crossentropy3d
 from ..utils._metrics import root_mean_square_error2d
 from ..utils.random import check_random_state
+from ..utils._metrics import _ce_from_probs_torch, _rmse_torch
 
 
 def fitness_function_structure(
     population: NDArray,
-    X: NDArray[np.float64],
-    targets: NDArray[np.float64],
+    X: torch.Tensor,
+    targets: torch.Tensor,
     net_size_penalty: float,
     task_type: str = "regression",
 ) -> NDArray[np.float64]:
     """
-    Evaluate the fitness of a population of neural networks for a given task.
-
-    This function computes the error between the networks' predictions and the actual targets. It supports both classification and regression tasks, determined by the `task_type` parameter.
-
-    Parameters
-    ----------
-    population : NDArray
-        The population of neural networks to be evaluated.
-    X : NDArray[np.float64]
-        The input data for which predictions are to be made. It should be in a format compatible with the networks' `forward` method.
-    targets : NDArray[np.float64]
-        The actual target values for the input data. For classification, this should be one-hot encoded.
-    net_size_penalty : float
-        Penalty for the size of the neural networks in the population.
-    task_type : str, optional
-        The type of task for which the fitness is being evaluated. Should be 'classification' for classification tasks and 'regression' for regression tasks. Defaults to 'regression'.
-
-    Returns
-    -------
-    NDArray[np.float64]
-        The computed error for the given population, input data, and target values. For classification, this is the sum of categorical cross-entropy error and network size penalty. For regression, it's the sum of root mean square error and network size penalty.
-
-    Raises
-    ------
-    ValueError
-        If `task_type` is not 'classification' or 'regression'.
+    Оценивает популяцию сетей: forward на torch и расчёт лосса.
+    Возвращает массив shape (len(population),) с fitness для ЭА.
     """
 
-    if task_type == "classification":
-        output3d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)
-        lens = np.array(list(map(len, population)))
-        fitness = categorical_crossentropy3d(targets, output3d) + net_size_penalty * lens
-    elif task_type == "regression":
-        output2d = np.array([net.forward(X)[0] for net in population], dtype=np.float64)[:, :, 0]
-        lens = np.array(list(map(len, population)))
-        fitness = root_mean_square_error2d(targets, output2d) + net_size_penalty * lens
-    else:
-        raise ValueError("task_type must be 'classification' or 'regression'")
-    return fitness
+    # 2) цикл по популяции
+    losses = np.empty(len(population), dtype=np.float64)
+    with torch.no_grad():
+        for i, net in enumerate(population):
+
+            # forward
+            out = net.forward(X)  # (N, C) для классификации или (N, 1) для регрессии
+
+            # torch-лосс
+            if task_type == "classification":
+                loss_t = _ce_from_probs_torch(out, targets)
+            elif task_type == "regression":
+                loss_t = _rmse_torch(out, targets)
+            else:
+                raise ValueError("task_type must be 'classification' or 'regression'")
+
+            # + штраф за размер сети
+            losses[i] = float(loss_t.item()) + net_size_penalty * len(net)
+
+    return losses
 
 
 def genotype_to_phenotype_tree(
@@ -153,6 +141,7 @@ def genotype_to_phenotype(
             fitness_function=fitness_function_weights,
             task_type=task_type,
         )
+        population_ph[i].compile_torch()
 
     return population_ph
 
@@ -228,6 +217,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         weights_optimizer_args: Optional[dict[str, Any]] = None,
         net_size_penalty: float = 0.0,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
+        device: str = "cpu",
     ):
         self.n_iter = n_iter
         self.pop_size = pop_size
@@ -241,6 +231,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         self.weights_optimizer_args = weights_optimizer_args
         self.net_size_penalty = net_size_penalty
         self.random_state = random_state
+        self.device = device
 
     def get_net(self) -> Net:
         return self.net_
@@ -352,8 +343,12 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
+        device = torch.device(self.device)
+        X_t = torch.as_tensor(X, dtype=torch.float32, device=device)
+        y_t = torch.as_tensor(y, dtype=torch.float32, device=device)
+
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=self.test_sample_ratio, random_state=random_state
+            X_t, y_t, test_size=self.test_sample_ratio, random_state=random_state
         )
 
         uniset: UniversalSet = init_net_uniset(
@@ -386,5 +381,5 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             n_outputs=n_outputs,
             task_type=task_type,
         )
-
+        self.net_.compile_torch()
         return self

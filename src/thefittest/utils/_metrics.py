@@ -5,6 +5,8 @@ from numba import njit
 import numpy as np
 from numpy.typing import NDArray
 
+import torch
+
 
 @njit(float64(float64[:], float64[:]))
 def root_mean_square_error(
@@ -230,3 +232,32 @@ def f1_score2d(y_true: NDArray[np.int64], y_predict2d: NDArray[np.int64]) -> NDA
         average_f1_values[i] = f1_score(y_true, y_predict2d[i])
 
     return average_f1_values
+
+
+def _ce_from_probs_torch(
+    probs: torch.Tensor, targets: torch.Tensor, eps: float = 1e-12
+) -> torch.Tensor:
+
+    if probs.ndim == 3 and probs.size(-1) == 1:
+        probs = probs.squeeze(-1)
+    if targets.ndim == 3 and targets.size(-1) == 1:
+        targets = targets.squeeze(-1)
+    if probs.ndim == 3:
+        probs = probs.reshape(-1, probs.size(-1))
+        targets = targets.reshape(-1, targets.size(-1))
+
+    probs = probs.clamp_min(eps)
+    loss_vec = -(targets * probs.log()).sum(dim=-1)
+    return loss_vec.mean()
+
+
+def _rmse_torch(pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    if pred.ndim == 3 and pred.size(-1) == 1:
+        pred = pred.squeeze(-1)
+    if target.ndim == 3 and target.size(-1) == 1:
+        target = target.squeeze(-1)
+    if pred.ndim == 2 and pred.size(-1) == 1:
+        pred = pred.squeeze(-1)
+    if target.ndim == 2 and target.size(-1) == 1:
+        target = target.squeeze(-1)
+    return torch.sqrt(torch.mean((pred - target) ** 2))

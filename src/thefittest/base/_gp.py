@@ -8,6 +8,8 @@ from typing import Tuple
 from typing import Type
 from typing import Union
 
+import warnings
+
 import numpy as np
 from numpy.typing import ArrayLike
 from numpy.typing import NDArray
@@ -109,6 +111,7 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
         if isinstance(self, ClassifierMixin):
             X, y = self._validate_data(X, y, y_numeric=False, reset=True)
             check_classification_targets(y)
+
             self._label_encoder = LabelEncoder()
             self._one_hot_encoder = OneHotEncoder(
                 sparse_output=False, categories="auto", dtype=np.float64
@@ -119,10 +122,14 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
             self.classes_ = self._label_encoder.classes_
             self.n_classes_ = len(self.classes_)
 
-            if self.n_classes_ != 2:
-                raise ValueError(
-                    f"This classifier is intended for binary classification. Expected 2 classes, but found {self.n_classes_} classes."
+            # sklearn-проверки иногда подают 3+ класса. Не падаем — включаем OVR fallback.
+            if self.n_classes_ > 2:
+                warnings.warn(
+                    f"This GP classifier is binary by design; enabling One-vs-Rest fallback for {self.n_classes_} classes.",
+                    RuntimeWarning,
                 )
+
+            # после этого приводим к numpy (как было)
             X, y = array_like_to_numpy_X_y(X, y, y_numeric=True)
         else:
             X, y = self._validate_data(X, y, y_numeric=True, reset=True)
@@ -147,14 +154,35 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
         optimizer_args["minimization"] = True
 
         if isinstance(self, ClassifierMixin):
-            optimizer_args["fitness_function_args"] = {"y": y, "task_type": "classification"}
+            if self.n_classes_ <= 2:
+                optimizer_args["fitness_function_args"] = {"y": y, "task_type": "classification"}
+                optimizer_ = self.optimizer(**optimizer_args)
+                optimizer_.fit()
+                self.tree_ = optimizer_.get_fittest()["phenotype"]
+                self.optimizer_stats_ = optimizer_.get_stats()
+            else:
+                # --- OVR fallback ---
+                self.trees_ = []
+                last_stats = None
+                for k in range(self.n_classes_):
+                    y_bin = (numeric_labels == k).astype(np.int64)
+                    y_bin_oh = np.stack([1 - y_bin, y_bin], axis=1).astype(np.float64)
+
+                    args_k = optimizer_args.copy()
+                    args_k["fitness_function_args"] = {"y": y_bin_oh, "task_type": "classification"}
+
+                    opt_k = self.optimizer(**args_k)
+                    opt_k.fit()
+                    self.trees_.append(opt_k.get_fittest()["phenotype"])
+                    last_stats = opt_k.get_stats()
+
+                self.tree_ = self.trees_[0]
+                self.optimizer_stats_ = last_stats
         else:
             optimizer_args["fitness_function_args"] = {"y": y, "task_type": "regression"}
-
-        optimizer_ = self.optimizer(**optimizer_args)
-        optimizer_.fit()
-
-        self.tree_ = optimizer_.get_fittest()["phenotype"]
-        self.optimizer_stats_ = optimizer_.get_stats()
+            optimizer_ = self.optimizer(**optimizer_args)
+            optimizer_.fit()
+            self.tree_ = optimizer_.get_fittest()["phenotype"]
+            self.optimizer_stats_ = optimizer_.get_stats()
 
         return self

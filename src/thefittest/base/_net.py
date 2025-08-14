@@ -327,21 +327,17 @@ class Net:
         return blocks
 
     def compile_torch(self, device: torch.device | str | None = None) -> "Net":
-        """Собрать план один раз на device весов (или указанном)."""
         dev = torch.device(device) if device is not None else self._weights.device
 
-        # 1) число узлов
         all_nodes = set(self._inputs)
         if self._hidden_layers:
             all_nodes |= set.union(*self._hidden_layers)
         all_nodes |= set(self._outputs)
         self.n_nodes = (max(all_nodes) + 1) if all_nodes else 0
 
-        # 2) входы/выходы
         self.inputs = torch.as_tensor(sorted(self._inputs), dtype=torch.long, device=dev)
         self.outputs = torch.as_tensor(sorted(self._outputs), dtype=torch.long, device=dev)
 
-        # 3) блоки
         blocks = self._build_order_no_numba()
         for b in blocks:
             b.to(dev)
@@ -365,7 +361,7 @@ class Net:
         autocast_input: bool = True,
     ) -> torch.Tensor:
         base_w = self._weights if weights is None else weights
-        w = base_w.view(1, -1) if base_w.ndim == 1 else base_w  # (W,E)
+        w = base_w.view(1, -1) if base_w.ndim == 1 else base_w
         W = w.shape[0]
 
         if autocast_input:

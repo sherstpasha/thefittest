@@ -15,6 +15,8 @@ import numpy as np
 from numpy.typing import ArrayLike
 from numpy.typing import NDArray
 
+import torch
+from torch.optim import Optimizer as TorchOptimizer
 
 MIN_VALUE = np.finfo(np.float64).min
 MAX_VALUE = np.finfo(np.float64).max
@@ -486,27 +488,8 @@ def if_single_or_array_to_int_array(
     return array
 
 
-import torch
-
-
-def _snapshot_tensor_meta(x):
-    if isinstance(x, torch.Tensor):
-        return dict(is_tensor=True, device=x.device, dtype=x.dtype)
-    return dict(is_tensor=False, device=None, dtype=None)
-
-
-def _to_numpy_for_validation(a):
-    if isinstance(a, torch.Tensor):
-        if a.requires_grad:
-            a = a.detach()
-        return a.cpu().numpy()
-    return np.asarray(a)
-
-
-def _back_to_torch(a_np, meta, dtype=torch.float32):
-    if not meta["is_tensor"]:
-        return a_np
-    a = torch.from_numpy(a_np)
-    if a.dtype != dtype:
-        a = a.to(dtype)
-    return a.to(meta["device"])
+def _is_torch_optimizer(cls: Any) -> bool:
+    try:
+        return issubclass(cls, TorchOptimizer)
+    except TypeError:
+        return False

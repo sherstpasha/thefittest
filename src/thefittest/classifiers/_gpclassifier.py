@@ -10,9 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from sklearn.base import ClassifierMixin
-from sklearn.utils.validation import check_array
-from sklearn.utils.validation import check_is_fitted
-
+from sklearn.utils.validation import check_is_fitted, validate_data
 from ..base._gp import BaseGP
 from ..base._gp import safe_sigmoid
 from ..optimizers import GeneticProgramming
@@ -39,35 +37,35 @@ class GeneticProgrammingClassifier(ClassifierMixin, BaseGP):
             random_state=random_state,
         )
 
-    def _more_tags(self):
-        return {"binary_only": True}
-
     def predict_proba(self, X: NDArray[np.float64]):
         check_is_fitted(self)
 
-        X = check_array(X)
+        X = validate_data(self, X, reset=False)
         n_features = X.shape[1]
 
-        if self.n_features_in_ != n_features:
-            raise ValueError(
-                "Number of features of the model must match the "
-                f"input. Model n_features is {self.n_features_in_} and input "
-                f"n_features is {n_features}."
-            )
+        def _tree_out(tree):
+            tfp = tree.set_terminals(**{f"x{i}": X[:, i] for i in range(n_features)})
+            return tfp() * np.ones(len(X))
 
-        tree_for_predict = self.tree_.set_terminals(**{f"x{i}": X[:, i] for i in range(n_features)})
+        # OVR: если в fit обучили по дереву на класс
+        if (
+            hasattr(self, "trees_")
+            and isinstance(self.trees_, (list, tuple))
+            and len(self.trees_) > 0
+        ):
+            logits = np.column_stack([_tree_out(t) for t in self.trees_])  # (N, K)
+            P = safe_sigmoid(logits)
+            row_sums = P.sum(axis=1, keepdims=True)
+            row_sums[row_sums == 0.0] = 1.0
+            proba = (P / row_sums).astype(np.float64, copy=False)
+            return proba
 
-        tree_output = tree_for_predict() * np.ones(len(X))
-        proba = safe_sigmoid(tree_output)
-        proba = np.vstack([1 - proba, proba]).T
-
+        tree_output = _tree_out(self.tree_)
+        p1 = safe_sigmoid(tree_output)
+        proba = np.vstack([1.0 - p1, p1]).T.astype(np.float64, copy=False)
         return proba
 
     def predict(self, X: NDArray[np.float64]):
-
-        proba = self.predict_proba(X)
-
+        proba = self.predict_proba(X)  # ndarray (N, K)
         indeces = np.argmax(proba, axis=1)
-        y_predict = self._label_encoder.inverse_transform(indeces)
-
-        return y_predict
+        return self._label_encoder.inverse_transform(indeces)

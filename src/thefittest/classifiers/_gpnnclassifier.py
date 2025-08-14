@@ -7,10 +7,13 @@ from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
+from numpy.typing import ArrayLike
+
+import torch
 
 from sklearn.base import ClassifierMixin
-from sklearn.utils.validation import check_array
 from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import validate_data
 
 from ..base._gpnn import BaseGPNN
 from ..base._mlp import weights_type_optimizer_alias
@@ -35,6 +38,7 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
         weights_optimizer_args: Optional[dict[str, Any]] = None,
         net_size_penalty: float = 0.0,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
+        device: str = "cpu",
     ):
         super().__init__(
             n_iter=n_iter,
@@ -49,32 +53,34 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
             weights_optimizer_args=weights_optimizer_args,
             net_size_penalty=net_size_penalty,
             random_state=random_state,
+            device=device,
         )
 
-    def predict_proba(self, X: NDArray[np.float64]) -> NDArray[np.float64]:
+    def predict_proba(self, X: ArrayLike) -> NDArray[np.float64]:
         check_is_fitted(self)
 
-        X = check_array(X)
-        n_features = X.shape[1]
+        X = validate_data(self, X, reset=False)
 
-        if self.n_features_in_ != n_features:
+        if X.shape[1] != self.n_features_in_:
             raise ValueError(
                 "Number of features of the model must match the "
                 f"input. Model n_features is {self.n_features_in_} and input "
-                f"n_features is {n_features}."
+                f"n_features is {X.shape[1]}."
             )
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
-        proba = self.net_.forward(X)[0]
-        return proba
+        device = torch.device(self.device)
+        X_t = torch.as_tensor(X, dtype=torch.float32, device=device)
 
-    def predict(self, X: NDArray[np.float64]):
+        with torch.no_grad():
+            proba_t = self.net_.forward(X_t)
 
+        return proba_t.detach().cpu().numpy()
+
+    def predict(self, X: ArrayLike):
         proba = self.predict_proba(X)
-
         indeces = np.argmax(proba, axis=1)
-        y_predict = self._label_encoder.inverse_transform(indeces)
 
-        return y_predict
+        return self._label_encoder.inverse_transform(indeces)

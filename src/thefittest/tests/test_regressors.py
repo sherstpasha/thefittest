@@ -4,6 +4,8 @@ import pytest
 
 from sklearn.utils.estimator_checks import check_estimator
 
+import torch
+
 from ..optimizers import SelfCGA
 from ..optimizers import SelfCGP
 from ..optimizers import GeneticProgramming
@@ -191,6 +193,8 @@ def test_MLPEARegressor():
         [np.linspace(left_border, right_border, sample_size) for _ in range(n_dimension)]
     ).T
     y = function(X)
+    X = torch.as_tensor(X, dtype=torch.float32)
+    y = torch.as_tensor(y, dtype=torch.float32)
 
     model = MLPEARegressor(
         n_iter=15,

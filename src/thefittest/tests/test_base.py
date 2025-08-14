@@ -4,6 +4,8 @@ from operator import sub
 
 import numpy as np
 
+import torch
+
 from ..base._ea import Statistics
 from ..base._ea import TheFittest
 from ..base._net import HiddenBlock
@@ -211,21 +213,20 @@ def test_net():
     net6 = Net(hidden_layers=[{5, 6}])
 
     net7 = net5 + net6
-
     assert net7._hidden_layers == [{4, 5, 6}]
 
     net8 = net5 > net6
     assert net8._hidden_layers == [{4}, {5, 6}]
-    assert np.all(net8._connects == np.array([[4, 5], [4, 6]], dtype=np.int64))
+    assert np.all(np.array(net8._connects) == np.array([[4, 5], [4, 6]], dtype=np.int64))
 
     net9 = net2 + net5
-    assert np.all(net9._connects == np.array([[2, 4]], dtype=np.int64))
+    assert np.all(np.array(net9._connects) == np.array([[2, 4]], dtype=np.int64))
 
     net10 = net5 + net2
-    assert np.all(net10._connects == np.array([[2, 4]], dtype=np.int64))
+    assert np.all(np.array(net10._connects) == np.array([[2, 4]], dtype=np.int64))
 
     net11 = net5 > net2
-    assert np.all(net11._connects == np.array([[2, 4]], dtype=np.int64))
+    assert np.all(np.array(net11._connects) == np.array([[2, 4]], dtype=np.int64))
 
     net12 = Net(hidden_layers=[{4}, {5, 6}])
     net13 = Net(hidden_layers=[{7, 8}])
@@ -237,14 +238,13 @@ def test_net():
     assert net15._hidden_layers == [{4, 7, 8}, {5, 6}]
 
     connects, weights = net._get_connect({1, 2}, {})
-    assert np.all(connects == np.zeros((0, 2), dtype=int))
-    assert np.all(weights == np.zeros((0), dtype=float))
+    assert np.all(np.array(connects) == np.zeros((0, 2), dtype=int))
+    assert np.all(np.array(weights) == np.zeros((0,), dtype=float))
 
     assert len(net11) == 1
 
     fixed = net5._fix(inputs={1, 2})
-
-    assert np.all(fixed._connects == np.array([[1, 4], [2, 4]], dtype=np.int64))
+    assert np.all(np.array(fixed._connects) == np.array([[1, 4], [2, 4]], dtype=np.int64))
     assert fixed._inputs == {1, 2}
 
     net16 = Net(
@@ -252,25 +252,27 @@ def test_net():
         hidden_layers=[{2, 3}, {4}],
         outputs={5},
         connects=np.array([[0, 2], [1, 3], [2, 4], [3, 4], [4, 5]], dtype=np.int64),
-        weights=np.array([0.1, 0.2, 0.4, 0.5, 1.5], dtype=np.float64),
+        weights=torch.tensor([0.1, 0.2, 0.4, 0.5, 1.5], dtype=torch.float32),
         activs={2: 1, 3: 1, 4: 1, 5: 1},
     )
 
-    X = np.array([[1, 2]], dtype=np.float64)
-    out = net16.forward(X)
-
-    print(out)
+    X_t = torch.tensor([[1, 2]], dtype=torch.float32)
+    net16.compile_torch()
+    out = net16.forward(X_t)
+    assert torch.is_tensor(out)
 
     graph = net16.get_graph()
 
-    assert out[0][0][0] == 0.36000000000000004
+    # Приводим к numpy для сравнения
+    out_np = out.detach().cpu().numpy()
+    assert np.isclose(out_np[0][0], 0.36, rtol=1e-7, atol=1e-9)
     assert isinstance(graph, dict)
 
     hb = HiddenBlock(max_size=10)
-
     assert hb._activ in [0, 1, 2, 3, 4]
     assert hb._size <= 10
 
+    # Проверка __eq__
     net17 = net16.copy()
     net17._inputs.add(3)
 
