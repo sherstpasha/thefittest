@@ -16,6 +16,8 @@ from operator import mul
 from operator import abs
 from operator import gt
 
+import hashlib
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -191,6 +193,10 @@ class Tree:
             else:
                 pack.append(node._name)
         return pack[0]
+
+    def signature(self) -> str:
+        s = str(self)
+        return hashlib.sha1(s.encode()).hexdigest()
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Tree):

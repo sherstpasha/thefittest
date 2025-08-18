@@ -208,6 +208,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         net_size_penalty: float = 0.0,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         device: str = "cpu",
+        use_fitness_cache: bool = False,
     ):
         self.n_iter = n_iter
         self.pop_size = pop_size

@@ -9,7 +9,7 @@ from typing import Optional
 from typing import Set
 from typing import Tuple
 
-from numba.typed import List as numbaList
+import hashlib
 
 import numpy as np
 from numpy.typing import NDArray
@@ -132,23 +132,27 @@ class Net:
         return int(self._weights.numel())
 
     def __eq__(self, other: Any) -> bool:
-        if isinstance(other, Net):
-            if self._inputs != other._inputs:
-                return False
-            elif any(h_1 != h_2 for h_1, h_2 in zip(self._hidden_layers, other._hidden_layers)):
-                return False
-            elif self._outputs != other._outputs:
-                return False
-            elif len(self._connects) != len(other._connects):
-                return False
-            elif np.any(self._connects != other._connects):
-                return False
-            elif self._activs != other._activs:
-                return False
-            else:
-                return True
-        else:
+        if not isinstance(other, Net):
             return NotImplemented
+
+        if self._inputs != other._inputs:
+            return False
+
+        if len(self._hidden_layers) != len(other._hidden_layers):
+            return False
+        if any(h1 != h2 for h1, h2 in zip(self._hidden_layers, other._hidden_layers)):
+            return False
+
+        if self._outputs != other._outputs:
+            return False
+
+        if set(map(tuple, self._connects)) != set(map(tuple, other._connects)):
+            return False
+
+        if self._activs != other._activs:
+            return False
+
+        return True
 
     def _set_connects(self, values: Optional[NDArray[np.int64]]) -> NDArray[np.int64]:
         if values is None:
@@ -180,6 +184,24 @@ class Net:
             return set.union(*self._hidden_layers)
         else:
             return set()
+
+    def signature(self) -> str:
+        inputs = tuple(sorted(self._inputs))
+        outputs = tuple(sorted(self._outputs))
+        
+        hidden_layers = tuple(tuple(sorted(layer)) for layer in self._hidden_layers)
+        
+        connects = tuple(sorted(map(tuple, self._connects.tolist())))
+        
+        activs = tuple(sorted(self._activs.items()))
+        
+        offset = self._offset
+        
+        sig_tuple = (inputs, hidden_layers, outputs, connects, activs, offset)
+        
+        sig_str = repr(sig_tuple).encode()
+        print(sig_str)
+        return hashlib.sha1(sig_str).hexdigest()
 
     def _get_connect(
         self, left: Set[int], right: Set[int]

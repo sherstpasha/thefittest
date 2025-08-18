@@ -27,6 +27,7 @@ class GeneticProgrammingClassifier(ClassifierMixin, BaseGP):
         optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,
         optimizer_args: Optional[dict[str, Any]] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
+        use_fitness_cache: bool = False,
     ):
         super().__init__(
             n_iter=n_iter,
@@ -35,6 +36,7 @@ class GeneticProgrammingClassifier(ClassifierMixin, BaseGP):
             optimizer=optimizer,
             optimizer_args=optimizer_args,
             random_state=random_state,
+            use_fitness_cache=use_fitness_cache,
         )
 
     def predict_proba(self, X: NDArray[np.float64]):

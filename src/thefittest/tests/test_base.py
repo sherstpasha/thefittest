@@ -198,6 +198,29 @@ def test_tree_class():
 
     assert isinstance(graph, dict)
 
+def test_tree_signature_and_copy():
+    x = TerminalNode(value=2, name="x")
+    y = TerminalNode(value=3, name="y")
+
+    functional_add = FunctionalNode(value=create_operator("({} + {})", "add", "+", add), sign="+")
+    functional_mul = FunctionalNode(value=create_operator("({} * {})", "mul", "*", mul), sign="*")
+
+    tree1 = Tree(nodes=[functional_add, x, y])
+
+    tree1_copy = tree1.copy()
+
+    tree2 = Tree(nodes=[functional_mul, x, y])
+
+
+    sig1 = tree1.signature()
+    sig1_copy = tree1_copy.signature()
+    sig2 = tree2.signature()
+
+    assert isinstance(sig1, str)
+    assert len(sig1) == 40
+    assert sig1 == sig1_copy
+
+    assert sig1 != sig2
 
 def test_net():
     net = Net(inputs={0, 1, 3})
@@ -295,3 +318,26 @@ def test_net():
                 assert net_i == net_j
             else:
                 assert net_i != net_j
+
+    # Проверка метода signature()
+    sig16 = net16.signature()
+    sig17 = net17.signature()
+    sig18 = net18.signature()
+    sig19 = net19.signature()
+    sig20 = net20.signature()
+    sig21 = net21.signature()
+
+    # у копии должна совпадать сигнатура
+    net16_copy = net16.copy()
+    assert net16.signature() == net16_copy.signature()
+
+    # все изменённые сети должны отличаться от оригинала
+    assert sig16 != sig17
+    assert sig16 != sig18
+    assert sig16 != sig19
+    assert sig16 != sig20
+    assert sig16 != sig21
+
+    # сигнатура — строка фиксированной длины SHA1 (40 hex-символов)
+    assert isinstance(sig16, str)
+    assert len(sig16) == 40
