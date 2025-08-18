@@ -1,4 +1,4 @@
-from thefittest.regressors import MLPEARegressor
+from thefittest.regressors import GeneticProgrammingNeuralNetRegressor
 
 from sklearn.preprocessing import scale
 from sklearn.metrics import r2_score
@@ -30,15 +30,20 @@ X_scaled = scale(X)
 
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.1)
 
-
-model = MLPEARegressor(
-    n_iter=5000,
-    pop_size=500,
-    hidden_layers=[100],
+model = GeneticProgrammingNeuralNetRegressor(
+    n_iter=5,
+    pop_size=10,
+    input_block_size=8,
     weights_optimizer=Adam,  # ключ: torch оптимизатор-класс
-    weights_optimizer_args={"lr": 1e-2, "show_progress_each": 10},  # и его аргументы
-    # weights_optimizer=SHAGA,
-    # weights_optimizer_args={"show_progress_each": 10},
+    weights_optimizer_args={
+        "lr": 1e-2,
+        "epochs": 3000,
+        "show_progress_each": 100,
+    },  # и его аргументы
+    optimizer_args={"show_progress_each": 1, 'n_jobs': 10},
+    # weights_optimizer=SHADE,
+    # weights_optimizer_args={"iters": 30, "pop_size": 30, "show_progress_each": 10},
+    device=device,
 )
 
 model.fit(X_train, y_train)

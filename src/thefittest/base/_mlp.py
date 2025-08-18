@@ -18,6 +18,7 @@ from sklearn.base import ClassifierMixin
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.multiclass import check_classification_targets
+from sklearn.utils.validation import check_X_y
 
 from ..base import Net
 from ..base._ea import Statistics
@@ -302,7 +303,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         check_random_state(self.random_state)
 
         if isinstance(self, ClassifierMixin):
-            X, y = self._validate_data(X, y, y_numeric=False, reset=True)
+            X, y = check_X_y(X, y)
             check_classification_targets(y)
 
             self._label_encoder = LabelEncoder()
@@ -315,7 +316,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
             self.classes_ = self._label_encoder.classes_
             self.n_classes_ = len(self.classes_)
         else:
-            X, y = self._validate_data(X, y, y_numeric=True, reset=True)
+            X, y = check_X_y(X, y)
 
         X, y = array_like_to_numpy_X_y(X, y)
 

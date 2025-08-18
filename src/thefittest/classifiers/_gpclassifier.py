@@ -41,10 +41,13 @@ class GeneticProgrammingClassifier(ClassifierMixin, BaseGP):
         check_is_fitted(self)
 
         X = validate_data(self, X, reset=False)
-        n_features = X.shape[1]
+        if X.shape[1] != self.n_features_in_:
+            raise ValueError(
+                f"X has {X.shape[1]} features, but this model was fitted with {self.n_features_in_}."
+            )
 
         def _tree_out(tree):
-            tfp = tree.set_terminals(**{f"x{i}": X[:, i] for i in range(n_features)})
+            tfp = tree.set_terminals(**{f"x{i}": X[:, i] for i in range(self.n_features_in_)})
             return tfp() * np.ones(len(X))
 
         # OVR: если в fit обучили по дереву на класс

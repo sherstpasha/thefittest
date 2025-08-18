@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
+print(device)
 # Load the Iris dataset
 data = DigitsDataset()
 X = data.get_X()

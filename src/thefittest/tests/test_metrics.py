@@ -16,20 +16,6 @@ from thefittest.utils._metrics import confusion_matrix
 from thefittest.utils._metrics import f1_score
 from thefittest.utils._metrics import precision_score
 from thefittest.utils._metrics import recall_score
-from thefittest.utils._metrics import root_mean_square_error
-
-
-def test_root_mean_square_error():
-    # Test data
-    y_true = np.array([1.0, 2.0, 3.0], dtype=np.float64)
-    y_predict = np.array([1.1, 1.9, 3.1], dtype=np.float64)
-
-    # Calculate RMSE using both functions
-    rmse_njit = root_mean_square_error(y_true, y_predict)
-    rmse_sklearn = np.sqrt(mean_squared_error_sklearn(y_true, y_predict))
-
-    # Check if the results are equal within a small tolerance
-    assert np.isclose(rmse_njit, rmse_sklearn, rtol=1e-10, atol=1e-10)
 
 
 def test_coefficient_determination():

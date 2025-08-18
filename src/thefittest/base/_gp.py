@@ -19,6 +19,7 @@ from sklearn.base import ClassifierMixin
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.multiclass import check_classification_targets
+from sklearn.utils.validation import check_X_y
 
 from ..base import Tree
 from ..base._ea import Statistics
@@ -109,7 +110,7 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
         check_random_state(self.random_state)
 
         if isinstance(self, ClassifierMixin):
-            X, y = self._validate_data(X, y, y_numeric=False, reset=True)
+            X, y = check_X_y(X, y)
             check_classification_targets(y)
 
             self._label_encoder = LabelEncoder()
@@ -128,13 +129,11 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
                     f"This GP classifier is binary by design; enabling One-vs-Rest fallback for {self.n_classes_} classes.",
                     RuntimeWarning,
                 )
-
-            # после этого приводим к numpy (как было)
-            X, y = array_like_to_numpy_X_y(X, y, y_numeric=True)
         else:
-            X, y = self._validate_data(X, y, y_numeric=True, reset=True)
-            X, y = array_like_to_numpy_X_y(X, y, y_numeric=True)
+            X, y = check_X_y(X, y)
 
+        X, y = array_like_to_numpy_X_y(X, y, y_numeric=True)
+        self.n_features_in_ = X.shape[1]
         if self.functional_set_names is not None:
             uniset = init_symbolic_regression_uniset(
                 X=X,

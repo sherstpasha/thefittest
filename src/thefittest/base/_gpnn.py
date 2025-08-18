@@ -18,6 +18,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.multiclass import check_classification_targets
+from sklearn.utils.validation import validate_data
 
 import torch
 
@@ -37,8 +38,6 @@ from ..optimizers import GeneticProgramming
 from ..optimizers import SHAGA
 from ..optimizers import SelfCGP
 from ..utils import array_like_to_numpy_X_y
-from ..utils._metrics import categorical_crossentropy3d
-from ..utils._metrics import root_mean_square_error2d
 from ..utils.random import check_random_state
 from ..utils._metrics import _ce_from_probs_torch, _rmse_torch
 
@@ -50,28 +49,19 @@ def fitness_function_structure(
     net_size_penalty: float,
     task_type: str = "regression",
 ) -> NDArray[np.float64]:
-    """
-    Оценивает популяцию сетей: forward на torch и расчёт лосса.
-    Возвращает массив shape (len(population),) с fitness для ЭА.
-    """
 
-    # 2) цикл по популяции
     losses = np.empty(len(population), dtype=np.float64)
     with torch.no_grad():
         for i, net in enumerate(population):
 
-            # forward
-            out = net.forward(X)  # (N, C) для классификации или (N, 1) для регрессии
+            out = net.forward(X)
 
-            # torch-лосс
             if task_type == "classification":
                 loss_t = _ce_from_probs_torch(out, targets)
             elif task_type == "regression":
                 loss_t = _rmse_torch(out, targets)
             else:
                 raise ValueError("task_type must be 'classification' or 'regression'")
-
-            # + штраф за размер сети
             losses[i] = float(loss_t.item()) + net_size_penalty * len(net)
 
     return losses
@@ -324,7 +314,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         random_state = check_random_state(self.random_state)
 
         if isinstance(self, ClassifierMixin):
-            X, y = self._validate_data(X, y, y_numeric=False, reset=True)
+            X, y = validate_data(self, X, y, reset=True)
             check_classification_targets(y)
             self._label_encoder = LabelEncoder()
             self._one_hot_encoder = OneHotEncoder(
@@ -336,7 +326,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             self.classes_ = self._label_encoder.classes_
             self.n_classes_ = len(self.classes_)
         else:
-            X, y = self._validate_data(X, y, y_numeric=True, reset=True)
+            X, y = validate_data(self, X, y, reset=True)
 
         X, y = array_like_to_numpy_X_y(X, y)
 

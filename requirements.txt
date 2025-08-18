@@ -1,7 +1,7 @@
-numpy
+numpy>=1.19
 numba
 scipy
-scikit-learn
+scikit-learn>=1.0
 pytest
 pytest-cov
 flake8
@@ -18,12 +18,12 @@ typing-extensions<=4.6.3
 networkx
 matplotlib
 joblib==1.2.0
-psutil 
-scikit-learn
+psutil
 sphinx
 sphinx-rtd-theme
 numpydoc
 pydeps
 Graphviz
 pandas
-pyarrow 
+pyarrow
+torch>=2.0
