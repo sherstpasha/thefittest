@@ -1,7 +1,7 @@
 numpy>=1.19
 numba
 scipy
-scikit-learn>=1.0
+scikit-learn>=1.2
 pytest
 pytest-cov
 flake8
