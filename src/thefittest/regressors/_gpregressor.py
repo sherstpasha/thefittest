@@ -17,7 +17,7 @@ from ..optimizers import GeneticProgramming
 from ..optimizers import SelfCGP
 
 
-class GeneticProgrammingRegressor(RegressorMixin, BaseGP):
+class GeneticProgrammingRegressor(BaseGP, RegressorMixin):
     def __init__(
         self,
         *,

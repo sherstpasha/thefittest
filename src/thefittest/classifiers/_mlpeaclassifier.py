@@ -21,7 +21,7 @@ from ..base._mlp import weights_type_optimizer_alias
 from ..optimizers import SHADE
 
 
-class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
+class MLPEAClassifier(BaseMLPEA, ClassifierMixin):
     def __init__(
         self,
         *,

@@ -17,7 +17,7 @@ from ..optimizers import SHADE
 import torch
 
 
-class MLPEARegressor(RegressorMixin, BaseMLPEA):
+class MLPEARegressor(BaseMLPEA, RegressorMixin):
     def __init__(
         self,
         *,

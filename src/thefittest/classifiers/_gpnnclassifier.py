@@ -21,7 +21,7 @@ from ..optimizers import SHADE
 from ..optimizers import SelfCGP
 
 
-class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
+class GeneticProgrammingNeuralNetClassifier(BaseGPNN, ClassifierMixin):
     def __init__(
         self,
         *,

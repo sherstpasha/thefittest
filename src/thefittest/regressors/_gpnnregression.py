@@ -21,7 +21,7 @@ from ..optimizers import SelfCGP
 
 
 
-class GeneticProgrammingNeuralNetRegressor(RegressorMixin, BaseGPNN):
+class GeneticProgrammingNeuralNetRegressor(BaseGPNN, RegressorMixin):
     def __init__(
         self,
         *,

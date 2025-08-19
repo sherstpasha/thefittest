@@ -17,7 +17,7 @@ from ..optimizers import GeneticProgramming
 from ..optimizers import SelfCGP
 
 
-class GeneticProgrammingClassifier(ClassifierMixin, BaseGP):
+class GeneticProgrammingClassifier(BaseGP, ClassifierMixin):
     def __init__(
         self,
         *,
