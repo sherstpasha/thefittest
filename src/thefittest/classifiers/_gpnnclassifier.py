@@ -13,7 +13,6 @@ import torch
 
 from sklearn.base import ClassifierMixin
 from sklearn.utils.validation import check_is_fitted
-from sklearn.utils.validation import validate_data
 
 from ..base._gpnn import BaseGPNN
 from ..base._mlp import weights_type_optimizer_alias
@@ -59,7 +58,7 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
     def predict_proba(self, X: ArrayLike) -> NDArray[np.float64]:
         check_is_fitted(self)
 
-        X = validate_data(self, X, reset=False)
+        X = self._validate_data(X, reset=False)
 
         if X.shape[1] != self.n_features_in_:
             raise ValueError(

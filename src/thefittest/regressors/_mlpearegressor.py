@@ -10,7 +10,6 @@ from numpy.typing import ArrayLike
 
 from sklearn.base import RegressorMixin
 from sklearn.utils.validation import check_is_fitted
-from sklearn.utils.validation import validate_data
 
 from ..base._mlp import BaseMLPEA
 from ..base._mlp import weights_type_optimizer_alias
@@ -45,7 +44,7 @@ class MLPEARegressor(RegressorMixin, BaseMLPEA):
     def predict(self, X: ArrayLike):
         check_is_fitted(self)
 
-        X = validate_data(self, X, reset=False)
+        X = self._validate_data(X, reset=False)
 
         if X.shape[1] != self.n_features_in_:
             raise ValueError(

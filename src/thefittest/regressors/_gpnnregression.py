@@ -11,7 +11,6 @@ from numpy.typing import NDArray
 import torch
 
 from sklearn.base import RegressorMixin
-from sklearn.utils.validation import validate_data
 from sklearn.utils.validation import check_is_fitted
 
 from ..base._gpnn import BaseGPNN
@@ -60,7 +59,7 @@ class GeneticProgrammingNeuralNetRegressor(RegressorMixin, BaseGPNN):
 
         check_is_fitted(self)
 
-        X = validate_data(self, X, reset=False)
+        X = self._validate_data(X, reset=False)
 
         n_features = X.shape[1]
 

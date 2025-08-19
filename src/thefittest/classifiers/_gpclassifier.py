@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from sklearn.base import ClassifierMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils.validation import check_is_fitted
 from ..base._gp import BaseGP
 from ..base._gp import safe_sigmoid
 from ..optimizers import GeneticProgramming
@@ -42,7 +42,7 @@ class GeneticProgrammingClassifier(ClassifierMixin, BaseGP):
     def predict_proba(self, X: NDArray[np.float64]):
         check_is_fitted(self)
 
-        X = validate_data(self, X, reset=False)
+        X = self._validate_data(X, reset=False)
         if X.shape[1] != self.n_features_in_:
             raise ValueError(
                 f"X has {X.shape[1]} features, but this model was fitted with {self.n_features_in_}."
