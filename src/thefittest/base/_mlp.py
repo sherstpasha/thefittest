@@ -217,6 +217,7 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         device: str = "cpu",
     ):
+        super().__init__()
         self.n_iter = n_iter
         self.pop_size = pop_size
         self.hidden_layers = hidden_layers

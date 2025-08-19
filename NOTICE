@@ -1,0 +1,15 @@
+thefittest
+Copyright (c) 2022-2025 Sherstnev Pavel
+Licensed under the MIT License (see LICENSE).
+
+This project makes use of the following third-party libraries.
+Each library is governed by its own license, all of which are permissive and
+compatible with the MIT License.
+
+- NumPy — BSD 3-Clause License — https://numpy.org
+- SciPy — BSD 3-Clause License — https://scipy.org
+- scikit-learn — BSD 3-Clause License — https://scikit-learn.org
+- PyTorch — BSD-style License — https://pytorch.org
+- joblib — BSD License — https://joblib.readthedocs.io
+- numba — BSD License — http://numba.pydata.org
+- llvmlite — BSD License — https://github.com/numba/llvmlite

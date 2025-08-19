@@ -209,6 +209,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         device: str = "cpu",
         use_fitness_cache: bool = False,
     ):
+        super().__init__()
         self.n_iter = n_iter
         self.pop_size = pop_size
         self.input_block_size = input_block_size

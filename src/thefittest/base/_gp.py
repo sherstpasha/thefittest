@@ -85,6 +85,7 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         use_fitness_cache: bool = False,
     ):
+        super().__init__()
         self.n_iter = n_iter
         self.pop_size = pop_size
         self.functional_set_names = functional_set_names
