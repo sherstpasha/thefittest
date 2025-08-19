@@ -10,14 +10,17 @@ from numpy.typing import ArrayLike
 
 from sklearn.base import RegressorMixin
 from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import validate_data
+
+import torch
 
 from ..base._mlp import BaseMLPEA
 from ..base._mlp import weights_type_optimizer_alias
 from ..optimizers import SHADE
-import torch
 
 
-class MLPEARegressor(BaseMLPEA, RegressorMixin):
+
+class MLPEARegressor(RegressorMixin, BaseMLPEA):
     def __init__(
         self,
         *,
@@ -44,14 +47,10 @@ class MLPEARegressor(BaseMLPEA, RegressorMixin):
     def predict(self, X: ArrayLike):
         check_is_fitted(self)
 
-        X = self._validate_data(X, reset=False)
-
-        if X.shape[1] != self.n_features_in_:
-            raise ValueError(
-                "Number of features of the model must match the input. "
-                f"Model n_features is {self.n_features_in_} and input n_features is {X.shape[1]}."
-            )
-
+        if hasattr(self, "_validate_data"):
+            X = self._validate_data(X, reset=False)
+        else:
+            X = validate_data(self, X, reset=False)
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 

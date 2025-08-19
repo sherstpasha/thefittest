@@ -12,6 +12,7 @@ import torch
 
 from sklearn.base import RegressorMixin
 from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import validate_data
 
 from ..base._gpnn import BaseGPNN
 from ..base._mlp import weights_type_optimizer_alias
@@ -20,8 +21,7 @@ from ..optimizers import SHADE
 from ..optimizers import SelfCGP
 
 
-
-class GeneticProgrammingNeuralNetRegressor(BaseGPNN, RegressorMixin):
+class GeneticProgrammingNeuralNetRegressor(RegressorMixin, BaseGPNN):
     def __init__(
         self,
         *,
@@ -59,16 +59,10 @@ class GeneticProgrammingNeuralNetRegressor(BaseGPNN, RegressorMixin):
 
         check_is_fitted(self)
 
-        X = self._validate_data(X, reset=False)
-
-        n_features = X.shape[1]
-
-        if self.n_features_in_ != n_features:
-            raise ValueError(
-                "Number of features of the model must match the "
-                f"input. Model n_features is {self.n_features_in_} and input "
-                f"n_features is {n_features}."
-            )
+        if hasattr(self, "_validate_data"):
+            X = self._validate_data(X, reset=False)
+        else:
+            X = validate_data(self, X, reset=False)
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])

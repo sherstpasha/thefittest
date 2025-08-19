@@ -11,13 +11,14 @@ from numpy.typing import NDArray
 
 from sklearn.base import RegressorMixin
 from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import validate_data
 
 from ..base._gp import BaseGP
 from ..optimizers import GeneticProgramming
 from ..optimizers import SelfCGP
 
 
-class GeneticProgrammingRegressor(BaseGP, RegressorMixin):
+class GeneticProgrammingRegressor(RegressorMixin, BaseGP):
     def __init__(
         self,
         *,
@@ -40,7 +41,10 @@ class GeneticProgrammingRegressor(BaseGP, RegressorMixin):
     def predict(self, X: NDArray[np.float64]):
         check_is_fitted(self)
 
-        X = self._validate_data(X, reset=False)
+        if hasattr(self, "_validate_data"):
+            X = self._validate_data(X, reset=False)
+        else:
+            X = validate_data(self, X, reset=False)
 
         n_features = X.shape[1]
         tree_for_predict = self.tree_.set_terminals(**{f"x{i}": X[:, i] for i in range(n_features)})

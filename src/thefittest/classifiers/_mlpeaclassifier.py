@@ -13,7 +13,7 @@ from numpy.typing import ArrayLike
 
 from sklearn.base import ClassifierMixin
 from sklearn.utils.validation import check_is_fitted
-
+from sklearn.utils.validation import validate_data
 import torch
 
 from ..base._mlp import BaseMLPEA
@@ -21,7 +21,7 @@ from ..base._mlp import weights_type_optimizer_alias
 from ..optimizers import SHADE
 
 
-class MLPEAClassifier(BaseMLPEA, ClassifierMixin):
+class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
     def __init__(
         self,
         *,
@@ -48,14 +48,10 @@ class MLPEAClassifier(BaseMLPEA, ClassifierMixin):
     def predict_proba(self, X: ArrayLike) -> NDArray[np.float64]:
         check_is_fitted(self)
 
-        X = self._validate_data(X, reset=False)
-
-        if X.shape[1] != self.n_features_in_:
-            raise ValueError(
-                "Number of features of the model must match the "
-                f"input. Model n_features is {self.n_features_in_} and input "
-                f"n_features is {X.shape[1]}."
-            )
+        if hasattr(self, "_validate_data"):
+            X = self._validate_data(X, reset=False)
+        else:
+            X = validate_data(self, X, reset=False)
 
         if self.offset:
             X = np.hstack([X, np.ones((X.shape[0], 1))])

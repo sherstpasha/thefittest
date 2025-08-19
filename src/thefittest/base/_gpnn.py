@@ -18,6 +18,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.multiclass import check_classification_targets
+from sklearn.utils.validation import validate_data
 
 import torch
 
@@ -315,7 +316,11 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         random_state = check_random_state(self.random_state)
 
         if isinstance(self, ClassifierMixin):
-            X, y = self._validate_data(X, y, reset=True)
+            if hasattr(self, "_validate_data"):
+                X, y = self._validate_data(X, y, reset=True)
+            else:
+                X, y = validate_data(self, X, y, reset=True)
+
             check_classification_targets(y)
             self._label_encoder = LabelEncoder()
             self._one_hot_encoder = OneHotEncoder(
@@ -327,7 +332,10 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             self.classes_ = self._label_encoder.classes_
             self.n_classes_ = len(self.classes_)
         else:
-            X, y = self._validate_data(X, y, reset=True)
+            if hasattr(self, "_validate_data"):
+                X, y = self._validate_data(X, y, reset=True)
+            else:
+                X, y = validate_data(self, X, y, reset=True)
 
         X, y = array_like_to_numpy_X_y(X, y)
 
