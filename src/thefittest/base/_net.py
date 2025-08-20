@@ -44,10 +44,6 @@ def _act(code: int, x: torch.Tensor) -> torch.Tensor:
     raise ValueError(f"Unknown activation code {code}")
 
 
-# def _act(code: int, x: torch.Tensor) -> torch.Tensor:
-#    return x
-
-
 ACTIVATION_NAME = {0: "sg", 1: "rl", 2: "gs", 3: "th", 4: "ln", 5: "sm"}
 ACTIV_NAME_INV = {"sigma": 0, "relu": 1, "gauss": 2, "tanh": 3, "ln": 4, "softmax": 5}
 
@@ -66,16 +62,15 @@ class _Block(nn.Module):
         super().__init__()
         self.register_buffer("from_idx", torch.as_tensor(fr, dtype=torch.long))
         self.register_buffer("to_idx", torch.as_tensor(to, dtype=torch.long))
-        self.register_buffer("weight_idx", torch.as_tensor(widx, dtype=torch.long))  # (rows, cols)
+        self.register_buffer("weight_idx", torch.as_tensor(widx, dtype=torch.long)) 
         self.register_buffer("act_codes", torch.as_tensor(act_codes, dtype=torch.long))
-        # упакуем списки узлов для активаций в паддинг
         lens = [len(a) for a in act_nodes_list]
         maxlen = max(lens) if lens else 0
         pad = torch.full((len(act_nodes_list), maxlen), -1, dtype=torch.long)
         for i, arr in enumerate(act_nodes_list):
             if len(arr):
                 pad[i, : len(arr)] = torch.as_tensor(arr, dtype=torch.long)
-        self.register_buffer("act_nodes", pad)  # (G, maxlen)
+        self.register_buffer("act_nodes", pad)
         self.register_buffer("act_nodes_len", torch.as_tensor(lens, dtype=torch.long))
 
 
@@ -112,7 +107,7 @@ class Net:
     def to(self, device: str | torch.device, dtype: Optional[torch.dtype] = None) -> "Net":
         dev = torch.device(device)
         self._weights = self._weights.to(device=dev if dtype is None else dev, dtype=dtype)
-        # если план уже собран — переносим его буферы
+
         if self.inputs is not None:
             self.inputs = self.inputs.to(dev)
         if self.outputs is not None:
@@ -200,7 +195,6 @@ class Net:
         sig_tuple = (inputs, hidden_layers, outputs, connects, activs, offset)
         
         sig_str = repr(sig_tuple).encode()
-        print(sig_str)
         return hashlib.sha1(sig_str).hexdigest()
 
     def _get_connect(
@@ -292,8 +286,7 @@ class Net:
             self._weights = self._weights[: self._connects.shape[0]]
         return self
 
-    def _build_order_no_numba(self) -> list[_Block]:
-        """Перенос логики _get_order на numpy/torch без numba и с правильными именами полей."""
+    def _build_order(self) -> list[_Block]:
         hidden = set.union(*self._hidden_layers) if self._hidden_layers else set()
         fr = self._connects[:, 0]
         to = self._connects[:, 1]
@@ -339,7 +332,7 @@ class Net:
                         _Block(
                             fr=np.asarray(f_tuple, dtype=np.int64),
                             to=np.asarray(to_nodes, dtype=np.int64),
-                            widx=widx_map[f_tuple],  # (rows=len(to), cols=len(from))
+                            widx=widx_map[f_tuple],
                             act_codes=act_codes,
                             act_nodes_list=act_nodes,
                         )
@@ -360,7 +353,7 @@ class Net:
         self.inputs = torch.as_tensor(sorted(self._inputs), dtype=torch.long, device=dev)
         self.outputs = torch.as_tensor(sorted(self._outputs), dtype=torch.long, device=dev)
 
-        blocks = self._build_order_no_numba()
+        blocks = self._build_order()
         for b in blocks:
             b.to(dev)
         self.blocks = blocks

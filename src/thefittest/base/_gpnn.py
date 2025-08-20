@@ -8,6 +8,8 @@ from typing import Optional
 from typing import Type
 from typing import Union
 
+from collections import OrderedDict
+
 import numpy as np
 from numpy.typing import ArrayLike
 from numpy.typing import NDArray
@@ -42,27 +44,56 @@ from ..utils.random import check_random_state
 from ..utils._metrics import _ce_from_probs_torch, _rmse_torch
 
 
+class LimitedSizeDict(OrderedDict):
+    def __init__(self, max_size: int, *args, **kwargs):
+        self.max_size = max_size
+        super().__init__(*args, **kwargs)
+
+    def __setitem__(self, key, value):
+        if key in self:
+            super().__delitem__(key)
+        elif len(self) >= self.max_size:
+            self.popitem(last=False)
+        super().__setitem__(key, value)
+
 def fitness_function_structure(
     population: NDArray,
     X: torch.Tensor,
     targets: torch.Tensor,
     net_size_penalty: float,
     task_type: str = "regression",
+    fitness_cache: Optional[dict[str, dict]] = None,
 ) -> NDArray[np.float64]:
 
     losses = np.empty(len(population), dtype=np.float64)
     with torch.no_grad():
         for i, net in enumerate(population):
+            sig = net.signature()
+
+            if fitness_cache is not None and sig in fitness_cache:
+                net._weights = fitness_cache[sig]["weights"].clone().to(X.device)
+                net.compile_torch()
+
+                if fitness_cache[sig]["fitness"] is not None:
+                    losses[i] = fitness_cache[sig]["fitness"]
+                    continue
 
             out = net.forward(X)
-
             if task_type == "classification":
                 loss_t = _ce_from_probs_torch(out, targets)
             elif task_type == "regression":
                 loss_t = _rmse_torch(out, targets)
             else:
                 raise ValueError("task_type must be 'classification' or 'regression'")
-            losses[i] = float(loss_t.item()) + net_size_penalty * len(net)
+
+            fitness_val = float(loss_t.item()) + net_size_penalty * len(net)
+            losses[i] = fitness_val
+
+            if fitness_cache is not None:
+                if sig not in fitness_cache:
+                    fitness_cache[sig] = {}
+                fitness_cache[sig]["fitness"] = None
+                fitness_cache[sig]["weights"] = net._weights.detach().cpu().clone()
 
     return losses
 
@@ -109,6 +140,7 @@ def genotype_to_phenotype(
     output_activation: str,
     offset: bool,
     task_type: str = "regression",
+    fitness_cache: Optional[dict[str, dict]] = None,
 ) -> NDArray:
 
     n_variables: int = X_train.shape[1]
@@ -122,6 +154,14 @@ def genotype_to_phenotype(
     )
 
     for i, net in enumerate(population_ph):
+        sig = net.signature()
+
+        if fitness_cache is not None and sig in fitness_cache:
+            if fitness_cache[sig]["weights"] is not None:
+                net._weights = fitness_cache[sig]["weights"].clone().to(X_train.device)
+                net.compile_torch()
+            continue
+
         population_ph[i]._weights, _ = train_net_weights(
             net=net,
             X_train=X_train,
@@ -132,6 +172,12 @@ def genotype_to_phenotype(
             task_type=task_type,
         )
         population_ph[i].compile_torch()
+
+        if fitness_cache is not None:
+            fitness_cache[sig] = {
+                "fitness": None,
+                "weights": net._weights.detach().cpu().clone(),
+            }
 
     return population_ph
 
@@ -151,6 +197,7 @@ def train_net_structure(
     offset: bool,
     n_outputs: int,
     task_type: str = "regression",
+    fitness_cache: Optional[dict[str, dict]] = None,
 ):
     if task_type == "regression":
         output_activation = "ln"
@@ -163,6 +210,7 @@ def train_net_structure(
         "targets": y_test,
         "net_size_penalty": net_size_penalty,
         "task_type": task_type,
+        "fitness_cache": fitness_cache,
     }
 
     optimizer_args["genotype_to_phenotype"] = genotype_to_phenotype
@@ -175,6 +223,7 @@ def train_net_structure(
         "output_activation": output_activation,
         "offset": offset,
         "task_type": task_type,
+        "fitness_cache": fitness_cache,
     }
 
     optimizer_args["uniset"] = uniset
@@ -209,6 +258,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         device: str = "cpu",
         use_fitness_cache: bool = False,
+        fitness_cache_size: int = 1000,
     ):
         super().__init__()
         self.n_iter = n_iter
@@ -224,6 +274,8 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         self.net_size_penalty = net_size_penalty
         self.random_state = random_state
         self.device = device
+        self.use_fitness_cache = use_fitness_cache
+        self.fitness_cache_size = fitness_cache_size
 
     def get_net(self) -> Net:
         return self.net_
@@ -267,6 +319,11 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         return to_return
 
     def fit(self, X: ArrayLike, y: ArrayLike):
+
+        if self.use_fitness_cache:
+            self._fitness_cache = LimitedSizeDict(max_size=self.fitness_cache_size)
+        else:
+            self._fitness_cache = None
 
         if self.optimizer_args is not None:
             optimizer_args = self.optimizer_args.copy()
@@ -379,6 +436,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             offset=self.offset,
             n_outputs=n_outputs,
             task_type=task_type,
+            fitness_cache=self._fitness_cache,
         )
         self.net_.compile_torch()
         return self

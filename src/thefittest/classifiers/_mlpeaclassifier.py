@@ -33,6 +33,7 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
         weights_optimizer: weights_type_optimizer_alias = SHADE,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
+        device: str = 'cpu',
     ):
         super().__init__(
             n_iter=n_iter,
@@ -43,6 +44,7 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
             weights_optimizer=weights_optimizer,
             weights_optimizer_args=weights_optimizer_args,
             random_state=random_state,
+            device=device,
         )
 
     def predict_proba(self, X: ArrayLike) -> NDArray[np.float64]:

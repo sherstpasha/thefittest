@@ -38,6 +38,8 @@ class GeneticProgrammingNeuralNetRegressor(RegressorMixin, BaseGPNN):
         net_size_penalty: float = 0.0,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         device: str = 'cpu',
+        use_fitness_cache: bool = False,
+        fitness_cache_size: int = 1000,
     ):
         super().__init__(
             n_iter=n_iter,
@@ -52,7 +54,9 @@ class GeneticProgrammingNeuralNetRegressor(RegressorMixin, BaseGPNN):
             weights_optimizer_args=weights_optimizer_args,
             net_size_penalty=net_size_penalty,
             random_state=random_state,
-            device=device
+            device=device,
+            use_fitness_cache=use_fitness_cache,
+            fitness_cache_size=fitness_cache_size,
         )
 
     def predict(self, X: NDArray[np.float64]):

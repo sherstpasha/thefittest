@@ -39,6 +39,8 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
         net_size_penalty: float = 0.0,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         device: str = "cpu",
+        use_fitness_cache: bool = False,
+        fitness_cache_size: int = 1000,
     ):
         super().__init__(
             n_iter=n_iter,
@@ -54,6 +56,8 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
             net_size_penalty=net_size_penalty,
             random_state=random_state,
             device=device,
+            use_fitness_cache=use_fitness_cache,
+            fitness_cache_size=fitness_cache_size,
         )
 
     def predict_proba(self, X: ArrayLike) -> NDArray[np.float64]:
