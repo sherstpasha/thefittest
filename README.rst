@@ -1,35 +1,25 @@
 .. image:: https://img.shields.io/pypi/v/thefittest?label=PyPI%20-%20Package%20version
     :target: https://pypi.org/project/thefittest/
     :alt: PyPI - Package version
-
 .. image:: https://static.pepy.tech/badge/thefittest
     :target: https://pepy.tech/project/thefittest
     :alt: Downloads
-
 .. image:: https://komarev.com/ghpvc/?username=thefittest
     :alt: Profile views
-
 .. image:: https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master
     :alt: codecov.io
-
 .. image:: https://app.codacy.com/project/badge/Grade/4c47b6de61c4422180529bbc360262c4
     :target: https://app.codacy.com/gh/sherstpasha/thefittest/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
     :alt: Codacy Badge
-
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
     :alt: Code style: black
-
 .. image:: https://readthedocs.com/projects/sherstpasha-pavel/badge/?version=latest&token=71adf5d63b55f0def96b09e1ce4c60f8d57cbdaed7db777117f34e4718d5a1ea
     :target: https://sherstpasha-pavel.readthedocs-hosted.com/ru/latest/?badge=latest
     :alt: Documentation Status
-
-|
-
+    
 .. image:: docs/logos/logo1.png
    :align: center
-
-|
 
 ``thefittest`` is an open-source library designed for the efficient application of classical evolutionary algorithms and their effective modifications in optimization and machine learning. Our project aims to provide performance, accessibility, and ease of use, opening up the world of advanced evolutionary methods to you.
 
@@ -54,16 +44,6 @@ To install ``thefittest`` library, use the following command:
 
     pip install thefittest
 
-Dependencies
-------------
-
-``thefittest`` requires:
-
-- `Python (>=3.7,<3.12) <https://www.python.org/>`_;
-- `NumPy <https://numpy.org/>`_;
-- `Numba <https://numba.pydata.org/>`_;
-- `Scipy <https://scipy.org/>`_;
-- `Scikit-learn <https://scikit-learn.org/>`_.
 
 Usage Example
 -------------
@@ -142,6 +122,28 @@ This example demonstrates how to train a machine learning model on the Iris data
     # Evaluate the model
     print("confusion_matrix: \n", confusion_matrix(y_test, predict))
     print("f1_score: \n", f1_score(y_test, predict, average="macro"))
+
+Dependencies
+------------
+
+``thefittest`` requires the following packages (installed automatically with ``pip install thefittest``):
+
+- `Python (>=3.7,<3.12) <https://www.python.org/>`_;
+- `numpy (>=1.23,<2.0) <https://numpy.org/>`_;
+- `numba <https://numba.pydata.org/>`_;
+- `scipy <https://scipy.org/>`_;
+- `scikit-learn (>=1.4) <https://scikit-learn.org/>`_;
+- `torch (>=2.0) <https://pytorch.org/>`_;
+- `joblib (==1.2.0) <https://joblib.readthedocs.io/>`_.
+
+Optional dependencies
+---------------------
+
+Some extra packages can be installed manually if needed:
+
+- `networkx <https://networkx.org/>`_ — required for methods that work with objects such as ``Net`` and ``Tree``;
+- `torch` with **CUDA** support — if you have a GPU, you can install PyTorch with CUDA for faster computations (see official instructions: https://pytorch.org/get-started/locally/).
+
 
 ``thefittest`` contains methods
 -------------------------------
