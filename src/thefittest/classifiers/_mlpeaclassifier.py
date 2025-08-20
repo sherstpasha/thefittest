@@ -57,7 +57,7 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
         device = torch.device(self.device)
-        X_t = torch.as_tensor(X, dtype=torch.float32, device=device)
+        X_t = torch.as_tensor(X, dtype=torch.float64, device=device)
 
         with torch.no_grad():
             proba_t = self.net_.forward(X_t)
