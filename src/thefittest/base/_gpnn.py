@@ -400,8 +400,8 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
         device = torch.device(self.device)
-        X_t = torch.as_tensor(X, dtype=torch.float32, device=device)
-        y_t = torch.as_tensor(y, dtype=torch.float32, device=device)
+        X_t = torch.as_tensor(X, dtype=torch.float64, device=device)
+        y_t = torch.as_tensor(y, dtype=torch.float64, device=device)
 
         X_train, X_test, y_train, y_test = train_test_split(
             X_t, y_t, test_size=self.test_sample_ratio, random_state=random_state

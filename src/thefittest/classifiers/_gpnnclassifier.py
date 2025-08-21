@@ -72,12 +72,12 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
         device = torch.device(self.device)
-        X_t = torch.as_tensor(X, dtype=torch.float32, device=device)
+        X_t = torch.as_tensor(X, dtype=torch.float64, device=device)
 
         with torch.no_grad():
             proba_t = self.net_.forward(X_t)
-
-        return proba_t.detach().cpu().numpy().astype(np.float64)
+        proba = proba_t.detach().cpu().to(torch.float64).numpy()
+        return np.ascontiguousarray(proba, dtype=np.float64)
 
     def predict(self, X: ArrayLike):
         proba = self.predict_proba(X)

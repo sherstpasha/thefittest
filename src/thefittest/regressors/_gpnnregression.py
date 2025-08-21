@@ -72,15 +72,15 @@ class GeneticProgrammingNeuralNetRegressor(RegressorMixin, BaseGPNN):
             X = np.hstack([X, np.ones((X.shape[0], 1))])
 
         device = torch.device(self.device)
-        X_t = torch.as_tensor(X, dtype=torch.float32, device=device)
+        X_t = torch.as_tensor(X, dtype=torch.float64, device=device)
 
         with torch.no_grad():
             out = self.net_.forward(X_t)
 
         if isinstance(out, torch.Tensor):
-            out = out.detach().cpu().numpy().astype(np.float64)
+             out = out.detach().cpu().to(torch.float64).numpy()
         if out.ndim == 3 and out.shape[-1] == 1:
             out = out.squeeze(-1)
         if out.ndim == 2 and out.shape[-1] == 1:
             out = out.squeeze(-1)
-        return out.reshape(-1)
+        return np.ascontiguousarray(out.reshape(-1), dtype=np.float64)
