@@ -78,7 +78,7 @@ class GeneticProgrammingNeuralNetRegressor(RegressorMixin, BaseGPNN):
             out = self.net_.forward(X_t)
 
         if isinstance(out, torch.Tensor):
-            out = out.detach().cpu().numpy()
+            out = out.detach().cpu().numpy().astype(np.float64)
         if out.ndim == 3 and out.shape[-1] == 1:
             out = out.squeeze(-1)
         if out.ndim == 2 and out.shape[-1] == 1:

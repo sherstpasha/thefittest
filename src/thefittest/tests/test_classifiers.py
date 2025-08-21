@@ -124,6 +124,7 @@ def test_MLPEAClassifier():
         model.fit(X, y)
 
     model = MLPEAClassifier(hidden_layers=(0,), weights_optimizer_args={"no_increase_num": 30})
+    check_estimator(model)
 
 def test_GPClassifier():
     data = BanknoteDataset()

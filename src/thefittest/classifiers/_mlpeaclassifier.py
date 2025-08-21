@@ -64,7 +64,7 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
         with torch.no_grad():
             proba_t = self.net_.forward(X_t)
 
-        return proba_t.detach().cpu().numpy()
+        return proba_t.detach().cpu().numpy().astype(np.float64)
 
     def predict(self, X: ArrayLike):
         proba = self.predict_proba(X)
