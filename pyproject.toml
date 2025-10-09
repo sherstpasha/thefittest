@@ -32,9 +32,9 @@ exclude = ['(?x)(^env|^src/thefittest/tests)']
 
 [project]
 name = "thefittest"
-version = "0.2.4"
+version = "0.2.7"
 dependencies = ["numpy>=1.23,<2.0", "numba", "scipy", "scikit-learn>=1.4", "torch>=2.0", "joblib==1.2.0"]
-requires-python = ">=3.7,<3.12"
+requires-python = ">=3.7,<=3.13"
 authors = [
   { name="Pavel Sherstnev", email="sherstpasha99@gmail.com"},
 ]
