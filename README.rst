@@ -153,7 +153,7 @@ Dependencies
 - `numba <https://numba.pydata.org/>`_;
 - `scipy <https://scipy.org/>`_;
 - `scikit-learn (>=1.4) <https://scikit-learn.org/>`_;
-- `joblib (==1.2.0) <https://joblib.readthedocs.io/>`_.
+- `joblib (>=1.3.0) <https://joblib.readthedocs.io/>`_.
 
 Optional dependencies
 ---------------------
