@@ -32,8 +32,8 @@ exclude = ['(?x)(^env|^src/thefittest/tests)']
 
 [project]
 name = "thefittest"
-version = "0.2.7"
-dependencies = ["numpy>=1.23,<2.0", "numba", "scipy", "scikit-learn>=1.4", "torch>=2.0", "joblib==1.2.0"]
+version = "0.2.8"
+dependencies = ["numpy>=1.23,<2.0", "numba", "scipy", "scikit-learn>=1.4", "joblib==1.2.0"]
 requires-python = ">=3.7,<=3.13"
 authors = [
   { name="Pavel Sherstnev", email="sherstpasha99@gmail.com"},
@@ -45,6 +45,33 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "flake8",
+    "Flake8-pyproject",
+    "flake8-bugbear",
+    "pep8-naming",
+    "flake8-builtins",
+    "flake8-comprehensions",
+    "flake8-eradicate",
+    "flake8-import-order",
+    "black",
+    "mypy",
+    "typing-extensions<=4.6.3",
+    "networkx",
+    "matplotlib",
+    "psutil",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "numpydoc",
+    "pydeps",
+    "Graphviz",
+    "pandas",
+    "pyarrow",
 ]
 
 [project.urls]

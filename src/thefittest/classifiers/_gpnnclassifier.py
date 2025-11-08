@@ -4,12 +4,19 @@ from typing import Any
 from typing import Optional
 from typing import Type
 from typing import Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy.typing import NDArray
 from numpy.typing import ArrayLike
 
-import torch
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    if TYPE_CHECKING:
+        import torch
 
 from sklearn.base import ClassifierMixin
 from sklearn.utils.validation import check_is_fitted
@@ -42,6 +49,11 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
         use_fitness_cache: bool = False,
         fitness_cache_size: int = 1000,
     ):
+        if not TORCH_AVAILABLE:
+            raise ImportError(
+                "GeneticProgrammingNeuralNetClassifier requires PyTorch. "
+                "Install with: pip install thefittest[torch]"
+            )
         super().__init__(
             n_iter=n_iter,
             pop_size=pop_size,

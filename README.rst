@@ -38,11 +38,31 @@ Features of ``thefittest``
 Installation
 ------------
 
-To install ``thefittest`` library, use the following command:
+**Basic installation** (for evolutionary algorithms and symbolic regression):
 
 .. code-block:: bash
 
     pip install thefittest
+
+This installation includes all evolutionary optimizers (GA, DE, SHADE, etc.) and symbolic regression with GP.
+
+**Full installation with neural networks** (requires GPU with CUDA):
+
+First, install PyTorch with CUDA support from the official website: https://pytorch.org/get-started/locally/
+
+For example, for CUDA 12.4:
+
+.. code-block:: bash
+
+    pip3 install torch --index-url https://download.pytorch.org/whl/cu124
+
+Then install thefittest:
+
+.. code-block:: bash
+
+    pip install thefittest
+
+This enables neural network models (``MLPEAClassifier``, ``MLPEARegressor``, ``GeneticProgrammingNeuralNetClassifier``, ``GeneticProgrammingNeuralNetRegressor``) with GPU acceleration.
 
 
 Usage Example
@@ -128,12 +148,11 @@ Dependencies
 
 ``thefittest`` requires the following packages (installed automatically with ``pip install thefittest``):
 
-- `Python (>=3.7,<3.12) <https://www.python.org/>`_;
+- `Python (>=3.7,<=3.13) <https://www.python.org/>`_;
 - `numpy (>=1.23,<2.0) <https://numpy.org/>`_;
 - `numba <https://numba.pydata.org/>`_;
 - `scipy <https://scipy.org/>`_;
 - `scikit-learn (>=1.4) <https://scikit-learn.org/>`_;
-- `torch (>=2.0) <https://pytorch.org/>`_;
 - `joblib (==1.2.0) <https://joblib.readthedocs.io/>`_.
 
 Optional dependencies
@@ -141,8 +160,8 @@ Optional dependencies
 
 Some extra packages can be installed manually if needed:
 
-- `networkx <https://networkx.org/>`_ — required for methods that work with objects such as ``Net`` and ``Tree``;
-- `torch` with **CUDA** support — if you have a GPU, you can install PyTorch with CUDA for faster computations (see official instructions: https://pytorch.org/get-started/locally/).
+- `networkx <https://networkx.org/>`_ — required for visualization methods that work with objects such as ``Net`` and ``Tree``;
+- `torch (>=2.0) <https://pytorch.org/>`_ with **CUDA** support — required for neural network models (``MLPEAClassifier``, ``MLPEARegressor``, ``GeneticProgrammingNeuralNetClassifier``, ``GeneticProgrammingNeuralNetRegressor``). Install from https://pytorch.org/get-started/locally/
 
 
 ``thefittest`` contains methods

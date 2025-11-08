@@ -8,6 +8,7 @@ from typing import List
 from typing import Optional
 from typing import Set
 from typing import Tuple
+from typing import TYPE_CHECKING
 
 import hashlib
 
@@ -19,16 +20,36 @@ from ..utils.transformations import minmax_scale
 from ..utils.random import random_sample
 from ..utils.random import uniform
 
-import torch
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+try:
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    if TYPE_CHECKING:
+        import torch
+        import torch.nn as nn
+        import torch.nn.functional as F
+    else:
+        # Заглушки для runtime без torch
+        class _DummyModule:
+            """Dummy base class when torch is not available"""
+
+            pass
+
+        nn = type("nn", (), {"Module": _DummyModule})()  # type: ignore
 
 SIGMA, RELU, GAUSS, TANH, LN, SOFTMAX = 0, 1, 2, 3, 4, 5
 
 
-def _act(code: int, x: torch.Tensor) -> torch.Tensor:
+def _act(code: int, x: "torch.Tensor") -> "torch.Tensor":
+    if not TORCH_AVAILABLE:
+        raise ImportError(
+            "PyTorch is required for neural network operations. "
+            "Install with: pip install thefittest[torch]"
+        )
     if code == SIGMA:
         return torch.sigmoid(x)
     if code == RELU:
@@ -48,30 +69,43 @@ ACTIVATION_NAME = {0: "sg", 1: "rl", 2: "gs", 3: "th", 4: "ln", 5: "sm"}
 ACTIV_NAME_INV = {"sigma": 0, "relu": 1, "gauss": 2, "tanh": 3, "ln": 4, "softmax": 5}
 
 
-class _Block(nn.Module):
-    """Контейнер для индексов одного топологического шага (только буферы, веса не дублируем)."""
+if TORCH_AVAILABLE:
 
-    def __init__(
-        self,
-        fr: np.ndarray,
-        to: np.ndarray,
-        widx: np.ndarray,
-        act_codes: np.ndarray,
-        act_nodes_list: list[np.ndarray],
-    ):
-        super().__init__()
-        self.register_buffer("from_idx", torch.as_tensor(fr, dtype=torch.long))
-        self.register_buffer("to_idx", torch.as_tensor(to, dtype=torch.long))
-        self.register_buffer("weight_idx", torch.as_tensor(widx, dtype=torch.long)) 
-        self.register_buffer("act_codes", torch.as_tensor(act_codes, dtype=torch.long))
-        lens = [len(a) for a in act_nodes_list]
-        maxlen = max(lens) if lens else 0
-        pad = torch.full((len(act_nodes_list), maxlen), -1, dtype=torch.long)
-        for i, arr in enumerate(act_nodes_list):
-            if len(arr):
-                pad[i, : len(arr)] = torch.as_tensor(arr, dtype=torch.long)
-        self.register_buffer("act_nodes", pad)
-        self.register_buffer("act_nodes_len", torch.as_tensor(lens, dtype=torch.long))
+    class _Block(nn.Module):
+        """Контейнер для индексов одного топологического шага (только буферы, веса не дублируем)."""
+
+        def __init__(
+            self,
+            fr: np.ndarray,
+            to: np.ndarray,
+            widx: np.ndarray,
+            act_codes: np.ndarray,
+            act_nodes_list: list[np.ndarray],
+        ):
+            super().__init__()
+            self.register_buffer("from_idx", torch.as_tensor(fr, dtype=torch.long))
+            self.register_buffer("to_idx", torch.as_tensor(to, dtype=torch.long))
+            self.register_buffer("weight_idx", torch.as_tensor(widx, dtype=torch.long))
+            self.register_buffer("act_codes", torch.as_tensor(act_codes, dtype=torch.long))
+            lens = [len(a) for a in act_nodes_list]
+            maxlen = max(lens) if lens else 0
+            pad = torch.full((len(act_nodes_list), maxlen), -1, dtype=torch.long)
+            for i, arr in enumerate(act_nodes_list):
+                if len(arr):
+                    pad[i, : len(arr)] = torch.as_tensor(arr, dtype=torch.long)
+            self.register_buffer("act_nodes", pad)
+            self.register_buffer("act_nodes_len", torch.as_tensor(lens, dtype=torch.long))
+
+else:
+
+    class _Block:  # type: ignore
+        """Dummy _Block when torch not available"""
+
+        def __init__(self, *args, **kwargs):
+            raise ImportError(
+                "PyTorch is required for neural network operations. "
+                "Install with: pip install thefittest[torch]"
+            )
 
 
 class Net:
@@ -81,7 +115,7 @@ class Net:
         hidden_layers: Optional[List] = None,
         outputs: Optional[Set] = None,
         connects: Optional[NDArray[np.int64]] = None,
-        weights: Optional[torch.Tensor] = None,
+        weights: Optional["torch.Tensor"] = None,
         activs: Optional[Dict[int, int]] = None,
     ):
         self._inputs = inputs or set()
@@ -97,14 +131,19 @@ class Net:
         self._n_hiddens: np.int64
 
         self.blocks: list[_Block] | None = None
-        self.inputs: torch.Tensor | None = None
-        self.outputs: torch.Tensor | None = None
+        self.inputs: "torch.Tensor" | None = None
+        self.outputs: "torch.Tensor" | None = None
         self.n_nodes: int | None = None
 
         self._activation_name = {0: "sg", 1: "rl", 2: "gs", 3: "th", 4: "ln", 5: "sm"}
         self._activ_name_inv = {"sigma": 0, "relu": 1, "gauss": 2, "tanh": 3, "ln": 4, "softmax": 5}
 
-    def to(self, device: str | torch.device, dtype: Optional[torch.dtype] = None) -> "Net":
+    def to(self, device: str | "torch.device", dtype: Optional["torch.dtype"] = None) -> "Net":
+        if not TORCH_AVAILABLE:
+            raise ImportError(
+                "PyTorch is required for 'to' method. "
+                "Install with: pip install thefittest[torch]"
+            )
         dev = torch.device(device)
         self._weights = self._weights.to(device=dev if dtype is None else dev, dtype=dtype)
 
@@ -124,7 +163,11 @@ class Net:
         return self.to("cpu")
 
     def __len__(self) -> int:
-        return int(self._weights.numel())
+        if TORCH_AVAILABLE and self._weights is not None:
+            return int(self._weights.numel())
+        else:
+            # Без torch возвращаем количество connections
+            return len(self._connects)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Net):
@@ -156,19 +199,29 @@ class Net:
             to_return = values
         return to_return
 
-    def _set_weights(self, values: Optional[torch.Tensor]) -> torch.Tensor:
+    def _set_weights(self, values: Optional["torch.Tensor"]) -> "torch.Tensor":
+        if not TORCH_AVAILABLE:
+            # Возвращаем None когда torch не доступен
+            return None  # type: ignore
         if values is None:
             return torch.empty(0, dtype=torch.float32, device="cpu")
         return values.to(dtype=torch.float32)
 
     def copy(self) -> "Net":
         hidden_layers = [layer.copy() for layer in self._hidden_layers]
+
+        # Копируем weights только если torch доступен
+        if TORCH_AVAILABLE and self._weights is not None:
+            weights_copy = self._weights.detach().clone().to(self._weights.device)
+        else:
+            weights_copy = None
+
         copy_net = Net(
             inputs=self._inputs.copy(),
             hidden_layers=hidden_layers,
             outputs=self._outputs.copy(),
             connects=self._connects.copy(),
-            weights=self._weights.detach().clone().to(self._weights.device),
+            weights=weights_copy,
             activs=self._activs.copy(),
         )
         copy_net._offset = self._offset
@@ -183,17 +236,17 @@ class Net:
     def signature(self) -> str:
         inputs = tuple(sorted(self._inputs))
         outputs = tuple(sorted(self._outputs))
-        
+
         hidden_layers = tuple(tuple(sorted(layer)) for layer in self._hidden_layers)
-        
+
         connects = tuple(sorted(map(tuple, self._connects.tolist())))
-        
+
         activs = tuple(sorted(self._activs.items()))
-        
+
         offset = self._offset
-        
+
         sig_tuple = (inputs, hidden_layers, outputs, connects, activs, offset)
-        
+
         sig_str = repr(sig_tuple).encode()
         return hashlib.sha1(sig_str).hexdigest()
 
@@ -229,12 +282,19 @@ class Net:
             excess = []
 
         hidden = list(map_res) + excess
+
+        # Объединяем weights только если torch доступен
+        if TORCH_AVAILABLE and self._weights is not None and other._weights is not None:
+            weights = torch.cat([self._weights, other._weights], dim=0)
+        else:
+            weights = None
+
         return Net(
             inputs=self._inputs.union(other._inputs),
             hidden_layers=hidden,
             outputs=self._outputs.union(other._outputs),
             connects=np.vstack([self._connects, other._connects]),
-            weights=torch.cat([self._weights, other._weights], dim=0),
+            weights=weights,
             activs={**self._activs, **other._activs},
         )
 
@@ -258,13 +318,22 @@ class Net:
         to_ = hidden_outputs.difference(connects_no_i)
 
         connects, weights_np = self._get_connect(from_, to_)
-        weights_t = torch.as_tensor(weights_np, dtype=torch.float32, device=self._weights.device)
+
+        # Объединяем weights только если torch доступен
+        if TORCH_AVAILABLE and self._weights is not None and other._weights is not None:
+            weights_t = torch.as_tensor(
+                weights_np, dtype=torch.float32, device=self._weights.device
+            )
+            weights = torch.cat([self._weights, other._weights, weights_t], dim=0)
+        else:
+            weights = None
+
         return Net(
             inputs=self._inputs.union(other._inputs),
             hidden_layers=self._hidden_layers + other._hidden_layers,
             outputs=self._outputs.union(other._outputs),
             connects=np.vstack([self._connects, other._connects, connects]),
-            weights=torch.cat([self._weights, other._weights, weights_t], dim=0),
+            weights=weights,
             activs={**self._activs, **other._activs},
         )
 
@@ -275,14 +344,23 @@ class Net:
             if not len(self._inputs):
                 self._inputs = inputs
             connects, weights_np = self._get_connect(self._inputs, to_)
-            weights_t = torch.as_tensor(
-                weights_np, dtype=torch.float32, device=self._weights.device
-            )
-            self._connects = np.vstack([self._connects, connects])
-            self._weights = torch.cat([self._weights, weights_t], dim=0)
+
+            # Добавляем weights только если torch доступен
+            if TORCH_AVAILABLE and self._weights is not None:
+                weights_t = torch.as_tensor(
+                    weights_np, dtype=torch.float32, device=self._weights.device
+                )
+                self._connects = np.vstack([self._connects, connects])
+                self._weights = torch.cat([self._weights, weights_t], dim=0)
+            else:
+                self._connects = np.vstack([self._connects, connects])
 
         self._connects = np.unique(self._connects, axis=0)
-        if self._weights.numel() > self._connects.shape[0]:
+        if (
+            TORCH_AVAILABLE
+            and self._weights is not None
+            and self._weights.numel() > self._connects.shape[0]
+        ):
             self._weights = self._weights[: self._connects.shape[0]]
         return self
 
@@ -341,7 +419,12 @@ class Net:
                 raise RuntimeError("Topological build stalled (cycle or disconnected nodes).")
         return blocks
 
-    def compile_torch(self, device: torch.device | str | None = None) -> "Net":
+    def compile_torch(self, device: "torch.device" | str | None = None) -> "Net":
+        if not TORCH_AVAILABLE:
+            raise ImportError(
+                "PyTorch is required for compile_torch. "
+                "Install with: pip install thefittest[torch]"
+            )
         dev = torch.device(device) if device is not None else self._weights.device
 
         all_nodes = set(self._inputs)
@@ -370,11 +453,15 @@ class Net:
 
     def forward(
         self,
-        X: torch.Tensor,
-        weights: torch.Tensor | None = None,
+        X: "torch.Tensor",
+        weights: "torch.Tensor" | None = None,
         keep_weight_dim: bool = False,
         autocast_input: bool = True,
-    ) -> torch.Tensor:
+    ) -> "torch.Tensor":
+        if not TORCH_AVAILABLE:
+            raise ImportError(
+                "PyTorch is required for forward. " "Install with: pip install thefittest[torch]"
+            )
         base_w = self._weights if weights is None else weights
         w = base_w.view(1, -1) if base_w.ndim == 1 else base_w
         W = w.shape[0]
@@ -418,6 +505,12 @@ class Net:
         return out
 
     def get_graph(self) -> Dict:
+        if not TORCH_AVAILABLE or self._weights is None:
+            raise ImportError(
+                "PyTorch is required for get_graph method. "
+                "Install it with: pip install thefittest[torch]"
+            )
+
         input_color_code = (0.11, 0.67, 0.47, 1)
         hidden_color_code = (0.0, 0.74, 0.99, 1)
         output_color_code = (0.94, 0.50, 0.50, 1)

@@ -7,6 +7,7 @@ from typing import Dict
 from typing import Optional
 from typing import Type
 from typing import Union
+from typing import TYPE_CHECKING
 
 from collections import OrderedDict
 
@@ -22,7 +23,13 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.validation import validate_data
 
-import torch
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    if TYPE_CHECKING:
+        import torch
 
 from ..base import FunctionalNode
 from ..base import Net

@@ -8,6 +8,7 @@ from typing import Optional
 from typing import Tuple
 from typing import Type
 from typing import Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -37,9 +38,21 @@ from ..utils._metrics import _ce_from_probs_torch
 from ..utils._metrics import _rmse_torch
 from ..utils.random import check_random_state
 from ..utils.transformations import GrayCode
-import torch
-import warnings
-from torch.optim import Optimizer as TorchOptimizer
+
+try:
+    import torch
+    import warnings
+    from torch.optim import Optimizer as TorchOptimizer
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    if TYPE_CHECKING:
+        import torch
+        from torch.optim import Optimizer as TorchOptimizer
+    else:
+        # Заглушка для runtime
+        class TorchOptimizer:  # type: ignore
+            pass
 
 
 weights_type_optimizer_alias = Union[

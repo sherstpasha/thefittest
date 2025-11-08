@@ -3,6 +3,7 @@ from typing import Callable
 from typing import Tuple
 from typing import List
 from typing import Union
+from typing import TYPE_CHECKING
 
 from numba import boolean
 from numba import float64
@@ -15,8 +16,19 @@ import numpy as np
 from numpy.typing import ArrayLike
 from numpy.typing import NDArray
 
-import torch
-from torch.optim import Optimizer as TorchOptimizer
+try:
+    import torch
+    from torch.optim import Optimizer as TorchOptimizer
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    if TYPE_CHECKING:
+        import torch
+        from torch.optim import Optimizer as TorchOptimizer
+    else:
+        # Заглушка для runtime
+        class TorchOptimizer:  # type: ignore
+            pass
 
 MIN_VALUE = np.finfo(np.float64).min
 MAX_VALUE = np.finfo(np.float64).max

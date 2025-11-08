@@ -3,8 +3,13 @@ from operator import mul
 from operator import sub
 
 import numpy as np
+import pytest
 
-import torch
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
 
 from ..base._ea import Statistics
 from ..base._ea import TheFittest
@@ -270,6 +275,9 @@ def test_net():
     assert np.all(np.array(fixed._connects) == np.array([[1, 4], [2, 4]], dtype=np.int64))
     assert fixed._inputs == {1, 2}
 
+
+@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
+def test_net_torch():
     net16 = Net(
         inputs={0, 1},
         hidden_layers=[{2, 3}, {4}],
