@@ -66,6 +66,16 @@ html_theme = "sphinx_rtd_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
+# Add meta tags to prevent browser caching
+html_context = {"default_mode": "light"}
+
+# Add cache-busting meta tags
+html_meta = {
+    "cache-control": "no-cache, no-store, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "0",
+}
+
 # Path to the build directory
 html_build_dir = os.path.join(os.path.dirname(__file__), "..", "docs")
 
