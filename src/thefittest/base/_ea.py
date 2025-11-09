@@ -216,15 +216,128 @@ class EvolutionaryAlgorithm:
         return fitness
 
     def get_remains_calls(self: EvolutionaryAlgorithm) -> int:
+        """
+        Get the number of remaining fitness function calls.
+
+        Returns the number of fitness evaluations that can still be performed
+        based on the configured population size and number of iterations.
+
+        Returns
+        -------
+        int
+            Number of remaining fitness function calls.
+
+        Examples
+        --------
+        >>> from thefittest.optimizers import DifferentialEvolution
+        >>> from thefittest.benchmarks import Sphere
+        >>>
+        >>> optimizer = DifferentialEvolution(
+        ...     fitness_function=Sphere(),
+        ...     iters=100,
+        ...     pop_size=50,
+        ...     left_border=-10,
+        ...     right_border=10,
+        ...     num_variables=5,
+        ... )
+        >>> optimizer.fit()
+        >>> remaining = optimizer.get_remains_calls()
+        >>> print(f"Remaining calls: {remaining}")
+        """
         return (self._pop_size * self._iters) - self._calls
 
     def get_calls(self: EvolutionaryAlgorithm) -> int:
         return self._calls
 
     def get_fittest(self: EvolutionaryAlgorithm) -> Dict:
+        """
+        Get the best solution found during optimization.
+
+        Returns a dictionary containing the genotype, phenotype, and fitness
+        value of the best individual found during the evolutionary process.
+
+        Returns
+        -------
+        Dict
+            Dictionary with keys:
+
+            - 'genotype': array-like
+                Internal representation of the best solution.
+            - 'phenotype': array-like
+                Decoded representation of the best solution.
+            - 'fitness': float
+                Fitness value of the best solution.
+
+        Examples
+        --------
+        >>> from thefittest.optimizers import DifferentialEvolution
+        >>> from thefittest.benchmarks import Sphere
+        >>>
+        >>> optimizer = DifferentialEvolution(
+        ...     fitness_function=Sphere(),
+        ...     iters=100,
+        ...     pop_size=50,
+        ...     left_border=-10,
+        ...     right_border=10,
+        ...     num_variables=5,
+        ...     minimization=True,
+        ... )
+        >>> optimizer.fit()
+        >>> fittest = optimizer.get_fittest()
+        >>> print('Best solution:', fittest['phenotype'])
+        >>> print('Best fitness:', fittest['fitness'])
+        """
         return self._thefittest.get()
 
     def get_stats(self: EvolutionaryAlgorithm) -> Statistics:
+        """
+        Get statistics collected during the optimization process.
+
+        Returns a Statistics object (dictionary subclass) containing history
+        of various metrics collected during evolution if `keep_history=True`
+        was set during initialization.
+
+        Returns
+        -------
+        Statistics
+            Dictionary containing evolution statistics with keys such as:
+
+            - 'fitness': list of arrays
+                Fitness values of populations at each iteration.
+            - 'population_g': list of arrays
+                Genotype populations at each iteration.
+            - 'population_ph': list of arrays
+                Phenotype populations at each iteration.
+            - 'max_fitness': list of float
+                Maximum fitness at each iteration.
+
+            Additional keys may be present depending on the specific algorithm.
+
+        Notes
+        -----
+        Statistics are only collected if `keep_history=True` was specified
+        during optimizer initialization. Otherwise, returns an empty dictionary.
+
+        Examples
+        --------
+        >>> from thefittest.optimizers import DifferentialEvolution
+        >>> from thefittest.benchmarks import Sphere
+        >>>
+        >>> optimizer = DifferentialEvolution(
+        ...     fitness_function=Sphere(),
+        ...     iters=100,
+        ...     pop_size=50,
+        ...     left_border=-10,
+        ...     right_border=10,
+        ...     num_variables=5,
+        ...     minimization=True,
+        ...     keep_history=True,
+        ... )
+        >>> optimizer.fit()
+        >>> stats = optimizer.get_stats()
+        >>> print(f"Number of generations: {len(stats['max_fitness'])}")
+        >>> print(f"Final max fitness: {stats['max_fitness'][-1]}")
+        """
         return self._stats
 
     def _update_data(self: EvolutionaryAlgorithm) -> None:
@@ -276,6 +389,58 @@ class EvolutionaryAlgorithm:
         return population_split
 
     def fit(self: EvolutionaryAlgorithm) -> EvolutionaryAlgorithm:
+        """
+        Execute the evolutionary optimization process.
+
+        Runs the evolutionary algorithm for the specified number of iterations,
+        evolving the population to optimize the fitness function. The method
+        handles initialization, population evolution, fitness evaluation, and
+        termination conditions.
+
+        Returns
+        -------
+        EvolutionaryAlgorithm
+            Returns self to allow method chaining.
+
+        Notes
+        -----
+        The optimization process includes:
+
+        1. Random state initialization
+        2. Initial population generation
+        3. Iterative evolution:
+
+           - Selection and variation operations
+           - Fitness evaluation
+           - Population update
+           - Progress tracking (if enabled)
+           - Termination checking
+
+        The process terminates when:
+
+        - Maximum iterations reached
+        - Optimal value achieved (if specified)
+        - No improvement for specified number of iterations (if configured)
+
+        Examples
+        --------
+        >>> from thefittest.optimizers import DifferentialEvolution
+        >>> from thefittest.benchmarks import Sphere
+        >>>
+        >>> optimizer = DifferentialEvolution(
+        ...     fitness_function=Sphere(),
+        ...     iters=100,
+        ...     pop_size=50,
+        ...     left_border=-10,
+        ...     right_border=10,
+        ...     num_variables=5,
+        ...     minimization=True,
+        ...     show_progress_each=20,
+        ... )
+        >>> optimizer.fit()
+        >>> fittest = optimizer.get_fittest()
+        >>> print('Best solution found:', fittest['phenotype'])
+        """
 
         check_random_state(self._random_state)
         self._get_init_population()

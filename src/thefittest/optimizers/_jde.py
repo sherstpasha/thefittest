@@ -15,10 +15,161 @@ from ..utils.random import uniform
 
 
 class jDE(DifferentialEvolution):
-    """Brest, Janez & Greiner, Sao & Bošković, Borko & Mernik, Marjan & Zumer, Viljem. (2007).
-    Self-Adapting Control Parameters in Differential Evolution: A Comparative Study on Numerical
-    Benchmark Problems. Evolutionary Computation, IEEE Transactions on. 10.
-      646 - 657. 10.1109/TEVC.2006.872133."""
+    """
+    Self-adaptive Differential Evolution with control parameter adaptation.
+
+    jDE (self-adaptive Differential Evolution) is a variant of DE that self-adapts
+    the control parameters F (mutation factor) and CR (crossover rate) during
+    evolution. Each individual has its own F and CR values that evolve along
+    with the solution, allowing the algorithm to automatically tune these
+    parameters for the problem at hand.
+
+    Parameters
+    ----------
+    fitness_function : Callable[[NDArray[Any]], NDArray[np.float64]]
+        Function to evaluate fitness of solutions. Should accept a 2D array
+        of shape (pop_size, num_variables) and return a 1D array of fitness
+        values of shape (pop_size,).
+    iters : int
+        Maximum number of iterations (generations) to run the algorithm.
+    pop_size : int
+        Number of individuals in the population.
+    left_border : Union[float, int, np.number, NDArray[np.number]]
+        Lower bound(s) for decision variables. Can be a scalar (same bound for
+        all variables) or an array of shape (num_variables,).
+    right_border : Union[float, int, np.number, NDArray[np.number]]
+        Upper bound(s) for decision variables. Can be a scalar (same bound for
+        all variables) or an array of shape (num_variables,).
+    num_variables : int
+        Number of decision variables (problem dimensionality).
+    mutation : str, optional (default="rand_1")
+        Mutation strategy to use. See DifferentialEvolution for available strategies.
+    F_min : float, optional (default=0.1)
+        Minimum value for mutation factor F.
+    F_max : float, optional (default=0.9)
+        Maximum value for mutation factor F.
+    t_F : float, optional (default=0.1)
+        Probability of updating F parameter for each individual.
+    t_CR : float, optional (default=0.1)
+        Probability of updating CR parameter for each individual.
+    elitism : bool, optional (default=True)
+        If True, the best solution is always preserved in the next generation.
+    init_population : Optional[NDArray[np.float64]], optional (default=None)
+        Initial population. If None, population is randomly initialized.
+        Shape should be (pop_size, num_variables).
+    genotype_to_phenotype : Optional[Callable], optional (default=None)
+        Function to decode genotype to phenotype. If None, genotype equals phenotype.
+    optimal_value : Optional[float], optional (default=None)
+        Known optimal value for termination. Algorithm stops if this value is reached.
+    termination_error_value : float, optional (default=0.0)
+        Acceptable error from optimal value for termination.
+    no_increase_num : Optional[int], optional (default=None)
+        Stop if no improvement for this many iterations. If None, runs all iterations.
+    minimization : bool, optional (default=False)
+        If True, minimize the fitness function; if False, maximize.
+    show_progress_each : Optional[int], optional (default=None)
+        Print progress every N iterations. If None, no progress is shown.
+    keep_history : bool, optional (default=False)
+        If True, keeps history of all populations, fitness values, and F/CR parameters.
+    n_jobs : int, optional (default=1)
+        Number of parallel jobs for fitness evaluation. -1 uses all processors.
+    fitness_function_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to fitness function.
+    genotype_to_phenotype_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to genotype_to_phenotype function.
+    random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
+        Random state for reproducibility.
+    on_generation : Optional[Callable], optional (default=None)
+        Callback function called after each generation.
+    fitness_update_eps : float, optional (default=0.0)
+        Minimum improvement threshold to consider a solution as better.
+
+    Attributes
+    ----------
+    _F_min : float
+        Minimum value for mutation factor.
+    _F_max : float
+        Maximum value for mutation factor.
+    _t_F : float
+        Probability of updating F parameter.
+    _t_CR : float
+        Probability of updating CR parameter.
+    _F : NDArray[np.float64]
+        Array of F values for each individual, initialized to 0.5.
+    _CR : NDArray[np.float64]
+        Array of CR values for each individual, initialized to 0.9.
+
+    Methods
+    -------
+    fit()
+        Execute the evolutionary optimization process.
+    get_fittest()
+        Get the best solution found.
+    get_stats()
+        Get statistics collected during optimization (includes F and CR histories).
+    get_remains_calls()
+        Get the number of remaining fitness function calls.
+
+    Notes
+    -----
+    The self-adaptation mechanism works as follows:
+
+    1. Each individual has its own F and CR parameters
+    2. With probability t_F, F is randomly regenerated from [F_min, F_max]
+    3. With probability t_CR, CR is randomly regenerated from [0, 1]
+    4. If the mutated individual is better, it inherits the adapted parameters
+    5. Otherwise, the old parameters are preserved
+
+    References
+    ----------
+    .. [1] Brest, Janez & Greiner, Sao & Bošković, Borko & Mernik, Marjan &
+           Zumer, Viljem. (2007). Self-Adapting Control Parameters in
+           Differential Evolution: A Comparative Study on Numerical Benchmark
+           Problems. Evolutionary Computation, IEEE Transactions on. 10.
+           646 - 657. 10.1109/TEVC.2006.872133.
+
+    Examples
+    --------
+    >>> from thefittest.benchmarks import Rastrigin
+    >>> from thefittest.optimizers import jDE
+    >>>
+    >>> # Define problem parameters
+    >>> n_dimension = 30
+    >>> left_border = -5.12
+    >>> right_border = 5.12
+    >>> number_of_generations = 200
+    >>> population_size = 100
+    >>>
+    >>> # Create jDE optimizer with self-adaptive parameters
+    >>> optimizer = jDE(
+    ...     fitness_function=Rastrigin(),
+    ...     iters=number_of_generations,
+    ...     pop_size=population_size,
+    ...     left_border=left_border,
+    ...     right_border=right_border,
+    ...     num_variables=n_dimension,
+    ...     mutation="rand_1",
+    ...     F_min=0.1,
+    ...     F_max=0.9,
+    ...     t_F=0.1,
+    ...     t_CR=0.1,
+    ...     minimization=True,
+    ...     show_progress_each=20,
+    ...     keep_history=True
+    ... )
+    >>>
+    >>> # Run optimization
+    >>> optimizer.fit()
+    >>>
+    >>> # Get results
+    >>> fittest = optimizer.get_fittest()
+    >>> stats = optimizer.get_stats()
+    >>>
+    >>> print('The fittest individ:', fittest['phenotype'])
+    >>> print('with fitness', fittest['fitness'])
+    >>> print('Final F parameters:', stats['F'][-1])
+    >>> print('Final CR parameters:', stats['CR'][-1])
+    """
 
     def __init__(
         self,

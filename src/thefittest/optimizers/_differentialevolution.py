@@ -41,9 +41,148 @@ def bounds_control(
 
 
 class DifferentialEvolution(EvolutionaryAlgorithm):
-    """Storn, Rainer & Price, Kenneth. (1995). Differential Evolution: A Simple and Efficient
-    Adaptive Scheme for Global Optimization Over Continuous Spaces.
-    Journal of Global Optimization. 23"""
+    """
+    Differential Evolution optimizer for continuous optimization problems.
+
+    Differential Evolution (DE) is a stochastic population-based optimization
+    algorithm that uses differential mutation and crossover operators to evolve
+    solutions. It is particularly effective for continuous optimization problems.
+
+    Parameters
+    ----------
+    fitness_function : Callable[[NDArray[Any]], NDArray[np.float64]]
+        Function to evaluate fitness of solutions. Should accept a 2D array
+        of shape (pop_size, num_variables) and return a 1D array of fitness
+        values of shape (pop_size,).
+    iters : int
+        Maximum number of iterations (generations) to run the algorithm.
+    pop_size : int
+        Number of individuals in the population.
+    left_border : Union[float, int, np.number, NDArray[np.number]]
+        Lower bound(s) for decision variables. Can be a scalar (same bound for
+        all variables) or an array of shape (num_variables,).
+    right_border : Union[float, int, np.number, NDArray[np.number]]
+        Upper bound(s) for decision variables. Can be a scalar (same bound for
+        all variables) or an array of shape (num_variables,).
+    num_variables : int
+        Number of decision variables (problem dimensionality).
+    mutation : str, optional (default="rand_1")
+        Mutation strategy to use. Available strategies:
+
+        - 'rand_1': mutant = x_r1 + F * (x_r2 - x_r3)
+        - 'best_1': mutant = x_best + F * (x_r1 - x_r2)
+        - 'current_to_best_1': mutant = x_i + F * (x_best - x_i) + F * (x_r1 - x_r2)
+        - 'rand_to_best1': mutant = x_r1 + F * (x_best - x_r1) + F * (x_r2 - x_r3)
+        - 'rand_2': mutant = x_r1 + F * (x_r2 - x_r3) + F * (x_r4 - x_r5)
+        - 'best_2': mutant = x_best + F * (x_r1 - x_r2) + F * (x_r3 - x_r4)
+    F : float, optional (default=0.5)
+        Differential weight (mutation factor), typically in [0, 2].
+    CR : float, optional (default=0.5)
+        Crossover probability, should be in [0, 1].
+    elitism : bool, optional (default=True)
+        If True, the best solution is always preserved in the next generation.
+    init_population : Optional[NDArray[np.float64]], optional (default=None)
+        Initial population. If None, population is randomly initialized.
+        Shape should be (pop_size, num_variables).
+    genotype_to_phenotype : Optional[Callable], optional (default=None)
+        Function to decode genotype to phenotype. If None, genotype equals phenotype.
+    optimal_value : Optional[float], optional (default=None)
+        Known optimal value for termination. Algorithm stops if this value is reached.
+    termination_error_value : float, optional (default=0.0)
+        Acceptable error from optimal value for termination.
+    no_increase_num : Optional[int], optional (default=None)
+        Stop if no improvement for this many iterations. If None, runs all iterations.
+    minimization : bool, optional (default=False)
+        If True, minimize the fitness function; if False, maximize.
+    show_progress_each : Optional[int], optional (default=None)
+        Print progress every N iterations. If None, no progress is shown.
+    keep_history : bool, optional (default=False)
+        If True, keeps history of all populations and fitness values.
+    n_jobs : int, optional (default=1)
+        Number of parallel jobs for fitness evaluation. -1 uses all processors.
+    fitness_function_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to fitness function.
+    genotype_to_phenotype_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to genotype_to_phenotype function.
+    random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
+        Random state for reproducibility.
+    on_generation : Optional[Callable], optional (default=None)
+        Callback function called after each generation.
+    fitness_update_eps : float, optional (default=0.0)
+        Minimum improvement threshold to consider a solution as better.
+
+    Attributes
+    ----------
+    _num_variables : int
+        Number of decision variables.
+    _left : NDArray[np.float64]
+        Lower bounds for each variable.
+    _right : NDArray[np.float64]
+        Upper bounds for each variable.
+    _specified_mutation : str
+        Selected mutation strategy.
+    _F : Union[float, NDArray[np.float64]]
+        Mutation factor.
+    _CR : Union[float, NDArray[np.float64]]
+        Crossover probability.
+
+    Methods
+    -------
+    fit()
+        Execute the evolutionary optimization process.
+    get_fittest()
+        Get the best solution found.
+    get_stats()
+        Get statistics collected during optimization.
+    get_remains_calls()
+        Get the number of remaining fitness function calls.
+    float_population(pop_size, left_border, right_border, num_variables)
+        Generate a random population of floating-point vectors.
+
+    References
+    ----------
+    .. [1] Storn, Rainer & Price, Kenneth. (1995). Differential Evolution:
+           A Simple and Efficient Adaptive Scheme for Global Optimization
+           Over Continuous Spaces. Journal of Global Optimization. 23.
+
+    Examples
+    --------
+    >>> from thefittest.benchmarks import Griewank
+    >>> from thefittest.optimizers import DifferentialEvolution
+    >>>
+    >>> # Define problem parameters
+    >>> n_dimension = 100
+    >>> left_border = -100.
+    >>> right_border = 100.
+    >>> number_of_generations = 500
+    >>> population_size = 500
+    >>>
+    >>> # Create optimizer instance
+    >>> optimizer = DifferentialEvolution(
+    ...     fitness_function=Griewank(),
+    ...     iters=number_of_generations,
+    ...     pop_size=population_size,
+    ...     left_border=left_border,
+    ...     right_border=right_border,
+    ...     num_variables=n_dimension,
+    ...     show_progress_each=10,
+    ...     minimization=True,
+    ...     mutation="rand_1",
+    ...     F=0.1,
+    ...     CR=0.5,
+    ...     keep_history=True
+    ... )
+    >>>
+    >>> # Run optimization
+    >>> optimizer.fit()
+    >>>
+    >>> # Get results
+    >>> fittest = optimizer.get_fittest()
+    >>> stats = optimizer.get_stats()
+    >>>
+    >>> print('The fittest individ:', fittest['phenotype'])
+    >>> print('with fitness', fittest['fitness'])
+    """
 
     def __init__(
         self,

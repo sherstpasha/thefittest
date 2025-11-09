@@ -36,9 +36,13 @@ release = "0.2.3"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.doctest",
+    # "sphinx.ext.doctest",  # Disabled - examples are for documentation only
     "numpydoc",
 ]
+
+# Numpydoc configuration - disable doctest
+numpydoc_show_class_members = False
+numpydoc_use_plots = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -63,9 +67,9 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 # Path to the build directory
-html_build_dir = os.path.join(os.path.dirname(__file__), '..', 'docs')
+html_build_dir = os.path.join(os.path.dirname(__file__), "..", "docs")
 
 # Output directory for the build html
-html_output = os.path.join(html_build_dir, 'html')
+html_output = os.path.join(html_build_dir, "html")
 
 autosummary_generate = True

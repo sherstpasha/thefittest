@@ -122,9 +122,143 @@ def randn01(u: np.float64) -> Union[float, np.float64]:
 
 
 class SHADE(DifferentialEvolution):
-    """Tanabe, Ryoji & Fukunaga, Alex. (2013). Success-history based parameter adaptation
-    for Differential Evolution. 2013 IEEE Congress on Evolutionary Computation,
-    CEC 2013. 71-78. 10.1109/CEC.2013.6557555."""
+    """
+    Success-History based Adaptive Differential Evolution optimizer.
+
+    SHADE is an advanced variant of Differential Evolution that adaptively adjusts
+    its control parameters (F and CR) based on the success history of previous
+    generations. It uses historical memory to guide parameter selection and
+    incorporates an archive of recently replaced solutions.
+
+    Parameters
+    ----------
+    fitness_function : Callable[[NDArray[Any]], NDArray[np.float64]]
+        Function to evaluate fitness of solutions. Should accept a 2D array
+        of shape (pop_size, num_variables) and return a 1D array of fitness
+        values of shape (pop_size,).
+    iters : int
+        Maximum number of iterations (generations) to run the algorithm.
+    pop_size : int
+        Number of individuals in the population. Also determines the size
+        of the historical memory for F and CR parameters.
+    left_border : Union[float, int, np.number, NDArray[np.number]]
+        Lower bound(s) for decision variables. Can be a scalar (same bound for
+        all variables) or an array of shape (num_variables,).
+    right_border : Union[float, int, np.number, NDArray[np.number]]
+        Upper bound(s) for decision variables. Can be a scalar (same bound for
+        all variables) or an array of shape (num_variables,).
+    num_variables : int
+        Number of decision variables (problem dimensionality).
+    elitism : bool, optional (default=True)
+        If True, the best solution is always preserved in the next generation.
+    init_population : Optional[NDArray[np.float64]], optional (default=None)
+        Initial population. If None, population is randomly initialized.
+        Shape should be (pop_size, num_variables).
+    genotype_to_phenotype : Optional[Callable], optional (default=None)
+        Function to decode genotype to phenotype. If None, genotype equals phenotype.
+    optimal_value : Optional[float], optional (default=None)
+        Known optimal value for termination. Algorithm stops if this value is reached.
+    termination_error_value : float, optional (default=0.0)
+        Acceptable error from optimal value for termination.
+    no_increase_num : Optional[int], optional (default=None)
+        Stop if no improvement for this many iterations. If None, runs all iterations.
+    minimization : bool, optional (default=False)
+        If True, minimize the fitness function; if False, maximize.
+    show_progress_each : Optional[int], optional (default=None)
+        Print progress every N iterations. If None, no progress is shown.
+    keep_history : bool, optional (default=False)
+        If True, keeps history of all populations, fitness values, and parameter histories.
+    n_jobs : int, optional (default=1)
+        Number of parallel jobs for fitness evaluation. -1 uses all processors.
+    fitness_function_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to fitness function.
+    genotype_to_phenotype_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to genotype_to_phenotype function.
+    random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
+        Random state for reproducibility.
+    on_generation : Optional[Callable], optional (default=None)
+        Callback function called after each generation.
+    fitness_update_eps : float, optional (default=0.0)
+        Minimum improvement threshold to consider a solution as better.
+
+    Attributes
+    ----------
+    _H_F : NDArray[np.float64]
+        Historical memory for mutation factor F, initialized to 0.5.
+    _H_CR : NDArray[np.float64]
+        Historical memory for crossover rate CR, initialized to 0.5.
+    _H_size : int
+        Size of historical memory (equal to pop_size).
+    _k : int
+        Current index in the historical memory.
+    _p : float
+        Proportion of population used for p-best selection (default 0.05).
+    _population_g_archive_i : NDArray[np.float64]
+        Archive of replaced solutions used in mutation.
+
+    Methods
+    -------
+    fit()
+        Execute the evolutionary optimization process.
+    get_fittest()
+        Get the best solution found.
+    get_stats()
+        Get statistics collected during optimization (includes H_F and H_CR histories).
+    get_remains_calls()
+        Get the number of remaining fitness function calls.
+
+    Notes
+    -----
+    SHADE uses:
+
+    - Current-to-pbest/1 mutation strategy with archive
+    - Adaptive F parameter sampled from Cauchy distribution
+    - Adaptive CR parameter sampled from normal distribution
+    - Success-history based parameter adaptation using Lehmer mean
+    - External archive of inferior solutions
+
+    References
+    ----------
+    .. [1] Tanabe, Ryoji & Fukunaga, Alex. (2013). Success-history based
+           parameter adaptation for Differential Evolution. 2013 IEEE Congress
+           on Evolutionary Computation, CEC 2013. 71-78.
+           10.1109/CEC.2013.6557555.
+
+    Examples
+    --------
+    >>> from thefittest.optimizers import SHADE
+    >>>
+    >>> # Define a custom optimization problem
+    >>> def custom_problem(x):
+    ...     return (5 - x[:, 0])**2 + (12 - x[:, 1])**2
+    >>>
+    >>> # Set up problem parameters
+    >>> n_dimension = 2
+    >>> left_border = -100.
+    >>> right_border = 100.
+    >>> number_of_generations = 100
+    >>> population_size = 100
+    >>>
+    >>> # Create SHADE optimizer
+    >>> optimizer = SHADE(
+    ...     fitness_function=custom_problem,
+    ...     iters=number_of_generations,
+    ...     pop_size=population_size,
+    ...     left_border=left_border,
+    ...     right_border=right_border,
+    ...     num_variables=n_dimension,
+    ...     show_progress_each=10,
+    ...     minimization=True
+    ... )
+    >>>
+    >>> # Run optimization
+    >>> optimizer.fit()
+    >>>
+    >>> # Get results
+    >>> fittest = optimizer.get_fittest()
+    >>> print('The fittest individ:', fittest['phenotype'])
+    >>> print('with fitness', fittest['fitness'])
+    """
 
     def __init__(
         self,
