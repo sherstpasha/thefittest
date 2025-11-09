@@ -149,8 +149,8 @@ Dependencies
 ``thefittest`` requires the following packages (installed automatically with ``pip install thefittest``):
 
 - `Python (>=3.7,<=3.13) <https://www.python.org/>`_;
-- `numpy (>=1.23,<2.0) <https://numpy.org/>`_;
-- `numba <https://numba.pydata.org/>`_;
+- `numpy (>=1.26) <https://numpy.org/>`_;
+- `numba (>=0.60) <https://numba.pydata.org/>`_;
 - `scipy <https://scipy.org/>`_;
 - `scikit-learn (>=1.4) <https://scikit-learn.org/>`_;
 - `joblib (>=1.3.0) <https://joblib.readthedocs.io/>`_.
