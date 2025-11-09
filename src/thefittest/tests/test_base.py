@@ -7,6 +7,7 @@ import pytest
 
 try:
     import torch
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
@@ -54,6 +55,47 @@ def test_thefittest_class():
     fittest = thefittest_.get()
     assert isinstance(fittest, dict)
     assert len(fittest) == 3
+
+
+def test_thefittest_with_eps():
+    """Test TheFittest class with fitness_update_eps parameter"""
+    net_1 = Net()
+    net_2 = Net()
+    net_3 = Net()
+
+    population_g = np.array([net_1, net_2, net_3], dtype=object)
+    population_ph = population_g
+
+    # Test with eps = 0.5
+    thefittest_ = TheFittest()
+    fitness = np.array([1.0, 2.0, 3.0], dtype=np.float64)
+    thefittest_._update(population_g, population_ph, fitness, eps=0.5)
+    assert thefittest_._fitness == 3.0
+    assert thefittest_._no_update_counter == 0
+
+    # Small improvement (< eps) should not update
+    fitness = np.array([1.0, 2.0, 3.3], dtype=np.float64)  # improvement = 0.3 < 0.5
+    thefittest_._update(population_g, population_ph, fitness, eps=0.5)
+    assert thefittest_._fitness == 3.0  # unchanged
+    assert thefittest_._no_update_counter == 1
+
+    # Large improvement (> eps) should update
+    fitness = np.array([1.0, 2.0, 4.0], dtype=np.float64)  # improvement = 1.0 > 0.5
+    thefittest_._update(population_g, population_ph, fitness, eps=0.5)
+    assert thefittest_._fitness == 4.0
+    assert thefittest_._no_update_counter == 0
+
+    # Test with eps = 0 (default behavior)
+    thefittest2 = TheFittest()
+    fitness = np.array([1.0, 2.0, 3.0], dtype=np.float64)
+    thefittest2._update(population_g, population_ph, fitness, eps=0.0)
+    assert thefittest2._fitness == 3.0
+
+    # Any improvement should update when eps=0
+    fitness = np.array([1.0, 2.0, 3.01], dtype=np.float64)
+    thefittest2._update(population_g, population_ph, fitness, eps=0.0)
+    assert thefittest2._fitness == 3.01
+    assert thefittest2._no_update_counter == 0
 
 
 def test_statistic_class():
@@ -203,6 +245,7 @@ def test_tree_class():
 
     assert isinstance(graph, dict)
 
+
 def test_tree_signature_and_copy():
     x = TerminalNode(value=2, name="x")
     y = TerminalNode(value=3, name="y")
@@ -216,7 +259,6 @@ def test_tree_signature_and_copy():
 
     tree2 = Tree(nodes=[functional_mul, x, y])
 
-
     sig1 = tree1.signature()
     sig1_copy = tree1_copy.signature()
     sig2 = tree2.signature()
@@ -226,6 +268,7 @@ def test_tree_signature_and_copy():
     assert sig1 == sig1_copy
 
     assert sig1 != sig2
+
 
 def test_net():
     net = Net(inputs={0, 1, 3})

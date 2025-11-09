@@ -5,7 +5,6 @@ from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
-from typing import Tuple
 from typing import Union
 
 from joblib import Parallel
@@ -30,10 +29,11 @@ class TheFittest:
         population_g: NDArray[Any],
         population_ph: NDArray[Any],
         fitness: NDArray[np.float64],
+        eps: float = 0.0,
     ) -> None:
         temp_best_id = np.argmax(fitness)
         temp_best_fitness = fitness[temp_best_id]
-        if temp_best_fitness > self._fitness:
+        if temp_best_fitness - self._fitness > eps:
             self._replace(
                 new_genotype=population_g[temp_best_id],
                 new_phenotype=population_ph[temp_best_id],
@@ -91,6 +91,7 @@ class EvolutionaryAlgorithm:
         genotype_to_phenotype_args: Optional[Dict] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         on_generation: Optional[Callable] = None,
+        fitness_update_eps: float = 0.0,
     ):
         self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]] = fitness_function
         self._iters: int = iters
@@ -104,6 +105,7 @@ class EvolutionaryAlgorithm:
         self._show_progress_each: Optional[int] = show_progress_each
         self._keep_history: bool = keep_history
         self._n_jobs: int = self._get_n_jobs(n_jobs)
+        self._fitness_update_eps: float = fitness_update_eps
 
         if fitness_function_args is not None:
             self._fitness_function_args = fitness_function_args
@@ -167,7 +169,10 @@ class EvolutionaryAlgorithm:
         fitness: NDArray[np.float64],
     ) -> None:
         self._thefittest._update(
-            population_g=population_g, population_ph=population_ph, fitness=fitness
+            population_g=population_g,
+            population_ph=population_ph,
+            fitness=fitness,
+            eps=self._fitness_update_eps,
         )
 
     def _update_stats(self: EvolutionaryAlgorithm, **kwargs: Any) -> None:

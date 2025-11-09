@@ -68,6 +68,7 @@ class SelfCGA(GeneticAlgorithm):
         genotype_to_phenotype_args: Optional[Dict] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         on_generation: Optional[Callable] = None,
+        fitness_update_eps: float = 0.0,
     ):
         GeneticAlgorithm.__init__(
             self,
@@ -92,6 +93,7 @@ class SelfCGA(GeneticAlgorithm):
             genotype_to_phenotype_args=genotype_to_phenotype_args,
             random_state=random_state,
             on_generation=on_generation,
+            fitness_update_eps=fitness_update_eps,
         )
 
         self._K: float = K
