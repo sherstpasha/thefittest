@@ -53,6 +53,7 @@ def test_GeneticAlgorithm_start_settings():
     stats = optimizer.get_stats()
 
     assert optimizer.get_remains_calls() == 0
+    assert optimizer.get_calls() == pop_size * iters
     assert len(stats["max_fitness"]) == iters
     assert optimizer._sign == -1
 
@@ -77,6 +78,7 @@ def test_GeneticAlgorithm_start_settings():
     optimizer.fit()
 
     assert optimizer.get_remains_calls() == pop_size * (iters - no_increase_num - 1)
+    assert optimizer.get_calls() == pop_size * (no_increase_num + 1)
     assert optimizer._sign == 1
 
     # start with the optimal_value is equal 1
@@ -95,6 +97,7 @@ def test_GeneticAlgorithm_start_settings():
 
     optimizer.fit()
     assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+    assert optimizer.get_calls() == pop_size
 
 
 def test_GeneticAlgorithm_set_strategy():

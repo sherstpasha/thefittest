@@ -218,6 +218,9 @@ class EvolutionaryAlgorithm:
     def get_remains_calls(self: EvolutionaryAlgorithm) -> int:
         return (self._pop_size * self._iters) - self._calls
 
+    def get_calls(self: EvolutionaryAlgorithm) -> int:
+        return self._calls
+
     def get_fittest(self: EvolutionaryAlgorithm) -> Dict:
         return self._thefittest.get()
 
