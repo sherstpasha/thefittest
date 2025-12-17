@@ -68,14 +68,6 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
     device : str, optional (default="cpu")
         Device for PyTorch computations: 'cpu' or 'cuda'.
 
-    Attributes
-    ----------
-    net_ : torch.nn.Module
-        The trained neural network.
-    n_features_in_ : int
-        Number of features seen during fit.
-    classes_ : ndarray
-        Class labels.
 
     Examples
     --------

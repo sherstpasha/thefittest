@@ -209,14 +209,6 @@ def train_net_weights(
 
 
 class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
-    """
-    Attributes that have been estimated from the data must always have a name ending with trailing underscore,
-    for example the coefficients of some regression estimator would be stored in a coef_ attribute after fit has been called.
-    The estimated attributes are expected to be overridden when you call fit a second time.
-
-    In iterative algorithms, the number of iterations should be specified by an integer called n_iter.
-    """
-
     @abstractmethod
     def __init__(
         self,
