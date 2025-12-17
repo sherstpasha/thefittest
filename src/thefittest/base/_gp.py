@@ -95,9 +95,28 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
         self.use_fitness_cache = use_fitness_cache
 
     def get_tree(self) -> Tree:
+        """
+        Get the evolved tree expression.
+
+        Returns
+        -------
+        tree : Tree
+            The best evolved tree representing the symbolic expression.
+            For classification, this is the decision tree.
+            For regression, this is the functional approximation.
+        """
         return self.tree_
 
     def get_stats(self) -> Statistics:
+        """
+        Get optimization statistics from the training process.
+
+        Returns
+        -------
+        stats : Statistics
+            Statistics object containing fitness history and other metrics
+            collected during the evolutionary optimization process.
+        """
         return self.optimizer_stats_
 
     def fit(self, X: ArrayLike, y: ArrayLike):

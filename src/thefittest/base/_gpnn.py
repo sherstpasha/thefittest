@@ -25,6 +25,7 @@ from sklearn.utils.validation import validate_data
 
 try:
     import torch
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
@@ -62,6 +63,7 @@ class LimitedSizeDict(OrderedDict):
         elif len(self) >= self.max_size:
             self.popitem(last=False)
         super().__setitem__(key, value)
+
 
 def fitness_function_structure(
     population: NDArray,
@@ -285,12 +287,39 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         self.fitness_cache_size = fitness_cache_size
 
     def get_net(self) -> Net:
+        """
+        Get the evolved and trained neural network.
+
+        Returns
+        -------
+        net : Net
+            The neural network with GP-evolved architecture and optimized weights.
+            Can be used for visualization or further analysis.
+        """
         return self.net_
 
     def get_tree(self) -> Tree:
+        """
+        Get the evolved tree representing the network architecture.
+
+        Returns
+        -------
+        tree : Tree
+            The tree expression that encodes the evolved neural network structure.
+            Each node represents network layers and connections.
+        """
         return self.tree_
 
     def get_stats(self) -> Statistics:
+        """
+        Get optimization statistics from the architecture evolution process.
+
+        Returns
+        -------
+        stats : Statistics
+            Statistics object containing fitness history and other metrics
+            collected during the architecture evolution process.
+        """
         return self.optimizer_stats_
 
     @staticmethod

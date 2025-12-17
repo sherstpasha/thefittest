@@ -43,6 +43,7 @@ try:
     import torch
     import warnings
     from torch.optim import Optimizer as TorchOptimizer
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
@@ -284,9 +285,28 @@ class BaseMLPEA(BaseEstimator, metaclass=ABCMeta):
         return net
 
     def get_stats(self) -> Statistics:
+        """
+        Get optimization statistics from the weight training process.
+
+        Returns
+        -------
+        stats : Statistics
+            Statistics object containing fitness history and other metrics
+            collected during the weight optimization process.
+            Returns None if torch.optim optimizer was used.
+        """
         return self.optimizer_stats_
 
     def get_net(self) -> Net:
+        """
+        Get the trained neural network.
+
+        Returns
+        -------
+        net : Net
+            The trained neural network with optimized weights.
+            Can be used for visualization or further analysis.
+        """
         return self.net_
 
     def fit(self, X: ArrayLike, y: ArrayLike):

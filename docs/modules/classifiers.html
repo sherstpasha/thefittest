@@ -254,12 +254,33 @@ contained subobjects that are estimators.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier.get_stats">
 <span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Statistics</span></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingClassifier.get_stats" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get optimization statistics from the training process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats</strong><span class="classifier">Statistics</span></dt><dd><p>Statistics object containing fitness history and other metrics
+collected during the evolutionary optimization process.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier.get_tree">
 <span class="sig-name descname"><span class="pre">get_tree</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingClassifier.get_tree" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get the evolved tree expression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tree</strong><span class="classifier">Tree</span></dt><dd><p>The best evolved tree representing the symbolic expression.
+For classification, this is the decision tree.
+For regression, this is the functional approximation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier.score">
@@ -384,11 +405,15 @@ Available: ‘sigma’ (sigmoid), ‘relu’, ‘gauss’ (Gaussian), ‘tanh’
 </dd>
 <dt><strong>offset</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, adds bias terms to the network.</p>
 </dd>
-<dt><strong>weights_optimizer</strong><span class="classifier">Type, optional (default=SHADE)</span></dt><dd><p>Evolutionary algorithm class for optimizing weights.
-Available: SHADE, jDE, DifferentialEvolution, SHAGA, etc.</p>
+<dt><strong>weights_optimizer</strong><span class="classifier">Type, optional (default=SHADE)</span></dt><dd><p>Evolutionary algorithm class for optimizing weights, or PyTorch optimizer.
+Available EA: SHADE, jDE, DifferentialEvolution, SHAGA, etc.
+Available torch.optim: Adam, SGD, RMSprop, etc.
+Note: When using torch.optim optimizers, pop_size parameter is ignored.</p>
 </dd>
 <dt><strong>weights_optimizer_args</strong><span class="classifier">Optional[dict], optional (default=None)</span></dt><dd><p>Additional arguments passed to the weights optimizer (excluding n_iter and pop_size).
-Common args: {‘show_progress_each’: 10}</p>
+For EA optimizers: {‘show_progress_each’: 10}
+For torch.optim: {‘lr’: 0.01, ‘weight_decay’: 0.0001}
+Note: Use ‘epochs’ or ‘iters’ to set training iterations for torch.optim.</p>
 </dd>
 <dt><strong>random_state</strong><span class="classifier">Optional[Union[int, np.random.RandomState]], optional (default=None)</span></dt><dd><p>Random state for reproducibility.</p>
 </dd>
@@ -519,7 +544,17 @@ routing information.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.get_net">
 <span class="sig-name descname"><span class="pre">get_net</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Net" title="thefittest.base._net.Net"><span class="pre">Net</span></a></span></span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier.get_net" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get the trained neural network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>net</strong><span class="classifier">Net</span></dt><dd><p>The trained neural network with optimized weights.
+Can be used for visualization or further analysis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.get_params">
@@ -545,7 +580,18 @@ contained subobjects that are estimators.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.get_stats">
 <span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Statistics</span></span></span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier.get_stats" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get optimization statistics from the weight training process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats</strong><span class="classifier">Statistics</span></dt><dd><p>Statistics object containing fitness history and other metrics
+collected during the weight optimization process.
+Returns None if torch.optim optimizer was used.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.score">
@@ -806,7 +852,17 @@ routing information.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_net">
 <span class="sig-name descname"><span class="pre">get_net</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Net" title="thefittest.base._net.Net"><span class="pre">Net</span></a></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_net" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get the evolved and trained neural network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>net</strong><span class="classifier">Net</span></dt><dd><p>The neural network with GP-evolved architecture and optimized weights.
+Can be used for visualization or further analysis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_params">
@@ -832,12 +888,32 @@ contained subobjects that are estimators.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_stats">
 <span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Statistics</span></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_stats" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get optimization statistics from the architecture evolution process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats</strong><span class="classifier">Statistics</span></dt><dd><p>Statistics object containing fitness history and other metrics
+collected during the architecture evolution process.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_tree">
 <span class="sig-name descname"><span class="pre">get_tree</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_tree" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get the evolved tree representing the network architecture.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tree</strong><span class="classifier">Tree</span></dt><dd><p>The tree expression that encodes the evolved neural network structure.
+Each node represents network layers and connections.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.score">

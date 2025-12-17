@@ -54,11 +54,15 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
     offset : bool, optional (default=True)
         If True, adds bias terms to the network.
     weights_optimizer : Type, optional (default=SHADE)
-        Evolutionary algorithm class for optimizing weights.
-        Available: SHADE, jDE, DifferentialEvolution, SHAGA, etc.
+        Evolutionary algorithm class for optimizing weights, or PyTorch optimizer.
+        Available EA: SHADE, jDE, DifferentialEvolution, SHAGA, etc.
+        Available torch.optim: Adam, SGD, RMSprop, etc.
+        Note: When using torch.optim optimizers, pop_size parameter is ignored.
     weights_optimizer_args : Optional[dict], optional (default=None)
         Additional arguments passed to the weights optimizer (excluding n_iter and pop_size).
-        Common args: {'show_progress_each': 10}
+        For EA optimizers: {'show_progress_each': 10}
+        For torch.optim: {'lr': 0.01, 'weight_decay': 0.0001}
+        Note: Use 'epochs' or 'iters' to set training iterations for torch.optim.
     random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
         Random state for reproducibility.
     device : str, optional (default="cpu")
