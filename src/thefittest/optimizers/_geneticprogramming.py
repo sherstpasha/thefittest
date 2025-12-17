@@ -16,8 +16,91 @@ from ..utils.random import randint
 
 
 class GeneticProgramming(GeneticAlgorithm):
-    """Koza, John R.. “Genetic programming - on the programming of computers by means
-    of natural selection.” Complex Adaptive Systems (1993)"""
+    """
+    Genetic Programming optimizer for symbolic regression and tree-based evolution.
+
+    Genetic Programming (GP) evolves computer programs represented as tree structures
+    using evolutionary operators adapted for tree manipulation. This implementation
+    follows Koza's approach to genetic programming.
+
+    Parameters
+    ----------
+    fitness_function : Callable[[NDArray[Any]], NDArray[np.float64]]
+        Function to evaluate fitness of tree-based solutions.
+    uniset : UniversalSet
+        Universal set defining terminal and function nodes for tree construction.
+    iters : int
+        Maximum number of iterations (generations).
+    pop_size : int
+        Number of individuals (trees) in the population.
+    tour_size : int, optional (default=2)
+        Tournament size for tournament selection.
+    mutation_rate : float, optional (default=0.05)
+        Mutation rate for custom mutation strategies.
+    parents_num : int, optional (default=7)
+        Number of parents used in crossover operation.
+    elitism : bool, optional (default=True)
+        If True, the best solution is preserved.
+    selection : str, optional (default="rank")
+        Selection strategy. Available: 'proportional', 'rank', 'tournament_k',
+        'tournament_3', 'tournament_5', 'tournament_7'.
+    crossover : str, optional (default="gp_standard")
+        Crossover strategy for trees. Available GP crossover operators:
+
+        - 'gp_empty': No crossover (cloning)
+        - 'gp_standard': Standard GP subtree crossover
+        - 'gp_one_point': One-point crossover for trees
+        - 'gp_uniform_2', 'gp_uniform_7', 'gp_uniform_k': Uniform crossover variants
+        - 'gp_uniform_prop_2', 'gp_uniform_prop_7', 'gp_uniform_prop_k': Proportional uniform
+        - 'gp_uniform_rank_2', 'gp_uniform_rank_7', 'gp_uniform_rank_k': Rank-based uniform
+        - 'gp_uniform_tour_3', 'gp_uniform_tour_7', 'gp_uniform_tour_k': Tournament uniform
+    mutation : str, optional (default="gp_weak_grow")
+        Mutation strategy for trees. Available GP mutation operators:
+
+        - 'gp_weak_point', 'gp_average_point', 'gp_strong_point': Point mutations
+        - 'gp_weak_grow', 'gp_average_grow', 'gp_strong_grow': Growing mutations
+        - 'gp_weak_swap', 'gp_average_swap', 'gp_strong_swap': Swap mutations
+        - 'gp_weak_shrink', 'gp_average_shrink', 'gp_strong_shrink': Shrink mutations
+        - 'gp_custom_rate_point', 'gp_custom_rate_grow', 'gp_custom_rate_swap',
+          'gp_custom_rate_shrink': Custom rate variants
+    max_level : int, optional (default=16)
+        Maximum tree depth allowed during evolution.
+    init_level : int, optional (default=5)
+        Initial tree depth for population initialization.
+    init_population : Optional[NDArray], optional (default=None)
+        Initial population of trees. If None, randomly initialized.
+    genotype_to_phenotype : Optional[Callable], optional (default=None)
+        Function to decode tree to phenotype.
+    optimal_value : Optional[float], optional (default=None)
+        Known optimal value for termination.
+    termination_error_value : float, optional (default=0.0)
+        Acceptable error from optimal value.
+    no_increase_num : Optional[int], optional (default=None)
+        Stop if no improvement for this many iterations.
+    minimization : bool, optional (default=False)
+        If True, minimize; if False, maximize.
+    show_progress_each : Optional[int], optional (default=None)
+        Print progress every N iterations.
+    keep_history : bool, optional (default=False)
+        If True, keeps history of populations and fitness.
+    n_jobs : int, optional (default=1)
+        Number of parallel jobs.
+    fitness_function_args : Optional[Dict], optional (default=None)
+        Additional arguments to fitness function.
+    genotype_to_phenotype_args : Optional[Dict], optional (default=None)
+        Additional arguments to genotype_to_phenotype.
+    random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
+        Random state for reproducibility.
+    on_generation : Optional[Callable], optional (default=None)
+        Callback after each generation.
+    fitness_update_eps : float, optional (default=0.0)
+        Minimum improvement threshold.
+
+    References
+    ----------
+    .. [1] Koza, John R. (1993). Genetic Programming: On the Programming of
+           Computers by Means of Natural Selection. MIT Press.
+    """
 
     def __init__(
         self,

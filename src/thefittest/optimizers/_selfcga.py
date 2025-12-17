@@ -16,8 +16,153 @@ from ..utils.random import random_weighted_sample
 
 
 class SelfCGA(GeneticAlgorithm):
-    """Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform
-    Crossover Operator. LNCS, 7331, 2012, pp. 414-421. https://doi.org/10.1007/978-3-642-30976-2_50
+    """
+    Self-Configuring Genetic Algorithm with Modified Uniform Crossover.
+
+    SelfCGA is an adaptive genetic algorithm that automatically selects the best
+    combination of selection, crossover, and mutation operators during evolution.
+    It maintains a pool of operators and dynamically adjusts their usage probabilities
+    based on their success in improving the population.
+
+    Parameters
+    ----------
+    fitness_function : Callable[[NDArray[Any]], NDArray[np.float64]]
+        Function to evaluate fitness of solutions. Should accept a 2D array
+        and return a 1D array of fitness values.
+    iters : int
+        Maximum number of iterations (generations) to run the algorithm.
+    pop_size : int
+        Number of individuals in the population.
+    str_len : int
+        Length of the binary string (genotype length).
+    tour_size : int, optional (default=2)
+        Tournament size for tournament selection operators.
+    mutation_rate : float, optional (default=0.05)
+        Mutation rate for custom mutation strategies.
+    parents_num : int, optional (default=2)
+        Number of parents used in crossover operations.
+    elitism : bool, optional (default=True)
+        If True, the best solution is always preserved in the next generation.
+    selections : Tuple[str, ...], optional
+        Tuple of selection operator names to use in the adaptive pool.
+        Available operators (all from GeneticAlgorithm):
+
+        - 'proportional': Fitness proportional selection
+        - 'rank': Rank-based selection
+        - 'tournament_k': Tournament selection with tour_size
+        - 'tournament_3', 'tournament_5', 'tournament_7': Fixed size tournaments
+
+        Default: ('proportional', 'rank', 'tournament_3', 'tournament_5', 'tournament_7')
+    crossovers : Tuple[str, ...], optional
+        Tuple of crossover operator names to use in the adaptive pool.
+        Available operators (all from GeneticAlgorithm except gp_* variants):
+
+        - 'empty': No crossover (cloning)
+        - 'one_point': Single-point crossover
+        - 'two_point': Two-point crossover
+        - 'uniform_2', 'uniform_7', 'uniform_k': Uniform crossover with N parents
+        - 'uniform_prop_2', 'uniform_prop_7', 'uniform_prop_k': Fitness-proportional uniform
+        - 'uniform_rank_2', 'uniform_rank_7', 'uniform_rank_k': Rank-based uniform
+        - 'uniform_tour_3', 'uniform_tour_7', 'uniform_tour_k': Tournament-based uniform
+
+        Default: ('empty', 'one_point', 'two_point', 'uniform_2', 'uniform_7',
+                  'uniform_prop_2', 'uniform_prop_7', 'uniform_rank_2',
+                  'uniform_rank_7', 'uniform_tour_3', 'uniform_tour_11')
+    mutations : Tuple[str, ...], optional
+        Tuple of mutation operator names to use in the adaptive pool.
+        Available operators (all from GeneticAlgorithm except gp_* variants):
+
+        - 'weak': Flip 1/3 of bits on average
+        - 'average': Flip 1 bit on average
+        - 'strong': Flip 3 bits on average
+        - 'custom_rate': Use specified mutation_rate
+
+        Default: ('weak', 'average', 'strong')
+    init_population : Optional[NDArray[np.byte]], optional (default=None)
+        Initial population. If None, population is randomly initialized.
+    K : float, optional (default=2)
+        Coefficient for probability adjustment based on operator success.
+    selection_threshold_proba : float, optional (default=0.05)
+        Minimum probability threshold for selection operators.
+    crossover_threshold_proba : float, optional (default=0.05)
+        Minimum probability threshold for crossover operators.
+    mutation_threshold_proba : float, optional (default=0.05)
+        Minimum probability threshold for mutation operators.
+    genotype_to_phenotype : Optional[Callable], optional (default=None)
+        Function to decode genotype to phenotype. If None, genotype equals phenotype.
+    optimal_value : Optional[float], optional (default=None)
+        Known optimal value for termination.
+    termination_error_value : float, optional (default=0.0)
+        Acceptable error from optimal value for termination.
+    no_increase_num : Optional[int], optional (default=None)
+        Stop if no improvement for this many iterations.
+    minimization : bool, optional (default=False)
+        If True, minimize; if False, maximize.
+    show_progress_each : Optional[int], optional (default=None)
+        Print progress every N iterations.
+    keep_history : bool, optional (default=False)
+        If True, keeps history of populations and fitness values.
+    n_jobs : int, optional (default=1)
+        Number of parallel jobs. -1 uses all processors.
+    fitness_function_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to fitness function.
+    genotype_to_phenotype_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to genotype_to_phenotype function.
+    random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
+        Random state for reproducibility.
+    on_generation : Optional[Callable], optional (default=None)
+        Callback function called after each generation.
+    fitness_update_eps : float, optional (default=0.0)
+        Minimum improvement threshold.
+
+    References
+    ----------
+    .. [1] Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm
+           with Modified Uniform Crossover Operator. LNCS, 7331, 2012,
+           pp. 414-421. https://doi.org/10.1007/978-3-642-30976-2_50
+
+    Examples
+    --------
+    **Example: Rastrigin Problem with 10 variables**
+
+    >>> import numpy as np
+    >>> from thefittest.benchmarks import Rastrigin
+    >>> from thefittest.optimizers import SelfCGA
+    >>> from thefittest.utils.transformations import GrayCode
+    >>>
+    >>> # Problem parameters
+    >>> n_dimension = 10
+    >>> left_border = -5.
+    >>> right_border = 5.
+    >>> number_of_generations = 500
+    >>> population_size = 500
+    >>>
+    >>> # Setup Gray Code encoding for continuous optimization
+    >>> genotype_to_phenotype = GrayCode()
+    >>> genotype_to_phenotype.fit(
+    ...     left_border=left_border,
+    ...     right_border=right_border,
+    ...     num_variables=n_dimension,
+    ...     h_per_variable=0.001
+    ... )
+    >>> num_bits = genotype_to_phenotype.get_bits_per_variable().sum()
+    >>>
+    >>> # Create optimizer
+    >>> optimizer = SelfCGA(
+    ...     fitness_function=Rastrigin(),
+    ...     genotype_to_phenotype=genotype_to_phenotype.transform,
+    ...     iters=number_of_generations,
+    ...     pop_size=population_size,
+    ...     str_len=num_bits,
+    ...     show_progress_each=30,
+    ...     minimization=True,
+    ...     optimal_value=0.
+    ... )
+    >>>
+    >>> optimizer.fit()
+    >>> fittest = optimizer.get_fittest()
+    >>> print('Best phenotype:', fittest['phenotype'])
+    >>> print('Best fitness:', fittest['fitness'])
     """
 
     def __init__(

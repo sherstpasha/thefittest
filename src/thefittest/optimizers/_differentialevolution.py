@@ -111,34 +111,6 @@ class DifferentialEvolution(EvolutionaryAlgorithm):
     fitness_update_eps : float, optional (default=0.0)
         Minimum improvement threshold to consider a solution as better.
 
-    Attributes
-    ----------
-    _num_variables : int
-        Number of decision variables.
-    _left : NDArray[np.float64]
-        Lower bounds for each variable.
-    _right : NDArray[np.float64]
-        Upper bounds for each variable.
-    _specified_mutation : str
-        Selected mutation strategy.
-    _F : Union[float, NDArray[np.float64]]
-        Mutation factor.
-    _CR : Union[float, NDArray[np.float64]]
-        Crossover probability.
-
-    Methods
-    -------
-    fit()
-        Execute the evolutionary optimization process.
-    get_fittest()
-        Get the best solution found.
-    get_stats()
-        Get statistics collected during optimization.
-    get_remains_calls()
-        Get the number of remaining fitness function calls.
-    float_population(pop_size, left_border, right_border, num_variables)
-        Generate a random population of floating-point vectors.
-
     References
     ----------
     .. [1] Storn, Rainer & Price, Kenneth. (1995). Differential Evolution:

@@ -84,41 +84,6 @@ class jDE(DifferentialEvolution):
     fitness_update_eps : float, optional (default=0.0)
         Minimum improvement threshold to consider a solution as better.
 
-    Attributes
-    ----------
-    _F_min : float
-        Minimum value for mutation factor.
-    _F_max : float
-        Maximum value for mutation factor.
-    _t_F : float
-        Probability of updating F parameter.
-    _t_CR : float
-        Probability of updating CR parameter.
-    _F : NDArray[np.float64]
-        Array of F values for each individual, initialized to 0.5.
-    _CR : NDArray[np.float64]
-        Array of CR values for each individual, initialized to 0.9.
-
-    Methods
-    -------
-    fit()
-        Execute the evolutionary optimization process.
-    get_fittest()
-        Get the best solution found.
-    get_stats()
-        Get statistics collected during optimization (includes F and CR histories).
-    get_remains_calls()
-        Get the number of remaining fitness function calls.
-
-    Notes
-    -----
-    The self-adaptation mechanism works as follows:
-
-    1. Each individual has its own F and CR parameters
-    2. With probability t_F, F is randomly regenerated from [F_min, F_max]
-    3. With probability t_CR, CR is randomly regenerated from [0, 1]
-    4. If the mutated individual is better, it inherits the adapted parameters
-    5. Otherwise, the old parameters are preserved
 
     References
     ----------

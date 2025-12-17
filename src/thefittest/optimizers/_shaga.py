@@ -21,9 +21,120 @@ from ..utils.random import randint
 
 
 class SHAGA(EvolutionaryAlgorithm):
-    """Stanovov, Vladimir & Akhmedova, Shakhnaz & Semenkin, Eugene. (2019).
-    Genetic Algorithm with Success History based Parameter Adaptation. 180-187.
-    10.5220/0008071201800187."""
+    """
+    Success History based Adaptive Genetic Algorithm.
+
+    SHAGA is an adaptive genetic algorithm that uses success history to dynamically
+    adjust mutation rate (MR) and crossover rate (CR) parameters during evolution.
+    It combines concepts from SHADE (Success-History based Adaptive Differential
+    Evolution) with genetic algorithms for binary optimization.
+
+    Parameters
+    ----------
+    fitness_function : Callable[[NDArray[Any]], NDArray[np.float64]]
+        Function to evaluate fitness of solutions. Should accept a 2D array
+        of shape (pop_size, str_len) and return a 1D array of fitness values.
+    iters : int
+        Maximum number of iterations (generations) to run the algorithm.
+    pop_size : int
+        Number of individuals in the population.
+    str_len : int
+        Length of the binary string (genotype length).
+    elitism : bool, optional (default=True)
+        If True, the best solution is always preserved in the next generation.
+    init_population : Optional[NDArray[np.byte]], optional (default=None)
+        Initial population. If None, population is randomly initialized.
+        Shape should be (pop_size, str_len).
+    genotype_to_phenotype : Optional[Callable], optional (default=None)
+        Function to decode genotype to phenotype. If None, genotype equals phenotype.
+    optimal_value : Optional[float], optional (default=None)
+        Known optimal value for termination. Algorithm stops if this value is reached.
+    termination_error_value : float, optional (default=0.0)
+        Acceptable error from optimal value for termination.
+    no_increase_num : Optional[int], optional (default=None)
+        Stop if no improvement for this many iterations. If None, runs all iterations.
+    minimization : bool, optional (default=False)
+        If True, minimize the fitness function; if False, maximize.
+    show_progress_each : Optional[int], optional (default=None)
+        Print progress every N iterations. If None, no progress is shown.
+    keep_history : bool, optional (default=False)
+        If True, keeps history of all populations and fitness values.
+    n_jobs : int, optional (default=1)
+        Number of parallel jobs for fitness evaluation. -1 uses all processors.
+    fitness_function_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to fitness function.
+    genotype_to_phenotype_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to genotype_to_phenotype function.
+    random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
+        Random state for reproducibility.
+    on_generation : Optional[Callable], optional (default=None)
+        Callback function called after each generation.
+    fitness_update_eps : float, optional (default=0.0)
+        Minimum improvement threshold to consider a solution as better.
+
+    Attributes
+    ----------
+    _str_len : int
+        Length of binary strings.
+    _MR : NDArray[np.float64]
+        Current mutation rates for each individual.
+    _CR : NDArray[np.float64]
+        Current crossover rates for each individual.
+    _H_MR : NDArray[np.float64]
+        Historical memory of successful mutation rates.
+    _H_CR : NDArray[np.float64]
+        Historical memory of successful crossover rates.
+
+    References
+    ----------
+    .. [1] Stanovov, Vladimir & Akhmedova, Shakhnaz & Semenkin, Eugene. (2019).
+           Genetic Algorithm with Success History based Parameter Adaptation.
+           180-187. 10.5220/0008071201800187.
+
+    Examples
+    --------
+    **Example 1: OneMax Problem**
+
+    >>> from thefittest.benchmarks import OneMax
+    >>> from thefittest.optimizers import SHAGA
+    >>>
+    >>> optimizer = SHAGA(
+    ...     fitness_function=OneMax(),
+    ...     iters=150,
+    ...     pop_size=100,
+    ...     str_len=500,
+    ...     show_progress_each=20
+    ... )
+    >>>
+    >>> optimizer.fit()
+    >>> fittest = optimizer.get_fittest()
+    >>> print('Best fitness:', fittest['fitness'])
+
+    **Example 2: Continuous Optimization with Gray Code**
+
+    >>> from thefittest.benchmarks import Sphere
+    >>> from thefittest.utils.transformations import GrayCode
+    >>>
+    >>> # Setup encoding
+    >>> encoder = GrayCode()
+    >>> encoder.fit(left_border=-10, right_border=10,
+    ...             num_variables=5, h_per_variable=0.01)
+    >>> num_bits = encoder.get_bits_per_variable().sum()
+    >>>
+    >>> optimizer = SHAGA(
+    ...     fitness_function=Sphere(),
+    ...     genotype_to_phenotype=encoder.transform,
+    ...     iters=200,
+    ...     pop_size=100,
+    ...     str_len=num_bits,
+    ...     minimization=True
+    ... )
+    >>>
+    >>> optimizer.fit()
+    >>> fittest = optimizer.get_fittest()
+    >>> print('Best solution:', fittest['phenotype'])
+    >>> print('Best fitness:', fittest['fitness'])
+    """
 
     def __init__(
         self,

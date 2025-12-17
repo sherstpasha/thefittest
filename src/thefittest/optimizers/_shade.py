@@ -53,31 +53,6 @@ def lehmer_mean(
 
 @njit(float64(float64))
 def randc01(u: np.float64) -> np.float64:
-    """
-    Generate a random number from a Cauchy distribution within the range (0, 1).
-
-    Parameters
-    ----------
-    u : np.float64
-        The location parameter for the Cauchy distribution.
-
-    Returns
-    -------
-    np.float64
-        A random number from a Cauchy distribution within the range (0, 1).
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from thefittest.utils.random import randc01
-    >>>
-    >>> # Generate a random number from Cauchy distribution within the range (0, 1)
-    >>> u_value = 0.0
-    >>> result = randc01(u_value)
-    >>>
-    >>> print("Random Number from Cauchy Distribution (0, 1):", result)
-    """
-
     value = cauchy_distribution(loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
     while value <= 0:
         value = cauchy_distribution(loc=u, scale=np.float64(0.1), size=np.int64(1))[0]
@@ -88,31 +63,6 @@ def randc01(u: np.float64) -> np.float64:
 
 @njit(float64(float64))
 def randn01(u: np.float64) -> Union[float, np.float64]:
-    """
-    Generate a random number from a normal distribution within the range (0, 1).
-
-    Parameters
-    ----------
-    u : np.float64
-        The mean parameter for the normal distribution.
-
-    Returns
-    -------
-    Union[float, np.float64]
-        A random number from a normal distribution within the range (0, 1).
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from thefittest.utils.random import randn01
-    >>>
-    >>> # Generate a random number from normal distribution within the range (0, 1)
-    >>> u_value = 0.0
-    >>> result = randn01(u_value)
-    >>>
-    >>> print("Random Number from Normal Distribution (0, 1):", result)
-    """
-
     value = np.random.normal(u, 0.1, size=1)[0]
     if value < 0:
         return 0.0
@@ -180,32 +130,6 @@ class SHADE(DifferentialEvolution):
         Callback function called after each generation.
     fitness_update_eps : float, optional (default=0.0)
         Minimum improvement threshold to consider a solution as better.
-
-    Attributes
-    ----------
-    _H_F : NDArray[np.float64]
-        Historical memory for mutation factor F, initialized to 0.5.
-    _H_CR : NDArray[np.float64]
-        Historical memory for crossover rate CR, initialized to 0.5.
-    _H_size : int
-        Size of historical memory (equal to pop_size).
-    _k : int
-        Current index in the historical memory.
-    _p : float
-        Proportion of population used for p-best selection (default 0.05).
-    _population_g_archive_i : NDArray[np.float64]
-        Archive of replaced solutions used in mutation.
-
-    Methods
-    -------
-    fit()
-        Execute the evolutionary optimization process.
-    get_fittest()
-        Get the best solution found.
-    get_stats()
-        Get statistics collected during optimization (includes H_F and H_CR histories).
-    get_remains_calls()
-        Get the number of remaining fitness function calls.
 
     Notes
     -----

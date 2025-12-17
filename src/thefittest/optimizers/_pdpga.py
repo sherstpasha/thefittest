@@ -18,11 +18,153 @@ from ..utils.random import random_sample
 
 
 class PDPGA(SelfCGA):
-    """Niehaus, J., Banzhaf, W. (2001). Adaption of Operator Probabilities in
-    Genetic Programming. In: Miller, J., Tomassini, M., Lanzi, P.L., Ryan, C.,
-    Tettamanzi, A.G.B., Langdon, W.B. (eds) Genetic Programming. EuroGP 2001.
-    Lecture Notes in Computer Science, vol 2038. Springer, Berlin, Heidelberg.
-    https://doi.org/10.1007/3-540-45355-5_26
+    """
+    Genetic Algorithm with Population-level Dynamic Probabilities (PDP).
+
+    PDPGA implements the PDP method for operator probability adaptation, which
+    assigns each operator a minimum application probability (threshold) and
+    dynamically adjusts probabilities based on operator success rates.
+
+    Parameters
+    ----------
+    fitness_function : Callable[[NDArray[Any]], NDArray[np.float64]]
+        Function to evaluate fitness of solutions. Should accept a 2D array
+        and return a 1D array of fitness values.
+    iters : int
+        Maximum number of iterations (generations) to run the algorithm.
+    pop_size : int
+        Number of individuals in the population.
+    str_len : int
+        Length of the binary string (genotype length).
+    tour_size : int, optional (default=2)
+        Tournament size for tournament selection operators.
+    mutation_rate : float, optional (default=0.05)
+        Mutation rate for custom mutation strategies.
+    parents_num : int, optional (default=2)
+        Number of parents used in crossover operations.
+    elitism : bool, optional (default=True)
+        If True, the best solution is always preserved in the next generation.
+    selections : Tuple[str, ...], optional
+        Tuple of selection operator names to use in the adaptive pool.
+        Available operators (all from GeneticAlgorithm):
+
+        - 'proportional': Fitness proportional selection
+        - 'rank': Rank-based selection
+        - 'tournament_k': Tournament selection with tour_size
+        - 'tournament_3', 'tournament_5', 'tournament_7': Fixed size tournaments
+
+        Default: ('proportional', 'rank', 'tournament_3', 'tournament_5', 'tournament_7')
+    crossovers : Tuple[str, ...], optional
+        Tuple of crossover operator names to use in the adaptive pool.
+        Available operators (all from GeneticAlgorithm except gp_* variants):
+
+        - 'empty': No crossover (cloning)
+        - 'one_point': Single-point crossover
+        - 'two_point': Two-point crossover
+        - 'uniform_2', 'uniform_7', 'uniform_k': Uniform crossover with N parents
+        - 'uniform_prop_2', 'uniform_prop_7', 'uniform_prop_k': Fitness-proportional uniform
+        - 'uniform_rank_2', 'uniform_rank_7', 'uniform_rank_k': Rank-based uniform
+        - 'uniform_tour_3', 'uniform_tour_7', 'uniform_tour_k': Tournament-based uniform
+
+        Default: ('empty', 'one_point', 'two_point', 'uniform_2', 'uniform_7',
+                  'uniform_prop_2', 'uniform_prop_7', 'uniform_rank_2',
+                  'uniform_rank_7', 'uniform_tour_3', 'uniform_tour_7')
+    mutations : Tuple[str, ...], optional
+        Tuple of mutation operator names to use in the adaptive pool.
+        Available operators (all from GeneticAlgorithm except gp_* variants):
+
+        - 'weak': Flip 1/3 of bits on average
+        - 'average': Flip 1 bit on average
+        - 'strong': Flip 3 bits on average
+        - 'custom_rate': Use specified mutation_rate
+
+        Default: ('weak', 'average', 'strong')
+    init_population : Optional[NDArray[np.byte]], optional (default=None)
+        Initial population. If None, population is randomly initialized.
+    genotype_to_phenotype : Optional[Callable], optional (default=None)
+        Function to decode genotype to phenotype. If None, genotype equals phenotype.
+    optimal_value : Optional[float], optional (default=None)
+        Known optimal value for termination.
+    termination_error_value : float, optional (default=0.0)
+        Acceptable error from optimal value for termination.
+    no_increase_num : Optional[int], optional (default=None)
+        Stop if no improvement for this many iterations.
+    minimization : bool, optional (default=False)
+        If True, minimize; if False, maximize.
+    show_progress_each : Optional[int], optional (default=None)
+        Print progress every N iterations.
+    keep_history : bool, optional (default=False)
+        If True, keeps history of populations and fitness values.
+    n_jobs : int, optional (default=1)
+        Number of parallel jobs. -1 uses all processors.
+    fitness_function_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to fitness function.
+    genotype_to_phenotype_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to genotype_to_phenotype function.
+    random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
+        Random state for reproducibility.
+    on_generation : Optional[Callable], optional (default=None)
+        Callback function called after each generation.
+    fitness_update_eps : float, optional (default=0.0)
+        Minimum improvement threshold.
+
+    Notes
+    -----
+    The threshold probabilities are automatically set to :math:`0.2 / n` for each
+    operator type, where :math:`n` is the number of operators. This provides a
+    balanced initial distribution that adapts based on operator performance during
+    evolution. The method evaluates operator success by comparing offspring fitness
+    with a randomly selected parent from the crossover pool.
+
+    References
+    ----------
+    .. [1] Niehaus, J., Banzhaf, W. (2001). Adaption of Operator Probabilities in
+           Genetic Programming. In: Miller, J., Tomassini, M., Lanzi, P.L., Ryan, C.,
+           Tettamanzi, A.G.B., Langdon, W.B. (eds) Genetic Programming. EuroGP 2001.
+           Lecture Notes in Computer Science, vol 2038. Springer, Berlin, Heidelberg.
+           https://doi.org/10.1007/3-540-45355-5_26
+
+    Examples
+    --------
+    **Example 1: OneMax Problem**
+
+    >>> from thefittest.benchmarks import OneMax
+    >>> from thefittest.optimizers import PDPGA
+    >>>
+    >>> optimizer = PDPGA(
+    ...     fitness_function=OneMax(),
+    ...     iters=150,
+    ...     pop_size=100,
+    ...     str_len=500,
+    ...     show_progress_each=30
+    ... )
+    >>>
+    >>> optimizer.fit()
+    >>> fittest = optimizer.get_fittest()
+    >>> print('Best fitness:', fittest['fitness'])
+
+    **Example 2: Custom Binary Problem with Operator Selection**
+
+    >>> import numpy as np
+    >>>
+    >>> def custom_fitness(X):
+    ...     return X.sum(axis=1).astype(np.float64)
+    >>>
+    >>> # Create optimizer with specific operator pools
+    >>> optimizer = PDPGA(
+    ...     fitness_function=custom_fitness,
+    ...     iters=100,
+    ...     pop_size=50,
+    ...     str_len=100,
+    ...     selections=('rank', 'tournament_3', 'tournament_5'),
+    ...     crossovers=('one_point', 'two_point', 'uniform_2'),
+    ...     mutations=('weak', 'average', 'strong'),
+    ...     keep_history=True
+    ... )
+    >>>
+    >>> optimizer.fit()
+    >>> fittest = optimizer.get_fittest()
+    >>> print('Best fitness:', fittest['fitness'])
     """
 
     def __init__(

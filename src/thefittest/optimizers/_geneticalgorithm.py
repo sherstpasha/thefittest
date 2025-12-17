@@ -42,7 +42,148 @@ from ..utils.random import randint
 
 
 class GeneticAlgorithm(EvolutionaryAlgorithm):
-    """Holland, J. H. (1992). Genetic algorithms. Scientific American, 267(1), 66-72"""
+    """
+    Genetic Algorithm optimizer for binary and combinatorial optimization problems.
+
+    Genetic Algorithm (GA) is a population-based evolutionary algorithm that uses
+    selection, crossover, and mutation operators to evolve solutions encoded as
+    binary strings. It is particularly effective for discrete optimization problems.
+
+    Parameters
+    ----------
+    fitness_function : Callable[[NDArray[Any]], NDArray[np.float64]]
+        Function to evaluate fitness of solutions. Should accept a 2D array
+        of shape (pop_size, ...) and return a 1D array of fitness values.
+    iters : int
+        Maximum number of iterations (generations) to run the algorithm.
+    pop_size : int
+        Number of individuals in the population.
+    str_len : int
+        Length of the binary string (genotype length).
+    tour_size : int, optional (default=2)
+        Tournament size for tournament selection.
+    mutation_rate : float, optional (default=0.05)
+        Mutation rate for custom mutation strategies.
+    parents_num : int, optional (default=2)
+        Number of parents used in crossover operation.
+    elitism : bool, optional (default=True)
+        If True, the best solution is always preserved in the next generation.
+    selection : str, optional (default="tournament_5")
+        Selection strategy. Available strategies:
+
+        - 'proportional': Fitness proportional selection
+        - 'rank': Rank-based selection
+        - 'tournament_k': Tournament selection with tour_size
+        - 'tournament_3', 'tournament_5', 'tournament_7': Fixed size tournaments
+    crossover : str, optional (default="uniform_2")
+        Crossover strategy. Available strategies for binary GAs:
+
+        - 'empty': No crossover (cloning)
+        - 'one_point': Single-point crossover
+        - 'two_point': Two-point crossover
+        - 'uniform_2': Uniform crossover with 2 parents
+        - 'uniform_7': Uniform crossover with 7 parents
+        - 'uniform_k': Uniform crossover with parents_num parents
+        - 'uniform_prop_2': Fitness-proportional uniform crossover with 2 parents
+        - 'uniform_prop_7': Fitness-proportional uniform crossover with 7 parents
+        - 'uniform_prop_k': Fitness-proportional uniform crossover with parents_num parents
+        - 'uniform_rank_2': Rank-based uniform crossover with 2 parents
+        - 'uniform_rank_7': Rank-based uniform crossover with 7 parents
+        - 'uniform_rank_k': Rank-based uniform crossover with parents_num parents
+        - 'uniform_tour_3': Tournament-based uniform crossover with 3 parents
+        - 'uniform_tour_7': Tournament-based uniform crossover with 7 parents
+        - 'uniform_tour_k': Tournament-based uniform crossover with parents_num parents
+
+        Note: Operators starting with 'gp_' are for Genetic Programming only.
+    mutation : str, optional (default="weak")
+        Mutation strategy. Available strategies:
+
+        - 'weak': Flip 1/3 of bits on average
+        - 'average': Flip 1 bit on average
+        - 'strong': Flip 3 bits on average
+        - 'custom_rate': Use specified mutation_rate
+    init_population : Optional[NDArray[np.byte]], optional (default=None)
+        Initial population. If None, population is randomly initialized.
+        Shape should be (pop_size, str_len).
+    genotype_to_phenotype : Optional[Callable], optional (default=None)
+        Function to decode genotype to phenotype. If None, genotype equals phenotype.
+    optimal_value : Optional[float], optional (default=None)
+        Known optimal value for termination. Algorithm stops if this value is reached.
+    termination_error_value : float, optional (default=0.0)
+        Acceptable error from optimal value for termination.
+    no_increase_num : Optional[int], optional (default=None)
+        Stop if no improvement for this many iterations. If None, runs all iterations.
+    minimization : bool, optional (default=False)
+        If True, minimize the fitness function; if False, maximize.
+    show_progress_each : Optional[int], optional (default=None)
+        Print progress every N iterations. If None, no progress is shown.
+    keep_history : bool, optional (default=False)
+        If True, keeps history of all populations and fitness values.
+    n_jobs : int, optional (default=1)
+        Number of parallel jobs for fitness evaluation. -1 uses all processors.
+    fitness_function_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to fitness function.
+    genotype_to_phenotype_args : Optional[Dict], optional (default=None)
+        Additional arguments to pass to genotype_to_phenotype function.
+    random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
+        Random state for reproducibility.
+    on_generation : Optional[Callable], optional (default=None)
+        Callback function called after each generation.
+    fitness_update_eps : float, optional (default=0.0)
+        Minimum improvement threshold to consider a solution as better.
+
+    References
+    ----------
+    .. [1] Holland, J. H. (1992). Genetic algorithms. Scientific American,
+           267(1), 66-72.
+
+    Examples
+    --------
+    **Example 1: OneMax Problem with 1000 bits**
+
+    >>> from thefittest.benchmarks import OneMax
+    >>> from thefittest.optimizers import GeneticAlgorithm
+    >>>
+    >>> number_of_iterations = 200
+    >>> population_size = 200
+    >>> string_length = 1000
+    >>>
+    >>> optimizer = GeneticAlgorithm(
+    ...     fitness_function=OneMax(),
+    ...     iters=number_of_iterations,
+    ...     pop_size=population_size,
+    ...     str_len=string_length,
+    ...     show_progress_each=10
+    ... )
+    >>>
+    >>> optimizer.fit()
+    >>> fittest = optimizer.get_fittest()
+    >>> print("Best fitness:", fittest["fitness"])
+    >>> print("Solution found:", fittest["genotype"])
+
+    **Example 2: Custom Binary Optimization**
+
+    >>> import numpy as np
+    >>>
+    >>> # Define custom fitness function
+    >>> def custom_fitness(X):
+    ...     # Count ones in each solution
+    ...     return X.sum(axis=1).astype(np.float64)
+    >>>
+    >>> optimizer = GeneticAlgorithm(
+    ...     fitness_function=custom_fitness,
+    ...     iters=100,
+    ...     pop_size=50,
+    ...     str_len=100,
+    ...     selection='tournament_5',
+    ...     crossover='uniform_2',
+    ...     mutation='weak'
+    ... )
+    >>>
+    >>> optimizer.fit()
+    >>> fittest = optimizer.get_fittest()
+    >>> print('Best fitness:', fittest['fitness'])
+    """
 
     def __init__(
         self,

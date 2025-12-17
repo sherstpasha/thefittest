@@ -229,17 +229,6 @@ class EvolutionaryAlgorithm:
 
         Examples
         --------
-        >>> from thefittest.optimizers import DifferentialEvolution
-        >>> from thefittest.benchmarks import Sphere
-        >>>
-        >>> optimizer = DifferentialEvolution(
-        ...     fitness_function=Sphere(),
-        ...     iters=100,
-        ...     pop_size=50,
-        ...     left_border=-10,
-        ...     right_border=10,
-        ...     num_variables=5,
-        ... )
         >>> optimizer.fit()
         >>> remaining = optimizer.get_remains_calls()
         >>> print(f"Remaining calls: {remaining}")
@@ -247,6 +236,28 @@ class EvolutionaryAlgorithm:
         return (self._pop_size * self._iters) - self._calls
 
     def get_calls(self: EvolutionaryAlgorithm) -> int:
+        """
+        Get the number of fitness function calls already performed.
+
+        Returns the total number of times the fitness function has been
+        evaluated since the start of the optimization process. This includes
+        all evaluations across generations and parallel executions.
+
+        Returns
+        -------
+        int
+            Number of fitness function calls performed so far.
+
+        See Also
+        --------
+        get_remains_calls : Returns the number of remaining fitness evaluations.
+
+        Examples
+        --------
+        >>> optimizer.fit()
+        >>> calls = optimizer.get_calls()
+        >>> print(f"Fitness function was called {calls} times")
+        """
         return self._calls
 
     def get_fittest(self: EvolutionaryAlgorithm) -> Dict:
@@ -270,18 +281,6 @@ class EvolutionaryAlgorithm:
 
         Examples
         --------
-        >>> from thefittest.optimizers import DifferentialEvolution
-        >>> from thefittest.benchmarks import Sphere
-        >>>
-        >>> optimizer = DifferentialEvolution(
-        ...     fitness_function=Sphere(),
-        ...     iters=100,
-        ...     pop_size=50,
-        ...     left_border=-10,
-        ...     right_border=10,
-        ...     num_variables=5,
-        ...     minimization=True,
-        ... )
         >>> optimizer.fit()
         >>> fittest = optimizer.get_fittest()
         >>> print('Best solution:', fittest['phenotype'])
@@ -320,19 +319,6 @@ class EvolutionaryAlgorithm:
 
         Examples
         --------
-        >>> from thefittest.optimizers import DifferentialEvolution
-        >>> from thefittest.benchmarks import Sphere
-        >>>
-        >>> optimizer = DifferentialEvolution(
-        ...     fitness_function=Sphere(),
-        ...     iters=100,
-        ...     pop_size=50,
-        ...     left_border=-10,
-        ...     right_border=10,
-        ...     num_variables=5,
-        ...     minimization=True,
-        ...     keep_history=True,
-        ... )
         >>> optimizer.fit()
         >>> stats = optimizer.get_stats()
         >>> print(f"Number of generations: {len(stats['max_fitness'])}")
@@ -424,19 +410,6 @@ class EvolutionaryAlgorithm:
 
         Examples
         --------
-        >>> from thefittest.optimizers import DifferentialEvolution
-        >>> from thefittest.benchmarks import Sphere
-        >>>
-        >>> optimizer = DifferentialEvolution(
-        ...     fitness_function=Sphere(),
-        ...     iters=100,
-        ...     pop_size=50,
-        ...     left_border=-10,
-        ...     right_border=10,
-        ...     num_variables=5,
-        ...     minimization=True,
-        ...     show_progress_each=20,
-        ... )
         >>> optimizer.fit()
         >>> fittest = optimizer.get_fittest()
         >>> print('Best solution found:', fittest['phenotype'])
