@@ -13,6 +13,7 @@
 import os
 import sys
 
+
 # Mock validate_data before any imports
 def _mock_validate_data(estimator, X, y=None, reset=True, **kwargs):
     """Mock validate_data for documentation build."""
@@ -20,10 +21,12 @@ def _mock_validate_data(estimator, X, y=None, reset=True, **kwargs):
         return X, y
     return X
 
+
 # Patch sklearn.utils.validation before importing thefittest
 try:
     import sklearn.utils.validation
-    if not hasattr(sklearn.utils.validation, 'validate_data'):
+
+    if not hasattr(sklearn.utils.validation, "validate_data"):
         sklearn.utils.validation.validate_data = _mock_validate_data
 except ImportError:
     pass
@@ -71,7 +74,8 @@ autodoc_default_options = {
 
 # Suppress warnings during import
 import warnings
-warnings.filterwarnings('ignore')
+
+warnings.filterwarnings("ignore")
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
