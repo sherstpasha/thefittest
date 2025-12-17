@@ -7,6 +7,7 @@
   <title>regressors &mdash; Thefittest 0.2.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=0dd6c78b" />
 
   
   <!--[if lt IE 9]>
@@ -52,12 +53,12 @@
 <li class="toctree-l2"><a class="reference internal" href="optimizers.html">optimizers</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">regressors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#genetic-programming-regressors">Genetic Programming Regressors</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingRegressor"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingRegressor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#geneticprogrammingregressor">GeneticProgrammingRegressor</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#neural-network-regressors">Neural Network Regressors</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mlpearegressor">MLPEARegressor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#geneticprogrammingneuralnetregressor">GeneticProgrammingNeuralNetRegressor</a></li>
 </ul>
 </li>
 </ul>
@@ -95,8 +96,29 @@
              
   <section id="regressors">
 <h1>regressors<a class="headerlink" href="#regressors" title="Link to this heading"></a></h1>
+<p>The library provides several regressor implementations based on evolutionary algorithms. These regressors can perform symbolic regression, optimize neural network weights, and evolve network architectures for continuous value prediction.</p>
 <section id="genetic-programming-regressors">
 <h2>Genetic Programming Regressors<a class="headerlink" href="#genetic-programming-regressors" title="Link to this heading"></a></h2>
+<p>Genetic Programming regressors evolve symbolic expressions or tree structures to perform regression. They can discover interpretable mathematical models and handle complex non-linear relationships.</p>
+<p><em>Reference:</em> Koza, J. R. (1993). Genetic Programming - On the Programming of Computers by Means of Natural Selection. Complex Adaptive Systems.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Regressor</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingRegressor" title="thefittest.regressors.GeneticProgrammingRegressor"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticProgrammingRegressor</span></code></a></p></td>
+<td><p>GP-based regressor evolving symbolic expressions for explicit functional relationships</p></td>
+</tr>
+</tbody>
+</table>
+<section id="geneticprogrammingregressor">
+<h3>GeneticProgrammingRegressor<a class="headerlink" href="#geneticprogrammingregressor" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingRegressor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.regressors.</span></span><span class="sig-name descname"><span class="pre">GeneticProgrammingRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functional_set_names:</span> <span class="pre">~typing.Tuple[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]</span> <span class="pre">=</span> <span class="pre">('cos'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'sin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'add'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'sub'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'mul'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'div')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcgp.SelfCGP]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticprogramming.GeneticProgramming]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._selfcgp.SelfCGP'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fitness_cache:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingRegressor" title="Link to this definition"></a></dt>
@@ -401,8 +423,31 @@ sub-estimator of a meta-estimator, e.g. used inside a
 </dd></dl>
 
 </section>
+</section>
 <section id="neural-network-regressors">
 <h2>Neural Network Regressors<a class="headerlink" href="#neural-network-regressors" title="Link to this heading"></a></h2>
+<p>Neural network regressors combine traditional neural architectures with evolutionary optimization. Instead of gradient descent, they use evolutionary algorithms to train networks or evolve architectures.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Regressor</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#thefittest.regressors.MLPEARegressor" title="thefittest.regressors.MLPEARegressor"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLPEARegressor</span></code></a></p></td>
+<td><p>Multi-Layer Perceptron with evolutionary algorithm-based weight optimization (<a class="reference external" href="http://dx.doi.org/10.1007/978-1-4615-1539-5_18">Cotta et al., 2002</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor" title="thefittest.regressors.GeneticProgrammingNeuralNetRegressor"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor</span></code></a></p></td>
+<td><p>Neural network with GP-evolved architecture and EA-optimized weights (Lipinsky &amp; Semenkin, 2006)</p></td>
+</tr>
+</tbody>
+</table>
+<section id="mlpearegressor">
+<h3>MLPEARegressor<a class="headerlink" href="#mlpearegressor" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.regressors.</span></span><span class="sig-name descname"><span class="pre">MLPEARegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers:</span> <span class="pre">~typing.Tuple[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]</span> <span class="pre">=</span> <span class="pre">(100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'sigma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor" title="Link to this definition"></a></dt>
@@ -713,6 +758,9 @@ sub-estimator of a meta-estimator, e.g. used inside a
 
 </dd></dl>
 
+</section>
+<section id="geneticprogrammingneuralnetregressor">
+<h3>GeneticProgrammingNeuralNetRegressor<a class="headerlink" href="#geneticprogrammingneuralnetregressor" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.regressors.</span></span><span class="sig-name descname"><span class="pre">GeneticProgrammingNeuralNetRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_hidden_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_sample_ratio:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcgp.SelfCGP]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticprogramming.GeneticProgramming]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._selfcgp.SelfCGP'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_size_penalty:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fitness_cache:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_cache_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor" title="Link to this definition"></a></dt>
@@ -1065,6 +1113,7 @@ sub-estimator of a meta-estimator, e.g. used inside a
 
 </dd></dl>
 
+</section>
 </section>
 </section>
 

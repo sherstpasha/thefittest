@@ -1,159 +1,232 @@
-.. Thefittest documentation master file, created by
-   sphinx-quickstart on Sun Dec 24 00:35:03 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. Thefittest documentation master file
 
-Welcome to Thefittest's documentation!
-======================================
-|
+.. raw:: html
+
+   <div class="header-section">
+      <h1>thefittest</h1>
+      <p class="tagline">Evolutionary algorithms for optimization & machine learning</p>
+      <div class="badges">
+         <a href="https://pypi.org/project/thefittest/"><img src="https://img.shields.io/pypi/v/thefittest?label=PyPI" alt="PyPI version"></a>
+         <a href="https://pepy.tech/project/thefittest"><img src="https://static.pepy.tech/badge/thefittest" alt="Downloads"></a>
+         <img src="https://komarev.com/ghpvc/?username=thefittest" alt="Profile views">
+         <a href="https://codecov.io/github/sherstpasha/thefittest"><img src="https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master" alt="codecov.io"></a>
+         <a href="https://app.codacy.com/gh/sherstpasha/thefittest/dashboard"><img src="https://app.codacy.com/project/badge/Grade/4c47b6de61c4422180529bbc360262c4" alt="Codacy Badge"></a>
+         <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
+      </div>
+   </div>
 
 .. image:: logos/logo1.png
    :align: center
+   :class: logo-image
 
 |
 
 ``thefittest`` is an open-source library designed for the efficient application of classical evolutionary algorithms and their effective modifications in optimization and machine learning. Our project aims to provide performance, accessibility, and ease of use, opening up the world of advanced evolutionary methods to you.
 
-Optimizers
-----------
+.. raw:: html
 
-The library provides a comprehensive set of evolutionary optimization algorithms for solving continuous and discrete optimization problems. Each optimizer is designed with flexibility in mind, supporting various selection methods, crossover operators, and mutation strategies.
+   <h2 class="section-header">Modules</h2>
+   <div class="module-grid">
+      <div class="module-card">
+         <h3>Optimizers</h3>
+         <p class="module-items">
+            <a href="modules/optimizers.html#thefittest.optimizers.DifferentialEvolution">DifferentialEvolution</a>, 
+            <a href="modules/optimizers.html#thefittest.optimizers.jDE">jDE</a>, 
+            <a href="modules/optimizers.html#thefittest.optimizers.SHADE">SHADE</a>, 
+            <a href="modules/optimizers.html#thefittest.optimizers.GeneticAlgorithm">GeneticAlgorithm</a>, 
+            <a href="modules/optimizers.html#thefittest.optimizers.SelfCGA">SelfCGA</a>, 
+            <a href="modules/optimizers.html#thefittest.optimizers.PDPGA">PDPGA</a>, 
+            <a href="modules/optimizers.html#thefittest.optimizers.GeneticProgramming">GeneticProgramming</a>, 
+            <a href="modules/optimizers.html#thefittest.optimizers.SelfCGP">SelfCGP</a>, 
+            <a href="modules/optimizers.html#thefittest.optimizers.PDPGP">PDPGP</a>, 
+            <a href="modules/optimizers.html#thefittest.optimizers.SHAGA">SHAGA</a>
+         </p>
+         <a href="modules/optimizers.html" class="module-card-arrow">View documentation →</a>
+      </div>
+      
+      <div class="module-card">
+         <h3>Classifiers</h3>
+         <p class="module-items">
+            <a href="modules/classifiers.html#thefittest.classifiers.GPClassifier">GPClassifier</a>, 
+            <a href="modules/classifiers.html#thefittest.classifiers.MLPEAClassifier">MLPEAClassifier</a>, 
+            <a href="modules/classifiers.html#thefittest.classifiers.GPNNClassifier">GPNNClassifier</a>
+         </p>
+         <a href="modules/classifiers.html" class="module-card-arrow">View documentation →</a>
+      </div>
+      
+      <div class="module-card">
+         <h3>Regressors</h3>
+         <p class="module-items">
+            <a href="modules/regressors.html#thefittest.regressors.GPRegressor">GPRegressor</a>, 
+            <a href="modules/regressors.html#thefittest.regressors.MLPEARegressor">MLPEARegressor</a>, 
+            <a href="modules/regressors.html#thefittest.regressors.GPNNRegressor">GPNNRegressor</a>
+         </p>
+         <a href="modules/regressors.html" class="module-card-arrow">View documentation →</a>
+      </div>
+      
+      <div class="module-card">
+         <h3>Benchmarks</h3>
+         <p>CEC2005 functions, symbolic regression datasets, ML classification datasets</p>
+         <a href="modules/benchmarks.html" class="module-card-arrow">View documentation →</a>
+      </div>
 
-**Differential Evolution**
+      <div class="module-card">
+         <h3>Utils</h3>
+         <p class="module-items">
+            <a href="modules/utils/selections.html">selections</a>, 
+            <a href="modules/utils/crossovers.html">crossovers</a>, 
+            <a href="modules/utils/mutations.html">mutations</a>, 
+            <a href="modules/utils/transformations.html">transformations</a>, 
+            <a href="modules/utils/random.html">random</a>
+         </p>
+         <a href="modules/utils/index.html" class="module-card-arrow">View documentation →</a>
+      </div>
+   </div>
 
-Differential Evolution is a population-based stochastic optimization method that operates on real-valued vectors. It uses vector differences for generating new candidate solutions and has proven effective for continuous optimization problems.
+Installation
+============
 
-*Reference:* Storn, R., & Price, K. (1995). Differential Evolution: A Simple and Efficient Adaptive Scheme for Global Optimization Over Continuous Spaces. Journal of Global Optimization, 23.
+**Basic installation** (for evolutionary algorithms and symbolic regression):
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 1
+.. code-block:: bash
 
-   * - Algorithm
-     - Description
-   * - :class:`~thefittest.optimizers.DifferentialEvolution`
-     - Classical Differential Evolution algorithm with multiple mutation strategies
-   * - :class:`~thefittest.optimizers.jDE`
-     - Self-adaptive Differential Evolution with dynamic parameter control (`Brest et al., 2007 <http://dx.doi.org/10.1109/TEVC.2009.2014613>`_)
-   * - :class:`~thefittest.optimizers.SHADE`
-     - Success-History based Adaptive Differential Evolution with parameter adaptation (`Tanabe & Fukunaga, 2013 <https://doi.org/10.1109/CEC.2013.6557555>`_)
+    pip install thefittest
 
-**Genetic Algorithms**
+**Full installation with neural networks** (requires GPU with CUDA):
 
-Genetic Algorithms are search heuristics inspired by natural selection. They work with binary string representations and use selection, crossover, and mutation operators to evolve solutions over generations.
+First, install PyTorch with CUDA support: https://pytorch.org/get-started/locally/
 
-*Reference:* Holland, J. H. (1992). Genetic Algorithms. Scientific American, 267(1), 66-72.
+.. code-block:: bash
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 1
+    pip3 install torch --index-url https://download.pytorch.org/whl/cu124
+    pip install thefittest
 
-   * - Algorithm
-     - Description
-   * - :class:`~thefittest.optimizers.GeneticAlgorithm`
-     - Classical Genetic Algorithm with binary string representation
-   * - :class:`~thefittest.optimizers.SelfCGA`
-     - Self-configuring Genetic Algorithm with automatic parameter tuning (`Semenkin & Semenkina, 2012 <https://doi.org/10.1007/978-3-642-30976-2_50>`_)
-   * - :class:`~thefittest.optimizers.PDPGA`
-     - Population-level Dynamic Probabilities Genetic Algorithm with operator probability adaptation (`Niehaus & Banzhaf, 2001 <https://doi.org/10.1007/3-540-45355-5_26>`_)
-   * - :class:`~thefittest.optimizers.SHAGA`
-     - Success-History based Adaptive Genetic Algorithm (`Stanovov et al., 2019 <http://dx.doi.org/10.5220/0008071201800187>`_)
+Quick Start
+===========
 
-**Genetic Programming**
+**Optimization Example**
 
-Genetic Programming evolves computer programs to solve problems. It uses tree-based representations and can perform symbolic regression, program synthesis, and other tasks requiring automatic program generation.
+.. code-block:: python
 
-*Reference:* Koza, J. R. (1993). Genetic Programming - On the Programming of Computers by Means of Natural Selection. Complex Adaptive Systems.
+    from thefittest.optimizers import SHADE
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 1
+    # Define the objective function to minimize
+    def custom_problem(x):
+        return (5 - x[:, 0])**2 + (12 - x[:, 1])**2
 
-   * - Algorithm
-     - Description
-   * - :class:`~thefittest.optimizers.GeneticProgramming`
-     - Genetic Programming for symbolic regression and program synthesis
-   * - :class:`~thefittest.optimizers.SelfCGP`
-     - Self-configuring Genetic Programming (`Semenkin & Semenkina, 2012 <http://dx.doi.org/10.1109/CEC.2012.6256587>`_)
-   * - :class:`~thefittest.optimizers.PDPGP`
-     - Population-level Dynamic Probabilities Genetic Programming (`Niehaus & Banzhaf, 2001 <https://doi.org/10.1007/3-540-45355-5_26>`_)
+    # Initialize the SHADE optimizer
+    optimizer = SHADE(
+        fitness_function=custom_problem,
+        iters=25,
+        pop_size=10,
+        left_border=-100,
+        right_border=100,
+        num_variables=2,
+        show_progress_each=10,
+        minimization=True,
+    )
 
-Classifiers
------------
+    optimizer.fit()
+    fittest = optimizer.get_fittest()
+    print('Best solution:', fittest['phenotype'])
+    print('Fitness:', fittest['fitness'])
 
-The library provides several classifier implementations based on evolutionary algorithms. These classifiers can learn complex decision boundaries, evolve neural network architectures, and optimize network weights using evolutionary strategies.
+**Machine Learning Example**
 
-**Genetic Programming Classifiers**
+.. code-block:: python
 
-Genetic Programming classifiers evolve symbolic expressions or tree structures to perform classification. They can discover interpretable decision rules and handle non-linear separations.
+    from thefittest.optimizers import SHAGA
+    from thefittest.benchmarks import IrisDataset
+    from thefittest.classifiers import MLPEAClassifier
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import minmax_scale
+    from sklearn.metrics import f1_score
 
-*Reference:* Koza, J. R. (1993). Genetic Programming - On the Programming of Computers by Means of Natural Selection. Complex Adaptive Systems.
+    # Load and prepare data
+    data = IrisDataset()
+    X = minmax_scale(data.get_X())
+    y = data.get_y()
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 1
+    # Train model
+    model = MLPEAClassifier(
+        n_iter=500,
+        pop_size=500,
+        hidden_layers=[5, 5],
+        weights_optimizer=SHAGA,
+        weights_optimizer_args={"show_progress_each": 10}
+    )
+    model.fit(X_train, y_train)
+    
+    # Evaluate
+    predict = model.predict(X_test)
+    print("F1 score:", f1_score(y_test, predict, average="macro"))
 
-   * - Classifier
-     - Description
-   * - :class:`~thefittest.classifiers.GeneticProgrammingClassifier`
-     - GP-based classifier evolving symbolic expressions for decision boundaries
+Dependencies
+============
 
-**Neural Network Classifiers**
+Required packages (installed automatically):
 
-Neural network classifiers combine traditional neural architectures with evolutionary optimization. Instead of gradient descent, they use evolutionary algorithms to train networks or evolve architectures.
+- Python (>=3.7, <=3.13)
+- numpy (>=1.26)
+- numba (>=0.60)
+- scipy
+- scikit-learn (>=1.4)
+- joblib (>=1.3.0)
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 1
+Optional packages: **networkx** for visualization, **torch (>=2.0)** with CUDA for neural networks.
 
-   * - Classifier
-     - Description
-   * - :class:`~thefittest.classifiers.MLPEAClassifier`
-     - Multi-Layer Perceptron with evolutionary algorithm-based weight optimization (`Cotta et al., 2002 <http://dx.doi.org/10.1007/978-1-4615-1539-5_18>`_)
-   * - :class:`~thefittest.classifiers.GeneticProgrammingNeuralNetClassifier`
-     - Neural network with GP-evolved architecture and EA-optimized weights (Lipinsky & Semenkin, 2006)
+.. raw:: html
 
-Regressors
-----------
-
-The library provides several regressor implementations based on evolutionary algorithms. These regressors can perform symbolic regression, optimize neural network weights, and evolve network architectures for continuous value prediction.
-
-**Genetic Programming Regressors**
-
-Genetic Programming regressors evolve symbolic expressions or tree structures to perform regression. They can discover interpretable mathematical models and handle complex non-linear relationships.
-
-*Reference:* Koza, J. R. (1993). Genetic Programming - On the Programming of Computers by Means of Natural Selection. Complex Adaptive Systems.
-
-.. list-table::
-   :widths: 30 70
-   :header-rows: 1
-
-   * - Regressor
-     - Description
-   * - :class:`~thefittest.regressors.GeneticProgrammingRegressor`
-     - GP-based regressor evolving symbolic expressions for explicit functional relationships
-
-**Neural Network Regressors**
-
-Neural network regressors combine traditional neural architectures with evolutionary optimization. Instead of gradient descent, they use evolutionary algorithms to train networks or evolve architectures.
-
-.. list-table::
-   :widths: 30 70
-   :header-rows: 1
-
-   * - Regressor
-     - Description
-   * - :class:`~thefittest.regressors.MLPEARegressor`
-     - Multi-Layer Perceptron with evolutionary algorithm-based weight optimization (`Cotta et al., 2002 <http://dx.doi.org/10.1007/978-1-4615-1539-5_18>`_)
-   * - :class:`~thefittest.regressors.GeneticProgrammingNeuralNetRegressor`
-     - Neural network with GP-evolved architecture and EA-optimized weights (Lipinsky & Semenkin, 2006)
-
-Contents:
----------
+   <div class="examples-section">
+      <h2>Learning Materials</h2>
+      <div class="example-grid">
+         <div class="example-card">
+            <span class="card-category">Notebook</span>
+            <h3>Solving Binary and Real-Valued Optimization Problems with Genetic Algorithms</h3>
+            <a href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb" target="_blank">Open Notebook →</a>
+         </div>
+         <div class="example-card">
+            <span class="card-category">Notebook</span>
+            <h3>Solving Real-Valued Optimization Problems with Differential Evolution</h3>
+            <a href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb" target="_blank">Open Notebook →</a>
+         </div>
+         <div class="example-card">
+            <span class="card-category">Notebook</span>
+            <h3>Solving Symbolic Regression Problems Using Genetic Programming Algorithms</h3>
+            <a href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_programming_symbolic_regression_problem.ipynb" target="_blank">Open Notebook →</a>
+         </div>
+         <div class="example-card">
+            <span class="card-category">Notebook</span>
+            <h3>Training Neural Networks Using Evolutionary Algorithms for Regression and Classification Problems</h3>
+            <a href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/mlpea_regression_classification_problem.ipynb" target="_blank">Open Notebook →</a>
+         </div>
+         <div class="example-card">
+            <span class="card-category">Notebook</span>
+            <h3>Optimizing Neural Network Structure Using Genetic Programming</h3>
+            <a href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/gpnn_regression_classification_problems.ipynb" target="_blank">Open Notebook →</a>
+         </div>
+         <div class="example-card">
+            <span class="card-category">Kaggle</span>
+            <h3>Can Evolution Guide Us to Better Machine Learning?</h3>
+            <a href="https://www.kaggle.com/code/pashasherst/can-evolution-guide-us-to-better-machine-learning" target="_blank">Open Kaggle →</a>
+         </div>
+         <div class="example-card">
+            <span class="card-category">Article</span>
+            <h3>Thefittest: evolutionary machine learning in Python</h3>
+            <a href="https://doi.org/10.1051/itmconf/20245902020" target="_blank">Read Article →</a>
+         </div>
+         <div class="example-card">
+            <span class="card-category">Article</span>
+            <h3>Thefittest: зачем я пишу свою open-source библиотеку эволюционных алгоритмов</h3>
+            <a href="https://habr.com/ru/articles/961924/" target="_blank">Read on Habr →</a>
+         </div>
+      </div>
+   </div>
 
 .. toctree::
    :maxdepth: 2
+   :hidden:
 
    modules/index
    references
-   

@@ -7,6 +7,7 @@
   <title>classifiers &mdash; Thefittest 0.2.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=0dd6c78b" />
 
   
   <!--[if lt IE 9]>
@@ -49,12 +50,12 @@
 <li class="toctree-l2"><a class="reference internal" href="benchmarks.html">benchmarks</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">classifiers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#genetic-programming-classifiers">Genetic Programming Classifiers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#thefittest.classifiers.GeneticProgrammingClassifier"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingClassifier</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#geneticprogrammingclassifier">GeneticProgrammingClassifier</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#neural-network-classifiers">Neural Network Classifiers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#thefittest.classifiers.MLPEAClassifier"><code class="docutils literal notranslate"><span class="pre">MLPEAClassifier</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetClassifier</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mlpeaclassifier">MLPEAClassifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#geneticprogrammingneuralnetclassifier">GeneticProgrammingNeuralNetClassifier</a></li>
 </ul>
 </li>
 </ul>
@@ -94,8 +95,29 @@
              
   <section id="classifiers">
 <h1>classifiers<a class="headerlink" href="#classifiers" title="Link to this heading"></a></h1>
+<p>The library provides several classifier implementations based on evolutionary algorithms. These classifiers can learn complex decision boundaries, evolve neural network architectures, and optimize network weights using evolutionary strategies.</p>
 <section id="genetic-programming-classifiers">
 <h2>Genetic Programming Classifiers<a class="headerlink" href="#genetic-programming-classifiers" title="Link to this heading"></a></h2>
+<p>Genetic Programming classifiers evolve symbolic expressions or tree structures to perform classification. They can discover interpretable decision rules and handle non-linear separations.</p>
+<p><em>Reference:</em> Koza, J. R. (1993). Genetic Programming - On the Programming of Computers by Means of Natural Selection. Complex Adaptive Systems.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Classifier</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#thefittest.classifiers.GeneticProgrammingClassifier" title="thefittest.classifiers.GeneticProgrammingClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticProgrammingClassifier</span></code></a></p></td>
+<td><p>GP-based classifier evolving symbolic expressions for decision boundaries</p></td>
+</tr>
+</tbody>
+</table>
+<section id="geneticprogrammingclassifier">
+<h3>GeneticProgrammingClassifier<a class="headerlink" href="#geneticprogrammingclassifier" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.classifiers.</span></span><span class="sig-name descname"><span class="pre">GeneticProgrammingClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functional_set_names:</span> <span class="pre">~typing.Tuple[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]</span> <span class="pre">=</span> <span class="pre">('cos'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'sin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'add'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'sub'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'mul'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'div')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcgp.SelfCGP]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticprogramming.GeneticProgramming]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._selfcgp.SelfCGP'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fitness_cache:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingClassifier" title="Link to this definition"></a></dt>
@@ -379,8 +401,31 @@ sub-estimator of a meta-estimator, e.g. used inside a
 </dd></dl>
 
 </section>
+</section>
 <section id="neural-network-classifiers">
 <h2>Neural Network Classifiers<a class="headerlink" href="#neural-network-classifiers" title="Link to this heading"></a></h2>
+<p>Neural network classifiers combine traditional neural architectures with evolutionary optimization. Instead of gradient descent, they use evolutionary algorithms to train networks or evolve architectures.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Classifier</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#thefittest.classifiers.MLPEAClassifier" title="thefittest.classifiers.MLPEAClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLPEAClassifier</span></code></a></p></td>
+<td><p>Multi-Layer Perceptron with evolutionary algorithm-based weight optimization (<a class="reference external" href="http://dx.doi.org/10.1007/978-1-4615-1539-5_18">Cotta et al., 2002</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier" title="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetClassifier</span></code></a></p></td>
+<td><p>Neural network with GP-evolved architecture and EA-optimized weights (Lipinsky &amp; Semenkin, 2006)</p></td>
+</tr>
+</tbody>
+</table>
+<section id="mlpeaclassifier">
+<h3>MLPEAClassifier<a class="headerlink" href="#mlpeaclassifier" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.classifiers.</span></span><span class="sig-name descname"><span class="pre">MLPEAClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers:</span> <span class="pre">~typing.Tuple[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]</span> <span class="pre">=</span> <span class="pre">(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'sigma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier" title="Link to this definition"></a></dt>
@@ -462,18 +507,6 @@ may require more function evaluations.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;F1 score:&quot;</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s2">&quot;macro&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>net_</strong><span class="classifier">torch.nn.Module</span></dt><dd><p>The trained neural network.</p>
-</dd>
-<dt><strong>n_features_in_</strong><span class="classifier">int</span></dt><dd><p>Number of features seen during fit.</p>
-</dd>
-<dt><strong>classes_</strong><span class="classifier">ndarray</span></dt><dd><p>Class labels.</p>
-</dd>
-</dl>
-</dd>
-</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers:</span> <span class="pre">~typing.Tuple[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]</span> <span class="pre">=</span> <span class="pre">(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'sigma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier.__init__" title="Link to this definition"></a></dt>
@@ -689,6 +722,9 @@ sub-estimator of a meta-estimator, e.g. used inside a
 
 </dd></dl>
 
+</section>
+<section id="geneticprogrammingneuralnetclassifier">
+<h3>GeneticProgrammingNeuralNetClassifier<a class="headerlink" href="#geneticprogrammingneuralnetclassifier" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.classifiers.</span></span><span class="sig-name descname"><span class="pre">GeneticProgrammingNeuralNetClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_hidden_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_sample_ratio:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcgp.SelfCGP]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticprogramming.GeneticProgramming]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._selfcgp.SelfCGP'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_size_penalty:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fitness_cache:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_cache_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier" title="Link to this definition"></a></dt>
@@ -1011,6 +1047,7 @@ sub-estimator of a meta-estimator, e.g. used inside a
 
 </dd></dl>
 
+</section>
 </section>
 </section>
 
