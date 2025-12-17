@@ -94,7 +94,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
         - 'uniform_tour_7': Tournament-based uniform crossover with 7 parents
         - 'uniform_tour_k': Tournament-based uniform crossover with parents_num parents
 
-        Note: Operators starting with 'gp_' are for Genetic Programming only.
+        Note: Operators starting with ``'gp_'`` are for Genetic Programming only.
     mutation : str, optional (default="weak")
         Mutation strategy. Available strategies:
 

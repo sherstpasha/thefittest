@@ -19,6 +19,7 @@ from numpy.typing import NDArray
 try:
     import torch
     from torch.optim import Optimizer as TorchOptimizer
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
@@ -26,9 +27,10 @@ except ImportError:
         import torch
         from torch.optim import Optimizer as TorchOptimizer
     else:
-        # Заглушка для runtime
+
         class TorchOptimizer:  # type: ignore
             pass
+
 
 MIN_VALUE = np.finfo(np.float64).min
 MAX_VALUE = np.finfo(np.float64).max

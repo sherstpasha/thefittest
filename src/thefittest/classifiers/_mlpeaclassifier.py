@@ -31,6 +31,93 @@ from ..optimizers import SHADE
 
 
 class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
+    """
+    Multi-Layer Perceptron classifier with Evolutionary Algorithm-based training.
+
+    This classifier uses evolutionary algorithms to optimize neural network weights
+    instead of traditional gradient-based methods.
+
+    Parameters
+    ----------
+    n_iter : int, optional (default=100)
+        Number of iterations (generations) for weight optimization.
+    pop_size : int, optional (default=500)
+        Population size for the evolutionary algorithm.
+    hidden_layers : Tuple[int, ...], optional (default=(0,))
+        Tuple specifying the number of neurons in each hidden layer.
+        Empty tuple or (0,) means no hidden layers (linear model).
+        Example: (5, 5) creates two hidden layers with 5 neurons each.
+    activation : str, optional (default="sigma")
+        Activation function for hidden layers.
+        Available: 'sigma' (sigmoid), 'relu', 'gauss' (Gaussian), 'tanh',
+        'ln' (natural logarithm normalization), 'softmax'.
+    offset : bool, optional (default=True)
+        If True, adds bias terms to the network.
+    weights_optimizer : Type, optional (default=SHADE)
+        Evolutionary algorithm class for optimizing weights.
+        Available: SHADE, jDE, DifferentialEvolution, SHAGA, etc.
+    weights_optimizer_args : Optional[dict], optional (default=None)
+        Additional arguments passed to the weights optimizer (excluding n_iter and pop_size).
+        Common args: {'show_progress_each': 10}
+    random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
+        Random state for reproducibility.
+    device : str, optional (default="cpu")
+        Device for PyTorch computations: 'cpu' or 'cuda'.
+
+    Attributes
+    ----------
+    net_ : torch.nn.Module
+        The trained neural network.
+    n_features_in_ : int
+        Number of features seen during fit.
+    classes_ : ndarray
+        Class labels.
+
+    Examples
+    --------
+    **Multi-class Classification with Iris Dataset**
+
+    >>> from thefittest.optimizers import SHAGA
+    >>> from thefittest.benchmarks import IrisDataset
+    >>> from thefittest.classifiers import MLPEAClassifier
+    >>> from sklearn.model_selection import train_test_split
+    >>> from sklearn.preprocessing import minmax_scale
+    >>> from sklearn.metrics import confusion_matrix, f1_score
+    >>>
+    >>> # Load and prepare data
+    >>> data = IrisDataset()
+    >>> X = data.get_X()
+    >>> y = data.get_y()
+    >>> X_scaled = minmax_scale(X)
+    >>>
+    >>> X_train, X_test, y_train, y_test = train_test_split(
+    ...     X_scaled, y, test_size=0.1
+    ... )
+    >>>
+    >>> # Create and train classifier
+    >>> model = MLPEAClassifier(
+    ...     n_iter=500,
+    ...     pop_size=500,
+    ...     hidden_layers=[5, 5],
+    ...     weights_optimizer=SHAGA,
+    ...     weights_optimizer_args={'show_progress_each': 10}
+    ... )
+    >>>
+    >>> model.fit(X_train, y_train)
+    >>> predict = model.predict(X_test)
+    >>>
+    >>> print("Confusion matrix:\\n", confusion_matrix(y_test, predict))
+    >>> print("F1 score:", f1_score(y_test, predict, average="macro"))
+
+    Notes
+    -----
+    Requires PyTorch. Install with: pip install thefittest[torch]
+
+    The classifier uses evolutionary algorithms to find optimal network weights,
+    which can be more robust to local minima compared to gradient descent but
+    may require more function evaluations.
+    """
+
     def __init__(
         self,
         *,
@@ -61,6 +148,19 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
         )
 
     def predict_proba(self, X: ArrayLike) -> NDArray[np.float64]:
+        """
+        Predict class probabilities for X using the trained neural network.
+
+        Parameters
+        ----------
+        X : ArrayLike, shape (n_samples, n_features)
+            Input samples.
+
+        Returns
+        -------
+        proba : NDArray[np.float64], shape (n_samples, n_classes)
+            Class probabilities for each sample.
+        """
         check_is_fitted(self)
 
         if hasattr(self, "_validate_data"):
@@ -80,6 +180,19 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
         return proba_t.detach().cpu().numpy().astype(np.float64)
 
     def predict(self, X: ArrayLike):
+        """
+        Predict class labels for X.
+
+        Parameters
+        ----------
+        X : ArrayLike, shape (n_samples, n_features)
+            Input samples.
+
+        Returns
+        -------
+        y_pred : ndarray, shape (n_samples,)
+            Predicted class labels.
+        """
         proba = self.predict_proba(X)
         indeces = np.argmax(proba, axis=1)
 

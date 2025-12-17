@@ -18,6 +18,7 @@
         <script src="../_static/documentation_options.js?v=a47416a6"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -46,11 +47,40 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Modules</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="base.html">base</a></li>
 <li class="toctree-l2"><a class="reference internal" href="benchmarks.html">benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classifiers.html">classifiers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="optimizers.html">optimizers</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">regressors</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">regressors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.__init__"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.predict"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.fit"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.genotype_to_phenotype_tree"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.genotype_to_phenotype_tree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_net"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.get_net()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_params"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.get_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_stats"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.get_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_tree"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.get_tree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.score"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.score()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.set_params"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.set_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.set_score_request"><code class="docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetRegressor.set_score_request()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor.__init__"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor.predict"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor.fit"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor.get_net"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor.get_net()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor.get_params"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor.get_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor.get_stats"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor.get_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor.score"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor.score()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor.set_params"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor.set_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor.set_score_request"><code class="docutils literal notranslate"><span class="pre">MLPEARegressor.set_score_request()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="utils/index.html">utils</a></li>
 </ul>
 </li>
@@ -82,8 +112,374 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="regressors">
-<h1>regressors<a class="headerlink" href="#regressors" title="Link to this heading"></a></h1>
+  <section id="module-thefittest.regressors">
+<span id="regressors"></span><h1>regressors<a class="headerlink" href="#module-thefittest.regressors" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.regressors.</span></span><span class="sig-name descname"><span class="pre">GeneticProgrammingNeuralNetRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_hidden_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_sample_ratio:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcgp.SelfCGP]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticprogramming.GeneticProgramming]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._selfcgp.SelfCGP'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_size_penalty:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fitness_cache:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_cache_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RegressorMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGPNN</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_hidden_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_sample_ratio:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcgp.SelfCGP]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticprogramming.GeneticProgramming]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._selfcgp.SelfCGP'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_size_penalty:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fitness_cache:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_cache_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.predict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.fit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.genotype_to_phenotype_tree">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">genotype_to_phenotype_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Net" title="thefittest.base._net.Net"><span class="pre">Net</span></a></span></span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.genotype_to_phenotype_tree" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_metadata_routing">
+<span class="sig-name descname"><span class="pre">get_metadata_routing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_metadata_routing" title="Link to this definition"></a></dt>
+<dd><p>Get metadata routing of this object.</p>
+<p>Please check <span class="xref std std-ref">User Guide</span> on how the routing
+mechanism works.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code> encapsulating
+routing information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_net">
+<span class="sig-name descname"><span class="pre">get_net</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Net" title="thefittest.base._net.Net"><span class="pre">Net</span></a></span></span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_net" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_params" title="Link to this definition"></a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>deep</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_stats">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Statistics</span></span></span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_stats" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_tree">
+<span class="sig-name descname"><span class="pre">get_tree</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.get_tree" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.score">
+<span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.score" title="Link to this definition"></a></dt>
+<dd><p>Return the coefficient of determination of the prediction.</p>
+<p>The coefficient of determination <span class="math notranslate nohighlight">\(R^2\)</span> is defined as
+<span class="math notranslate nohighlight">\((1 - \frac{u}{v})\)</span>, where <span class="math notranslate nohighlight">\(u\)</span> is the residual
+sum of squares <code class="docutils literal notranslate"><span class="pre">((y_true</span> <span class="pre">-</span> <span class="pre">y_pred)**</span> <span class="pre">2).sum()</span></code> and <span class="math notranslate nohighlight">\(v\)</span>
+is the total sum of squares <code class="docutils literal notranslate"><span class="pre">((y_true</span> <span class="pre">-</span> <span class="pre">y_true.mean())</span> <span class="pre">**</span> <span class="pre">2).sum()</span></code>.
+The best possible score is 1.0 and it can be negative (because the
+model can be arbitrarily worse). A constant model that always predicts
+the expected value of <cite>y</cite>, disregarding the input features, would get
+a <span class="math notranslate nohighlight">\(R^2\)</span> score of 0.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like of shape (n_samples, n_features)</span></dt><dd><p>Test samples. For some estimators this may be a precomputed
+kernel matrix or a list of generic objects instead with shape
+<code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_samples_fitted)</span></code>, where <code class="docutils literal notranslate"><span class="pre">n_samples_fitted</span></code>
+is the number of samples used in the fitting for the estimator.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">array-like of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>True values for <cite>X</cite>.</p>
+</dd>
+<dt><strong>sample_weight</strong><span class="classifier">array-like of shape (n_samples,), default=None</span></dt><dd><p>Sample weights.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>score</strong><span class="classifier">float</span></dt><dd><p><span class="math notranslate nohighlight">\(R^2\)</span> of <code class="docutils literal notranslate"><span class="pre">self.predict(X)</span></code> w.r.t. <cite>y</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The <span class="math notranslate nohighlight">\(R^2\)</span> score used when calling <code class="docutils literal notranslate"><span class="pre">score</span></code> on a regressor uses
+<code class="docutils literal notranslate"><span class="pre">multioutput='uniform_average'</span></code> from version 0.23 to keep consistent
+with default value of <code class="xref py py-func docutils literal notranslate"><span class="pre">r2_score()</span></code>.
+This influences the <code class="docutils literal notranslate"><span class="pre">score</span></code> method of all the multioutput
+regressors (except for
+<code class="xref py py-class docutils literal notranslate"><span class="pre">MultiOutputRegressor</span></code>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.set_params" title="Link to this definition"></a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as <code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code>). The latter have
+parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
+possible to update each component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.GeneticProgrammingNeuralNetRegressor.set_score_request">
+<span class="sig-name descname"><span class="pre">set_score_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor" title="thefittest.regressors._gpnnregression.GeneticProgrammingNeuralNetRegressor"><span class="pre">GeneticProgrammingNeuralNetRegressor</span></a></span></span><a class="headerlink" href="#thefittest.regressors.GeneticProgrammingNeuralNetRegressor.set_score_request" title="Link to this definition"></a></dt>
+<dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">score</span></code> method.</p>
+<p>Note that this method is only relevant if
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code>).
+Please see <span class="xref std std-ref">User Guide</span> on how the routing
+mechanism works.</p>
+<p>The options for each parameter are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: metadata is requested, and passed to <code class="docutils literal notranslate"><span class="pre">score</span></code> if provided. The request is ignored if metadata is not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code>: metadata is not requested and the meta-estimator will not pass it to <code class="docutils literal notranslate"><span class="pre">score</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: metadata is not requested, and the meta-estimator will raise an error if the user provides it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: metadata should be passed to the meta-estimator with this given alias instead of the original name.</p></li>
+</ul>
+<p>The default (<code class="docutils literal notranslate"><span class="pre">sklearn.utils.metadata_routing.UNCHANGED</span></code>) retains the
+existing request. This allows you to change the request for some
+parameters and not others.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is only relevant if this estimator is used as a
+sub-estimator of a meta-estimator, e.g. used inside a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code>. Otherwise it has no effect.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sample_weight</strong><span class="classifier">str, True, False, or None,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">sample_weight</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">score</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>The updated object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.regressors.</span></span><span class="sig-name descname"><span class="pre">MLPEARegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers:</span> <span class="pre">~typing.Tuple[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]</span> <span class="pre">=</span> <span class="pre">(100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'sigma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RegressorMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseMLPEA</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers:</span> <span class="pre">~typing.Tuple[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]</span> <span class="pre">=</span> <span class="pre">(100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'sigma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor.predict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor.fit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor.get_metadata_routing">
+<span class="sig-name descname"><span class="pre">get_metadata_routing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor.get_metadata_routing" title="Link to this definition"></a></dt>
+<dd><p>Get metadata routing of this object.</p>
+<p>Please check <span class="xref std std-ref">User Guide</span> on how the routing
+mechanism works.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code> encapsulating
+routing information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor.get_net">
+<span class="sig-name descname"><span class="pre">get_net</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Net" title="thefittest.base._net.Net"><span class="pre">Net</span></a></span></span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor.get_net" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor.get_params" title="Link to this definition"></a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>deep</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor.get_stats">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Statistics</span></span></span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor.get_stats" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor.score">
+<span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor.score" title="Link to this definition"></a></dt>
+<dd><p>Return the coefficient of determination of the prediction.</p>
+<p>The coefficient of determination <span class="math notranslate nohighlight">\(R^2\)</span> is defined as
+<span class="math notranslate nohighlight">\((1 - \frac{u}{v})\)</span>, where <span class="math notranslate nohighlight">\(u\)</span> is the residual
+sum of squares <code class="docutils literal notranslate"><span class="pre">((y_true</span> <span class="pre">-</span> <span class="pre">y_pred)**</span> <span class="pre">2).sum()</span></code> and <span class="math notranslate nohighlight">\(v\)</span>
+is the total sum of squares <code class="docutils literal notranslate"><span class="pre">((y_true</span> <span class="pre">-</span> <span class="pre">y_true.mean())</span> <span class="pre">**</span> <span class="pre">2).sum()</span></code>.
+The best possible score is 1.0 and it can be negative (because the
+model can be arbitrarily worse). A constant model that always predicts
+the expected value of <cite>y</cite>, disregarding the input features, would get
+a <span class="math notranslate nohighlight">\(R^2\)</span> score of 0.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like of shape (n_samples, n_features)</span></dt><dd><p>Test samples. For some estimators this may be a precomputed
+kernel matrix or a list of generic objects instead with shape
+<code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_samples_fitted)</span></code>, where <code class="docutils literal notranslate"><span class="pre">n_samples_fitted</span></code>
+is the number of samples used in the fitting for the estimator.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">array-like of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>True values for <cite>X</cite>.</p>
+</dd>
+<dt><strong>sample_weight</strong><span class="classifier">array-like of shape (n_samples,), default=None</span></dt><dd><p>Sample weights.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>score</strong><span class="classifier">float</span></dt><dd><p><span class="math notranslate nohighlight">\(R^2\)</span> of <code class="docutils literal notranslate"><span class="pre">self.predict(X)</span></code> w.r.t. <cite>y</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The <span class="math notranslate nohighlight">\(R^2\)</span> score used when calling <code class="docutils literal notranslate"><span class="pre">score</span></code> on a regressor uses
+<code class="docutils literal notranslate"><span class="pre">multioutput='uniform_average'</span></code> from version 0.23 to keep consistent
+with default value of <code class="xref py py-func docutils literal notranslate"><span class="pre">r2_score()</span></code>.
+This influences the <code class="docutils literal notranslate"><span class="pre">score</span></code> method of all the multioutput
+regressors (except for
+<code class="xref py py-class docutils literal notranslate"><span class="pre">MultiOutputRegressor</span></code>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor.set_params" title="Link to this definition"></a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as <code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code>). The latter have
+parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
+possible to update each component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.regressors.MLPEARegressor.set_score_request">
+<span class="sig-name descname"><span class="pre">set_score_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#thefittest.regressors.MLPEARegressor" title="thefittest.regressors._mlpearegressor.MLPEARegressor"><span class="pre">MLPEARegressor</span></a></span></span><a class="headerlink" href="#thefittest.regressors.MLPEARegressor.set_score_request" title="Link to this definition"></a></dt>
+<dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">score</span></code> method.</p>
+<p>Note that this method is only relevant if
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code>).
+Please see <span class="xref std std-ref">User Guide</span> on how the routing
+mechanism works.</p>
+<p>The options for each parameter are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: metadata is requested, and passed to <code class="docutils literal notranslate"><span class="pre">score</span></code> if provided. The request is ignored if metadata is not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code>: metadata is not requested and the meta-estimator will not pass it to <code class="docutils literal notranslate"><span class="pre">score</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: metadata is not requested, and the meta-estimator will raise an error if the user provides it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: metadata should be passed to the meta-estimator with this given alias instead of the original name.</p></li>
+</ul>
+<p>The default (<code class="docutils literal notranslate"><span class="pre">sklearn.utils.metadata_routing.UNCHANGED</span></code>) retains the
+existing request. This allows you to change the request for some
+parameters and not others.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is only relevant if this estimator is used as a
+sub-estimator of a meta-estimator, e.g. used inside a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code>. Otherwise it has no effect.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sample_weight</strong><span class="classifier">str, True, False, or None,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">sample_weight</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">score</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>The updated object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 

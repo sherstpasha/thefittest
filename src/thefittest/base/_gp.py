@@ -28,7 +28,6 @@ from ..base._tree import init_symbolic_regression_uniset
 from ..optimizers import GeneticProgramming
 from ..optimizers import SelfCGP
 from ..utils import array_like_to_numpy_X_y
-from ..utils._metrics import coefficient_determination
 from ..utils._metrics import categorical_crossentropy
 from ..utils._metrics import root_mean_square_error
 from ..utils.random import check_random_state
@@ -70,6 +69,7 @@ def fitness_function_gp(
         fitness.append(fit_val)
 
     return np.array(fitness, dtype=np.float64)
+
 
 class BaseGP(BaseEstimator, metaclass=ABCMeta):
 
@@ -171,7 +171,11 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
 
         if isinstance(self, ClassifierMixin):
             if self.n_classes_ <= 2:
-                optimizer_args["fitness_function_args"] = {"y": y, "task_type": "classification", "fitness_cache": self._fitness_cache}
+                optimizer_args["fitness_function_args"] = {
+                    "y": y,
+                    "task_type": "classification",
+                    "fitness_cache": self._fitness_cache,
+                }
                 optimizer_ = self.optimizer(**optimizer_args)
                 optimizer_.fit()
                 self.tree_ = optimizer_.get_fittest()["phenotype"]
@@ -188,7 +192,11 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
                     y_bin_oh = np.stack([1 - y_bin, y_bin], axis=1).astype(np.float64)
 
                     args_k = optimizer_args.copy()
-                    args_k["fitness_function_args"] = {"y": y_bin_oh, "task_type": "classification", "fitness_cache": self._fitness_cache}
+                    args_k["fitness_function_args"] = {
+                        "y": y_bin_oh,
+                        "task_type": "classification",
+                        "fitness_cache": self._fitness_cache,
+                    }
 
                     opt_k = self.optimizer(**args_k)
                     opt_k.fit()
@@ -198,7 +206,11 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
                 self.tree_ = self.trees_[0]
                 self.optimizer_stats_ = last_stats
         else:
-            optimizer_args["fitness_function_args"] = {"y": y, "task_type": "regression", "fitness_cache": self._fitness_cache}
+            optimizer_args["fitness_function_args"] = {
+                "y": y,
+                "task_type": "regression",
+                "fitness_cache": self._fitness_cache,
+            }
             optimizer_ = self.optimizer(**optimizer_args)
             optimizer_.fit()
             self.tree_ = optimizer_.get_fittest()["phenotype"]

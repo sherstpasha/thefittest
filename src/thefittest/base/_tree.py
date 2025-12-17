@@ -479,7 +479,7 @@ def init_net_uniset(
 
     if offset:
         terminal_set.append(
-            TerminalNode(value={(n_dimension)}, name="in{}".format(len(variables_pool)))
+            TerminalNode(value={n_dimension}, name="in{}".format(len(variables_pool)))
         )
     terminal_set.append(EphemeralNode(random_hidden_block))
 

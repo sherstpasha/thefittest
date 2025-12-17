@@ -13,6 +13,20 @@
 import os
 import sys
 
+# Mock validate_data before any imports
+def _mock_validate_data(estimator, X, y=None, reset=True, **kwargs):
+    """Mock validate_data for documentation build."""
+    if y is not None:
+        return X, y
+    return X
+
+# Patch sklearn.utils.validation before importing thefittest
+try:
+    import sklearn.utils.validation
+    if not hasattr(sklearn.utils.validation, 'validate_data'):
+        sklearn.utils.validation.validate_data = _mock_validate_data
+except ImportError:
+    pass
 
 path_list = os.getcwd().split("\\")
 path = "\\".join(path_list[:-2]) + "\\src"
@@ -54,6 +68,10 @@ autodoc_default_options = {
     "inherited-members": True,
     "show-inheritance": True,
 }
+
+# Suppress warnings during import
+import warnings
+warnings.filterwarnings('ignore')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
