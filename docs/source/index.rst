@@ -3,8 +3,6 @@
 .. raw:: html
 
    <div class="header-section">
-      <h1>thefittest</h1>
-      <p class="tagline">Evolutionary algorithms for optimization & machine learning</p>
       <div class="badges">
          <a href="https://pypi.org/project/thefittest/"><img src="https://img.shields.io/pypi/v/thefittest?label=PyPI" alt="PyPI version"></a>
          <a href="https://pepy.tech/project/thefittest"><img src="https://static.pepy.tech/badge/thefittest" alt="Downloads"></a>
@@ -25,7 +23,7 @@
 
 .. raw:: html
 
-   <h2 class="section-header">Modules</h2>
+   <h2 class="centered-header">Modules</h2>
    <div class="module-grid">
       <div class="module-card">
          <h3>Optimizers</h3>
@@ -83,8 +81,9 @@
       </div>
    </div>
 
-Installation
-============
+.. raw:: html
+
+   <h2 class="centered-header">Installation</h2>
 
 **Basic installation** (for evolutionary algorithms and symbolic regression):
 
@@ -101,8 +100,9 @@ First, install PyTorch with CUDA support: https://pytorch.org/get-started/locall
     pip3 install torch --index-url https://download.pytorch.org/whl/cu124
     pip install thefittest
 
-Quick Start
-===========
+.. raw:: html
+
+   <h2 class="centered-header">Quick Start</h2>
 
 **Optimization Example**
 
@@ -162,65 +162,188 @@ Quick Start
     predict = model.predict(X_test)
     print("F1 score:", f1_score(y_test, predict, average="macro"))
 
-Dependencies
-============
+.. raw:: html
 
-Required packages (installed automatically):
+   <h2 class="centered-header">Dependencies</h2>
 
-- Python (>=3.7, <=3.13)
-- numpy (>=1.26)
-- numba (>=0.60)
-- scipy
-- scikit-learn (>=1.4)
-- joblib (>=1.3.0)
+.. raw:: html
 
-Optional packages: **networkx** for visualization, **torch (>=2.0)** with CUDA for neural networks.
+   <div class="dependencies-grid">
+      <div class="dependency-card">
+         <h3>Required</h3>
+         <ul>
+            <li>
+               <strong>Python</strong> ≥ 3.7, ≤ 3.13
+               <br/>
+               <span class="dependency-note">
+                  Core runtime environment supported across a wide range of Python versions
+               </span>
+            </li>
+            <li>
+               <strong>NumPy</strong> ≥ 1.26
+               <br/>
+               <span class="dependency-note">
+                  Vectorized numerical computations and population-level data representation
+               </span>
+            </li>
+            <li>
+               <strong>Numba</strong> ≥ 0.60
+               <br/>
+               <span class="dependency-note">
+                  JIT compilation of performance-critical evolutionary operators and neural network routines
+               </span>
+            </li>
+            <li>
+               <strong>SciPy</strong>
+               <br/>
+               <span class="dependency-note">
+                  Linear algebra and numerical utilities used in optimization procedures
+               </span>
+            </li>
+            <li>
+               <strong>scikit-learn</strong> ≥ 1.4
+               <br/>
+               <span class="dependency-note">
+                  Dataset utilities, preprocessing, metrics, and sklearn-compatible API design
+               </span>
+            </li>
+            <li>
+               <strong>joblib</strong> ≥ 1.3.0
+               <br/>
+               <span class="dependency-note">
+                  Lightweight parallelization and efficient execution of independent tasks
+               </span>
+            </li>
+         </ul>
+      </div>
+
+      <div class="dependency-card">
+         <h3>Optional</h3>
+         <ul>
+            <li>
+               <strong>networkx</strong>
+               <br/>
+               <span class="dependency-note">
+                  Visualization of genetic programming trees and neural network structures
+               </span>
+            </li>
+            <li>
+               <strong>PyTorch</strong> ≥ 2.0 (CUDA)
+               <br/>
+               <span class="dependency-note">
+                  Evolutionary training of neural networks with optional GPU acceleration
+               </span>
+            </li>
+         </ul>
+      </div>
+   </div>
 
 .. raw:: html
 
    <div class="examples-section">
       <h2>Learning Materials</h2>
       <div class="example-grid">
+
          <div class="example-card">
             <span class="card-category">Notebook</span>
-            <h3>Solving Binary and Real-Valued Optimization Problems with Genetic Algorithms</h3>
-            <a href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb" target="_blank">Open Notebook →</a>
+            <h3>
+               <a class="example-link" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb" target="_blank">
+                  Solving Binary and Real-Valued Optimization Problems with Genetic Algorithms
+               </a>
+            </h3>
+            <p class="example-meta">GitHub Notebook</p>
          </div>
+
          <div class="example-card">
             <span class="card-category">Notebook</span>
-            <h3>Solving Real-Valued Optimization Problems with Differential Evolution</h3>
-            <a href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb" target="_blank">Open Notebook →</a>
+            <h3>
+               <a class="example-link" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb" target="_blank">
+                  Solving Real-Valued Optimization Problems with Differential Evolution
+               </a>
+            </h3>
+            <p class="example-meta">GitHub Notebook</p>
          </div>
+
          <div class="example-card">
             <span class="card-category">Notebook</span>
-            <h3>Solving Symbolic Regression Problems Using Genetic Programming Algorithms</h3>
-            <a href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_programming_symbolic_regression_problem.ipynb" target="_blank">Open Notebook →</a>
+            <h3>
+               <a class="example-link" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_programming_symbolic_regression_problem.ipynb" target="_blank">
+                  Solving Symbolic Regression Problems Using Genetic Programming Algorithms
+               </a>
+            </h3>
+            <p class="example-meta">GitHub Notebook</p>
          </div>
+
          <div class="example-card">
             <span class="card-category">Notebook</span>
-            <h3>Training Neural Networks Using Evolutionary Algorithms for Regression and Classification Problems</h3>
-            <a href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/mlpea_regression_classification_problem.ipynb" target="_blank">Open Notebook →</a>
+            <h3>
+               <a class="example-link" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/mlpea_regression_classification_problem.ipynb" target="_blank">
+                  Training Neural Networks Using Evolutionary Algorithms for Regression and Classification Problems
+               </a>
+            </h3>
+            <p class="example-meta">GitHub Notebook</p>
          </div>
+
          <div class="example-card">
             <span class="card-category">Notebook</span>
-            <h3>Optimizing Neural Network Structure Using Genetic Programming</h3>
-            <a href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/gpnn_regression_classification_problems.ipynb" target="_blank">Open Notebook →</a>
+            <h3>
+               <a class="example-link" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/gpnn_regression_classification_problems.ipynb" target="_blank">
+                  Optimizing Neural Network Structure Using Genetic Programming
+               </a>
+            </h3>
+            <p class="example-meta">GitHub Notebook</p>
          </div>
+
          <div class="example-card">
             <span class="card-category">Kaggle</span>
-            <h3>Can Evolution Guide Us to Better Machine Learning?</h3>
-            <a href="https://www.kaggle.com/code/pashasherst/can-evolution-guide-us-to-better-machine-learning" target="_blank">Open Kaggle →</a>
+            <h3>
+               <a class="example-link" href="https://www.kaggle.com/code/pashasherst/can-evolution-guide-us-to-better-machine-learning" target="_blank">
+                  Can Evolution Guide Us to Better Machine Learning?
+               </a>
+            </h3>
+            <p class="example-meta">Kaggle</p>
          </div>
+
          <div class="example-card">
             <span class="card-category">Article</span>
-            <h3>Thefittest: evolutionary machine learning in Python</h3>
-            <a href="https://doi.org/10.1051/itmconf/20245902020" target="_blank">Read Article →</a>
+            <h3>
+               <a class="example-link" href="https://doi.org/10.1051/itmconf/20245902020" target="_blank">
+                  Thefittest: evolutionary machine learning in Python
+               </a>
+            </h3>
+            <p class="example-meta">Article</p>
          </div>
+
          <div class="example-card">
             <span class="card-category">Article</span>
-            <h3>Thefittest: зачем я пишу свою open-source библиотеку эволюционных алгоритмов</h3>
-            <a href="https://habr.com/ru/articles/961924/" target="_blank">Read on Habr →</a>
+            <h3>
+               <a class="example-link" href="https://habr.com/ru/articles/961924/" target="_blank">
+                  Thefittest: зачем я пишу свою open-source библиотеку эволюционных алгоритмов
+               </a>
+            </h3>
+            <p class="example-meta">Habr</p>
          </div>
+
+         <div class="example-card">
+            <span class="card-category">Youtube</span>
+            <h3>
+               <a class="example-link" href="https://youtu.be/R46b1tt5qUo?si=ZxGIcX2-sWJEWCbt&t=4550" target="_blank">
+                  Paper presentation: "Thefittest: Evolutionary Machine Learning in Python"
+               </a>
+            </h3>
+            <p class="example-meta">IWMMA'2023 by Pavel Sherstnev</p>
+         </div>
+
+         <div class="example-card">
+            <span class="card-category">Youtube</span>
+            <h3>
+               <a class="example-link" href="https://www.youtube.com/watch?v=PtDahwMstuw" target="_blank">
+                  Tutorial "Thefittest Library: Evolutionary Algorithms and Automation of Machine Learning Models Design in Python"
+               </a>
+            </h3>
+            <p class="example-meta">IWMMA'2024 by Pavel Sherstnev</p>
+         </div>
+
       </div>
    </div>
 
