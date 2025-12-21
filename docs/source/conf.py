@@ -39,11 +39,11 @@ sys.path.insert(0, os.path.abspath("../../src"))
 # -- Project information -----------------------------------------------------
 
 project = "Thefittest"
-copyright = "2023, Pavel Sherstnev"
+copyright = "2026, Pavel Sherstnev"
 author = "Pavel Sherstnev"
 
 # The full version, including alpha/beta/rc tags
-release = "0.2.3"
+release = "0.2.7"
 
 
 # -- General configuration ---------------------------------------------------
