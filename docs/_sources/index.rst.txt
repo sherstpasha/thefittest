@@ -1,5 +1,8 @@
 .. Thefittest documentation master file
 
+Thefittest Documentation
+========================
+
 .. raw:: html
 
    <div class="header-section">
