@@ -1,0 +1,76 @@
+ML Datasets
+===========
+
+Classification Datasets
+-----------------------
+
+This section contains various classification datasets from the UCI Machine Learning Repository and other sources.
+
+IrisDataset
+^^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.IrisDataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+WineDataset
+^^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.WineDataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+BreastCancerDataset
+^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.BreastCancerDataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+DigitsDataset
+^^^^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.DigitsDataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+CreditRiskDataset
+^^^^^^^^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.CreditRiskDataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+UserKnowladgeDataset
+^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.UserKnowladgeDataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+BanknoteDataset
+^^^^^^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.BanknoteDataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

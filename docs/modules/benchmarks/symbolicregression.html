@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Symbolic Regression Benchmark &mdash; Thefittest 0.2.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=db5433e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=a47416a6"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="classifiers" href="../classifiers.html" />
+    <link rel="prev" title="CEC2005 Benchmark Suite" href="cec2005.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Thefittest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../benchmarks.html">Benchmarks</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#overview">Overview</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../benchmarks.html#contents">Contents</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="datasets.html">ML Datasets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optfunctions.html">Optimization Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cec2005.html">CEC2005 Benchmark Suite</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Symbolic Regression Benchmark</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#quick-start">Quick Start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#module-thefittest.benchmarks">Module Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.BanknoteDataset"><code class="docutils literal notranslate"><span class="pre">BanknoteDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.BreastCancerDataset"><code class="docutils literal notranslate"><span class="pre">BreastCancerDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.CreditRiskDataset"><code class="docutils literal notranslate"><span class="pre">CreditRiskDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.DigitsDataset"><code class="docutils literal notranslate"><span class="pre">DigitsDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.IrisDataset"><code class="docutils literal notranslate"><span class="pre">IrisDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.UserKnowladgeDataset"><code class="docutils literal notranslate"><span class="pre">UserKnowladgeDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.WineDataset"><code class="docutils literal notranslate"><span class="pre">WineDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Ackley"><code class="docutils literal notranslate"><span class="pre">Ackley</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Griewank"><code class="docutils literal notranslate"><span class="pre">Griewank</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.HighConditionedElliptic"><code class="docutils literal notranslate"><span class="pre">HighConditionedElliptic</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.OneMax"><code class="docutils literal notranslate"><span class="pre">OneMax</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Rastrigin"><code class="docutils literal notranslate"><span class="pre">Rastrigin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Rosenbrock"><code class="docutils literal notranslate"><span class="pre">Rosenbrock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Schwefe1_2"><code class="docutils literal notranslate"><span class="pre">Schwefe1_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Sphere"><code class="docutils literal notranslate"><span class="pre">Sphere</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Weierstrass"><code class="docutils literal notranslate"><span class="pre">Weierstrass</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../classifiers.html">classifiers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#genetic-programming-classifiers">Genetic Programming Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#geneticprogrammingclassifier">GeneticProgrammingClassifier</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#neural-network-classifiers">Neural Network Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#mlpeaclassifier">MLPEAClassifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#geneticprogrammingneuralnetclassifier">GeneticProgrammingNeuralNetClassifier</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../optimizers.html">optimizers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#differential-evolution-optimizers">Differential Evolution Optimizers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#differentialevolution">DifferentialEvolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#jde">jDE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#shade">SHADE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#genetic-algorithms">Genetic Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#geneticalgorithm">GeneticAlgorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#shaga">SHAGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#selfcga">SelfCGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#pdpga">PDPGA</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#genetic-programming">Genetic Programming</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#geneticprogramming">GeneticProgramming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#pdpgp">PDPGP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#selfcgp">SelfCGP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../regressors.html">regressors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#genetic-programming-regressors">Genetic Programming Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#geneticprogrammingregressor">GeneticProgrammingRegressor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#neural-network-regressors">Neural Network Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#mlpearegressor">MLPEARegressor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#geneticprogrammingneuralnetregressor">GeneticProgrammingNeuralNetRegressor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../utils/index.html">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../utils/selections.html">selections</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.proportional_selection"><code class="docutils literal notranslate"><span class="pre">proportional_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.rank_selection"><code class="docutils literal notranslate"><span class="pre">rank_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.tournament_selection"><code class="docutils literal notranslate"><span class="pre">tournament_selection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/crossovers.html">crossovers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.empty_crossover"><code class="docutils literal notranslate"><span class="pre">empty_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.binomialGA"><code class="docutils literal notranslate"><span class="pre">binomialGA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.one_point_crossover"><code class="docutils literal notranslate"><span class="pre">one_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.two_point_crossover"><code class="docutils literal notranslate"><span class="pre">two_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.binomial"><code class="docutils literal notranslate"><span class="pre">binomial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.empty_crossoverGP"><code class="docutils literal notranslate"><span class="pre">empty_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.standard_crossover"><code class="docutils literal notranslate"><span class="pre">standard_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.one_point_crossoverGP"><code class="docutils literal notranslate"><span class="pre">one_point_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_crossoverGP"><code class="docutils literal notranslate"><span class="pre">uniform_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover_GP()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/mutations.html">mutations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.flip_mutation"><code class="docutils literal notranslate"><span class="pre">flip_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.best_1"><code class="docutils literal notranslate"><span class="pre">best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_1"><code class="docutils literal notranslate"><span class="pre">rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_to_best1"><code class="docutils literal notranslate"><span class="pre">rand_to_best1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_best_1"><code class="docutils literal notranslate"><span class="pre">current_to_best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.best_2"><code class="docutils literal notranslate"><span class="pre">best_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_2"><code class="docutils literal notranslate"><span class="pre">rand_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_rand_1"><code class="docutils literal notranslate"><span class="pre">current_to_rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive_p_min"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive_p_min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.point_mutation"><code class="docutils literal notranslate"><span class="pre">point_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.growing_mutation"><code class="docutils literal notranslate"><span class="pre">growing_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.swap_mutation"><code class="docutils literal notranslate"><span class="pre">swap_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.shrink_mutation"><code class="docutils literal notranslate"><span class="pre">shrink_mutation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/random.html">random</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.sattolo_shuffle"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.sattolo_shuffle_2d"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle_2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.numba_seed"><code class="docutils literal notranslate"><span class="pre">numba_seed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.cauchy_distribution"><code class="docutils literal notranslate"><span class="pre">cauchy_distribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.random_weighted_sample"><code class="docutils literal notranslate"><span class="pre">random_weighted_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.random_sample"><code class="docutils literal notranslate"><span class="pre">random_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.flip_coin"><code class="docutils literal notranslate"><span class="pre">flip_coin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.uniform"><code class="docutils literal notranslate"><span class="pre">uniform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.randint"><code class="docutils literal notranslate"><span class="pre">randint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.check_random_state"><code class="docutils literal notranslate"><span class="pre">check_random_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.generator1"><code class="docutils literal notranslate"><span class="pre">generator1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.generator2"><code class="docutils literal notranslate"><span class="pre">generator2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/transformations.html">transformations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.minmax_scale"><code class="docutils literal notranslate"><span class="pre">minmax_scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.SamplingGrid"><code class="docutils literal notranslate"><span class="pre">SamplingGrid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.GrayCode"><code class="docutils literal notranslate"><span class="pre">GrayCode</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Thefittest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+          <li class="breadcrumb-item"><a href="../benchmarks.html">Benchmarks</a></li>
+      <li class="breadcrumb-item active">Symbolic Regression Benchmark</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/benchmarks/symbolicregression.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="symbolic-regression-benchmark">
+<h1>Symbolic Regression Benchmark<a class="headerlink" href="#symbolic-regression-benchmark" title="Link to this heading"></a></h1>
+<p>This module provides 17 test functions commonly used for benchmarking symbolic regression and genetic programming algorithms. These functions represent various mathematical relationships with different complexity levels and characteristics.</p>
+<section id="module-thefittest.benchmarks.symbolicregression17">
+<span id="module"></span><h2>Module<a class="headerlink" href="#module-thefittest.benchmarks.symbolicregression17" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.z">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.z" title="Link to this definition"></a></dt>
+<dd><p>Helper function used in F13 and F14.</p>
+<p>Combination of three inverse squared terms with different parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F1">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F1" title="Link to this definition"></a></dt>
+<dd><p>Complex oscillatory function with exponential decay (1D).</p>
+<p>Domain: [-1, 1]
+Variables: 1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 1)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F2">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F2" title="Link to this definition"></a></dt>
+<dd><p>Multi-frequency cosine composition (1D).</p>
+<p>Domain: [-1, 1]
+Variables: 1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 1)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F3">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F3" title="Link to this definition"></a></dt>
+<dd><p>Quadratic with cosine terms (2D).</p>
+<p>Domain: [-16, 16]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F4">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F4" title="Link to this definition"></a></dt>
+<dd><p>Scaled version of F3 (2D).</p>
+<p>Domain: [-16, 16]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F5">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F5" title="Link to this definition"></a></dt>
+<dd><p>Rosenbrock function (2D).</p>
+<p>Classic optimization benchmark with a narrow parabolic valley.</p>
+<p>Domain: [-2, 2]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F6">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F6</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F6" title="Link to this definition"></a></dt>
+<dd><p>Modified Griewank-like function (2D).</p>
+<p>Domain: [-16, 16]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F7">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F7</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F7" title="Link to this definition"></a></dt>
+<dd><p>Inverse Rosenbrock (2D).</p>
+<p>Domain: [-5, 5]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F8">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F8" title="Link to this definition"></a></dt>
+<dd><p>Modified Schaffer function (2D).</p>
+<p>Domain: [-10, 10]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F9">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F9</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F9" title="Link to this definition"></a></dt>
+<dd><p>Quadratic with multi-frequency cosines (2D).</p>
+<p>Domain: [-2.5, 2.5]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F10">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F10</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F10" title="Link to this definition"></a></dt>
+<dd><p>Similar to F9 with different domain (2D).</p>
+<p>Domain: [-5, 5]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F11">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F11</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F11" title="Link to this definition"></a></dt>
+<dd><p>Absolute sine products with inverse term (2D).</p>
+<p>Domain: [-4, 4]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F12">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F12</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F12" title="Link to this definition"></a></dt>
+<dd><p>Cross-term interaction function (2D).</p>
+<p>Domain: [0, 4]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F13">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F13</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F13" title="Link to this definition"></a></dt>
+<dd><p>Product of z-functions (2D).</p>
+<p>Domain: [0, 4]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F14">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F14</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F14" title="Link to this definition"></a></dt>
+<dd><p>Sum of z-functions (2D).</p>
+<p>Domain: [0, 4]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F15">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F15</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F15" title="Link to this definition"></a></dt>
+<dd><p>Simple quadratic (2D).</p>
+<p>Domain: [-5, 5]
+Variables: 2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 2)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F16">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F16</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F16" title="Link to this definition"></a></dt>
+<dd><p>Sine with quadratic term (1D).</p>
+<p>Domain: [-5, 5]
+Variables: 1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 1)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.benchmarks.symbolicregression17.F17">
+<span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.symbolicregression17.</span></span><span class="sig-name descname"><span class="pre">F17</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.symbolicregression17.F17" title="Link to this definition"></a></dt>
+<dd><p>Linear sine function (1D).</p>
+<p>Domain: [-5, 5]
+Variables: 1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, 1)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="test-functions-overview">
+<h2>Test Functions Overview<a class="headerlink" href="#test-functions-overview" title="Link to this heading"></a></h2>
+<p>The benchmark suite contains 17 functions (F1-F17) with varying complexity:</p>
+<section id="one-dimensional-functions-f1-f2-f16-f17">
+<h3>One-Dimensional Functions (F1, F2, F16, F17)<a class="headerlink" href="#one-dimensional-functions-f1-f2-f16-f17" title="Link to this heading"></a></h3>
+<p><strong>F1</strong>: Complex oscillatory function with exponential decay</p>
+<div class="math notranslate nohighlight">
+\[F1(x) = 0.05(x-1)^2 + (3 - 2.9e^{-2.77257x^2})(1 - \cos(x(4 - 50e^{-2.77257x^2})))\]</div>
+<ul class="simple">
+<li><p>Domain: [-1, 1]</p></li>
+<li><p>Variables: 1</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F2</strong>: Multi-frequency cosine composition</p>
+<div class="math notranslate nohighlight">
+\[F2(x) = 1 - 0.5\cos(1.5(10x - 0.3))\cos(31.4x) + 0.5\cos(\sqrt{5} \cdot 10x)\cos(35x)\]</div>
+<ul class="simple">
+<li><p>Domain: [-1, 1]</p></li>
+<li><p>Variables: 1</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F16</strong>: Sine with quadratic term</p>
+<div class="math notranslate nohighlight">
+\[F16(x) = \sin(x) \cdot x^2\]</div>
+<ul class="simple">
+<li><p>Domain: [-5, 5]</p></li>
+<li><p>Variables: 1</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F17</strong>: Linear sine function</p>
+<div class="math notranslate nohighlight">
+\[F17(x) = \sin(x) + x\]</div>
+<ul class="simple">
+<li><p>Domain: [-5, 5]</p></li>
+<li><p>Variables: 1</p></li>
+</ul>
+</section>
+<section id="two-dimensional-functions-f3-f15">
+<h3>Two-Dimensional Functions (F3-F15)<a class="headerlink" href="#two-dimensional-functions-f3-f15" title="Link to this heading"></a></h3>
+<p><strong>F3</strong>: Quadratic with cosine terms</p>
+<div class="math notranslate nohighlight">
+\[F3(x_1, x_2) = 0.1x_1^2 + 0.1x_2^2 - 4\cos(0.8x_1) - 4\cos(0.8x_2) + 8\]</div>
+<ul class="simple">
+<li><p>Domain: [-16, 16]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F4</strong>: Scaled version of F3</p>
+<div class="math notranslate nohighlight">
+\[F4(x_1, x_2) = (0.1 \cdot 1.5x_2)^2 + (0.1 \cdot 0.8x_1)^2 - 4\cos(0.8 \cdot 1.5x_2) - 4\cos(0.8 \cdot 0.8x_1) + 8\]</div>
+<ul class="simple">
+<li><p>Domain: [-16, 16]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F5</strong>: Rosenbrock function</p>
+<div class="math notranslate nohighlight">
+\[F5(x_1, x_2) = 100(x_2 - x_1^2)^2 + (1 - x_1)^2\]</div>
+<ul class="simple">
+<li><p>Domain: [-2, 2]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F6</strong>: Modified Griewank-like function</p>
+<div class="math notranslate nohighlight">
+\[F6(x_1, x_2) = -\frac{10}{0.005(x_1^2 + x_2^2) - \cos(x_1)\cos(x_2/\sqrt{2}) + 2} + 10\]</div>
+<ul class="simple">
+<li><p>Domain: [-16, 16]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F7</strong>: Inverse Rosenbrock</p>
+<div class="math notranslate nohighlight">
+\[F7(x_1, x_2) = -\frac{100}{100(x_1^2 - x_2) + (1 - x_1)^2 + 1} + 100\]</div>
+<ul class="simple">
+<li><p>Domain: [-5, 5]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F8</strong>: Modified Schaffer function</p>
+<div class="math notranslate nohighlight">
+\[F8(x_1, x_2) = \frac{1 - \sin^2(\sqrt{x_1^2 + x_2^2})}{1 + 0.001(x_1^2 + x_2^2)}\]</div>
+<ul class="simple">
+<li><p>Domain: [-10, 10]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F9</strong>: Quadratic with multi-frequency cosines</p>
+<div class="math notranslate nohighlight">
+\[F9(x_1, x_2) = 0.5(x_1^2 + x_2^2)(2 \cdot 0.8 + 0.8\cos(1.5x_1)\cos(3.14x_2) + 0.8\cos(\sqrt{5}x_1)\cos(3.5x_2))\]</div>
+<ul class="simple">
+<li><p>Domain: [-2.5, 2.5]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F10</strong>: Similar to F9 (different domain)</p>
+<ul class="simple">
+<li><p>Domain: [-5, 5]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F11</strong>: Absolute sine products with inverse term</p>
+<div class="math notranslate nohighlight">
+\[F11(x_1, x_2) = x_1^2|\sin(2x_1)| + x_2^2|\sin(2x_2)| - \frac{1}{5x_1^2 + 5x_2^2 + 0.2} + 5\]</div>
+<ul class="simple">
+<li><p>Domain: [-4, 4]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F12</strong>: Cross-term interaction function</p>
+<div class="math notranslate nohighlight">
+\[F12(x_1, x_2) = 0.5(x_1^2 + x_1x_2 + x_2^2)(1 + 0.5\cos(1.5x_1)\cos(3.2x_1x_2)\cos(3.14x_2) + 0.5\cos(2.2x_2)\cos(4.8x_1x_2)\cos(3.5x_2))\]</div>
+<ul class="simple">
+<li><p>Domain: [0, 4]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F13</strong>: Product of z-functions</p>
+<div class="math notranslate nohighlight">
+\[F13(x_1, x_2) = -z(x_1) \cdot z(x_2)\]</div>
+<p>where <span class="math notranslate nohighlight">\(z(x) = -\frac{1}{(x-1)^2 + 0.2} - \frac{1}{2(x-2)^2 + 0.15} - \frac{1}{3(x-3)^2 + 0.3}\)</span></p>
+<ul class="simple">
+<li><p>Domain: [0, 4]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F14</strong>: Sum of z-functions</p>
+<div class="math notranslate nohighlight">
+\[F14(x_1, x_2) = z(x_1) + z(x_2)\]</div>
+<ul class="simple">
+<li><p>Domain: [0, 4]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>F15</strong>: Simple quadratic</p>
+<div class="math notranslate nohighlight">
+\[F15(x_1, x_2) = (x_1 - 2)^2 + (x_2 - 1)^2\]</div>
+<ul class="simple">
+<li><p>Domain: [-5, 5]</p></li>
+<li><p>Variables: 2</p></li>
+</ul>
+</section>
+</section>
+<section id="usage-example">
+<h2>Usage Example<a class="headerlink" href="#usage-example" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">thefittest.benchmarks</span> <span class="kn">import</span> <span class="n">symbolicregression17</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Access problem dictionary</span>
+<span class="n">problems</span> <span class="o">=</span> <span class="n">symbolicregression17</span><span class="o">.</span><span class="n">problems_dict</span>
+
+<span class="c1"># Get F5 (Rosenbrock)</span>
+<span class="n">f5_config</span> <span class="o">=</span> <span class="n">problems</span><span class="p">[</span><span class="s2">&quot;F5&quot;</span><span class="p">]</span>
+<span class="n">function</span> <span class="o">=</span> <span class="n">f5_config</span><span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">]</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">f5_config</span><span class="p">[</span><span class="s2">&quot;bounds&quot;</span><span class="p">]</span>
+<span class="n">n_vars</span> <span class="o">=</span> <span class="n">f5_config</span><span class="p">[</span><span class="s2">&quot;n_vars&quot;</span><span class="p">]</span>
+
+<span class="c1"># Generate test data</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">*</span><span class="n">bounds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_vars</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="problem-configuration">
+<h2>Problem Configuration<a class="headerlink" href="#problem-configuration" title="Link to this heading"></a></h2>
+<p>Each problem in the <code class="docutils literal notranslate"><span class="pre">problems_dict</span></code> contains:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">function</span></code>: The test function</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bounds</span></code>: Input domain (min, max)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_vars</span></code>: Number of input variables (1 or 2)</p></li>
+</ul>
+<p>All functions return scalar outputs for given input arrays.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cec2005.html" class="btn btn-neutral float-left" title="CEC2005 Benchmark Suite" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../classifiers.html" class="btn btn-neutral float-right" title="classifiers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Pavel Sherstnev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

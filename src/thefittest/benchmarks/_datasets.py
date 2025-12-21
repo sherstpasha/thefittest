@@ -31,21 +31,69 @@ class Dataset:
         self._y_names = y_names
 
     def get_X(self) -> NDArray[np.float64]:
+        """Get feature matrix.
+
+        Returns
+        -------
+        NDArray[np.float64]
+            Feature matrix of shape (n_samples, n_features)
+        """
         return self._X
 
     def get_y(self) -> NDArray[Union[np.int64, np.float64]]:
+        """Get target values.
+
+        Returns
+        -------
+        NDArray[Union[np.int64, np.float64]]
+            Target array of shape (n_samples,)
+        """
         return self._y
 
     def get_X_names(self) -> Dict[int, str]:
+        """Get feature names.
+
+        Returns
+        -------
+        Dict[int, str]
+            Dictionary mapping feature indices to feature names
+        """
         return self._X_names
 
     def get_y_names(self) -> Dict[int, str]:
+        """Get class/target names.
+
+        Returns
+        -------
+        Dict[int, str]
+            Dictionary mapping class indices to class names
+        """
         return self._y_names
 
 
 class IrisDataset(Dataset):
-    """Fisher R. A.. (1988). Iris. UCI Machine Learning Repository.
-    https://doi.org/10.24432/C56C76."""
+    """The Iris dataset - one of the most famous datasets in machine learning.
+
+    Contains measurements of iris flowers from three different species.
+
+    Features (4):
+        - sepal length in cm
+        - sepal width in cm
+        - petal length in cm
+        - petal width in cm
+
+    Classes (3):
+        - Iris-setosa (0)
+        - Iris-versicolor (1)
+        - Iris-virginica (2)
+
+    Samples: 150 (50 per class)
+
+    References
+    ----------
+    Fisher R. A.. (1988). Iris. UCI Machine Learning Repository.
+    https://doi.org/10.24432/C56C76.
+    """
 
     def __init__(self) -> None:
         Dataset.__init__(
@@ -63,8 +111,35 @@ class IrisDataset(Dataset):
 
 
 class WineDataset(Dataset):
-    """Aeberhard,Stefan and Forina,M.. (1991). Wine. UCI Machine
-    Learning Repository. https://doi.org/10.24432/C5PC7J."""
+    """Wine recognition dataset.
+
+    Contains results of a chemical analysis of wines grown in the same region
+    in Italy but derived from three different cultivars.
+
+    Features (13):
+        - Alcohol
+        - Malic acid
+        - Ash
+        - Alcalinity of ash
+        - Magnesium
+        - Total phenols
+        - Flavanoids
+        - Nonflavanoid phenols
+        - Proanthocyanins
+        - Color intensity
+        - Hue
+        - OD280/OD315 of diluted wines
+        - Proline
+
+    Classes (3): class 1 (0), class 2 (1), class 3 (2)
+
+    Samples: 178
+
+    References
+    ----------
+    Aeberhard, Stefan and Forina, M.. (1991). Wine. UCI Machine
+    Learning Repository. https://doi.org/10.24432/C5PC7J.
+    """
 
     def __init__(self) -> None:
         Dataset.__init__(
@@ -91,10 +166,33 @@ class WineDataset(Dataset):
 
 
 class BreastCancerDataset(Dataset):
-    """
-    Wolberg,William, Mangasarian,Olvi, Street,Nick, and Street,W.. (1995).
+    """Breast Cancer Wisconsin (Diagnostic) dataset.
+
+    Contains features computed from digitized images of fine needle aspirate (FNA)
+    of breast masses. They describe characteristics of the cell nuclei present
+    in the image.
+
+    Features (30):
+        Ten real-valued features computed for each cell nucleus:
+
+        - Mean: radius, texture, perimeter, area, smoothness, compactness,
+          concavity, concave points, symmetry, fractal dimension
+        - Error: radius error, texture error, perimeter error, area error,
+          smoothness error, compactness error, concavity error,
+          concave points error, symmetry error, fractal dimension error
+        - Worst: worst radius, texture, perimeter, area, smoothness,
+          compactness, concavity, concave points, symmetry, fractal dimension
+
+    Classes (2): M (malignant, 0), B (benign, 1)
+
+    Samples: 569
+
+    References
+    ----------
+    Wolberg, William, Mangasarian, Olvi, Street, Nick, and Street, W.. (1995).
     Breast Cancer Wisconsin (Diagnostic). UCI Machine Learning Repository.
-    https://doi.org/10.24432/C5DW2B."""
+    https://doi.org/10.24432/C5DW2B.
+    """
 
     def __init__(self) -> None:
         Dataset.__init__(
@@ -138,8 +236,21 @@ class BreastCancerDataset(Dataset):
 
 
 class DigitsDataset(Dataset):
-    """Alpaydin,E. and Kaynak,C.. (1998). Optical Recognition of Handwritten Digits.
-    UCI Machine Learning Repository. https://doi.org/10.24432/C50P49."""
+    """Optical Recognition of Handwritten Digits dataset.
+
+    Contains normalized bitmaps of handwritten digits from 0 to 9.
+
+    Features (64): 8x8 pixel values (0-16)
+
+    Classes (10): Digits 0-9
+
+    Samples: 5620
+
+    References
+    ----------
+    Alpaydin, E. and Kaynak, C.. (1998). Optical Recognition of Handwritten Digits.
+    UCI Machine Learning Repository. https://doi.org/10.24432/C50P49.
+    """
 
     def __init__(self) -> None:
         Dataset.__init__(
@@ -152,7 +263,22 @@ class DigitsDataset(Dataset):
 
 
 class CreditRiskDataset(Dataset):
-    """https://www.kaggle.com/datasets/upadorprofzs/credit-risk"""
+    """Credit Risk dataset.
+
+    For predicting whether a client is a good or bad credit risk based on
+    financial information.
+
+    Features (3):
+        - income
+        - age
+        - loan
+
+    Classes (2): good client (0), bad client (1)
+
+    References
+    ----------
+    https://www.kaggle.com/datasets/upadorprofzs/credit-risk
+    """
 
     def __init__(self) -> None:
         Dataset.__init__(
@@ -165,8 +291,28 @@ class CreditRiskDataset(Dataset):
 
 
 class UserKnowladgeDataset(Dataset):
-    """Kahraman,Hamdi, Colak,Ilhami, and Sagiroglu,Seref. (2013). User Knowledge Modeling.
-    UCI Machine Learning Repository. https://doi.org/10.24432/C5231X."""
+    """User Knowledge Modeling dataset.
+
+    Real dataset about students' knowledge status about the subject of
+    Electrical DC Machines.
+
+    Features (5):
+        - STG: The degree of study time for goal object materials
+        - SCG: The degree of repetition number of user for goal object materials
+        - STR: The degree of study time of user for related objects with goal object
+        - LPR: The exam performance of user for related objects with goal object
+        - PEG: The exam performance of user for goal objects
+
+    Classes (4): Very Low (0), Low (1), Middle (2), High (3)
+
+    Samples: 403
+
+    References
+    ----------
+    Kahraman, Hamdi, Colak, Ilhami, and Sagiroglu, Seref. (2013).
+    User Knowledge Modeling. UCI Machine Learning Repository.
+    https://doi.org/10.24432/C5231X.
+    """
 
     def __init__(self) -> None:
         Dataset.__init__(
@@ -185,9 +331,26 @@ class UserKnowladgeDataset(Dataset):
 
 
 class BanknoteDataset(Dataset):
+    """Banknote authentication dataset.
+
+    Data extracted from images taken for the evaluation of an authentication
+    procedure for banknotes.
+
+    Features (4):
+        - variance of Wavelet Transformed image (continuous)
+        - skewness of Wavelet Transformed image (continuous)
+        - curtosis of Wavelet Transformed image (continuous)
+        - entropy of image (continuous)
+
+    Classes (2): not original (0), original (1)
+
+    Samples: 1372
+
+    References
+    ----------
+    Lohweg, Volker. (2013). banknote authentication.
+    UCI Machine Learning Repository. https://doi.org/10.24432/C55P57.
     """
-    Lohweg,Volker. (2013). banknote authentication.
-    UCI Machine Learning Repository. https://doi.org/10.24432/C55P57."""
 
     def __init__(self) -> None:
         Dataset.__init__(

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CEC2005 Benchmark Suite &mdash; Thefittest 0.2.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=db5433e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=a47416a6"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Symbolic Regression Benchmark" href="symbolicregression.html" />
+    <link rel="prev" title="Optimization Functions" href="optfunctions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Thefittest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../benchmarks.html">Benchmarks</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#overview">Overview</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../benchmarks.html#contents">Contents</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="datasets.html">ML Datasets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optfunctions.html">Optimization Functions</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">CEC2005 Benchmark Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="symbolicregression.html">Symbolic Regression Benchmark</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#quick-start">Quick Start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#module-thefittest.benchmarks">Module Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.BanknoteDataset"><code class="docutils literal notranslate"><span class="pre">BanknoteDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.BreastCancerDataset"><code class="docutils literal notranslate"><span class="pre">BreastCancerDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.CreditRiskDataset"><code class="docutils literal notranslate"><span class="pre">CreditRiskDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.DigitsDataset"><code class="docutils literal notranslate"><span class="pre">DigitsDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.IrisDataset"><code class="docutils literal notranslate"><span class="pre">IrisDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.UserKnowladgeDataset"><code class="docutils literal notranslate"><span class="pre">UserKnowladgeDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.WineDataset"><code class="docutils literal notranslate"><span class="pre">WineDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Ackley"><code class="docutils literal notranslate"><span class="pre">Ackley</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Griewank"><code class="docutils literal notranslate"><span class="pre">Griewank</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.HighConditionedElliptic"><code class="docutils literal notranslate"><span class="pre">HighConditionedElliptic</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.OneMax"><code class="docutils literal notranslate"><span class="pre">OneMax</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Rastrigin"><code class="docutils literal notranslate"><span class="pre">Rastrigin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Rosenbrock"><code class="docutils literal notranslate"><span class="pre">Rosenbrock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Schwefe1_2"><code class="docutils literal notranslate"><span class="pre">Schwefe1_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Sphere"><code class="docutils literal notranslate"><span class="pre">Sphere</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Weierstrass"><code class="docutils literal notranslate"><span class="pre">Weierstrass</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../classifiers.html">classifiers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#genetic-programming-classifiers">Genetic Programming Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#geneticprogrammingclassifier">GeneticProgrammingClassifier</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#neural-network-classifiers">Neural Network Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#mlpeaclassifier">MLPEAClassifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#geneticprogrammingneuralnetclassifier">GeneticProgrammingNeuralNetClassifier</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../optimizers.html">optimizers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#differential-evolution-optimizers">Differential Evolution Optimizers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#differentialevolution">DifferentialEvolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#jde">jDE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#shade">SHADE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#genetic-algorithms">Genetic Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#geneticalgorithm">GeneticAlgorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#shaga">SHAGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#selfcga">SelfCGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#pdpga">PDPGA</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#genetic-programming">Genetic Programming</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#geneticprogramming">GeneticProgramming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#pdpgp">PDPGP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#selfcgp">SelfCGP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../regressors.html">regressors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#genetic-programming-regressors">Genetic Programming Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#geneticprogrammingregressor">GeneticProgrammingRegressor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#neural-network-regressors">Neural Network Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#mlpearegressor">MLPEARegressor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#geneticprogrammingneuralnetregressor">GeneticProgrammingNeuralNetRegressor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../utils/index.html">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../utils/selections.html">selections</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.proportional_selection"><code class="docutils literal notranslate"><span class="pre">proportional_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.rank_selection"><code class="docutils literal notranslate"><span class="pre">rank_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.tournament_selection"><code class="docutils literal notranslate"><span class="pre">tournament_selection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/crossovers.html">crossovers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.empty_crossover"><code class="docutils literal notranslate"><span class="pre">empty_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.binomialGA"><code class="docutils literal notranslate"><span class="pre">binomialGA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.one_point_crossover"><code class="docutils literal notranslate"><span class="pre">one_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.two_point_crossover"><code class="docutils literal notranslate"><span class="pre">two_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.binomial"><code class="docutils literal notranslate"><span class="pre">binomial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.empty_crossoverGP"><code class="docutils literal notranslate"><span class="pre">empty_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.standard_crossover"><code class="docutils literal notranslate"><span class="pre">standard_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.one_point_crossoverGP"><code class="docutils literal notranslate"><span class="pre">one_point_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_crossoverGP"><code class="docutils literal notranslate"><span class="pre">uniform_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover_GP()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/mutations.html">mutations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.flip_mutation"><code class="docutils literal notranslate"><span class="pre">flip_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.best_1"><code class="docutils literal notranslate"><span class="pre">best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_1"><code class="docutils literal notranslate"><span class="pre">rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_to_best1"><code class="docutils literal notranslate"><span class="pre">rand_to_best1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_best_1"><code class="docutils literal notranslate"><span class="pre">current_to_best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.best_2"><code class="docutils literal notranslate"><span class="pre">best_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_2"><code class="docutils literal notranslate"><span class="pre">rand_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_rand_1"><code class="docutils literal notranslate"><span class="pre">current_to_rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive_p_min"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive_p_min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.point_mutation"><code class="docutils literal notranslate"><span class="pre">point_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.growing_mutation"><code class="docutils literal notranslate"><span class="pre">growing_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.swap_mutation"><code class="docutils literal notranslate"><span class="pre">swap_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.shrink_mutation"><code class="docutils literal notranslate"><span class="pre">shrink_mutation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/random.html">random</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.sattolo_shuffle"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.sattolo_shuffle_2d"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle_2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.numba_seed"><code class="docutils literal notranslate"><span class="pre">numba_seed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.cauchy_distribution"><code class="docutils literal notranslate"><span class="pre">cauchy_distribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.random_weighted_sample"><code class="docutils literal notranslate"><span class="pre">random_weighted_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.random_sample"><code class="docutils literal notranslate"><span class="pre">random_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.flip_coin"><code class="docutils literal notranslate"><span class="pre">flip_coin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.uniform"><code class="docutils literal notranslate"><span class="pre">uniform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.randint"><code class="docutils literal notranslate"><span class="pre">randint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.check_random_state"><code class="docutils literal notranslate"><span class="pre">check_random_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.generator1"><code class="docutils literal notranslate"><span class="pre">generator1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.generator2"><code class="docutils literal notranslate"><span class="pre">generator2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/transformations.html">transformations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.minmax_scale"><code class="docutils literal notranslate"><span class="pre">minmax_scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.SamplingGrid"><code class="docutils literal notranslate"><span class="pre">SamplingGrid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.GrayCode"><code class="docutils literal notranslate"><span class="pre">GrayCode</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Thefittest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+          <li class="breadcrumb-item"><a href="../benchmarks.html">Benchmarks</a></li>
+      <li class="breadcrumb-item active">CEC2005 Benchmark Suite</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/benchmarks/cec2005.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cec2005-benchmark-suite">
+<h1>CEC2005 Benchmark Suite<a class="headerlink" href="#cec2005-benchmark-suite" title="Link to this heading"></a></h1>
+<p>The CEC 2005 Special Session on Real-Parameter Optimization provides a comprehensive benchmark suite for testing optimization algorithms. The benchmark contains 25 test functions designed to evaluate different aspects of optimization algorithms.</p>
+<p><strong>Reference</strong>: Suganthan, Ponnuthurai &amp; Hansen, Nikolaus &amp; Liang, Jing &amp; Deb, Kalyan &amp; Chen, Ying-ping &amp; Auger, Anne &amp; Tiwari, Santosh. (2005). Problem Definitions and Evaluation Criteria for the CEC 2005 Special Session on Real-Parameter Optimization. Natural Computing. 341-357</p>
+<section id="module-thefittest.benchmarks.CEC2005">
+<span id="module"></span><h2>Module<a class="headerlink" href="#module-thefittest.benchmarks.CEC2005" title="Link to this heading"></a></h2>
+</section>
+<section id="test-functions-overview">
+<h2>Test Functions Overview<a class="headerlink" href="#test-functions-overview" title="Link to this heading"></a></h2>
+<p>The benchmark suite is organized into several categories:</p>
+<section id="unimodal-functions-f1-f5">
+<h3>Unimodal Functions (F1-F5)<a class="headerlink" href="#unimodal-functions-f1-f5" title="Link to this heading"></a></h3>
+<p>These functions have a single global optimum and are used to test the exploitation capability of algorithms.</p>
+<ul class="simple">
+<li><p><strong>F1</strong>: Shifted Sphere Function</p></li>
+<li><p><strong>F2</strong>: Shifted Schwefel’s Problem 1.2</p></li>
+<li><p><strong>F3</strong>: Shifted Rotated High Conditioned Elliptic Function</p></li>
+<li><p><strong>F4</strong>: Shifted Schwefel’s Problem 1.2 with Noise in Fitness</p></li>
+<li><p><strong>F5</strong>: Schwefel’s Problem 2.6 with Global Optimum on Bounds</p></li>
+</ul>
+</section>
+<section id="basic-multimodal-functions-f6-f12">
+<h3>Basic Multimodal Functions (F6-F12)<a class="headerlink" href="#basic-multimodal-functions-f6-f12" title="Link to this heading"></a></h3>
+<p>These functions have many local optima and test the exploration capability of algorithms.</p>
+<ul class="simple">
+<li><p><strong>F6</strong>: Shifted Rosenbrock’s Function</p></li>
+<li><p><strong>F7</strong>: Shifted Rotated Griewank’s Function without Bounds</p></li>
+<li><p><strong>F8</strong>: Shifted Rotated Ackley’s Function with Global Optimum on Bounds</p></li>
+<li><p><strong>F9</strong>: Shifted Rastrigin’s Function</p></li>
+<li><p><strong>F10</strong>: Shifted Rotated Rastrigin’s Function</p></li>
+<li><p><strong>F11</strong>: Shifted Rotated Weierstrass Function</p></li>
+<li><p><strong>F12</strong>: Schwefel’s Problem 2.13</p></li>
+</ul>
+</section>
+<section id="expanded-functions-f13-f14">
+<h3>Expanded Functions (F13-F14)<a class="headerlink" href="#expanded-functions-f13-f14" title="Link to this heading"></a></h3>
+<p>These are expanded versions of 2-D functions.</p>
+<ul class="simple">
+<li><p><strong>F13</strong>: Shifted Expanded Griewank’s plus Rosenbrock’s Function</p></li>
+<li><p><strong>F14</strong>: Shifted Rotated Expanded Scaffer’s F6</p></li>
+</ul>
+</section>
+<section id="hybrid-composition-functions-f15-f25">
+<h3>Hybrid Composition Functions (F15-F25)<a class="headerlink" href="#hybrid-composition-functions-f15-f25" title="Link to this heading"></a></h3>
+<p>These are the most challenging functions, composed of multiple basic functions.</p>
+<ul class="simple">
+<li><p><strong>F15</strong>: Hybrid Composition Function 1</p></li>
+<li><p><strong>F16</strong>: Rotated Version of Hybrid Composition Function 1</p></li>
+<li><p><strong>F17</strong>: F16 with Noise in Fitness</p></li>
+<li><p><strong>F18</strong>: Rotated Hybrid Composition Function</p></li>
+<li><p><strong>F19</strong>: Rotated Hybrid Composition Function with Narrow Basin Global Optimum</p></li>
+<li><p><strong>F20</strong>: Rotated Hybrid Composition Function with Global Optimum on the Bounds</p></li>
+<li><p><strong>F21</strong>: Rotated Hybrid Composition Function</p></li>
+<li><p><strong>F22</strong>: Rotated Hybrid Composition Function with High Condition Number Matrix</p></li>
+<li><p><strong>F23</strong>: Non-Continuous Rotated Hybrid Composition Function</p></li>
+<li><p><strong>F24</strong>: Rotated Hybrid Composition Function</p></li>
+<li><p><strong>F25</strong>: Rotated Hybrid Composition Function without Bounds</p></li>
+</ul>
+</section>
+</section>
+<section id="usage-example">
+<h2>Usage Example<a class="headerlink" href="#usage-example" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">thefittest.benchmarks</span> <span class="kn">import</span> <span class="n">CEC2005</span>
+
+<span class="c1"># Access problem dictionary</span>
+<span class="n">problems</span> <span class="o">=</span> <span class="n">CEC2005</span><span class="o">.</span><span class="n">problems_dict</span>
+
+<span class="c1"># Get F1 (Shifted Sphere)</span>
+<span class="n">f1_config</span> <span class="o">=</span> <span class="n">problems</span><span class="p">[</span><span class="s2">&quot;F1&quot;</span><span class="p">]</span>
+<span class="n">function</span> <span class="o">=</span> <span class="n">f1_config</span><span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">]()</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">f1_config</span><span class="p">[</span><span class="s2">&quot;bounds&quot;</span><span class="p">]</span>
+<span class="n">optimum</span> <span class="o">=</span> <span class="n">f1_config</span><span class="p">[</span><span class="s2">&quot;optimum&quot;</span><span class="p">]</span>
+
+<span class="c1"># Evaluate function</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">*</span><span class="n">bounds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="problem-configuration">
+<h2>Problem Configuration<a class="headerlink" href="#problem-configuration" title="Link to this heading"></a></h2>
+<p>Each problem in the <code class="docutils literal notranslate"><span class="pre">problems_dict</span></code> contains:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">function</span></code>: The test function class</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bounds</span></code>: Search space bounds (min, max)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fix_accuracy</span></code>: Required accuracy to consider a solution as optimal</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimum</span></code>: Global optimum value</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimum_x</span></code>: Location of the global optimum</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dimentions</span></code>: Supported problem dimensions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">init_bounds</span></code> (optional): Recommended initialization bounds</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="optfunctions.html" class="btn btn-neutral float-left" title="Optimization Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="symbolicregression.html" class="btn btn-neutral float-right" title="Symbolic Regression Benchmark" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Pavel Sherstnev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+Symbolic Regression Benchmark
+=============================
+
+This module provides 17 test functions commonly used for benchmarking symbolic regression and genetic programming algorithms. These functions represent various mathematical relationships with different complexity levels and characteristics.
+
+Module
+------
+
+.. automodule:: thefittest.benchmarks.symbolicregression17
+   :members:
+   :undoc-members:
+
+Test Functions Overview
+-----------------------
+
+The benchmark suite contains 17 functions (F1-F17) with varying complexity:
+
+One-Dimensional Functions (F1, F2, F16, F17)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**F1**: Complex oscillatory function with exponential decay
+
+.. math::
+
+   F1(x) = 0.05(x-1)^2 + (3 - 2.9e^{-2.77257x^2})(1 - \cos(x(4 - 50e^{-2.77257x^2})))
+
+- Domain: [-1, 1]
+- Variables: 1
+
+----
+
+**F2**: Multi-frequency cosine composition
+
+.. math::
+
+   F2(x) = 1 - 0.5\cos(1.5(10x - 0.3))\cos(31.4x) + 0.5\cos(\sqrt{5} \cdot 10x)\cos(35x)
+
+- Domain: [-1, 1]
+- Variables: 1
+
+----
+
+**F16**: Sine with quadratic term
+
+.. math::
+
+   F16(x) = \sin(x) \cdot x^2
+
+- Domain: [-5, 5]
+- Variables: 1
+
+----
+
+**F17**: Linear sine function
+
+.. math::
+
+   F17(x) = \sin(x) + x
+
+- Domain: [-5, 5]
+- Variables: 1
+
+Two-Dimensional Functions (F3-F15)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**F3**: Quadratic with cosine terms
+
+.. math::
+
+   F3(x_1, x_2) = 0.1x_1^2 + 0.1x_2^2 - 4\cos(0.8x_1) - 4\cos(0.8x_2) + 8
+
+- Domain: [-16, 16]
+- Variables: 2
+
+----
+
+**F4**: Scaled version of F3
+
+.. math::
+
+   F4(x_1, x_2) = (0.1 \cdot 1.5x_2)^2 + (0.1 \cdot 0.8x_1)^2 - 4\cos(0.8 \cdot 1.5x_2) - 4\cos(0.8 \cdot 0.8x_1) + 8
+
+- Domain: [-16, 16]
+- Variables: 2
+
+----
+
+**F5**: Rosenbrock function
+
+.. math::
+
+   F5(x_1, x_2) = 100(x_2 - x_1^2)^2 + (1 - x_1)^2
+
+- Domain: [-2, 2]
+- Variables: 2
+
+----
+
+**F6**: Modified Griewank-like function
+
+.. math::
+
+   F6(x_1, x_2) = -\frac{10}{0.005(x_1^2 + x_2^2) - \cos(x_1)\cos(x_2/\sqrt{2}) + 2} + 10
+
+- Domain: [-16, 16]
+- Variables: 2
+
+----
+
+**F7**: Inverse Rosenbrock
+
+.. math::
+
+   F7(x_1, x_2) = -\frac{100}{100(x_1^2 - x_2) + (1 - x_1)^2 + 1} + 100
+
+- Domain: [-5, 5]
+- Variables: 2
+
+----
+
+**F8**: Modified Schaffer function
+
+.. math::
+
+   F8(x_1, x_2) = \frac{1 - \sin^2(\sqrt{x_1^2 + x_2^2})}{1 + 0.001(x_1^2 + x_2^2)}
+
+- Domain: [-10, 10]
+- Variables: 2
+
+----
+
+**F9**: Quadratic with multi-frequency cosines
+
+.. math::
+
+   F9(x_1, x_2) = 0.5(x_1^2 + x_2^2)(2 \cdot 0.8 + 0.8\cos(1.5x_1)\cos(3.14x_2) + 0.8\cos(\sqrt{5}x_1)\cos(3.5x_2))
+
+- Domain: [-2.5, 2.5]
+- Variables: 2
+
+----
+
+**F10**: Similar to F9 (different domain)
+
+- Domain: [-5, 5]
+- Variables: 2
+
+----
+
+**F11**: Absolute sine products with inverse term
+
+.. math::
+
+   F11(x_1, x_2) = x_1^2|\sin(2x_1)| + x_2^2|\sin(2x_2)| - \frac{1}{5x_1^2 + 5x_2^2 + 0.2} + 5
+
+- Domain: [-4, 4]
+- Variables: 2
+
+----
+
+**F12**: Cross-term interaction function
+
+.. math::
+
+   F12(x_1, x_2) = 0.5(x_1^2 + x_1x_2 + x_2^2)(1 + 0.5\cos(1.5x_1)\cos(3.2x_1x_2)\cos(3.14x_2) + 0.5\cos(2.2x_2)\cos(4.8x_1x_2)\cos(3.5x_2))
+
+- Domain: [0, 4]
+- Variables: 2
+
+----
+
+**F13**: Product of z-functions
+
+.. math::
+
+   F13(x_1, x_2) = -z(x_1) \cdot z(x_2)
+
+where :math:`z(x) = -\frac{1}{(x-1)^2 + 0.2} - \frac{1}{2(x-2)^2 + 0.15} - \frac{1}{3(x-3)^2 + 0.3}`
+
+- Domain: [0, 4]
+- Variables: 2
+
+----
+
+**F14**: Sum of z-functions
+
+.. math::
+
+   F14(x_1, x_2) = z(x_1) + z(x_2)
+
+- Domain: [0, 4]
+- Variables: 2
+
+----
+
+**F15**: Simple quadratic
+
+.. math::
+
+   F15(x_1, x_2) = (x_1 - 2)^2 + (x_2 - 1)^2
+
+- Domain: [-5, 5]
+- Variables: 2
+
+Usage Example
+-------------
+
+.. code-block:: python
+
+    from thefittest.benchmarks import symbolicregression17
+    import numpy as np
+    
+    # Access problem dictionary
+    problems = symbolicregression17.problems_dict
+    
+    # Get F5 (Rosenbrock)
+    f5_config = problems["F5"]
+    function = f5_config["function"]
+    bounds = f5_config["bounds"]
+    n_vars = f5_config["n_vars"]
+    
+    # Generate test data
+    X = np.random.uniform(*bounds, size=(100, n_vars))
+    y = function(X)
+
+Problem Configuration
+---------------------
+
+Each problem in the ``problems_dict`` contains:
+
+- ``function``: The test function
+- ``bounds``: Input domain (min, max)
+- ``n_vars``: Number of input variables (1 or 2)
+
+All functions return scalar outputs for given input arrays.

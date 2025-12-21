@@ -3,6 +3,13 @@ regressors
 
 The library provides several regressor implementations based on evolutionary algorithms. These regressors can perform symbolic regression, optimize neural network weights, and evolve network architectures for continuous value prediction.
 
+Contents
+--------
+
+.. contents::
+   :local:
+   :depth: 2
+
 Genetic Programming Regressors
 --------------------------------
 

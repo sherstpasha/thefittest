@@ -1,0 +1,101 @@
+CEC2005 Benchmark Suite
+=======================
+
+The CEC 2005 Special Session on Real-Parameter Optimization provides a comprehensive benchmark suite for testing optimization algorithms. The benchmark contains 25 test functions designed to evaluate different aspects of optimization algorithms.
+
+**Reference**: Suganthan, Ponnuthurai & Hansen, Nikolaus & Liang, Jing & Deb, Kalyan & Chen, Ying-ping & Auger, Anne & Tiwari, Santosh. (2005). Problem Definitions and Evaluation Criteria for the CEC 2005 Special Session on Real-Parameter Optimization. Natural Computing. 341-357
+
+Module
+------
+
+.. automodule:: thefittest.benchmarks.CEC2005
+   :members:
+   :undoc-members:
+
+Test Functions Overview
+-----------------------
+
+The benchmark suite is organized into several categories:
+
+Unimodal Functions (F1-F5)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These functions have a single global optimum and are used to test the exploitation capability of algorithms.
+
+- **F1**: Shifted Sphere Function
+- **F2**: Shifted Schwefel's Problem 1.2
+- **F3**: Shifted Rotated High Conditioned Elliptic Function
+- **F4**: Shifted Schwefel's Problem 1.2 with Noise in Fitness
+- **F5**: Schwefel's Problem 2.6 with Global Optimum on Bounds
+
+Basic Multimodal Functions (F6-F12)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These functions have many local optima and test the exploration capability of algorithms.
+
+- **F6**: Shifted Rosenbrock's Function
+- **F7**: Shifted Rotated Griewank's Function without Bounds
+- **F8**: Shifted Rotated Ackley's Function with Global Optimum on Bounds
+- **F9**: Shifted Rastrigin's Function
+- **F10**: Shifted Rotated Rastrigin's Function
+- **F11**: Shifted Rotated Weierstrass Function
+- **F12**: Schwefel's Problem 2.13
+
+Expanded Functions (F13-F14)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These are expanded versions of 2-D functions.
+
+- **F13**: Shifted Expanded Griewank's plus Rosenbrock's Function
+- **F14**: Shifted Rotated Expanded Scaffer's F6
+
+Hybrid Composition Functions (F15-F25)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These are the most challenging functions, composed of multiple basic functions.
+
+- **F15**: Hybrid Composition Function 1
+- **F16**: Rotated Version of Hybrid Composition Function 1
+- **F17**: F16 with Noise in Fitness
+- **F18**: Rotated Hybrid Composition Function
+- **F19**: Rotated Hybrid Composition Function with Narrow Basin Global Optimum
+- **F20**: Rotated Hybrid Composition Function with Global Optimum on the Bounds
+- **F21**: Rotated Hybrid Composition Function
+- **F22**: Rotated Hybrid Composition Function with High Condition Number Matrix
+- **F23**: Non-Continuous Rotated Hybrid Composition Function
+- **F24**: Rotated Hybrid Composition Function
+- **F25**: Rotated Hybrid Composition Function without Bounds
+
+Usage Example
+-------------
+
+.. code-block:: python
+
+    from thefittest.benchmarks import CEC2005
+    
+    # Access problem dictionary
+    problems = CEC2005.problems_dict
+    
+    # Get F1 (Shifted Sphere)
+    f1_config = problems["F1"]
+    function = f1_config["function"]()
+    bounds = f1_config["bounds"]
+    optimum = f1_config["optimum"]
+    
+    # Evaluate function
+    import numpy as np
+    x = np.random.uniform(*bounds, size=10)
+    result = function(x)
+
+Problem Configuration
+---------------------
+
+Each problem in the ``problems_dict`` contains:
+
+- ``function``: The test function class
+- ``bounds``: Search space bounds (min, max)
+- ``fix_accuracy``: Required accuracy to consider a solution as optimal
+- ``optimum``: Global optimum value
+- ``optimum_x``: Location of the global optimum
+- ``dimentions``: Supported problem dimensions
+- ``init_bounds`` (optional): Recommended initialization bounds

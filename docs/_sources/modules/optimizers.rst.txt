@@ -3,6 +3,13 @@ optimizers
 
 The library provides a comprehensive set of evolutionary optimization algorithms for solving continuous and discrete optimization problems. Each optimizer is designed with flexibility in mind, supporting various selection methods, crossover operators, and mutation strategies.
 
+Contents
+--------
+
+.. contents::
+   :local:
+   :depth: 2
+
 Differential Evolution Optimizers
 ----------------------------------
 

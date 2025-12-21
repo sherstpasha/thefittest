@@ -308,21 +308,94 @@ class SampleHybridCompositionFunction:
 
 
 class OneMax(TestFunction):
+    """OneMax function - simple sum of all variables.
+
+    A basic test function that simply sums all input variables.
+    The global minimum is at x = [0, 0, ..., 0] with f(x) = 0.
+
+    Parameters
+    ----------
+    x : NDArray[np.float64]
+        Input array of shape (n_samples, n_dimensions)
+
+    Returns
+    -------
+    NDArray[np.float64]
+        Function values of shape (n_samples,)
+    """
+
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.sum(x, axis=1, dtype=np.float64)
 
 
 class Sphere(TestFunction):
+    """Sphere function - simple quadratic function.
+
+    One of the simplest optimization test functions. It is continuous,
+    convex, and unimodal. The global minimum is at x = [0, 0, ..., 0]
+    with f(x) = 0.
+
+    Formula: f(x) = sum(x_i^2)
+
+    Parameters
+    ----------
+    x : NDArray[np.float64]
+        Input array of shape (n_samples, n_dimensions)
+
+    Returns
+    -------
+    NDArray[np.float64]
+        Function values of shape (n_samples,)
+    """
+
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.sum(x**2, axis=-1)
 
 
 class Schwefe1_2(TestFunction):
+    """Schwefel's Problem 1.2.
+
+    A unimodal function with a single global minimum. The variables are
+    not separable, which makes it harder to optimize than the Sphere function.
+    The global minimum is at x = [0, 0, ..., 0] with f(x) = 0.
+
+    Formula: f(x) = sum_{i=1}^n (sum_{j=1}^i x_j)^2
+
+    Parameters
+    ----------
+    x : NDArray[np.float64]
+        Input array of shape (n_samples, n_dimensions)
+
+    Returns
+    -------
+    NDArray[np.float64]
+        Function values of shape (n_samples,)
+    """
+
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.sum(np.add.accumulate(x, axis=-1) ** 2, axis=-1)
 
 
 class HighConditionedElliptic(TestFunction):
+    """High Conditioned Elliptic function.
+
+    A unimodal function with high condition number, making it difficult
+    for optimization algorithms that are sensitive to the scaling of variables.
+    The global minimum is at x = [0, 0, ..., 0] with f(x) = 0.
+
+    Formula: f(x) = sum_{i=1}^n (10^6)^((i-1)/(n-1)) * x_i^2
+
+    Parameters
+    ----------
+    x : NDArray[np.float64]
+        Input array of shape (n_samples, n_dimensions)
+
+    Returns
+    -------
+    NDArray[np.float64]
+        Function values of shape (n_samples,)
+    """
+
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         i = np.arange(1, x.shape[1] + 1)
         demension = x.shape[1]
@@ -330,17 +403,76 @@ class HighConditionedElliptic(TestFunction):
 
 
 class Rosenbrock(TestFunction):
+    """Rosenbrock function (De Jong's function 2, Valley function).
+
+    A classic optimization test function with a narrow, parabolic valley.
+    The global minimum is inside a long, narrow, parabolic shaped flat valley.
+    Finding the valley is trivial, but convergence to the global minimum is
+    difficult. The global minimum is at x = [1, 1, ..., 1] with f(x) = 0.
+
+    Formula: f(x) = sum_{i=1}^{n-1} [100(x_{i+1} - x_i^2)^2 + (x_i - 1)^2]
+
+    Parameters
+    ----------
+    x : NDArray[np.float64]
+        Input array of shape (n_samples, n_dimensions)
+
+    Returns
+    -------
+    NDArray[np.float64]
+        Function values of shape (n_samples,)
+    """
+
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         value = 100 * ((x.T[:-1] ** 2 - x.T[1:]) ** 2) + (x.T[:-1] - 1) ** 2
         return np.sum(value.T, axis=-1)
 
 
 class Rastrigin(TestFunction):
+    """Rastrigin function.
+
+    A highly multimodal function with a large number of local minima.
+    The function is based on the Sphere function with added cosine modulation
+    to create the local minima. The global minimum is at x = [0, 0, ..., 0]
+    with f(x) = 0.
+
+    Formula: f(x) = 10n + sum_{i=1}^n [x_i^2 - 10*cos(2*pi*x_i)]
+
+    Parameters
+    ----------
+    x : NDArray[np.float64]
+        Input array of shape (n_samples, n_dimensions)
+
+    Returns
+    -------
+    NDArray[np.float64]
+        Function values of shape (n_samples,)
+    """
+
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.sum(x**2 - 10 * np.cos(2 * np.pi * x) + 10, axis=-1)
 
 
 class Griewank(TestFunction):
+    """Griewank function.
+
+    A multimodal function with many widespread local minima. The number and
+    positioning of local minima is space dependent. The global minimum is
+    at x = [0, 0, ..., 0] with f(x) = 0.
+
+    Formula: f(x) = 1 + sum_{i=1}^n x_i^2/4000 - prod_{i=1}^n cos(x_i/sqrt(i))
+
+    Parameters
+    ----------
+    x : NDArray[np.float64]
+        Input array of shape (n_samples, n_dimensions)
+
+    Returns
+    -------
+    NDArray[np.float64]
+        Function values of shape (n_samples,)
+    """
+
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         sqrt_i = np.sqrt(np.arange(1, x.shape[1] + 1))
         sum_ = np.sum((x**2) / 4000, axis=-1)
@@ -349,6 +481,26 @@ class Griewank(TestFunction):
 
 
 class Ackley(TestFunction):
+    """Ackley function.
+
+    A multimodal function with many local minima and a single global minimum.
+    It is characterized by a nearly flat outer region and a large hole at the
+    center. The global minimum is at x = [0, 0, ..., 0] with f(x) = 0.
+
+    Formula: f(x) = -a*exp(-b*sqrt(sum(x_i^2)/n)) - exp(sum(cos(c*x_i))/n) + a + e
+    where a=20, b=0.2, c=2*pi
+
+    Parameters
+    ----------
+    x : NDArray[np.float64]
+        Input array of shape (n_samples, n_dimensions)
+
+    Returns
+    -------
+    NDArray[np.float64]
+        Function values of shape (n_samples,)
+    """
+
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         a = 20
         c = 2 * np.pi
@@ -360,6 +512,27 @@ class Ackley(TestFunction):
 
 
 class Weierstrass(TestFunction):
+    """Weierstrass function.
+
+    A continuous but nowhere differentiable function with a fractal structure.
+    It is highly multimodal with many local optima. The global minimum is
+    at x = [0, 0, ..., 0].
+
+    Formula: f(x) = sum_{i=1}^n sum_{k=0}^{k_max} [a^k * cos(2*pi*b^k*(x_i+0.5))]
+             - n*sum_{k=0}^{k_max} [a^k * cos(2*pi*b^k*0.5)]
+    where a=0.5, b=3, k_max=20
+
+    Parameters
+    ----------
+    x : NDArray[np.float64]
+        Input array of shape (n_samples, n_dimensions)
+
+    Returns
+    -------
+    NDArray[np.float64]
+        Function values of shape (n_samples,)
+    """
+
     def f(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         a = 0.5
         b = 3

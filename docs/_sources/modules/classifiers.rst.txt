@@ -3,6 +3,13 @@ classifiers
 
 The library provides several classifier implementations based on evolutionary algorithms. These classifiers can learn complex decision boundaries, evolve neural network architectures, and optimize network weights using evolutionary strategies.
 
+Contents
+--------
+
+.. contents::
+   :local:
+   :depth: 2
+
 Genetic Programming Classifiers
 ---------------------------------
 

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Optimization Functions &mdash; Thefittest 0.2.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=db5433e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=a47416a6"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="CEC2005 Benchmark Suite" href="cec2005.html" />
+    <link rel="prev" title="ML Datasets" href="datasets.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Thefittest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../benchmarks.html">Benchmarks</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#overview">Overview</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../benchmarks.html#contents">Contents</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="datasets.html">ML Datasets</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Optimization Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cec2005.html">CEC2005 Benchmark Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="symbolicregression.html">Symbolic Regression Benchmark</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#quick-start">Quick Start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#module-thefittest.benchmarks">Module Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.BanknoteDataset"><code class="docutils literal notranslate"><span class="pre">BanknoteDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.BreastCancerDataset"><code class="docutils literal notranslate"><span class="pre">BreastCancerDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.CreditRiskDataset"><code class="docutils literal notranslate"><span class="pre">CreditRiskDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.DigitsDataset"><code class="docutils literal notranslate"><span class="pre">DigitsDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.IrisDataset"><code class="docutils literal notranslate"><span class="pre">IrisDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.UserKnowladgeDataset"><code class="docutils literal notranslate"><span class="pre">UserKnowladgeDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.WineDataset"><code class="docutils literal notranslate"><span class="pre">WineDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Ackley"><code class="docutils literal notranslate"><span class="pre">Ackley</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Griewank"><code class="docutils literal notranslate"><span class="pre">Griewank</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.HighConditionedElliptic"><code class="docutils literal notranslate"><span class="pre">HighConditionedElliptic</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.OneMax"><code class="docutils literal notranslate"><span class="pre">OneMax</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Rastrigin"><code class="docutils literal notranslate"><span class="pre">Rastrigin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Rosenbrock"><code class="docutils literal notranslate"><span class="pre">Rosenbrock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Schwefe1_2"><code class="docutils literal notranslate"><span class="pre">Schwefe1_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Sphere"><code class="docutils literal notranslate"><span class="pre">Sphere</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Weierstrass"><code class="docutils literal notranslate"><span class="pre">Weierstrass</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../classifiers.html">classifiers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#genetic-programming-classifiers">Genetic Programming Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#geneticprogrammingclassifier">GeneticProgrammingClassifier</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#neural-network-classifiers">Neural Network Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#mlpeaclassifier">MLPEAClassifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#geneticprogrammingneuralnetclassifier">GeneticProgrammingNeuralNetClassifier</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../optimizers.html">optimizers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#differential-evolution-optimizers">Differential Evolution Optimizers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#differentialevolution">DifferentialEvolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#jde">jDE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#shade">SHADE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#genetic-algorithms">Genetic Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#geneticalgorithm">GeneticAlgorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#shaga">SHAGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#selfcga">SelfCGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#pdpga">PDPGA</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#genetic-programming">Genetic Programming</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#geneticprogramming">GeneticProgramming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#pdpgp">PDPGP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#selfcgp">SelfCGP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../regressors.html">regressors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#genetic-programming-regressors">Genetic Programming Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#geneticprogrammingregressor">GeneticProgrammingRegressor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#neural-network-regressors">Neural Network Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#mlpearegressor">MLPEARegressor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#geneticprogrammingneuralnetregressor">GeneticProgrammingNeuralNetRegressor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../utils/index.html">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../utils/selections.html">selections</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.proportional_selection"><code class="docutils literal notranslate"><span class="pre">proportional_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.rank_selection"><code class="docutils literal notranslate"><span class="pre">rank_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.tournament_selection"><code class="docutils literal notranslate"><span class="pre">tournament_selection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/crossovers.html">crossovers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.empty_crossover"><code class="docutils literal notranslate"><span class="pre">empty_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.binomialGA"><code class="docutils literal notranslate"><span class="pre">binomialGA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.one_point_crossover"><code class="docutils literal notranslate"><span class="pre">one_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.two_point_crossover"><code class="docutils literal notranslate"><span class="pre">two_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.binomial"><code class="docutils literal notranslate"><span class="pre">binomial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.empty_crossoverGP"><code class="docutils literal notranslate"><span class="pre">empty_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.standard_crossover"><code class="docutils literal notranslate"><span class="pre">standard_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.one_point_crossoverGP"><code class="docutils literal notranslate"><span class="pre">one_point_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_crossoverGP"><code class="docutils literal notranslate"><span class="pre">uniform_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover_GP()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/mutations.html">mutations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.flip_mutation"><code class="docutils literal notranslate"><span class="pre">flip_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.best_1"><code class="docutils literal notranslate"><span class="pre">best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_1"><code class="docutils literal notranslate"><span class="pre">rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_to_best1"><code class="docutils literal notranslate"><span class="pre">rand_to_best1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_best_1"><code class="docutils literal notranslate"><span class="pre">current_to_best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.best_2"><code class="docutils literal notranslate"><span class="pre">best_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_2"><code class="docutils literal notranslate"><span class="pre">rand_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_rand_1"><code class="docutils literal notranslate"><span class="pre">current_to_rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive_p_min"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive_p_min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.point_mutation"><code class="docutils literal notranslate"><span class="pre">point_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.growing_mutation"><code class="docutils literal notranslate"><span class="pre">growing_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.swap_mutation"><code class="docutils literal notranslate"><span class="pre">swap_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.shrink_mutation"><code class="docutils literal notranslate"><span class="pre">shrink_mutation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/random.html">random</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.sattolo_shuffle"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.sattolo_shuffle_2d"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle_2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.numba_seed"><code class="docutils literal notranslate"><span class="pre">numba_seed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.cauchy_distribution"><code class="docutils literal notranslate"><span class="pre">cauchy_distribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.random_weighted_sample"><code class="docutils literal notranslate"><span class="pre">random_weighted_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.random_sample"><code class="docutils literal notranslate"><span class="pre">random_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.flip_coin"><code class="docutils literal notranslate"><span class="pre">flip_coin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.uniform"><code class="docutils literal notranslate"><span class="pre">uniform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.randint"><code class="docutils literal notranslate"><span class="pre">randint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.check_random_state"><code class="docutils literal notranslate"><span class="pre">check_random_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.generator1"><code class="docutils literal notranslate"><span class="pre">generator1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.generator2"><code class="docutils literal notranslate"><span class="pre">generator2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/transformations.html">transformations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.minmax_scale"><code class="docutils literal notranslate"><span class="pre">minmax_scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.SamplingGrid"><code class="docutils literal notranslate"><span class="pre">SamplingGrid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.GrayCode"><code class="docutils literal notranslate"><span class="pre">GrayCode</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Thefittest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+          <li class="breadcrumb-item"><a href="../benchmarks.html">Benchmarks</a></li>
+      <li class="breadcrumb-item active">Optimization Functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/benchmarks/optfunctions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="optimization-functions">
+<h1>Optimization Functions<a class="headerlink" href="#optimization-functions" title="Link to this heading"></a></h1>
+<section id="basic-test-functions">
+<h2>Basic Test Functions<a class="headerlink" href="#basic-test-functions" title="Link to this heading"></a></h2>
+<p>These are classic benchmark functions for testing continuous optimization algorithms.
+Each function has different characteristics (unimodal/multimodal, separable/non-separable)
+that challenge different aspects of optimization algorithms.</p>
+<section id="onemax">
+<h3>OneMax<a class="headerlink" href="#onemax" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.OneMax">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">OneMax</span></span><a class="headerlink" href="#thefittest.benchmarks.OneMax" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestFunction</span></code></p>
+<p>OneMax function - simple sum of all variables.</p>
+<p>A basic test function that simply sums all input variables.
+The global minimum is at x = [0, 0, …, 0] with f(x) = 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, n_dimensions)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.OneMax.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.OneMax.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.OneMax.build_grid">
+<span class="sig-name descname"><span class="pre">build_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.OneMax.build_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="sphere">
+<h3>Sphere<a class="headerlink" href="#sphere" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Sphere">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">Sphere</span></span><a class="headerlink" href="#thefittest.benchmarks.Sphere" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestFunction</span></code></p>
+<p>Sphere function - simple quadratic function.</p>
+<p>One of the simplest optimization test functions. It is continuous,
+convex, and unimodal. The global minimum is at x = [0, 0, …, 0]
+with f(x) = 0.</p>
+<p>Formula: f(x) = sum(x_i^2)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, n_dimensions)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Sphere.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Sphere.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Sphere.build_grid">
+<span class="sig-name descname"><span class="pre">build_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Sphere.build_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="schwefe1-2">
+<h3>Schwefe1_2<a class="headerlink" href="#schwefe1-2" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Schwefe1_2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">Schwefe1_2</span></span><a class="headerlink" href="#thefittest.benchmarks.Schwefe1_2" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestFunction</span></code></p>
+<p>Schwefel’s Problem 1.2.</p>
+<p>A unimodal function with a single global minimum. The variables are
+not separable, which makes it harder to optimize than the Sphere function.
+The global minimum is at x = [0, 0, …, 0] with f(x) = 0.</p>
+<p>Formula: f(x) = sum_{i=1}^n (sum_{j=1}^i x_j)^2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, n_dimensions)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Schwefe1_2.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Schwefe1_2.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Schwefe1_2.build_grid">
+<span class="sig-name descname"><span class="pre">build_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Schwefe1_2.build_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="highconditionedelliptic">
+<h3>HighConditionedElliptic<a class="headerlink" href="#highconditionedelliptic" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.HighConditionedElliptic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">HighConditionedElliptic</span></span><a class="headerlink" href="#thefittest.benchmarks.HighConditionedElliptic" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestFunction</span></code></p>
+<p>High Conditioned Elliptic function.</p>
+<p>A unimodal function with high condition number, making it difficult
+for optimization algorithms that are sensitive to the scaling of variables.
+The global minimum is at x = [0, 0, …, 0] with f(x) = 0.</p>
+<p>Formula: f(x) = sum_{i=1}^n (10^6)^((i-1)/(n-1)) * x_i^2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, n_dimensions)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.HighConditionedElliptic.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.HighConditionedElliptic.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.HighConditionedElliptic.build_grid">
+<span class="sig-name descname"><span class="pre">build_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.HighConditionedElliptic.build_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="rosenbrock">
+<h3>Rosenbrock<a class="headerlink" href="#rosenbrock" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Rosenbrock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">Rosenbrock</span></span><a class="headerlink" href="#thefittest.benchmarks.Rosenbrock" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestFunction</span></code></p>
+<p>Rosenbrock function (De Jong’s function 2, Valley function).</p>
+<p>A classic optimization test function with a narrow, parabolic valley.
+The global minimum is inside a long, narrow, parabolic shaped flat valley.
+Finding the valley is trivial, but convergence to the global minimum is
+difficult. The global minimum is at x = [1, 1, …, 1] with f(x) = 0.</p>
+<p>Formula: f(x) = sum_{i=1}^{n-1} [100(x_{i+1} - x_i^2)^2 + (x_i - 1)^2]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, n_dimensions)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Rosenbrock.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Rosenbrock.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Rosenbrock.build_grid">
+<span class="sig-name descname"><span class="pre">build_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Rosenbrock.build_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="rastrigin">
+<h3>Rastrigin<a class="headerlink" href="#rastrigin" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Rastrigin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">Rastrigin</span></span><a class="headerlink" href="#thefittest.benchmarks.Rastrigin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestFunction</span></code></p>
+<p>Rastrigin function.</p>
+<p>A highly multimodal function with a large number of local minima.
+The function is based on the Sphere function with added cosine modulation
+to create the local minima. The global minimum is at x = [0, 0, …, 0]
+with f(x) = 0.</p>
+<p>Formula: f(x) = 10n + sum_{i=1}^n [x_i^2 - 10*cos(2*pi*x_i)]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, n_dimensions)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Rastrigin.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Rastrigin.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Rastrigin.build_grid">
+<span class="sig-name descname"><span class="pre">build_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Rastrigin.build_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="griewank">
+<h3>Griewank<a class="headerlink" href="#griewank" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Griewank">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">Griewank</span></span><a class="headerlink" href="#thefittest.benchmarks.Griewank" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestFunction</span></code></p>
+<p>Griewank function.</p>
+<p>A multimodal function with many widespread local minima. The number and
+positioning of local minima is space dependent. The global minimum is
+at x = [0, 0, …, 0] with f(x) = 0.</p>
+<p>Formula: f(x) = 1 + sum_{i=1}^n x_i^2/4000 - prod_{i=1}^n cos(x_i/sqrt(i))</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, n_dimensions)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Griewank.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Griewank.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Griewank.build_grid">
+<span class="sig-name descname"><span class="pre">build_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Griewank.build_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="ackley">
+<h3>Ackley<a class="headerlink" href="#ackley" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Ackley">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">Ackley</span></span><a class="headerlink" href="#thefittest.benchmarks.Ackley" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestFunction</span></code></p>
+<p>Ackley function.</p>
+<p>A multimodal function with many local minima and a single global minimum.
+It is characterized by a nearly flat outer region and a large hole at the
+center. The global minimum is at x = [0, 0, …, 0] with f(x) = 0.</p>
+<p>Formula: f(x) = -a*exp(-b*sqrt(sum(x_i^2)/n)) - exp(sum(cos(c*x_i))/n) + a + e
+where a=20, b=0.2, c=2*pi</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, n_dimensions)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Ackley.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Ackley.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Ackley.build_grid">
+<span class="sig-name descname"><span class="pre">build_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Ackley.build_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="weierstrass">
+<h3>Weierstrass<a class="headerlink" href="#weierstrass" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Weierstrass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">Weierstrass</span></span><a class="headerlink" href="#thefittest.benchmarks.Weierstrass" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestFunction</span></code></p>
+<p>Weierstrass function.</p>
+<p>A continuous but nowhere differentiable function with a fractal structure.
+It is highly multimodal with many local optima. The global minimum is
+at x = [0, 0, …, 0].</p>
+<dl class="simple">
+<dt>Formula: f(x) = sum_{i=1}^n sum_{k=0}^{k_max} [a^k * cos(2*pi*b^k*(x_i+0.5))]</dt><dd><ul class="simple">
+<li><p>n*sum_{k=0}^{k_max} [a^k * cos(2*pi*b^k*0.5)]</p></li>
+</ul>
+</dd>
+</dl>
+<p>where a=0.5, b=3, k_max=20</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>Input array of shape (n_samples, n_dimensions)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Function values of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Weierstrass.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Weierstrass.f" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.Weierstrass.build_grid">
+<span class="sig-name descname"><span class="pre">build_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.Weierstrass.build_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="datasets.html" class="btn btn-neutral float-left" title="ML Datasets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cec2005.html" class="btn btn-neutral float-right" title="CEC2005 Benchmark Suite" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Pavel Sherstnev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

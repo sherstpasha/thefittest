@@ -45,9 +45,9 @@
       <div class="module-card">
          <h3>Classifiers</h3>
          <p class="module-items">
-            <a href="modules/classifiers.html#thefittest.classifiers.GPClassifier">GPClassifier</a>, 
+            <a href="modules/classifiers.html#thefittest.classifiers.GPClassifier">GeneticProgrammingClassifier</a>, 
             <a href="modules/classifiers.html#thefittest.classifiers.MLPEAClassifier">MLPEAClassifier</a>, 
-            <a href="modules/classifiers.html#thefittest.classifiers.GPNNClassifier">GPNNClassifier</a>
+            <a href="modules/classifiers.html#thefittest.classifiers.GPNNClassifier">GeneticProgrammingClassifier</a>
          </p>
          <a href="modules/classifiers.html" class="module-card-arrow">View documentation →</a>
       </div>
@@ -55,16 +55,20 @@
       <div class="module-card">
          <h3>Regressors</h3>
          <p class="module-items">
-            <a href="modules/regressors.html#thefittest.regressors.GPRegressor">GPRegressor</a>, 
+            <a href="modules/regressors.html#thefittest.regressors.GPRegressor">GeneticProgrammingRegressor</a>, 
             <a href="modules/regressors.html#thefittest.regressors.MLPEARegressor">MLPEARegressor</a>, 
-            <a href="modules/regressors.html#thefittest.regressors.GPNNRegressor">GPNNRegressor</a>
+            <a href="modules/regressors.html#thefittest.regressors.GPNNRegressor">GeneticProgrammingRegressor</a>
          </p>
          <a href="modules/regressors.html" class="module-card-arrow">View documentation →</a>
       </div>
       
       <div class="module-card">
          <h3>Benchmarks</h3>
-         <p>CEC2005 functions, symbolic regression datasets, ML classification datasets</p>
+         <p class="module-items">
+            <a href="modules/benchmarks.html#ml-datasets">ML Datasets</a>, 
+            <a href="modules/benchmarks.html#optimization-functions">Optimization Functions</a>, 
+            <a href="modules/benchmarks.html#benchmark-suites">Benchmark Suites</a>
+         </p>
          <a href="modules/benchmarks.html" class="module-card-arrow">View documentation →</a>
       </div>
 

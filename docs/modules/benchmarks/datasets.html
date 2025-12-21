@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ML Datasets &mdash; Thefittest 0.2.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=db5433e6" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=a47416a6"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Optimization Functions" href="optfunctions.html" />
+    <link rel="prev" title="Benchmarks" href="../benchmarks.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Thefittest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../benchmarks.html">Benchmarks</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#overview">Overview</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../benchmarks.html#contents">Contents</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">ML Datasets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optfunctions.html">Optimization Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cec2005.html">CEC2005 Benchmark Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="symbolicregression.html">Symbolic Regression Benchmark</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#quick-start">Quick Start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#module-thefittest.benchmarks">Module Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.BanknoteDataset"><code class="docutils literal notranslate"><span class="pre">BanknoteDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.BreastCancerDataset"><code class="docutils literal notranslate"><span class="pre">BreastCancerDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.CreditRiskDataset"><code class="docutils literal notranslate"><span class="pre">CreditRiskDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.DigitsDataset"><code class="docutils literal notranslate"><span class="pre">DigitsDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.IrisDataset"><code class="docutils literal notranslate"><span class="pre">IrisDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.UserKnowladgeDataset"><code class="docutils literal notranslate"><span class="pre">UserKnowladgeDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.WineDataset"><code class="docutils literal notranslate"><span class="pre">WineDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Ackley"><code class="docutils literal notranslate"><span class="pre">Ackley</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Griewank"><code class="docutils literal notranslate"><span class="pre">Griewank</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.HighConditionedElliptic"><code class="docutils literal notranslate"><span class="pre">HighConditionedElliptic</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.OneMax"><code class="docutils literal notranslate"><span class="pre">OneMax</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Rastrigin"><code class="docutils literal notranslate"><span class="pre">Rastrigin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Rosenbrock"><code class="docutils literal notranslate"><span class="pre">Rosenbrock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Schwefe1_2"><code class="docutils literal notranslate"><span class="pre">Schwefe1_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Sphere"><code class="docutils literal notranslate"><span class="pre">Sphere</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#thefittest.benchmarks.Weierstrass"><code class="docutils literal notranslate"><span class="pre">Weierstrass</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../classifiers.html">classifiers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#genetic-programming-classifiers">Genetic Programming Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#geneticprogrammingclassifier">GeneticProgrammingClassifier</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#neural-network-classifiers">Neural Network Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#mlpeaclassifier">MLPEAClassifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#geneticprogrammingneuralnetclassifier">GeneticProgrammingNeuralNetClassifier</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../optimizers.html">optimizers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#differential-evolution-optimizers">Differential Evolution Optimizers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#differentialevolution">DifferentialEvolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#jde">jDE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#shade">SHADE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#genetic-algorithms">Genetic Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#geneticalgorithm">GeneticAlgorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#shaga">SHAGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#selfcga">SelfCGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#pdpga">PDPGA</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#genetic-programming">Genetic Programming</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#geneticprogramming">GeneticProgramming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#pdpgp">PDPGP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#selfcgp">SelfCGP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../regressors.html">regressors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#genetic-programming-regressors">Genetic Programming Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#geneticprogrammingregressor">GeneticProgrammingRegressor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#neural-network-regressors">Neural Network Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#mlpearegressor">MLPEARegressor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#geneticprogrammingneuralnetregressor">GeneticProgrammingNeuralNetRegressor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../utils/index.html">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../utils/selections.html">selections</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.proportional_selection"><code class="docutils literal notranslate"><span class="pre">proportional_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.rank_selection"><code class="docutils literal notranslate"><span class="pre">rank_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/selections.html#thefittest.utils.selections.tournament_selection"><code class="docutils literal notranslate"><span class="pre">tournament_selection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/crossovers.html">crossovers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.empty_crossover"><code class="docutils literal notranslate"><span class="pre">empty_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.binomialGA"><code class="docutils literal notranslate"><span class="pre">binomialGA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.one_point_crossover"><code class="docutils literal notranslate"><span class="pre">one_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.two_point_crossover"><code class="docutils literal notranslate"><span class="pre">two_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.binomial"><code class="docutils literal notranslate"><span class="pre">binomial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.empty_crossoverGP"><code class="docutils literal notranslate"><span class="pre">empty_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.standard_crossover"><code class="docutils literal notranslate"><span class="pre">standard_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.one_point_crossoverGP"><code class="docutils literal notranslate"><span class="pre">one_point_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_crossoverGP"><code class="docutils literal notranslate"><span class="pre">uniform_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover_GP()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/mutations.html">mutations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.flip_mutation"><code class="docutils literal notranslate"><span class="pre">flip_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.best_1"><code class="docutils literal notranslate"><span class="pre">best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_1"><code class="docutils literal notranslate"><span class="pre">rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_to_best1"><code class="docutils literal notranslate"><span class="pre">rand_to_best1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_best_1"><code class="docutils literal notranslate"><span class="pre">current_to_best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.best_2"><code class="docutils literal notranslate"><span class="pre">best_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.rand_2"><code class="docutils literal notranslate"><span class="pre">rand_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_rand_1"><code class="docutils literal notranslate"><span class="pre">current_to_rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive_p_min"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive_p_min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.point_mutation"><code class="docutils literal notranslate"><span class="pre">point_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.growing_mutation"><code class="docutils literal notranslate"><span class="pre">growing_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.swap_mutation"><code class="docutils literal notranslate"><span class="pre">swap_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/mutations.html#thefittest.utils.mutations.shrink_mutation"><code class="docutils literal notranslate"><span class="pre">shrink_mutation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/random.html">random</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.sattolo_shuffle"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.sattolo_shuffle_2d"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle_2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.numba_seed"><code class="docutils literal notranslate"><span class="pre">numba_seed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.cauchy_distribution"><code class="docutils literal notranslate"><span class="pre">cauchy_distribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.random_weighted_sample"><code class="docutils literal notranslate"><span class="pre">random_weighted_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.random_sample"><code class="docutils literal notranslate"><span class="pre">random_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.flip_coin"><code class="docutils literal notranslate"><span class="pre">flip_coin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.uniform"><code class="docutils literal notranslate"><span class="pre">uniform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.randint"><code class="docutils literal notranslate"><span class="pre">randint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.check_random_state"><code class="docutils literal notranslate"><span class="pre">check_random_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.generator1"><code class="docutils literal notranslate"><span class="pre">generator1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/random.html#thefittest.utils.random.generator2"><code class="docutils literal notranslate"><span class="pre">generator2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/transformations.html">transformations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.minmax_scale"><code class="docutils literal notranslate"><span class="pre">minmax_scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.SamplingGrid"><code class="docutils literal notranslate"><span class="pre">SamplingGrid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/transformations.html#thefittest.utils.transformations.GrayCode"><code class="docutils literal notranslate"><span class="pre">GrayCode</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Thefittest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+          <li class="breadcrumb-item"><a href="../benchmarks.html">Benchmarks</a></li>
+      <li class="breadcrumb-item active">ML Datasets</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/benchmarks/datasets.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ml-datasets">
+<h1>ML Datasets<a class="headerlink" href="#ml-datasets" title="Link to this heading"></a></h1>
+<section id="classification-datasets">
+<h2>Classification Datasets<a class="headerlink" href="#classification-datasets" title="Link to this heading"></a></h2>
+<p>This section contains various classification datasets from the UCI Machine Learning Repository and other sources.</p>
+<section id="irisdataset">
+<h3>IrisDataset<a class="headerlink" href="#irisdataset" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.IrisDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">IrisDataset</span></span><a class="headerlink" href="#thefittest.benchmarks.IrisDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>The Iris dataset - one of the most famous datasets in machine learning.</p>
+<p>Contains measurements of iris flowers from three different species.</p>
+<dl class="simple">
+<dt>Features (4):</dt><dd><ul class="simple">
+<li><p>sepal length in cm</p></li>
+<li><p>sepal width in cm</p></li>
+<li><p>petal length in cm</p></li>
+<li><p>petal width in cm</p></li>
+</ul>
+</dd>
+<dt>Classes (3):</dt><dd><ul class="simple">
+<li><p>Iris-setosa (0)</p></li>
+<li><p>Iris-versicolor (1)</p></li>
+<li><p>Iris-virginica (2)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Samples: 150 (50 per class)</p>
+<p class="rubric">References</p>
+<p>Fisher R. A.. (1988). Iris. UCI Machine Learning Repository.
+<a class="reference external" href="https://doi.org/10.24432/C56C76">https://doi.org/10.24432/C56C76</a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.IrisDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#thefittest.benchmarks.IrisDataset.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.IrisDataset.get_X">
+<span class="sig-name descname"><span class="pre">get_X</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.IrisDataset.get_X" title="Link to this definition"></a></dt>
+<dd><p>Get feature matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Feature matrix of shape (n_samples, n_features)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.IrisDataset.get_X_names">
+<span class="sig-name descname"><span class="pre">get_X_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.IrisDataset.get_X_names" title="Link to this definition"></a></dt>
+<dd><p>Get feature names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping feature indices to feature names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.IrisDataset.get_y">
+<span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.IrisDataset.get_y" title="Link to this definition"></a></dt>
+<dd><p>Get target values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[Union[np.int64, np.float64]]</dt><dd><p>Target array of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.IrisDataset.get_y_names">
+<span class="sig-name descname"><span class="pre">get_y_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.IrisDataset.get_y_names" title="Link to this definition"></a></dt>
+<dd><p>Get class/target names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping class indices to class names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="winedataset">
+<h3>WineDataset<a class="headerlink" href="#winedataset" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.WineDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">WineDataset</span></span><a class="headerlink" href="#thefittest.benchmarks.WineDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>Wine recognition dataset.</p>
+<p>Contains results of a chemical analysis of wines grown in the same region
+in Italy but derived from three different cultivars.</p>
+<dl class="simple">
+<dt>Features (13):</dt><dd><ul class="simple">
+<li><p>Alcohol</p></li>
+<li><p>Malic acid</p></li>
+<li><p>Ash</p></li>
+<li><p>Alcalinity of ash</p></li>
+<li><p>Magnesium</p></li>
+<li><p>Total phenols</p></li>
+<li><p>Flavanoids</p></li>
+<li><p>Nonflavanoid phenols</p></li>
+<li><p>Proanthocyanins</p></li>
+<li><p>Color intensity</p></li>
+<li><p>Hue</p></li>
+<li><p>OD280/OD315 of diluted wines</p></li>
+<li><p>Proline</p></li>
+</ul>
+</dd>
+</dl>
+<p>Classes (3): class 1 (0), class 2 (1), class 3 (2)</p>
+<p>Samples: 178</p>
+<p class="rubric">References</p>
+<p>Aeberhard, Stefan and Forina, M.. (1991). Wine. UCI Machine
+Learning Repository. <a class="reference external" href="https://doi.org/10.24432/C5PC7J">https://doi.org/10.24432/C5PC7J</a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.WineDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#thefittest.benchmarks.WineDataset.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.WineDataset.get_X">
+<span class="sig-name descname"><span class="pre">get_X</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.WineDataset.get_X" title="Link to this definition"></a></dt>
+<dd><p>Get feature matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Feature matrix of shape (n_samples, n_features)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.WineDataset.get_X_names">
+<span class="sig-name descname"><span class="pre">get_X_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.WineDataset.get_X_names" title="Link to this definition"></a></dt>
+<dd><p>Get feature names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping feature indices to feature names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.WineDataset.get_y">
+<span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.WineDataset.get_y" title="Link to this definition"></a></dt>
+<dd><p>Get target values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[Union[np.int64, np.float64]]</dt><dd><p>Target array of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.WineDataset.get_y_names">
+<span class="sig-name descname"><span class="pre">get_y_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.WineDataset.get_y_names" title="Link to this definition"></a></dt>
+<dd><p>Get class/target names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping class indices to class names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="breastcancerdataset">
+<h3>BreastCancerDataset<a class="headerlink" href="#breastcancerdataset" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BreastCancerDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">BreastCancerDataset</span></span><a class="headerlink" href="#thefittest.benchmarks.BreastCancerDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>Breast Cancer Wisconsin (Diagnostic) dataset.</p>
+<p>Contains features computed from digitized images of fine needle aspirate (FNA)
+of breast masses. They describe characteristics of the cell nuclei present
+in the image.</p>
+<dl class="simple">
+<dt>Features (30):</dt><dd><p>Ten real-valued features computed for each cell nucleus:</p>
+<ul class="simple">
+<li><p>Mean: radius, texture, perimeter, area, smoothness, compactness,
+concavity, concave points, symmetry, fractal dimension</p></li>
+<li><p>Error: radius error, texture error, perimeter error, area error,
+smoothness error, compactness error, concavity error,
+concave points error, symmetry error, fractal dimension error</p></li>
+<li><p>Worst: worst radius, texture, perimeter, area, smoothness,
+compactness, concavity, concave points, symmetry, fractal dimension</p></li>
+</ul>
+</dd>
+</dl>
+<p>Classes (2): M (malignant, 0), B (benign, 1)</p>
+<p>Samples: 569</p>
+<p class="rubric">References</p>
+<p>Wolberg, William, Mangasarian, Olvi, Street, Nick, and Street, W.. (1995).
+Breast Cancer Wisconsin (Diagnostic). UCI Machine Learning Repository.
+<a class="reference external" href="https://doi.org/10.24432/C5DW2B">https://doi.org/10.24432/C5DW2B</a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BreastCancerDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#thefittest.benchmarks.BreastCancerDataset.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BreastCancerDataset.get_X">
+<span class="sig-name descname"><span class="pre">get_X</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.BreastCancerDataset.get_X" title="Link to this definition"></a></dt>
+<dd><p>Get feature matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Feature matrix of shape (n_samples, n_features)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BreastCancerDataset.get_X_names">
+<span class="sig-name descname"><span class="pre">get_X_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.BreastCancerDataset.get_X_names" title="Link to this definition"></a></dt>
+<dd><p>Get feature names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping feature indices to feature names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BreastCancerDataset.get_y">
+<span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.BreastCancerDataset.get_y" title="Link to this definition"></a></dt>
+<dd><p>Get target values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[Union[np.int64, np.float64]]</dt><dd><p>Target array of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BreastCancerDataset.get_y_names">
+<span class="sig-name descname"><span class="pre">get_y_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.BreastCancerDataset.get_y_names" title="Link to this definition"></a></dt>
+<dd><p>Get class/target names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping class indices to class names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="digitsdataset">
+<h3>DigitsDataset<a class="headerlink" href="#digitsdataset" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.DigitsDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">DigitsDataset</span></span><a class="headerlink" href="#thefittest.benchmarks.DigitsDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>Optical Recognition of Handwritten Digits dataset.</p>
+<p>Contains normalized bitmaps of handwritten digits from 0 to 9.</p>
+<p>Features (64): 8x8 pixel values (0-16)</p>
+<p>Classes (10): Digits 0-9</p>
+<p>Samples: 5620</p>
+<p class="rubric">References</p>
+<p>Alpaydin, E. and Kaynak, C.. (1998). Optical Recognition of Handwritten Digits.
+UCI Machine Learning Repository. <a class="reference external" href="https://doi.org/10.24432/C50P49">https://doi.org/10.24432/C50P49</a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.DigitsDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#thefittest.benchmarks.DigitsDataset.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.DigitsDataset.get_X">
+<span class="sig-name descname"><span class="pre">get_X</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.DigitsDataset.get_X" title="Link to this definition"></a></dt>
+<dd><p>Get feature matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Feature matrix of shape (n_samples, n_features)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.DigitsDataset.get_X_names">
+<span class="sig-name descname"><span class="pre">get_X_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.DigitsDataset.get_X_names" title="Link to this definition"></a></dt>
+<dd><p>Get feature names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping feature indices to feature names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.DigitsDataset.get_y">
+<span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.DigitsDataset.get_y" title="Link to this definition"></a></dt>
+<dd><p>Get target values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[Union[np.int64, np.float64]]</dt><dd><p>Target array of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.DigitsDataset.get_y_names">
+<span class="sig-name descname"><span class="pre">get_y_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.DigitsDataset.get_y_names" title="Link to this definition"></a></dt>
+<dd><p>Get class/target names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping class indices to class names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="creditriskdataset">
+<h3>CreditRiskDataset<a class="headerlink" href="#creditriskdataset" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.CreditRiskDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">CreditRiskDataset</span></span><a class="headerlink" href="#thefittest.benchmarks.CreditRiskDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>Credit Risk dataset.</p>
+<p>For predicting whether a client is a good or bad credit risk based on
+financial information.</p>
+<dl class="simple">
+<dt>Features (3):</dt><dd><ul class="simple">
+<li><p>income</p></li>
+<li><p>age</p></li>
+<li><p>loan</p></li>
+</ul>
+</dd>
+</dl>
+<p>Classes (2): good client (0), bad client (1)</p>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://www.kaggle.com/datasets/upadorprofzs/credit-risk">https://www.kaggle.com/datasets/upadorprofzs/credit-risk</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.CreditRiskDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#thefittest.benchmarks.CreditRiskDataset.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.CreditRiskDataset.get_X">
+<span class="sig-name descname"><span class="pre">get_X</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.CreditRiskDataset.get_X" title="Link to this definition"></a></dt>
+<dd><p>Get feature matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Feature matrix of shape (n_samples, n_features)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.CreditRiskDataset.get_X_names">
+<span class="sig-name descname"><span class="pre">get_X_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.CreditRiskDataset.get_X_names" title="Link to this definition"></a></dt>
+<dd><p>Get feature names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping feature indices to feature names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.CreditRiskDataset.get_y">
+<span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.CreditRiskDataset.get_y" title="Link to this definition"></a></dt>
+<dd><p>Get target values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[Union[np.int64, np.float64]]</dt><dd><p>Target array of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.CreditRiskDataset.get_y_names">
+<span class="sig-name descname"><span class="pre">get_y_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.CreditRiskDataset.get_y_names" title="Link to this definition"></a></dt>
+<dd><p>Get class/target names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping class indices to class names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="userknowladgedataset">
+<h3>UserKnowladgeDataset<a class="headerlink" href="#userknowladgedataset" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.UserKnowladgeDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">UserKnowladgeDataset</span></span><a class="headerlink" href="#thefittest.benchmarks.UserKnowladgeDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>User Knowledge Modeling dataset.</p>
+<p>Real dataset about students’ knowledge status about the subject of
+Electrical DC Machines.</p>
+<dl class="simple">
+<dt>Features (5):</dt><dd><ul class="simple">
+<li><p>STG: The degree of study time for goal object materials</p></li>
+<li><p>SCG: The degree of repetition number of user for goal object materials</p></li>
+<li><p>STR: The degree of study time of user for related objects with goal object</p></li>
+<li><p>LPR: The exam performance of user for related objects with goal object</p></li>
+<li><p>PEG: The exam performance of user for goal objects</p></li>
+</ul>
+</dd>
+</dl>
+<p>Classes (4): Very Low (0), Low (1), Middle (2), High (3)</p>
+<p>Samples: 403</p>
+<p class="rubric">References</p>
+<p>Kahraman, Hamdi, Colak, Ilhami, and Sagiroglu, Seref. (2013).
+User Knowledge Modeling. UCI Machine Learning Repository.
+<a class="reference external" href="https://doi.org/10.24432/C5231X">https://doi.org/10.24432/C5231X</a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.UserKnowladgeDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#thefittest.benchmarks.UserKnowladgeDataset.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.UserKnowladgeDataset.get_X">
+<span class="sig-name descname"><span class="pre">get_X</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.UserKnowladgeDataset.get_X" title="Link to this definition"></a></dt>
+<dd><p>Get feature matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Feature matrix of shape (n_samples, n_features)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.UserKnowladgeDataset.get_X_names">
+<span class="sig-name descname"><span class="pre">get_X_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.UserKnowladgeDataset.get_X_names" title="Link to this definition"></a></dt>
+<dd><p>Get feature names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping feature indices to feature names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.UserKnowladgeDataset.get_y">
+<span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.UserKnowladgeDataset.get_y" title="Link to this definition"></a></dt>
+<dd><p>Get target values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[Union[np.int64, np.float64]]</dt><dd><p>Target array of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.UserKnowladgeDataset.get_y_names">
+<span class="sig-name descname"><span class="pre">get_y_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.UserKnowladgeDataset.get_y_names" title="Link to this definition"></a></dt>
+<dd><p>Get class/target names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping class indices to class names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<hr class="docutils" />
+<section id="banknotedataset">
+<h3>BanknoteDataset<a class="headerlink" href="#banknotedataset" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BanknoteDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.benchmarks.</span></span><span class="sig-name descname"><span class="pre">BanknoteDataset</span></span><a class="headerlink" href="#thefittest.benchmarks.BanknoteDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>Banknote authentication dataset.</p>
+<p>Data extracted from images taken for the evaluation of an authentication
+procedure for banknotes.</p>
+<dl class="simple">
+<dt>Features (4):</dt><dd><ul class="simple">
+<li><p>variance of Wavelet Transformed image (continuous)</p></li>
+<li><p>skewness of Wavelet Transformed image (continuous)</p></li>
+<li><p>curtosis of Wavelet Transformed image (continuous)</p></li>
+<li><p>entropy of image (continuous)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Classes (2): not original (0), original (1)</p>
+<p>Samples: 1372</p>
+<p class="rubric">References</p>
+<p>Lohweg, Volker. (2013). banknote authentication.
+UCI Machine Learning Repository. <a class="reference external" href="https://doi.org/10.24432/C55P57">https://doi.org/10.24432/C55P57</a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BanknoteDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#thefittest.benchmarks.BanknoteDataset.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BanknoteDataset.get_X">
+<span class="sig-name descname"><span class="pre">get_X</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.BanknoteDataset.get_X" title="Link to this definition"></a></dt>
+<dd><p>Get feature matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>Feature matrix of shape (n_samples, n_features)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BanknoteDataset.get_X_names">
+<span class="sig-name descname"><span class="pre">get_X_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.BanknoteDataset.get_X_names" title="Link to this definition"></a></dt>
+<dd><p>Get feature names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping feature indices to feature names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BanknoteDataset.get_y">
+<span class="sig-name descname"><span class="pre">get_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.BanknoteDataset.get_y" title="Link to this definition"></a></dt>
+<dd><p>Get target values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>NDArray[Union[np.int64, np.float64]]</dt><dd><p>Target array of shape (n_samples,)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.benchmarks.BanknoteDataset.get_y_names">
+<span class="sig-name descname"><span class="pre">get_y_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.benchmarks.BanknoteDataset.get_y_names" title="Link to this definition"></a></dt>
+<dd><p>Get class/target names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Dict[int, str]</dt><dd><p>Dictionary mapping class indices to class names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../benchmarks.html" class="btn btn-neutral float-left" title="Benchmarks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="optfunctions.html" class="btn btn-neutral float-right" title="Optimization Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Pavel Sherstnev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

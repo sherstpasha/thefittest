@@ -93,6 +93,12 @@ exclude_patterns = []
 
 html_theme = "sphinx_rtd_theme"
 
+# RTD Theme options
+html_theme_options = {
+    "collapse_navigation": False,  # Keep navigation expanded
+    "navigation_depth": 4,  # Show 4 levels of hierarchy
+    "titles_only": False,  # Show all sections in TOC
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
