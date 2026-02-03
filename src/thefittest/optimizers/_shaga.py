@@ -209,29 +209,51 @@ class SHAGA(EvolutionaryAlgorithm):
         self._population_ph_i = self._get_phenotype(self._population_g_i)
         self._fitness_i = self._get_fitness(self._population_ph_i)
 
-    def _randc(self: SHAGA, u: float, scale: float) -> NDArray[np.float64]:
+    def _randc(
+        self: SHAGA,
+        u: float,
+        scale: float,
+        lower: float = 0.0,
+        upper: float = 1.0,
+    ) -> NDArray[np.float64]:
         value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
-        while value <= 0 or value > 5 / self._str_len:
+        while value <= lower or value > upper:
             value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
+
         return value
 
-    def _randn(self: SHAGA, u: float, scale: float) -> float:
+    def _randn(
+        self: SHAGA,
+        u: float,
+        scale: float,
+        lower: float = 0.0,
+        upper: float = 1.0,
+    ) -> float:
         value = cauchy_distribution(loc=u, scale=scale, size=1)[0]
-        if value < 0:
-            value = 0
-        elif value > 1:
-            value = 1
+        if value < lower:
+            value = lower
+        elif value > upper:
+            value = upper
         return value
 
-    def _generate_MR_CR(self: SHAGA) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+    def _generate_MR_CR(
+        self: SHAGA,
+        randc_scale: float,
+        randc_lower: float,
+        randc_upper: float,
+        randn_scale: float,
+        randn_lower: float,
+        randn_upper: float,
+    ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+
         MR_i = np.zeros(self._pop_size)
         CR_i = np.zeros(self._pop_size)
         for i in range(self._pop_size):
             r_i = randint(0, self._H_size, 1)[0]
             u_MR = self._H_MR[r_i]
             u_CR = self._H_CR[r_i]
-            MR_i[i] = self._randc(u_MR, 0.1 / self._str_len)
-            CR_i[i] = self._randn(u_CR, 0.1)
+            MR_i[i] = self._randc(u=u_MR, scale=randc_scale, lower=randc_lower, upper=randc_upper)
+            CR_i[i] = self._randn(u=u_CR, scale=randn_scale, lower=randn_lower, upper=randn_upper)
         return MR_i, CR_i
 
     def _update_u(self: SHAGA, u: float, S: NDArray[np.float64], df: NDArray[np.float64]) -> float:
@@ -254,15 +276,48 @@ class SHAGA(EvolutionaryAlgorithm):
         mutant = flip_mutation(offspring, MR)
         return mutant
 
+    def _replace_population(
+        self,
+        mutant_g: NDArray,
+        mutant_ph: NDArray,
+        mutant_fit: NDArray,
+    ) -> Tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+        mask = mutant_fit >= self._fitness_i
+        succeses = mutant_fit > self._fitness_i
+
+        succeses_MR = self._MR[succeses]
+        succeses_CR = self._CR[succeses]
+
+        will_be_replaced_fit = self._fitness_i[succeses].copy()
+
+        self._population_g_i[mask] = mutant_g[mask]
+        self._population_ph_i[mask] = mutant_ph[mask]
+        self._fitness_i[mask] = mutant_fit[mask]
+
+        d_fitness = np.abs(will_be_replaced_fit - self._fitness_i[succeses])
+        d_fitness[d_fitness == np.inf] = 1e4
+
+        return succeses_MR, succeses_CR, d_fitness
+
     def _get_new_population(self: SHAGA) -> None:
-        get_new_individ_g = partial(
-            self._get_new_individ_g,
+        get_new_individ_g = partial(self._get_new_individ_g)
+
+        self._MR, self._CR = self._generate_MR_CR(
+            randc_scale=0.1 / self._str_len,
+            randc_lower=0.0,
+            randc_upper=5 / self._str_len,
+            randn_scale=0.1,
+            randn_lower=0.0,
+            randn_upper=1.0,
         )
-        self._MR, self._CR = self._generate_MR_CR()
 
         mutant_cr_b_g = np.array(
             [
-                get_new_individ_g(individ_g=self._population_g_i[i], MR=self._MR[i], CR=self._CR[i])
+                get_new_individ_g(
+                    individ_g=self._population_g_i[i],
+                    MR=self._MR[i],
+                    CR=self._CR[i],
+                )
                 for i in range(self._pop_size)
             ],
             dtype=np.float64,
@@ -270,32 +325,17 @@ class SHAGA(EvolutionaryAlgorithm):
 
         mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)
         mutant_cr_fit = self._get_fitness(mutant_cr_ph)
-        mask = mutant_cr_fit >= self._fitness_i
-        succeses = mutant_cr_fit > self._fitness_i
 
-        succeses_MR = self._MR[succeses]
-        succeses_CR = self._CR[succeses]
+        succeses_MR, succeses_CR, d_fitness = self._replace_population(
+            mutant_cr_b_g,
+            mutant_cr_ph,
+            mutant_cr_fit,
+        )
 
-        will_be_replaced_fit = self._fitness_i[succeses].copy()
-
-        self._population_g_i[mask] = mutant_cr_b_g[mask]
-        self._population_ph_i[mask] = mutant_cr_ph[mask]
-        self._fitness_i[mask] = mutant_cr_fit[mask]
-
-        d_fitness = np.abs(will_be_replaced_fit - self._fitness_i[succeses])
-
-        if self._k + 1 == self._H_size:
-            next_k = 0
-        else:
-            next_k = self._k + 1
-
+        next_k = (self._k + 1) % self._H_size
         self._H_MR[next_k] = self._update_u(self._H_MR[self._k], succeses_MR, d_fitness)
         self._H_CR[next_k] = self._update_u(self._H_CR[self._k], succeses_CR, d_fitness)
-
-        if self._k == self._H_size - 1:
-            self._k = 0
-        else:
-            self._k += 1
+        self._k = next_k
 
     def _update_data(self: SHAGA) -> None:
         super()._update_data()

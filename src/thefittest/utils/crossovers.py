@@ -1070,3 +1070,551 @@ def uniform_tournament_crossover_GP(
     mutant = mutant.copy()
     mutant._n_args = np.array(new_n_args.copy(), dtype=np.int64)
     return mutant
+
+
+def empty_crossover_shagp(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    """
+    Perform an empty crossover operation for Success History-based Adaptation Genetic Programming (SHAGP).
+
+    Parameters
+    ----------
+    individ : NDArray
+        The current individual represented as a tree.
+    individs : NDArray
+        A 1D array containing other individuals represented as trees.
+    fitness : NDArray[np.float64]
+        A 1D array containing the fitness values of individuals. (not used)
+    rank : NDArray[np.float64]
+        A 1D array containing the rank values of individuals. The higher the rank, the better the individual.
+        (not used)
+    max_level : int
+        Maximum allowed depth/level of the resulting offspring. (not used)
+    CR : float
+        Crossover probability/rate. (not used)
+
+    Returns
+    -------
+    Tree
+        Offspring resulting from the empty crossover operation.
+
+    Notes
+    -----
+    Empty crossover is a placeholder crossover operator used in Success History-based Adaptation Genetic
+    Programming (SHAGP). Unlike standard GP crossover operators, it does not exchange genetic material
+    between individuals and simply returns a copy of the current individual. The operator exists to
+    maintain a unified crossover interface within SHAGP.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import empty_crossover_shagp
+    >>> from thefittest.base import Tree
+    >>> from thefittest.base import init_symbolic_regression_uniset
+    >>>
+    >>> # Example
+    >>>
+    >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
+    >>> functional_set_names = ("add", "mul")
+    >>> max_tree_level = 5
+    >>>
+    >>> # Initialize Universal Set for Symbolic Regression
+    >>> universal_set = init_symbolic_regression_uniset(X, functional_set_names)
+    >>>
+    >>> current_individ = Tree.random_tree(universal_set, max_tree_level)
+    >>> parent1 = Tree.random_tree(universal_set, max_tree_level)
+    >>> parent2 = Tree.random_tree(universal_set, max_tree_level)
+    >>> parent3 = Tree.random_tree(universal_set, max_tree_level)
+    >>>
+    >>> pool_individs = np.array([parent1, parent2, parent3], dtype=object)
+    >>> fitness_values = np.array([0.5, 0.8, 0.6], dtype=np.float64)
+    >>> ranks = np.array([2.0, 1.0, 3.0], dtype=np.float64)
+    >>> max_level = 7  # Set the maximum allowed depth
+    >>> CR = 0.8
+    >>>
+    >>> # Perform empty crossover for SHAGP
+    >>> offspring = empty_crossover_shagp(
+    ...     current_individ,
+    ...     pool_individs,
+    ...     fitness_values,
+    ...     ranks,
+    ...     max_level,
+    ...     CR,
+    ... )
+    >>>
+    >>> # Display results
+    >>> print("Current individual:", current_individ)
+    Current individual: ...
+    >>> print("Offspring After Empty Crossover (SHAGP):", offspring)
+    Offspring After Empty Crossover (SHAGP): ...
+    """
+    offspring = individ.copy()
+    return offspring
+
+
+def standard_crossover_shagp(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    """
+    Perform standard subtree crossover operation for Success History-based Adaptation Genetic Programming (SHAGP).
+
+    Parameters
+    ----------
+    individ : NDArray
+        The current individual represented as a tree.
+    individs : NDArray
+        A 1D array containing other individuals represented as trees. The first individual in the array
+        is used as the second parent for crossover.
+    fitness : NDArray[np.float32]
+        A 1D array containing the fitness values of individuals. (not used)
+    rank : NDArray[np.float32]
+        A 1D array containing the rank values of individuals. (not used)
+    max_level : int
+        Maximum allowed depth/level of the resulting offspring.
+    CR : float
+        Crossover probability/rate. If crossover is not applied, the current individual is returned.
+
+    Returns
+    -------
+    Tree
+        Offspring resulting from the standard crossover operation.
+
+    Notes
+    -----
+    Standard crossover in SHAGP performs a subtree exchange between the current individual and one
+    selected individual from the pool. Two random crossover points are selected, one in each parent.
+    With equal probability, either a subtree from the current individual is inserted into the pool
+    individual or vice versa. If the resulting offspring exceeds the maximum allowed depth, the
+    offspring is discarded and the original parent is returned instead.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import standard_crossover_shagp
+    >>> from thefittest.base import Tree
+    >>> from thefittest.base import init_symbolic_regression_uniset
+    >>>
+    >>> # Example
+    >>>
+    >>> X = np.array([[0.3, 0.7], [0.3, 1.1], [3.5, 11.0]], dtype=np.float64)
+    >>> functional_set_names = ("add", "mul")
+    >>> max_tree_level = 5
+    >>>
+    >>> # Initialize Universal Set for Symbolic Regression
+    >>> universal_set = init_symbolic_regression_uniset(X, functional_set_names)
+    >>>
+    >>> current_individ = Tree.random_tree(universal_set, max_tree_level)
+    >>> parent1 = Tree.random_tree(universal_set, max_tree_level)
+    >>>
+    >>> pool_individs = np.array([parent1], dtype=object)
+    >>> fitness_values = np.array([0.5], dtype=np.float32)
+    >>> ranks = np.array([1.0], dtype=np.float32)
+    >>> max_level = 7
+    >>> CR = 0.8
+    >>>
+    >>> # Perform standard crossover for SHAGP
+    >>> offspring = standard_crossover_shagp(
+    ...     current_individ,
+    ...     pool_individs,
+    ...     fitness_values,
+    ...     ranks,
+    ...     max_level,
+    ...     CR,
+    ... )
+    >>>
+    >>> # Display results
+    >>> print("Current individual:", current_individ)
+    Current individual: ...
+    >>> print("Second parent:", parent1)
+    Second parent: ...
+    >>> print("Offspring After Standard Crossover (SHAGP):", offspring)
+    Offspring After Standard Crossover (SHAGP): ...
+    """
+    if flip_coin(CR):
+        individ_1 = individ.copy()
+        individ_2 = individs[0].copy()
+        first_point = randint(0, len(individ_1), 1)[0]
+        second_point = randint(0, len(individ_2), 1)[0]
+
+        if flip_coin(0.5):
+            first_subtree = individ_1.subtree(first_point)
+            offspring = individ_2.concat(second_point, first_subtree)
+            if offspring.get_max_level() > max_level:
+                offspring = individ_2
+        else:
+            second_subtree = individ_2.subtree(second_point)
+            offspring = individ_1.concat(first_point, second_subtree)
+            if offspring.get_max_level() > max_level:
+                offspring = individ_1
+        return offspring
+    else:
+        return individ
+
+
+def uniform_crossover_shagp(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    """
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import uniform_crossover_shagp
+    >>> from thefittest.base import Tree, init_symbolic_regression_uniset
+    >>>
+    >>> # Input data
+    >>> X = np.array([[0.3, 0.7],
+    ...               [0.3, 1.1],
+    ...               [3.5, 11.0]], dtype=np.float64)
+    >>> functional_set_names = ("add", "mul")
+    >>> max_tree_level = 5
+    >>>
+    >>> # Initialize universal set
+    >>> universal_set = init_symbolic_regression_uniset(X, functional_set_names)
+    >>>
+    >>> # Current individual and pool
+    >>> current_individ = Tree.random_tree(universal_set, max_tree_level)
+    >>> parent1 = Tree.random_tree(universal_set, max_tree_level)
+    >>> parent2 = Tree.random_tree(universal_set, max_tree_level)
+    >>> parent3 = Tree.random_tree(universal_set, max_tree_level)
+    >>>
+    >>> pool_individs = np.array([parent1, parent2, parent3], dtype=object)
+    >>> fitness_values = np.array([0.5, 0.8, 0.6], dtype=np.float64)
+    >>> ranks = np.array([2.0, 1.0, 3.0], dtype=np.float64)
+    >>> max_level = 7
+    >>> CR = 0.8
+    >>>
+    >>> # Perform uniform crossover (SHAGP)
+    >>> offspring = uniform_crossover_shagp(
+    ...     current_individ,
+    ...     pool_individs,
+    ...     fitness_values,
+    ...     ranks,
+    ...     max_level,
+    ...     CR,
+    ... )
+    >>>
+    >>> print("Current individual:", current_individ)
+    Current individual: ...
+    >>> print("Offspring after uniform crossover (SHAGP):", offspring)
+    Offspring after uniform crossover (SHAGP): ...
+    """
+    to_return = Tree([], [])
+    new_n_args = []
+    weight = np.array([1 - CR, CR], dtype=np.float64)
+
+    all_members = np.append(individ, individs)
+    common, border = individ.get_common_region(individs)
+
+    pool_stage_1 = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+    pool_stage_2 = random_sample(range_size=len(fitness), quantity=len(common[0]), replace=True)
+    all_members_pool = pool_stage_1 * pool_stage_2 + pool_stage_1
+
+    for i, common_0_i in enumerate(common[0]):
+        j = all_members_pool[i]
+        id_ = common[j][i]
+        if common_0_i in border[0]:
+            subtree = all_members[j].subtree(id_)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
+        else:
+            to_return._nodes.append(all_members[j]._nodes[id_])
+            new_n_args.append(all_members[j]._n_args[id_])
+
+    to_return = to_return.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
+    return to_return
+
+
+def uniform_prop_crossover_shagp(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    """
+    Perform fitness-proportional uniform crossover operation for Success History-based Adaptation
+    Genetic Programming (SHAGP).
+
+    Parameters
+    ----------
+    individ : NDArray
+        The current individual represented as a tree.
+    individs : NDArray
+        A 1D array containing other individuals represented as trees.
+    fitness : NDArray[np.float64]
+        A 1D array containing fitness values of individuals. These values are used as weights
+        when selecting donor individuals.
+    rank : NDArray[np.float64]
+        A 1D array containing the rank values of individuals. (not used)
+    max_level : int
+        Maximum allowed depth/level of the resulting offspring. (not used)
+    CR : float
+        Crossover probability/rate controlling the probability of deviating from the current
+        individual within the common region.
+
+    Returns
+    -------
+    Tree
+        Offspring resulting from the fitness-proportional uniform crossover operation.
+
+    Notes
+    -----
+    This operator is identical to uniform crossover in SHAGP, except that when genetic material
+    is taken from the pool of individuals, the donor is selected proportionally to its fitness
+    value rather than uniformly at random.
+
+    The offspring is constructed over the common region of the current individual (`individ`)
+    and the pool (`individs`). For each position in the common region, genetic material is taken
+    either from `individ` (with probability 1 - CR) or from a donor selected from `individs`
+    according to fitness-proportional sampling (with probability CR). For border positions of
+    the common region, entire subtrees are copied.
+    """
+    to_return = Tree([], [])
+    new_n_args = []
+    weight = np.array([1 - CR, CR], dtype=np.float64)
+
+    all_members = np.append(individ, individs)
+    common, border = individ.get_common_region(individs)
+
+    pool_stage_1 = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+    pool_stage_2 = random_weighted_sample(weights=fitness, quantity=len(common[0]), replace=True)
+    all_members_pool = pool_stage_1 * pool_stage_2 + pool_stage_1
+
+    for i, common_0_i in enumerate(common[0]):
+        j = all_members_pool[i]
+        id_ = common[j][i]
+        if common_0_i in border[0]:
+            subtree = all_members[j].subtree(id_)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
+        else:
+            to_return._nodes.append(all_members[j]._nodes[id_])
+            new_n_args.append(all_members[j]._n_args[id_])
+
+    to_return = to_return.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
+    return to_return
+
+
+def uniform_rank_crossover_shagp(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    """
+    Perform rank-based uniform crossover operation for Success History-based Adaptation
+    Genetic Programming (SHAGP).
+
+    Parameters
+    ----------
+    individ : NDArray
+        The current individual represented as a tree.
+    individs : NDArray
+        A 1D array containing other individuals represented as trees.
+    fitness : NDArray[np.float64]
+        A 1D array containing the fitness values of individuals. (not used)
+    rank : NDArray[np.float64]
+        A 1D array containing rank values of individuals. These values are used as weights
+        when selecting donor individuals.
+    max_level : int
+        Maximum allowed depth/level of the resulting offspring. (not used)
+    CR : float
+        Crossover probability/rate controlling the probability of deviating from the current
+        individual within the common region.
+
+    Returns
+    -------
+    Tree
+        Offspring resulting from the rank-based uniform crossover operation.
+
+    Notes
+    -----
+    This operator is a variant of uniform crossover in SHAGP where donor individuals are
+    selected proportionally to their rank values instead of uniformly or by fitness.
+
+    The offspring is constructed over the common region of the current individual (`individ`)
+    and the pool (`individs`). For each position in the common region, genetic material is taken
+    either from `individ` (with probability 1 - CR) or from a donor selected from `individs`
+    according to rank-proportional sampling (with probability CR). For border positions of the
+    common region, entire subtrees are copied.
+    """
+    to_return = Tree([], [])
+    new_n_args = []
+    weight = np.array([1 - CR, CR], dtype=np.float64)
+
+    all_members = np.append(individ, individs)
+    common, border = individ.get_common_region(individs)
+
+    pool_stage_1 = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+    pool_stage_2 = random_weighted_sample(weights=rank, quantity=len(common[0]), replace=True)
+    all_members_pool = pool_stage_1 * pool_stage_2 + pool_stage_1
+
+    for i, common_0_i in enumerate(common[0]):
+        j = all_members_pool[i]
+        id_ = common[j][i]
+        if common_0_i in border[0]:
+            subtree = all_members[j].subtree(id_)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
+        else:
+            to_return._nodes.append(all_members[j]._nodes[id_])
+            new_n_args.append(all_members[j]._n_args[id_])
+
+    to_return = to_return.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
+    return to_return
+
+
+def uniform_tour_crossover_shagp(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    """
+    Perform tournament-based uniform crossover operation for Success History-based Adaptation
+    Genetic Programming (SHAGP).
+
+    Parameters
+    ----------
+    individ : NDArray
+        The current individual represented as a tree.
+    individs : NDArray
+        A 1D array containing other individuals represented as trees.
+    fitness : NDArray[np.float64]
+        A 1D array containing the fitness values of individuals.
+    rank : NDArray[np.float64]
+        A 1D array containing the rank values of individuals. These values are used during
+        tournament selection.
+    max_level : int
+        Maximum allowed depth/level of the resulting offspring. (not used)
+    CR : float
+        Crossover probability/rate controlling the probability of deviating from the current
+        individual within the common region.
+
+    Returns
+    -------
+    Tree
+        Offspring resulting from the tournament-based uniform crossover operation.
+
+    Notes
+    -----
+    This operator is a variant of uniform crossover in SHAGP where donor individuals are selected
+    using tournament selection instead of uniform, fitness-proportional, or rank-proportional
+    sampling.
+
+    The offspring is constructed over the common region of the current individual (`individ`)
+    and the pool (`individs`). For each position in the common region, genetic material is taken
+    either from `individ` (with probability 1 - CR) or from a donor selected via tournament
+    selection (with probability CR). For border positions of the common region, entire subtrees
+    are copied.
+    """
+    to_return = Tree([], [])
+    new_n_args = []
+    weight = np.array([1 - CR, CR], dtype=np.float64)
+
+    all_members = np.append(individ, individs)
+    common, border = individ.get_common_region(individs)
+
+    pool_stage_1 = random_weighted_sample(weights=weight, quantity=len(common[0]), replace=True)
+    pool_stage_2 = tournament_selection(fitness, rank, 2, len(common[0]))
+    all_members_pool = pool_stage_1 * pool_stage_2 + pool_stage_1
+
+    for i, common_0_i in enumerate(common[0]):
+        j = all_members_pool[i]
+        id_ = common[j][i]
+        if common_0_i in border[0]:
+            subtree = all_members[j].subtree(id_)
+            to_return._nodes.extend(subtree._nodes)
+            new_n_args.extend(subtree._n_args)
+        else:
+            to_return._nodes.append(all_members[j]._nodes[id_])
+            new_n_args.append(all_members[j]._n_args[id_])
+
+    to_return = to_return.copy()
+    to_return._n_args = np.array(new_n_args.copy(), dtype=np.int64)
+    return to_return
+
+
+def one_point_crossover_shagp(
+    individ: NDArray,
+    individs: NDArray,
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    max_level: int,
+    CR: float,
+) -> Tree:
+    """
+    Perform one-point crossover operation for Success History-based Adaptation
+    Genetic Programming (SHAGP).
+
+    Parameters
+    ----------
+    individ : NDArray
+        The current individual represented as a tree.
+    individs : NDArray
+        A 1D array containing other individuals represented as trees. Only the
+        first individual in the array is used as the second parent.
+    fitness : NDArray[np.float32]
+        A 1D array containing the fitness values of individuals. (not used)
+    rank : NDArray[np.float32]
+        A 1D array containing the rank values of individuals. (not used)
+    max_level : int
+        Maximum allowed depth/level of the resulting offspring. (not used)
+    CR : float
+        Crossover probability/rate. If crossover is not applied, the current
+        individual is returned unchanged.
+
+    Returns
+    -------
+    Tree
+        Offspring resulting from the one-point crossover operation.
+
+    Notes
+    -----
+    One-point crossover in SHAGP selects a single crossover point from the common
+    region shared by the current individual (`individ`) and one other individual
+    (`individs[0]`). With equal probability, a subtree from one parent is inserted
+    into the other parent at the selected position. If crossover is not applied
+    (with probability 1 - CR), the current individual is returned unchanged.
+    """
+    if flip_coin(CR):
+        individ_1 = individ
+        individ_2 = individs[0]
+        common_indexes, _ = individ_1.get_common_region([individ_2])
+
+        point = randint(0, len(common_indexes[0]), 1)[0]
+        first_point = common_indexes[0][point]
+        second_point = common_indexes[1][point]
+        if flip_coin(0.5):
+            first_subtree = individ_1.subtree(first_point)
+            offspring = individ_2.concat(second_point, first_subtree)
+        else:
+            second_subtree = individ_2.subtree(second_point)
+            offspring = individ_1.concat(first_point, second_subtree)
+        return offspring
+    else:
+        return individ

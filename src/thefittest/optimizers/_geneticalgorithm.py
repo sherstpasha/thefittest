@@ -37,6 +37,13 @@ from ..utils.crossovers import uniform_rank_crossover
 from ..utils.crossovers import uniform_rank_crossover_GP
 from ..utils.crossovers import uniform_tournament_crossover
 from ..utils.crossovers import uniform_tournament_crossover_GP
+from ..utils.crossovers import empty_crossover_shagp
+from ..utils.crossovers import one_point_crossover_shagp
+from ..utils.crossovers import standard_crossover_shagp
+from ..utils.crossovers import uniform_crossover_shagp
+from ..utils.crossovers import uniform_prop_crossover_shagp
+from ..utils.crossovers import uniform_rank_crossover_shagp
+from ..utils.crossovers import uniform_tour_crossover_shagp
 from ..utils.transformations import minmax_scale
 from ..utils.random import randint
 
@@ -282,6 +289,18 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             "gp_uniform_tour_3": (uniform_tournament_crossover_GP, 3),
             "gp_uniform_tour_7": (uniform_tournament_crossover_GP, 7),
             "gp_uniform_tour_k": (uniform_tournament_crossover_GP, self._parents_num),
+            "empty": (empty_crossover_shagp, 1),
+            "shagp_standard": (standard_crossover_shagp, 1),
+            "shagp_uniform_1": (uniform_crossover_shagp, 1),
+            "shagp_one_point": (one_point_crossover_shagp, 1),
+            "shagp_uniform_2": (uniform_crossover_shagp, 2),
+            "shagp_uniform_7": (uniform_crossover_shagp, 7),
+            "shagp_uniform_prop_2": (uniform_prop_crossover_shagp, 2),
+            "shagp_uniform_prop_7": (uniform_prop_crossover_shagp, 7),
+            "shagp_uniform_rank_2": (uniform_rank_crossover_shagp, 2),
+            "shagp_uniform_rank_7": (uniform_rank_crossover_shagp, 7),
+            "shagp_uniform_tour_3": (uniform_tour_crossover_shagp, 3),
+            "shagp_uniform_tour_7": (uniform_tour_crossover_shagp, 7),
         }
 
         self._mutation_pool: Dict[str, Tuple[Callable, Union[float, int], bool]] = {
@@ -305,6 +324,10 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             "gp_average_shrink": (shrink_mutation, 1, False),
             "gp_strong_shrink": (shrink_mutation, 4, False),
             "gp_custom_rate_shrink": (shrink_mutation, self._mutation_rate, True),
+            "shagp_point": (point_mutation,),
+            "shagp_grow": (point_mutation,),
+            "shagp_swap": (point_mutation,),
+            "shagp_shrink": (point_mutation,),
         }
 
         self._fitness_scale_i: NDArray[np.float64]

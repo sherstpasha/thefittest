@@ -48,7 +48,12 @@ def lehmer_mean(
 
     x_up = weight_arg * np.power(x, power)
     x_down = weight_arg * np.power(x, power - 1)
-    return np.sum(x_up) / np.sum(x_down)
+
+    sum_down = np.sum(x_down)
+    if sum_down == 0:
+        return np.mean(x)
+
+    return np.sum(x_up) / sum_down
 
 
 @njit(float64(float64))
