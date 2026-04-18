@@ -223,8 +223,12 @@ Publications where ``thefittest`` has been used:
   DOI: 10.1051/itmconf/20245902020. Licensed under CC BY 4.0. Authored by Pavel Sherstnev.
   Available at: https://doi.org/10.1051/itmconf/20245902020
 
-- Demidov N. Aspects of Implementing a Genetic Algorithm in Mixed Optimization Problems in A Variable-Size Design Space // *International Journal of Open Information Technologies*. — 2026. — Vol. 14, No. 5. — P. 110–123.
+- (in Russian) Демидов Н. Аспекты реализации генетического алгоритма в задачах смешанной оптимизации в пространстве переменной размерности // *International Journal of Open Information Technologies*. — 2026. — Т. 14, № 5. — С. 110–123.
   Available at: http://injoit.ru/index.php/j1/article/view/2562
+  (transliteration) Demidov N. Aspekty realizatsii geneticheskogo algoritma v zadachakh smeshannoy optimizatsii v prostranstve peremennoy razmernosti // *International Journal of Open Information Technologies*. — 2026. — Vol. 14, No. 5. — P. 110–123.
+
+- (in Russian) Масленников В. В. Квантово-инспирированный генетический алгоритм вещественной однокритериальной оптимизации с адаптацией значений параметров на основе истории успеха // *ИТ-Стандарт*. — 2025. — № 4(45). — С. 81–101. — EDN KJRSYX.
+  (transliteration) Maslennikov V. V. Kvantovo-inspirovannyy geneticheskiy algoritm veshchestvennoy odnokriterial'noy optimizatsii s adaptatsiyey znacheniy parametrov na osnove istorii uspekha // *IT-Standart*. — 2025. — No. 4(45). — P. 81–101.
 
 Awards and Presentations
 -------------------------
