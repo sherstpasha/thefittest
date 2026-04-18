@@ -223,6 +223,9 @@ Publications where ``thefittest`` has been used:
   DOI: 10.1051/itmconf/20245902020. Licensed under CC BY 4.0. Authored by Pavel Sherstnev.
   Available at: https://doi.org/10.1051/itmconf/20245902020
 
+- Demidov N. Aspects of Implementing a Genetic Algorithm in Mixed Optimization Problems in A Variable-Size Design Space // *International Journal of Open Information Technologies*. — 2026. — Vol. 14, No. 5. — P. 110–123.
+  Available at: http://injoit.ru/index.php/j1/article/view/2562
+
 Awards and Presentations
 -------------------------
 
