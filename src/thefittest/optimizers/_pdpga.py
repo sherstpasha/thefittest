@@ -297,6 +297,10 @@ class PDPGA(SelfCGA):
 
             self._previous_fitness_i = []
 
+            self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
+            self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
+            self._mutation_operators = self._choice_operators(proba_dict=self._mutation_proba)
+
     def _get_new_individ_g(
         self: PDPGA,
         specified_selection: str,

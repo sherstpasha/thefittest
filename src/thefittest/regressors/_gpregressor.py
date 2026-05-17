@@ -118,7 +118,7 @@ class GeneticProgrammingRegressor(RegressorMixin, BaseGP):
         optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,
         optimizer_args: Optional[dict[str, Any]] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
-        use_fitness_cache: bool = False,
+        use_fitness_cache: bool = True,
     ):
         super().__init__(
             n_iter=n_iter,

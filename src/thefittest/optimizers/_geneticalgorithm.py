@@ -289,7 +289,7 @@ class GeneticAlgorithm(EvolutionaryAlgorithm):
             "gp_uniform_tour_3": (uniform_tournament_crossover_GP, 3),
             "gp_uniform_tour_7": (uniform_tournament_crossover_GP, 7),
             "gp_uniform_tour_k": (uniform_tournament_crossover_GP, self._parents_num),
-            "empty": (empty_crossover_shagp, 1),
+            "shagp_empty": (empty_crossover_shagp, 1),
             "shagp_standard": (standard_crossover_shagp, 1),
             "shagp_uniform_1": (uniform_crossover_shagp, 1),
             "shagp_one_point": (one_point_crossover_shagp, 1),
