@@ -1473,3 +1473,64 @@ def test_SHAGA_start_settings():
 
     optimizer.fit()
     assert optimizer.get_remains_calls() == pop_size * (iters - 1)
+
+
+def test_fitness_cache_skips_duplicate_genotypes():
+    calls = 0
+
+    def fitness_function(x):
+        nonlocal calls
+        calls += len(x)
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    initial_population = np.array(
+        [
+            [1, 0, 1, 0],
+            [1, 0, 1, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+        ],
+        dtype=np.byte,
+    )
+
+    optimizer = GeneticAlgorithm(
+        fitness_function=fitness_function,
+        iters=1,
+        pop_size=4,
+        str_len=4,
+        init_population=initial_population,
+        use_fitness_cache=True,
+        fitness_cache_size=10,
+    )
+    optimizer.fit()
+
+    assert calls == 2
+    assert optimizer.get_calls() == 2
+
+
+def test_fitness_cache_respects_size_limit():
+    def fitness_function(x):
+        return np.sum(x, axis=1, dtype=np.float64)
+
+    initial_population = np.array(
+        [
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1],
+        ],
+        dtype=np.byte,
+    )
+
+    optimizer = GeneticAlgorithm(
+        fitness_function=fitness_function,
+        iters=1,
+        pop_size=4,
+        str_len=4,
+        init_population=initial_population,
+        use_fitness_cache=True,
+        fitness_cache_size=2,
+    )
+    optimizer.fit()
+
+    assert len(optimizer._fitness_cache) == 2

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from collections import OrderedDict
 from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
 
 from joblib import Parallel
@@ -92,6 +94,8 @@ class EvolutionaryAlgorithm:
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         on_generation: Optional[Callable] = None,
         fitness_update_eps: float = 0.0,
+        use_fitness_cache: bool = False,
+        fitness_cache_size: Optional[int] = 1000,
     ):
         self._fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]] = fitness_function
         self._iters: int = iters
@@ -106,6 +110,11 @@ class EvolutionaryAlgorithm:
         self._keep_history: bool = keep_history
         self._n_jobs: int = self._get_n_jobs(n_jobs)
         self._fitness_update_eps: float = fitness_update_eps
+        self._use_fitness_cache: bool = use_fitness_cache
+        if fitness_cache_size is not None and fitness_cache_size < 0:
+            raise ValueError("Parameter fitness_cache_size must be non-negative or None.")
+        self._fitness_cache_size: Optional[int] = fitness_cache_size
+        self._fitness_cache: OrderedDict[Any, Tuple[Any, float]] = OrderedDict()
 
         if fitness_function_args is not None:
             self._fitness_function_args = fitness_function_args
@@ -214,6 +223,103 @@ class EvolutionaryAlgorithm:
         self._calls += len(value)
         fitness = self._sign * value
         return fitness
+
+    def _get_genotype_cache_key(self: EvolutionaryAlgorithm, genotype: Any) -> Any:
+        if hasattr(genotype, "signature"):
+            return ("signature", genotype.signature())
+
+        if isinstance(genotype, np.ndarray):
+            if genotype.dtype == object:
+                return (
+                    "object_array",
+                    genotype.shape,
+                    tuple(self._get_genotype_cache_key(item) for item in genotype.flat),
+                )
+
+            contiguous = np.ascontiguousarray(genotype)
+            return ("ndarray", contiguous.dtype.str, contiguous.shape, contiguous.tobytes())
+
+        try:
+            array = np.asarray(genotype)
+            contiguous = np.ascontiguousarray(array)
+            return ("array_like", contiguous.dtype.str, contiguous.shape, contiguous.tobytes())
+        except (TypeError, ValueError):
+            return ("repr", repr(genotype))
+
+    def _save_fitness_cache(
+        self: EvolutionaryAlgorithm,
+        key: Any,
+        phenotype: Any,
+        fitness: float,
+    ) -> None:
+        try:
+            cached_phenotype = phenotype.copy()
+        except AttributeError:
+            cached_phenotype = phenotype
+
+        self._fitness_cache[key] = (cached_phenotype, float(fitness))
+        self._fitness_cache.move_to_end(key)
+
+        if self._fitness_cache_size is not None:
+            while len(self._fitness_cache) > self._fitness_cache_size:
+                self._fitness_cache.popitem(last=False)
+
+    def _evaluate_population(
+        self: EvolutionaryAlgorithm, population_g: NDArray[Any]
+    ) -> Tuple[NDArray[Any], NDArray[np.float64]]:
+        if not self._use_fitness_cache:
+            population_ph = self._get_phenotype(population_g)
+            fitness = self._get_fitness(population_ph)
+            return population_ph, fitness
+
+        population_size = len(population_g)
+        population_ph_list: List[Any] = [None] * population_size
+        fitness = np.empty(population_size, dtype=np.float64)
+        missing_indexes: List[int] = []
+        missing_keys: List[Any] = []
+        pending_indexes: Dict[Any, List[int]] = {}
+
+        for i, genotype in enumerate(population_g):
+            key = self._get_genotype_cache_key(genotype)
+            cached_value = self._fitness_cache.get(key)
+            if cached_value is None:
+                if key in pending_indexes:
+                    pending_indexes[key].append(i)
+                else:
+                    pending_indexes[key] = [i]
+                    missing_indexes.append(i)
+                    missing_keys.append(key)
+            else:
+                phenotype, cached_fitness = cached_value
+                try:
+                    population_ph_list[i] = phenotype.copy()
+                except AttributeError:
+                    population_ph_list[i] = phenotype
+                fitness[i] = cached_fitness
+                self._fitness_cache.move_to_end(key)
+
+        if missing_indexes:
+            missing_population_g = population_g[missing_indexes]
+            missing_population_ph = self._get_phenotype(missing_population_g)
+            missing_fitness = self._get_fitness(missing_population_ph)
+
+            for local_i, population_i in enumerate(missing_indexes):
+                phenotype = missing_population_ph[local_i]
+                fitness_value = missing_fitness[local_i]
+                for duplicate_i in pending_indexes[missing_keys[local_i]]:
+                    try:
+                        population_ph_list[duplicate_i] = phenotype.copy()
+                    except AttributeError:
+                        population_ph_list[duplicate_i] = phenotype
+                    fitness[duplicate_i] = fitness_value
+                self._save_fitness_cache(
+                    missing_keys[local_i],
+                    phenotype,
+                    float(fitness_value),
+                )
+
+        population_ph = np.array(population_ph_list)
+        return population_ph, fitness
 
     def get_remains_calls(self: EvolutionaryAlgorithm) -> int:
         """
@@ -342,8 +448,7 @@ class EvolutionaryAlgorithm:
         return None
 
     def _from_population_g_to_fitness(self: EvolutionaryAlgorithm) -> None:
-        self._population_ph_i = self._get_phenotype(self._population_g_i)
-        self._fitness_i = self._get_fitness(self._population_ph_i)
+        self._population_ph_i, self._fitness_i = self._evaluate_population(self._population_g_i)
 
         self._update_data()
 
@@ -368,7 +473,8 @@ class EvolutionaryAlgorithm:
             return n_jobs
 
     def _split_population(self: EvolutionaryAlgorithm, population: NDArray) -> List:
-        indexes = np.linspace(start=0, stop=self._pop_size, num=self._n_jobs + 1, dtype=np.int64)
+        jobs = min(self._n_jobs, len(population))
+        indexes = np.linspace(start=0, stop=len(population), num=jobs + 1, dtype=np.int64)
         indexes = indexes[1:-1]
 
         population_split = np.split(population, indexes)

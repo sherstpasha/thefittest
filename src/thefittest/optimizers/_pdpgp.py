@@ -163,6 +163,8 @@ class PDPGP(GeneticProgramming, PDPGA):
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         on_generation: Optional[Callable] = None,
         fitness_update_eps: float = 0.0,
+        use_fitness_cache: bool = False,
+        fitness_cache_size: Optional[int] = 1000,
     ):
         PDPGA.__init__(
             self,
@@ -191,6 +193,8 @@ class PDPGP(GeneticProgramming, PDPGA):
             random_state=random_state,
             on_generation=on_generation,
             fitness_update_eps=fitness_update_eps,
+            use_fitness_cache=use_fitness_cache,
+            fitness_cache_size=fitness_cache_size,
         )
 
         GeneticProgramming.__init__(
@@ -218,6 +222,9 @@ class PDPGP(GeneticProgramming, PDPGA):
             genotype_to_phenotype_args=genotype_to_phenotype_args,
             random_state=random_state,
             on_generation=on_generation,
+            fitness_update_eps=fitness_update_eps,
+            use_fitness_cache=use_fitness_cache,
+            fitness_cache_size=fitness_cache_size,
         )
 
     def _get_new_individ_g(

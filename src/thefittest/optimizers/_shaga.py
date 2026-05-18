@@ -157,6 +157,8 @@ class SHAGA(EvolutionaryAlgorithm):
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         on_generation: Optional[Callable] = None,
         fitness_update_eps: float = 0.0,
+        use_fitness_cache: bool = False,
+        fitness_cache_size: Optional[int] = 1000,
     ):
         EvolutionaryAlgorithm.__init__(
             self,
@@ -178,6 +180,8 @@ class SHAGA(EvolutionaryAlgorithm):
             random_state=random_state,
             on_generation=on_generation,
             fitness_update_eps=fitness_update_eps,
+            use_fitness_cache=use_fitness_cache,
+            fitness_cache_size=fitness_cache_size,
         )
 
         self._str_len = str_len
@@ -206,8 +210,7 @@ class SHAGA(EvolutionaryAlgorithm):
 
     def _get_init_population(self: SHAGA) -> None:
         self._first_generation()
-        self._population_ph_i = self._get_phenotype(self._population_g_i)
-        self._fitness_i = self._get_fitness(self._population_ph_i)
+        self._population_ph_i, self._fitness_i = self._evaluate_population(self._population_g_i)
 
     def _randc(
         self: SHAGA,
@@ -323,8 +326,7 @@ class SHAGA(EvolutionaryAlgorithm):
             dtype=np.float64,
         )
 
-        mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)
-        mutant_cr_fit = self._get_fitness(mutant_cr_ph)
+        mutant_cr_ph, mutant_cr_fit = self._evaluate_population(mutant_cr_b_g)
 
         succeses_MR, succeses_CR, d_fitness = self._replace_population(
             mutant_cr_b_g,

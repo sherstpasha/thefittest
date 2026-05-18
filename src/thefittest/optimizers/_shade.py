@@ -212,6 +212,8 @@ class SHADE(DifferentialEvolution):
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         on_generation: Optional[Callable] = None,
         fitness_update_eps: float = 0.0,
+        use_fitness_cache: bool = False,
+        fitness_cache_size: Optional[int] = 1000,
     ):
         DifferentialEvolution.__init__(
             self,
@@ -236,6 +238,8 @@ class SHADE(DifferentialEvolution):
             random_state=random_state,
             on_generation=on_generation,
             fitness_update_eps=fitness_update_eps,
+            use_fitness_cache=use_fitness_cache,
+            fitness_cache_size=fitness_cache_size,
         )
 
         self._F: NDArray[np.float64]
@@ -317,8 +321,7 @@ class SHADE(DifferentialEvolution):
             dtype=np.float64,
         )
 
-        mutant_cr_ph = self._get_phenotype(mutant_cr_b_g)
-        mutant_cr_fit = self._get_fitness(mutant_cr_ph)
+        mutant_cr_ph, mutant_cr_fit = self._evaluate_population(mutant_cr_b_g)
         mask = mutant_cr_fit >= self._fitness_i
         succeses = mutant_cr_fit > self._fitness_i
 
