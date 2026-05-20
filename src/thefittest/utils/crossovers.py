@@ -1072,3 +1072,300 @@ def uniform_tournament_crossover_GP(
     return mutant
 
 
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def empty_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    offspring = individ.copy()
+    return offspring
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def one_point_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    if flip_coin(CR):
+        cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
+        choosen = random_sample(range_size=len(fitness), quantity=1, replace=True)[0]
+
+        if flip_coin(0.5):
+            offspring = individ.copy()
+            for i in range(len(individ)):
+                if i > cross_point:
+                    offspring[i] = individs[choosen][i]
+        else:
+            offspring = individs[choosen].copy()
+            for i in range(len(individ)):
+                if i > cross_point:
+                    offspring[i] = individ[i]
+        return offspring
+    else:
+        return individ
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def one_point_prop_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    if flip_coin(CR):
+        cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
+        choosen = random_weighted_sample(weights=fitness, quantity=1, replace=True)[0]
+
+        if flip_coin(0.5):
+            offspring = individ.copy()
+            for i in range(len(individ)):
+                if i > cross_point:
+                    offspring[i] = individs[choosen][i]
+        else:
+            offspring = individs[choosen].copy()
+            for i in range(len(individ)):
+                if i > cross_point:
+                    offspring[i] = individ[i]
+        return offspring
+    else:
+        return individ
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def one_point_rank_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    if flip_coin(CR):
+        cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
+        choosen = random_weighted_sample(weights=rank, quantity=1, replace=True)[0]
+
+        if flip_coin(0.5):
+            offspring = individ.copy()
+            for i in range(len(individ)):
+                if i > cross_point:
+                    offspring[i] = individs[choosen][i]
+        else:
+            offspring = individs[choosen].copy()
+            for i in range(len(individ)):
+                if i > cross_point:
+                    offspring[i] = individ[i]
+        return offspring
+    else:
+        return individ
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def one_point_tour_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    if flip_coin(CR):
+        cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
+        choosen = tournament_selection(fitness, rank, 2, 1)[0]
+
+        if flip_coin(0.5):
+            offspring = individ.copy()
+            for i in range(len(individ)):
+                if i > cross_point:
+                    offspring[i] = individs[choosen][i]
+        else:
+            offspring = individs[choosen].copy()
+            for i in range(len(individ)):
+                if i > cross_point:
+                    offspring[i] = individ[i]
+        return offspring
+    else:
+        return individ
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def two_point_rank_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    CR: np.float32,
+) -> NDArray[np.byte]:
+    if flip_coin(CR):
+        size = len(individs[0])
+        c_points = random_sample(range_size=len(individs[0]), quantity=2, replace=False)
+        c_points = sorted(c_points)
+        choosen = random_weighted_sample(weights=rank, quantity=1, replace=True)[0]
+
+        if flip_coin(0.5):
+            offspring = individ.copy()
+            other_individ = individs[choosen]
+        else:
+            offspring = individs[choosen].copy()
+            other_individ = individ
+        for i in range(size):
+            if c_points[0] <= i <= c_points[1]:
+                offspring[i] = other_individ[i]
+        return offspring
+    else:
+        return individ
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def two_point_prop_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    CR: np.float32,
+) -> NDArray[np.byte]:
+    if flip_coin(CR):
+        size = len(individs[0])
+        c_points = random_sample(range_size=len(individs[0]), quantity=2, replace=False)
+        c_points = sorted(c_points)
+        choosen = random_weighted_sample(weights=fitness, quantity=1, replace=True)[0]
+
+        if flip_coin(0.5):
+            offspring = individ.copy()
+            other_individ = individs[choosen]
+        else:
+            offspring = individs[choosen].copy()
+            other_individ = individ
+        for i in range(size):
+            if c_points[0] <= i <= c_points[1]:
+                offspring[i] = other_individ[i]
+        return offspring
+    else:
+        return individ
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def two_point_tour_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    CR: np.float32,
+) -> NDArray[np.byte]:
+    if flip_coin(CR):
+        size = len(individs[0])
+        c_points = random_sample(range_size=len(individs[0]), quantity=2, replace=False)
+        c_points = sorted(c_points)
+        choosen = tournament_selection(fitness, rank, 2, 1)[0]
+
+        if flip_coin(0.5):
+            offspring = individ.copy()
+            other_individ = individs[choosen]
+        else:
+            offspring = individs[choosen].copy()
+            other_individ = individ
+        for i in range(size):
+            if c_points[0] <= i <= c_points[1]:
+                offspring[i] = other_individ[i]
+        return offspring
+    else:
+        return individ
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def uniform_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    size = len(individ)
+    offspring = individ.copy()
+    j = randint(0, size, 1)[0]
+
+    choosen = random_sample(range_size=len(fitness), quantity=len(individs[0]), replace=True)
+    for i in range(individs.shape[1]):
+        if np.random.rand() <= CR or i == j:
+            offspring[i] = individs[choosen[i]][i]
+    return offspring
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def uniform_prop_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    size = len(individ)
+    offspring = individ.copy()
+    j = randint(0, size, 1)[0]
+
+    choosen = random_weighted_sample(weights=fitness, quantity=len(individs[0]), replace=True)
+
+    for i in range(individs.shape[1]):
+        if np.random.rand() <= CR or i == j:
+            offspring[i] = individs[choosen[i]][i]
+    return offspring
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def uniform_rank_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float32],
+    rank: NDArray[np.float32],
+    CR: np.float32,
+) -> NDArray[np.byte]:
+    size = len(individ)
+    offspring = individ.copy()
+    j = randint(0, size, 1)[0]
+
+    choosen = random_weighted_sample(weights=rank, quantity=len(individs[0]), replace=True)
+    for i in range(individs.shape[1]):
+        if np.random.rand() <= CR or i == j:
+            offspring[i] = individs[choosen[i]][i]
+    return offspring
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def uniform_tour_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    size = len(individ)
+    offspring = individ.copy()
+    j = randint(0, size, 1)[0]
+
+    choosen = tournament_selection(fitness, rank, 2, size)
+    for i in range(size):
+        if np.random.rand() <= CR or i == j:
+            offspring[i] = individs[choosen[i]][i]
+    return offspring
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def binomial_selfshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    size = len(individ)
+    offspring = individ.copy()
+    j = randint(0, size, 1)[0]
+
+    for i in range(size):
+        if flip_coin(CR) or i == j:
+            offspring[i] = individs[0][i]
+    return offspring
