@@ -1193,6 +1193,39 @@ def one_point_tour_crossover_selfcshaga(
 
 
 @njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
+def two_point_crossover_selfcshaga(
+    individ: NDArray[np.byte],
+    individs: NDArray[np.byte],
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
+) -> NDArray[np.byte]:
+    if flip_coin(CR):
+        size = len(individ)
+        c_points = random_sample(range_size=size, quantity=2, replace=False)
+        left = c_points[0]
+        right = c_points[1]
+        if left > right:
+            left, right = right, left
+
+        choosen = random_sample(range_size=len(fitness), quantity=1, replace=True)[0]
+
+        if flip_coin(0.5):
+            offspring = individ.copy()
+            other_individ = individs[choosen]
+        else:
+            offspring = individs[choosen].copy()
+            other_individ = individ
+
+        for i in range(size):
+            if left <= i <= right:
+                offspring[i] = other_individ[i]
+        return offspring
+    else:
+        return individ
+
+
+@njit(int8[:](int8[:], int8[:, :], float64[:], float64[:], float64))
 def two_point_rank_crossover_selfcshaga(
     individ: NDArray[np.byte],
     individs: NDArray[np.byte],

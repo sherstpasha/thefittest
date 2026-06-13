@@ -19,7 +19,7 @@ from thefittest.benchmarks import Sphere
 from thefittest.benchmarks import IrisDataset
 from thefittest.classifiers import MLPEAClassifier
 from thefittest.optimizers._shaga import SHAGA as BaseSHAGA
-from thefittest.optimizers._shaga_conf import SHAGA as ConfSHAGA
+from thefittest.optimizers._shaga import SHAGA as ConfSHAGA
 from thefittest.utils.transformations import GrayCode
 
 

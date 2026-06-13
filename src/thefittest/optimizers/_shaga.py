@@ -1,148 +1,64 @@
 from __future__ import annotations
 
-from functools import partial
 from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
 from typing import Union
-
 import numpy as np
 from numpy.typing import NDArray
 
+from scipy.stats import rankdata
+
 from ..base._ea import EvolutionaryAlgorithm
-from ..optimizers._shade import lehmer_mean
-from ..utils.crossovers import binomialGA
-from ..utils.mutations import flip_mutation
+
+from ..utils.selections import proportional_selection
+from ..utils.selections import rank_selection
 from ..utils.selections import tournament_selection
+
+from ..utils.crossovers import empty_crossover_selfcshaga
+from ..utils.crossovers import one_point_crossover_selfcshaga
+from ..utils.crossovers import one_point_prop_crossover_selfcshaga
+from ..utils.crossovers import one_point_rank_crossover_selfcshaga
+from ..utils.crossovers import one_point_tour_crossover_selfcshaga
+from ..utils.crossovers import two_point_crossover_selfcshaga
+from ..utils.crossovers import two_point_prop_crossover_selfcshaga
+from ..utils.crossovers import two_point_rank_crossover_selfcshaga
+from ..utils.crossovers import two_point_tour_crossover_selfcshaga
+from ..utils.crossovers import uniform_crossover_selfcshaga
+from ..utils.crossovers import uniform_prop_crossover_selfcshaga
+from ..utils.crossovers import uniform_rank_crossover_selfcshaga
+from ..utils.crossovers import uniform_tour_crossover_selfcshaga
+from ..utils.crossovers import binomial_selfshaga
+from ..utils.mutations import flip_mutation
+from ._shade import lehmer_mean
+
 from ..utils.random import cauchy_distribution
 from ..utils.random import randint
+from ..utils.transformations import minmax_scale
 
 
 class SHAGA(EvolutionaryAlgorithm):
     """
-    Success History based Adaptive Genetic Algorithm.
-
-    SHAGA is an adaptive genetic algorithm that uses success history to dynamically
-    adjust mutation rate (MR) and crossover rate (CR) parameters during evolution.
-    It combines concepts from SHADE (Success-History based Adaptive Differential
-    Evolution) with genetic algorithms for binary optimization.
-
-    Parameters
-    ----------
-    fitness_function : Callable[[NDArray[Any]], NDArray[np.float64]]
-        Function to evaluate fitness of solutions. Should accept a 2D array
-        of shape (pop_size, str_len) and return a 1D array of fitness values.
-    iters : int
-        Maximum number of iterations (generations) to run the algorithm.
-    pop_size : int
-        Number of individuals in the population.
-    str_len : int
-        Length of the binary string (genotype length).
-    elitism : bool, optional (default=True)
-        If True, the best solution is always preserved in the next generation.
-    init_population : Optional[NDArray[np.byte]], optional (default=None)
-        Initial population. If None, population is randomly initialized.
-        Shape should be (pop_size, str_len).
-    genotype_to_phenotype : Optional[Callable], optional (default=None)
-        Function to decode genotype to phenotype. If None, genotype equals phenotype.
-    optimal_value : Optional[float], optional (default=None)
-        Known optimal value for termination. Algorithm stops if this value is reached.
-    termination_error_value : float, optional (default=0.0)
-        Acceptable error from optimal value for termination.
-    no_increase_num : Optional[int], optional (default=None)
-        Stop if no improvement for this many iterations. If None, runs all iterations.
-    minimization : bool, optional (default=False)
-        If True, minimize the fitness function; if False, maximize.
-    show_progress_each : Optional[int], optional (default=None)
-        Print progress every N iterations. If None, no progress is shown.
-    keep_history : bool, optional (default=False)
-        If True, keeps history of all populations and fitness values.
-    n_jobs : int, optional (default=1)
-        Number of parallel jobs for fitness evaluation. -1 uses all processors.
-    fitness_function_args : Optional[Dict], optional (default=None)
-        Additional arguments to pass to fitness function.
-    genotype_to_phenotype_args : Optional[Dict], optional (default=None)
-        Additional arguments to pass to genotype_to_phenotype function.
-    random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
-        Random state for reproducibility.
-    on_generation : Optional[Callable], optional (default=None)
-        Callback function called after each generation.
-    fitness_update_eps : float, optional (default=0.0)
-        Minimum improvement threshold to consider a solution as better.
-
-    Attributes
-    ----------
-    _str_len : int
-        Length of binary strings.
-    _MR : NDArray[np.float64]
-        Current mutation rates for each individual.
-    _CR : NDArray[np.float64]
-        Current crossover rates for each individual.
-    _H_MR : NDArray[np.float64]
-        Historical memory of successful mutation rates.
-    _H_CR : NDArray[np.float64]
-        Historical memory of successful crossover rates.
-
-    References
-    ----------
-    .. [1] Stanovov, Vladimir & Akhmedova, Shakhnaz & Semenkin, Eugene. (2019).
-           Genetic Algorithm with Success History based Parameter Adaptation.
-           180-187. 10.5220/0008071201800187.
-
-    Examples
-    --------
-    **Example 1: OneMax Problem**
-
-    >>> from thefittest.benchmarks import OneMax
-    >>> from thefittest.optimizers import SHAGA
-    >>>
-    >>> optimizer = SHAGA(
-    ...     fitness_function=OneMax(),
-    ...     iters=150,
-    ...     pop_size=100,
-    ...     str_len=500,
-    ...     show_progress_each=20
-    ... )
-    >>>
-    >>> optimizer.fit()
-    >>> fittest = optimizer.get_fittest()
-    >>> print('Best fitness:', fittest['fitness'])
-
-    **Example 2: Continuous Optimization with Gray Code**
-
-    >>> from thefittest.benchmarks import Sphere
-    >>> from thefittest.utils.transformations import GrayCode
-    >>>
-    >>> # Setup encoding
-    >>> encoder = GrayCode()
-    >>> encoder.fit(left_border=-10, right_border=10,
-    ...             num_variables=5, h_per_variable=0.01)
-    >>> num_bits = encoder.get_bits_per_variable().sum()
-    >>>
-    >>> optimizer = SHAGA(
-    ...     fitness_function=Sphere(),
-    ...     genotype_to_phenotype=encoder.transform,
-    ...     iters=200,
-    ...     pop_size=100,
-    ...     str_len=num_bits,
-    ...     minimization=True
-    ... )
-    >>>
-    >>> optimizer.fit()
-    >>> fittest = optimizer.get_fittest()
-    >>> print('Best solution:', fittest['phenotype'])
-    >>> print('Best fitness:', fittest['fitness'])
-    """
+    - Stanovov, Vladimir & Akhmedova, Shakhnaz & Semenkin, Eugene. (2019).
+    Genetic Algorithm with Success History based Parameter Adaptation. 180-187.
+    10.5220/0008071201800187.
+    - Sherstnev P.A., Semenkin E.S. SelfCSHAGA: Self-configuring genetic optimization
+    algorithm with adaptation based on success history // Vestnik MGTU im. N.E. Baumana.
+    Ser. Priborostroenie. — 2025. — No. 2 (151). — P. 8."""
 
     def __init__(
         self,
-        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float32]],
         iters: int,
         pop_size: int,
         str_len: int,
+        tour_size: int = 2,
+        parents_num: int = 2,
         elitism: bool = True,
+        selection: str = "tournament_2",
+        crossover: str = "uniform_1",
         init_population: Optional[NDArray[np.byte]] = None,
         genotype_to_phenotype: Optional[Callable[[NDArray[np.byte]], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
@@ -191,6 +107,64 @@ class SHAGA(EvolutionaryAlgorithm):
         self._H_MR = np.full(self._H_size, 1 / (self._str_len), dtype=np.float64)
         self._H_CR = np.full(self._H_size, 0.5, dtype=np.float64)
         self._k: int = 0
+        self._parents_num: int = parents_num
+        self._tour_size: int = tour_size
+
+        self._specified_selection: str = selection
+        self._specified_crossover: str = crossover
+
+        self._selection_pool: Dict[str, Tuple[Callable, Union[float, int]]] = {
+            "proportional": (proportional_selection, 0),
+            "rank": (rank_selection, 0),
+            "tournament_k": (tournament_selection, self._tour_size),
+            "tournament_2": (tournament_selection, 2),
+            "tournament_3": (tournament_selection, 3),
+            "tournament_5": (tournament_selection, 5),
+            "tournament_7": (tournament_selection, 7),
+        }
+
+        self._crossover_pool: Dict[str, Tuple[Callable, Union[float, int]]] = {
+            "empty": (empty_crossover_selfcshaga, 1),
+            "one_point_1": (one_point_crossover_selfcshaga, 1),
+            "one_point_2": (one_point_crossover_selfcshaga, 2),
+            "one_point_7": (one_point_crossover_selfcshaga, 7),
+            "one_point_k": (one_point_crossover_selfcshaga, self._parents_num),
+            "one_point_prop_2": (one_point_prop_crossover_selfcshaga, 2),
+            "one_point_prop_7": (one_point_prop_crossover_selfcshaga, 7),
+            "one_point_prop_k": (one_point_prop_crossover_selfcshaga, self._parents_num),
+            "one_point_rank_2": (one_point_rank_crossover_selfcshaga, 2),
+            "one_point_rank_7": (one_point_rank_crossover_selfcshaga, 7),
+            "one_point_rank_k": (one_point_rank_crossover_selfcshaga, self._parents_num),
+            "one_point_tour_3": (one_point_tour_crossover_selfcshaga, 3),
+            "one_point_tour_7": (one_point_tour_crossover_selfcshaga, 7),
+            "one_point_tour_k": (one_point_tour_crossover_selfcshaga, self._parents_num),
+            "two_point_1": (two_point_crossover_selfcshaga, 1),
+            "two_point_2": (two_point_crossover_selfcshaga, 2),
+            "two_point_7": (two_point_crossover_selfcshaga, 7),
+            "two_point_k": (two_point_crossover_selfcshaga, self._parents_num),
+            "two_point_prop_2": (two_point_prop_crossover_selfcshaga, 2),
+            "two_point_prop_7": (two_point_prop_crossover_selfcshaga, 7),
+            "two_point_prop_k": (two_point_prop_crossover_selfcshaga, self._parents_num),
+            "two_point_rank_2": (two_point_rank_crossover_selfcshaga, 2),
+            "two_point_rank_7": (two_point_rank_crossover_selfcshaga, 7),
+            "two_point_rank_k": (two_point_rank_crossover_selfcshaga, self._parents_num),
+            "two_point_tour_3": (two_point_tour_crossover_selfcshaga, 3),
+            "two_point_tour_7": (two_point_tour_crossover_selfcshaga, 7),
+            "two_point_tour_k": (two_point_tour_crossover_selfcshaga, self._parents_num),
+            "uniform_1": (binomial_selfshaga, 1),
+            "uniform_2": (uniform_crossover_selfcshaga, 2),
+            "uniform_7": (uniform_crossover_selfcshaga, 7),
+            "uniform_k": (uniform_crossover_selfcshaga, self._parents_num),
+            "uniform_prop_2": (uniform_prop_crossover_selfcshaga, 2),
+            "uniform_prop_7": (uniform_prop_crossover_selfcshaga, 7),
+            "uniform_prop_k": (uniform_prop_crossover_selfcshaga, self._parents_num),
+            "uniform_rank_2": (uniform_rank_crossover_selfcshaga, 2),
+            "uniform_rank_7": (uniform_rank_crossover_selfcshaga, 7),
+            "uniform_rank_k": (uniform_rank_crossover_selfcshaga, self._parents_num),
+            "uniform_tour_3": (uniform_tour_crossover_selfcshaga, 3),
+            "uniform_tour_7": (uniform_tour_crossover_selfcshaga, 7),
+            "uniform_tour_k": (uniform_tour_crossover_selfcshaga, self._parents_num),
+        }
 
     @staticmethod
     def binary_string_population(pop_size: int, str_len: int) -> NDArray[np.byte]:
@@ -211,6 +185,8 @@ class SHAGA(EvolutionaryAlgorithm):
     def _get_init_population(self: SHAGA) -> None:
         self._first_generation()
         self._population_ph_i, self._fitness_i = self._evaluate_population(self._population_g_i)
+        self._fitness_scale_i = minmax_scale(self._fitness_i)
+        self._fitness_rank_i = rankdata(self._fitness_i)
 
     def _randc(
         self: SHAGA,
@@ -269,13 +245,31 @@ class SHAGA(EvolutionaryAlgorithm):
 
     def _get_new_individ_g(
         self: SHAGA,
+        specified_selection: str,
+        specified_crossover: str,
         individ_g: NDArray[np.float64],
         MR: float,
         CR: float,
     ) -> NDArray[np.float64]:
-        second_parent_id = tournament_selection(self._fitness_i, self._fitness_i, 2, 1)[0]
-        second_parent = self._population_g_i[second_parent_id].copy()
-        offspring = binomialGA(individ_g, second_parent, CR)
+        selection_func, tour_size = self._selection_pool[specified_selection]
+        crossover_func, quantity = self._crossover_pool[specified_crossover]
+
+        selected_id = selection_func(
+            self._fitness_scale_i,
+            self._fitness_rank_i,
+            np.int64(tour_size),
+            np.int64(quantity),
+        )
+
+        second_parents = self._population_g_i[selected_id].copy()
+
+        offspring = crossover_func(
+            individ_g,
+            second_parents,
+            self._fitness_scale_i[selected_id],
+            self._fitness_rank_i[selected_id],
+            CR,
+        )
         mutant = flip_mutation(offspring, MR)
         return mutant
 
@@ -296,15 +290,18 @@ class SHAGA(EvolutionaryAlgorithm):
         self._population_g_i[mask] = mutant_g[mask]
         self._population_ph_i[mask] = mutant_ph[mask]
         self._fitness_i[mask] = mutant_fit[mask]
+        self._fitness_scale_i = minmax_scale(self._fitness_i)
+        self._fitness_rank_i = rankdata(self._fitness_i)
 
         d_fitness = np.abs(will_be_replaced_fit - self._fitness_i[succeses])
         d_fitness[d_fitness == np.inf] = 1e4
 
         return succeses_MR, succeses_CR, d_fitness
 
-    def _get_new_population(self: SHAGA) -> None:
-        get_new_individ_g = partial(self._get_new_individ_g)
+    def _get_individ_operators(self: SHAGA, index: int) -> Tuple[str, str]:
+        return self._specified_selection, self._specified_crossover
 
+    def _get_new_population(self: SHAGA) -> None:
         self._MR, self._CR = self._generate_MR_CR(
             randc_scale=0.1 / self._str_len,
             randc_lower=0.0,
@@ -316,7 +313,8 @@ class SHAGA(EvolutionaryAlgorithm):
 
         mutant_cr_b_g = np.array(
             [
-                get_new_individ_g(
+                self._get_new_individ_g(
+                    *self._get_individ_operators(i),
                     individ_g=self._population_g_i[i],
                     MR=self._MR[i],
                     CR=self._CR[i],
@@ -327,7 +325,6 @@ class SHAGA(EvolutionaryAlgorithm):
         )
 
         mutant_cr_ph, mutant_cr_fit = self._evaluate_population(mutant_cr_b_g)
-
         succeses_MR, succeses_CR, d_fitness = self._replace_population(
             mutant_cr_b_g,
             mutant_cr_ph,

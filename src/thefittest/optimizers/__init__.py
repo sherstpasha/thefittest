@@ -8,7 +8,8 @@ from ._shade import SHADE
 from ._shaga import SHAGA
 from ._pdpga import PDPGA
 from ._pdpgp import PDPGP
-
+from ._selfcshaga import SelfCSHAGA
+from ._pdpshaga import PDPSHAGA
 
 __all__ = [
     "DifferentialEvolution",
@@ -21,4 +22,6 @@ __all__ = [
     "SHAGA",
     "PDPGA",
     "PDPGP",
+    "SelfCSHAGA",
+    "PDPSHAGA",
 ]

@@ -1,21 +1,23 @@
 from __future__ import annotations
 
-from typing import Any, Union
+from typing import Any
 from typing import Callable
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Tuple
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
+from ..utils import numpy_group_by
 from ..base._ea import EvolutionaryAlgorithm
+from ._pdpga import PDPGA
 from ._shaga import SHAGA
-from ._selfcga import SelfCGA
 
 
-class SelfCSHAGA(SHAGA, SelfCGA):
-
+class PDPSHAGA(SHAGA, PDPGA):
     def __init__(
         self,
         fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
@@ -63,9 +65,6 @@ class SelfCSHAGA(SHAGA, SelfCGA):
             "uniform_tour_7",
         ),
         init_population: Optional[NDArray[np.byte]] = None,
-        K: float = 2,
-        selection_threshold_proba: float = 0.05,
-        crossover_threshold_proba: float = 0.05,
         genotype_to_phenotype: Optional[Callable[[NDArray[np.byte]], NDArray[Any]]] = None,
         optimal_value: Optional[float] = None,
         termination_error_value: float = 0.0,
@@ -109,10 +108,9 @@ class SelfCSHAGA(SHAGA, SelfCGA):
             fitness_cache_size=fitness_cache_size,
         )
 
-        self._K: float = K
         self._thresholds: Dict[str, float] = {
-            "selection": selection_threshold_proba,
-            "crossover": crossover_threshold_proba,
+            "selection": 0.2 / len(selections),
+            "crossover": 0.2 / len(crossovers),
         }
 
         self._selection_set: Dict[str, Tuple[Callable, Union[float, int]]] = {}
@@ -150,6 +148,7 @@ class SelfCSHAGA(SHAGA, SelfCGA):
 
         self._selection_operators: NDArray
         self._crossover_operators: NDArray
+        self._success_i: Optional[NDArray[np.bool_]] = None
 
     def _get_individ_operators(self: SHAGA, index: int) -> Tuple[str, str]:
         return self._selection_operators[index], self._crossover_operators[index]
@@ -168,16 +167,51 @@ class SelfCSHAGA(SHAGA, SelfCGA):
             c_proba=self._crossover_proba,
         )
 
-    def _adapt(self: SHAGA) -> None:
-        s_fittest_oper = self._find_fittest_operator(self._selection_operators, self._fitness_i)
-        self._selection_proba = self._get_new_proba(
-            self._selection_proba, s_fittest_oper, self._thresholds["selection"]
+    def _replace_population(
+        self,
+        mutant_g: NDArray,
+        mutant_ph: NDArray,
+        mutant_fit: NDArray,
+    ) -> Tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+        self._success_i = mutant_fit > self._fitness_i
+        return super()._replace_population(mutant_g, mutant_ph, mutant_fit)
+
+    def _culc_r_i(
+        self, success: NDArray[np.bool_], operators: NDArray, operator_keys: List[str]
+    ) -> Tuple[NDArray, NDArray[np.float64]]:
+        keys, groups = numpy_group_by(group=success, by=operators)
+        r_values = np.array(list(map(lambda x: (np.sum(x) ** 2 + 1) / (len(x) + 1), groups)))
+        for key in operator_keys:
+            if key not in keys:
+                keys = np.append(keys, key)
+                r_values = np.append(r_values, 0.0)
+
+        return keys, r_values
+
+    def _get_new_proba_pdp(
+        self,
+        proba_dict: Dict[str, float],
+        operators: NDArray,
+        threshold: float,
+    ) -> Dict[str, float]:
+        n = len(proba_dict)
+        operators, r_values = self._culc_r_i(self._success_i, operators, list(proba_dict.keys()))
+        scale = np.sum(r_values)
+        proba_value = threshold + (r_values * ((1.0 - n * threshold) / scale))
+        new_proba_dict = dict(zip(operators, proba_value))
+        return dict(sorted(new_proba_dict.items()))
+
+    def _adapt(self) -> None:
+        if self._success_i is None:
+            return None
+
+        self._selection_proba = self._get_new_proba_pdp(
+            self._selection_proba, self._selection_operators, self._thresholds["selection"]
+        )
+        self._crossover_proba = self._get_new_proba_pdp(
+            self._crossover_proba, self._crossover_operators, self._thresholds["crossover"]
         )
 
-        c_fittest_oper = self._find_fittest_operator(self._crossover_operators, self._fitness_i)
-        self._crossover_proba = self._get_new_proba(
-            self._crossover_proba, c_fittest_oper, self._thresholds["crossover"]
-        )
-
+        self._success_i = None
         self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
         self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
