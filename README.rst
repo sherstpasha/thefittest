@@ -1,25 +1,29 @@
-.. image:: https://img.shields.io/pypi/v/thefittest?label=PyPI%20-%20Package%20version
-    :target: https://pypi.org/project/thefittest/
-    :alt: PyPI - Package version
-.. image:: https://static.pepy.tech/badge/thefittest
-    :target: https://pepy.tech/project/thefittest
-    :alt: Downloads
-.. image:: https://komarev.com/ghpvc/?username=thefittest
-    :alt: Profile views
-.. image:: https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master
-    :alt: codecov.io
-.. image:: https://app.codacy.com/project/badge/Grade/4c47b6de61c4422180529bbc360262c4
-    :target: https://app.codacy.com/gh/sherstpasha/thefittest/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
-    :alt: Codacy Badge
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
-    :alt: Code style: black
-.. image:: https://readthedocs.com/projects/sherstpasha-pavel/badge/?version=latest&token=71adf5d63b55f0def96b09e1ce4c60f8d57cbdaed7db777117f34e4718d5a1ea
-    :target: https://sherstpasha-pavel.readthedocs-hosted.com/ru/latest/?badge=latest
-    :alt: Documentation Status
-    
+|pypi|_ |downloads|_ |views| |coverage|_ |codacy|_ |black|_ |docs|_
+
+.. |pypi| image:: https://img.shields.io/pypi/v/thefittest?label=PyPI%20version
+.. _pypi: https://pypi.org/project/thefittest/
+
+.. |downloads| image:: https://static.pepy.tech/badge/thefittest
+.. _downloads: https://pepy.tech/project/thefittest
+
+.. |views| image:: https://komarev.com/ghpvc/?username=thefittest
+
+.. |coverage| image:: https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master
+.. _coverage: https://codecov.io/github/sherstpasha/thefittest
+
+.. |codacy| image:: https://app.codacy.com/project/badge/Grade/4c47b6de61c4422180529bbc360262c4
+.. _codacy: https://app.codacy.com/gh/sherstpasha/thefittest/dashboard
+
+.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+.. _black: https://github.com/psf/black
+
+.. |docs| image:: https://img.shields.io/badge/docs-online-brightgreen
+.. _docs: https://sherstpasha.github.io/thefittest/
+
 .. image:: docs/logos/logo1.png
    :align: center
+   :alt: thefittest logo
+
 
 ``thefittest`` is an open-source library designed for the efficient application of classical evolutionary algorithms and their effective modifications in optimization and machine learning. Our project aims to provide performance, accessibility, and ease of use, opening up the world of advanced evolutionary methods to you.
 
@@ -27,43 +31,16 @@ Features of ``thefittest``
 --------------------------
 
 **Performance**
-  Our library is developed using advanced coding practices and delivers high performance through integration with `NumPy <https://numpy.org/>`_, `Scipy <https://scipy.org/>`_, `Numba <https://numba.pydata.org/>`_, and `scikit-learn <https://scikit-learn.org/>`_.
+  Our library is developed using advanced coding practices and delivers high performance through integration with `NumPy <https://numpy.org/>`_, `SciPy <https://scipy.org/>`_, and `Numba <https://numba.pydata.org/>`_.
 
 **Versatility**
-  ``thefittest`` offers a wide range of classical evolutionary algorithms and effective modifications, making it the ideal choice for a variety of optimization and machine learning tasks.
+  ``thefittest`` offers a wide range of classical evolutionary algorithms and effective modifications, making it suitable for a variety of optimization and machine learning tasks.
 
 **Integration with scikit-learn**
-  Easily integrate machine learning methods from ``thefittest`` with `scikit-learn <https://scikit-learn.org/>`_ tools, creating comprehensive and versatile solutions for evolutionary optimization and model training tasks.
+  Machine learning models from ``thefittest`` follow the familiar `scikit-learn <https://scikit-learn.org/>`_ interface and can be used with its preprocessing, model selection, and evaluation tools.
 
-Installation
-------------
-
-**Basic installation** (for evolutionary algorithms and symbolic regression):
-
-.. code-block:: bash
-
-    pip install thefittest
-
-This installation includes all evolutionary optimizers (GA, DE, SHADE, etc.) and symbolic regression with GP.
-
-**Full installation with neural networks** (requires GPU with CUDA):
-
-First, install PyTorch with CUDA support from the official website: https://pytorch.org/get-started/locally/
-
-For example, for CUDA 12.4:
-
-.. code-block:: bash
-
-    pip3 install torch --index-url https://download.pytorch.org/whl/cu124
-
-Then install thefittest:
-
-.. code-block:: bash
-
-    pip install thefittest
-
-This enables neural network models (``MLPEAClassifier``, ``MLPEARegressor``, ``GeneticProgrammingNeuralNetClassifier``, ``GeneticProgrammingNeuralNetRegressor``) with GPU acceleration.
-
+**PyTorch support**
+  ``thefittest`` supports `PyTorch <https://pytorch.org/>`_ for efficient neural network computations and evolutionary optimization of neural network weights and architectures, including GPU acceleration with CUDA.
 
 Usage Example
 -------------
@@ -143,26 +120,14 @@ This example demonstrates how to train a machine learning model on the Iris data
     print("confusion_matrix: \n", confusion_matrix(y_test, predict))
     print("f1_score: \n", f1_score(y_test, predict, average="macro"))
 
-Dependencies
+Installation
 ------------
 
-``thefittest`` requires the following packages (installed automatically with ``pip install thefittest``):
+Install ``thefittest`` from PyPI:
 
-- `Python (>=3.7,<=3.13) <https://www.python.org/>`_;
-- `numpy (>=1.26) <https://numpy.org/>`_;
-- `numba (>=0.60) <https://numba.pydata.org/>`_;
-- `scipy <https://scipy.org/>`_;
-- `scikit-learn (>=1.4) <https://scikit-learn.org/>`_;
-- `joblib (>=1.3.0) <https://joblib.readthedocs.io/>`_.
+.. code-block:: bash
 
-Optional dependencies
----------------------
-
-Some extra packages can be installed manually if needed:
-
-- `networkx <https://networkx.org/>`_ — required for visualization methods that work with objects such as ``Net`` and ``Tree``;
-- `torch (>=2.0) <https://pytorch.org/>`_ with **CUDA** support — required for neural network models (``MLPEAClassifier``, ``MLPEARegressor``, ``GeneticProgrammingNeuralNetClassifier``, ``GeneticProgrammingNeuralNetRegressor``). Install from https://pytorch.org/get-started/locally/
-
+    pip install thefittest
 
 ``thefittest`` contains methods
 -------------------------------
@@ -186,34 +151,6 @@ Some extra packages can be installed manually if needed:
 - **Genetic programming of neural networks (GPNN)** (`Lipinsky L., Semenkin E., Bulletin of the Siberian State Aerospace University., 3(10), 22-26 (2006). In Russian`_);
 - **Multilayer perceptron trained by evolutionary algorithms** (`Cotta, Carlos & Alba, Enrique & Sagarna, R. & Larranaga, Pedro. (2002). Adjusting Weights in Artificial Neural Networks using Evolutionary Algorithms. <http://dx.doi.org/10.1007/978-1-4615-1539-5_18>`_);
 
-Benchmarks
-----------
-
-- **CEC2005** (`Suganthan, Ponnuthurai & Hansen, Nikolaus & Liang, Jing & Deb, Kalyan & Chen, Ying-ping & Auger, Anne & Tiwari, Santosh. (2005). Problem Definitions and Evaluation Criteria for the CEC 2005 Special Session on Real-Parameter Optimization. Natural Computing. 341-357`_);
-- **Symbolicregression17. 17 test regression problem from the paper** (`Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm with modified uniform crossover. 1-6. <http://dx.doi.org/10.1109/CEC.2012.6256587>`_).
-- **Iris** (`Fisher,R. A.. (1988). Iris. UCI Machine Learning Repository. <https://doi.org/10.24432/C56C76>`_);
-- **Wine** (`Aeberhard,Stefan and Forina,M.. (1991). Wine. UCI Machine Learning Repository. <https://doi.org/10.24432/C5PC7J>`_);
-- **Breast Cancer Wisconsin (Diagnostic)** (`Wolberg,William, Mangasarian,Olvi, Street,Nick, and Street,W.. (1995). Breast Cancer Wisconsin (Diagnostic). UCI Machine Learning Repository. <https://doi.org/10.24432/C5DW2B>`_);
-- **Optical Recognition of Handwritten Digits** (`Alpaydin,E. and Kaynak,C.. (1998). Optical Recognition of Handwritten Digits. UCI Machine Learning Repository. <https://doi.org/10.24432/C50P49>`_);
-
-Examples
---------
-
-Notebooks on how to use ``thefittest``:
-
-- `Solving Binary and Real-Valued Optimization Problems with Genetic Algorithms; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb>`_
-- `Solving Real-Valued Optimization Problems with Differential Evolution; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb>`_
-- `Solving Symbolic Regression Problems Using Genetic Programming Algorithms; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_programming_symbolic_regression_problem.ipynb>`_
-- `Training Neural Networks Using Evolutionary Algorithms for Regression and Classification Problems; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/mlpea_regression_classification_problem.ipynb>`_
-- `Optimizing Neural Network Structure Using Genetic Programming; <https://github.com/sherstpasha/thefittest-notebooks/blob/main/gpnn_regression_classification_problems.ipynb>`_
-
-If some notebooks are too big to display, you can use `NBviewer <https://nbviewer.org/>`_.
-
-Kaggle Notebooks
-----------------
-
-- `Can Evolution Guide Us to Better Machine Learning? <https://www.kaggle.com/code/pashasherst/can-evolution-guide-us-to-better-machine-learning>`_
-
 Articles
 --------
 
@@ -222,13 +159,13 @@ Publications where ``thefittest`` has been used:
 - *Thefittest: evolutionary machine learning in Python*, January 2024, ITM Web of Conferences 59.
   DOI: 10.1051/itmconf/20245902020. Licensed under CC BY 4.0. Authored by Pavel Sherstnev.
   Available at: https://doi.org/10.1051/itmconf/20245902020
-
 - (in Russian) Демидов Н. Аспекты реализации генетического алгоритма в задачах смешанной оптимизации в пространстве переменной размерности // *International Journal of Open Information Technologies*. — 2026. — Т. 14, № 5. — С. 110–123.
   Available at: http://injoit.ru/index.php/j1/article/view/2562
   (transliteration) Demidov N. Aspekty realizatsii geneticheskogo algoritma v zadachakh smeshannoy optimizatsii v prostranstve peremennoy razmernosti // *International Journal of Open Information Technologies*. — 2026. — Vol. 14, No. 5. — P. 110–123.
-
 - (in Russian) Масленников В. В. Квантово-инспирированный генетический алгоритм вещественной однокритериальной оптимизации с адаптацией значений параметров на основе истории успеха // *ИТ-Стандарт*. — 2025. — № 4(45). — С. 81–101. — EDN KJRSYX.
   (transliteration) Maslennikov V. V. Kvantovo-inspirovannyy geneticheskiy algoritm veshchestvennoy odnokriterial'noy optimizatsii s adaptatsiyey znacheniy parametrov na osnove istorii uspekha // *IT-Standart*. — 2025. — No. 4(45). — P. 81–101.
+- (in Russian) Демидов Н. А. Решение задачи одноклассовой классификации в пространстве проектирования переменной размерности на примере наборов регулярных выражений // *Вестник Рязанского государственного радиотехнического университета*. — 2026. — № 96-1. — С. 98–114.
+  (transliteration) Demidov N. A. Reshenie zadachi odnoklassovoy klassifikatsii v prostranstve proektirovaniya peremennoy razmernosti na primere naborov regulyarnykh vyrazheniy // *Vestnik Ryazanskogo gosudarstvennogo radiotekhnicheskogo universiteta*. — 2026. — No. 96-1. — P. 98–114.
 
 Awards and Presentations
 -------------------------
@@ -239,3 +176,8 @@ Awards and Presentations
 - **2nd place**, Youth IT Project Competition "Soft-Parade 2025". `More details <https://www.soft-parade.ru/archive>`_
 - **2nd place**, GitVerse, Cloud.ru and Habr Open Source Grant Program "Code Without Borders" 2025. `More details <https://gitverse.ru/blog/articles/open-source/1172-pozdravlyaem-pobeditelej-grantovoj-programmy-kod-bez-granic>`_
 - **International University Award "Gravitation" 2025** in the category *"Algorithms and Software Solutions in AI and Big Data"*, awarded by the Presidential Academy, Tomsk State University, and the Association *"University Consortium of Big Data Researchers"*. `More details <https://gravitation.ai/2025>`_
+
+Documentation
+-------------
+
+For detailed installation instructions, usage examples, API reference, and additional information, see the `official documentation <https://sherstpasha.github.io/thefittest/>`_.
