@@ -1,6 +1,10 @@
-from __future__ import annotations
+"""Crossover operators used by evolutionary algorithms.
 
-from typing import Any
+The module contains operators that build offspring from binary, real-valued,
+and tree-based individuals used by evolutionary optimizers in ``thefittest``.
+"""
+
+from __future__ import annotations
 
 from numba import float64
 from numba import int64
@@ -51,7 +55,7 @@ def empty_crossover(
     >>>
     >>> # Example
     >>> # Define the parents, fitness values, and ranks
-    >>> parents = np.array([[1, 0, 1]], dtype=np.byte)  # First and second parent
+    >>> parents = np.array([[1, 0, 1]], dtype=np.byte)
     >>> fitness_values = np.array([0.5], dtype=np.float64)
     >>> ranks = np.array([1.0], dtype=np.float64)
     >>>
@@ -162,7 +166,7 @@ def one_point_crossover(
     >>>
     >>> # Example
     >>> # Define the parents, fitness values, and ranks
-    >>> parents = np.array([[1, 0, 1], [0, 1, 1]], dtype=np.byte)  # First and second parent
+    >>> parents = np.array([[1, 0, 1], [0, 1, 1]], dtype=np.byte)
     >>> fitness_values = np.array([0.5, 0.8], dtype=np.float64)
     >>> ranks = np.array([2.0, 1.0], dtype=np.float64)
     >>>
@@ -172,8 +176,8 @@ def one_point_crossover(
     >>> # Display results
     >>> print("Original Individuals:", parents)
     Original Individuals: ...
-    >>> print("Offspring After Empty Crossover:", offspring)
-    Offspring After Empty Crossover: ...
+    >>> print("Offspring After One-Point Crossover:", offspring)
+    Offspring After One-Point Crossover: ...
     """
     cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
     if flip_coin(0.5):
@@ -223,7 +227,7 @@ def two_point_crossover(
     >>>
     >>> # Example
     >>> # Define the parents, fitness values, and ranks
-    >>> parents = np.array([[1, 0, 1, 0], [0, 1, 1, 1]], dtype=np.byte)  # First and second parent
+    >>> parents = np.array([[1, 0, 1, 0], [0, 1, 1, 1]], dtype=np.byte)
     >>> fitness_values = np.array([0.5, 0.8], dtype=np.float64)
     >>> ranks = np.array([2.0, 1.0], dtype=np.float64)
     >>>
@@ -286,7 +290,7 @@ def uniform_crossover(
     >>>
     >>> # Example
     >>> # Define the parents, fitness values, and ranks
-    >>> parents = np.array([[1, 0, 1, 0], [0, 1, 1, 1]], dtype=np.byte)  # First and second parent
+    >>> parents = np.array([[1, 0, 1, 0], [0, 1, 1, 1]], dtype=np.byte)
     >>> fitness_values = np.array([0.5, 0.8], dtype=np.float64)
     >>> ranks = np.array([2.0, 1.0], dtype=np.float64)
     >>>
@@ -340,7 +344,7 @@ def uniform_proportional_crossover(
     >>>
     >>> # Example
     >>> # Define the parents, fitness values, and ranks
-    >>> parents = np.array([[1, 0, 1, 0], [0, 1, 1, 1]], dtype=np.byte)  # First and second parent
+    >>> parents = np.array([[1, 0, 1, 0], [0, 1, 1, 1]], dtype=np.byte)
     >>> fitness_values = np.array([0.5, 0.8], dtype=np.float64)
     >>> ranks = np.array([2.0, 1.0], dtype=np.float64)
     >>>
@@ -394,7 +398,7 @@ def uniform_rank_crossover(
     >>>
     >>> # Example
     >>> # Define the parents, fitness values, and ranks
-    >>> parents = np.array([[1, 0, 1, 0], [0, 1, 1, 1]], dtype=np.byte)  # First and second parent
+    >>> parents = np.array([[1, 0, 1, 0], [0, 1, 1, 1]], dtype=np.byte)
     >>> fitness_values = np.array([0.5, 0.8], dtype=np.float64)
     >>> ranks = np.array([2.0, 1.0], dtype=np.float64)
     >>>
@@ -437,8 +441,8 @@ def uniform_tournament_crossover(
     Notes
     -----
     Uniform tournament crossover randomly selects genetic material from the parents for each gene in the chromosome.
-    The parents for each gene are chosen through tournament selection based on their fitness values.
-    The function returns a new chromosome representing potential offspring.
+    For every gene, two candidate parents are sampled from ``individs`` and the candidate with the higher fitness is
+    copied to the offspring. The function returns a new chromosome representing potential offspring.
 
     Examples
     --------
@@ -447,7 +451,7 @@ def uniform_tournament_crossover(
     >>>
     >>> # Example
     >>> # Define the parents, fitness values, and ranks
-    >>> parents = np.array([[1, 0, 1, 0], [0, 1, 1, 1]], dtype=np.byte)  # First and second parent
+    >>> parents = np.array([[1, 0, 1, 0], [0, 1, 1, 1]], dtype=np.byte)
     >>> fitness_values = np.array([0.5, 0.8], dtype=np.float64)
     >>> ranks = np.array([2.0, 1.0], dtype=np.float64)
     >>>
@@ -460,12 +464,12 @@ def uniform_tournament_crossover(
     >>> print("Offspring After Uniform Tournament Crossover:", offspring)
     Offspring After Uniform Tournament Crossover: ...
     """
-    range_ = np.arange(len(individs))
     diag = np.arange(len(individs[0]))
 
     tournament = random_sample(len(individs), 2 * len(individs[0]), True)
     tournament = tournament.reshape(-1, 2)
-    choosen = np.argmax(fitness[tournament], axis=1)
+    winners = np.argmax(fitness[tournament], axis=1)
+    choosen = tournament[diag, winners]
     offspring = individs[choosen, diag].copy()
     return offspring
 
@@ -534,6 +538,26 @@ def empty_crossoverGP(
     individs: NDArray, fitness: NDArray[np.float64], rank: NDArray[np.float64], max_level: int
 ) -> Tree:
     """
+    Return a copy of the first genetic programming parent.
+
+    Parameters
+    ----------
+    individs : NDArray
+        A 1D array containing at least one tree individual.
+    fitness : NDArray[np.float64]
+        Fitness values of individuals. Not used.
+    rank : NDArray[np.float64]
+        Rank values of individuals. Not used.
+    max_level : int
+        Maximum allowed tree level. Not used.
+
+    Returns
+    -------
+    Tree
+        Copy of the first tree in ``individs``.
+
+    Examples
+    --------
     >>> import numpy as np
     >>> from thefittest.utils.crossovers import empty_crossoverGP
     >>> from thefittest.base import Tree
@@ -1011,7 +1035,7 @@ def uniform_tournament_crossover_GP(
     -----
     Uniform tournament crossover is a genetic programming operator. It involves selecting a common region between two or more parents,
     and the genetic material is exchanged at randomly chosen points within this region. The probability of selecting genetic material
-    from a parent is determined through a tournament selection process, where individuals with higher fitness or rank values have a higher chance
+    from a parent is determined through a tournament selection process, where individuals with higher fitness values have a higher chance
     of contributing genetic material to the offspring. The resulting tree represents a combination of genetic material from all parents.
 
     Examples
@@ -1080,6 +1104,42 @@ def empty_crossover_selfcshaga(
     rank: NDArray[np.float64],
     CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Return the target chromosome unchanged for configurable SHAGA.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. Not used.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. Not used.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. Not used.
+    CR : np.float64
+        Crossover probability. Not used.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Copy of ``individ``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import empty_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = empty_crossover_selfcshaga(individ, parents, fitness, rank, 0.7)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     offspring = individ.copy()
     return offspring
 
@@ -1092,6 +1152,51 @@ def one_point_crossover_selfcshaga(
     rank: NDArray[np.float64],
     CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply one-point configurable SHAGA crossover with a uniformly selected parent.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. The parent used for crossover is sampled
+        uniformly from this array.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. Not used.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. Not used.
+    CR : np.float64
+        Probability of applying crossover. If crossover is not applied,
+        ``individ`` is returned.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by one-point crossover, or ``individ`` if crossover
+        is not applied.
+
+    Notes
+    -----
+    If crossover is triggered by ``CR``, a crossover point and one selected
+    parent are sampled. The suffix of one chromosome is exchanged with the
+    suffix of the other chromosome.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import one_point_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = one_point_crossover_selfcshaga(individ, parents, fitness, rank, 1.0)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     if flip_coin(CR):
         cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
         choosen = random_sample(range_size=len(fitness), quantity=1, replace=True)[0]
@@ -1119,6 +1224,51 @@ def one_point_prop_crossover_selfcshaga(
     rank: NDArray[np.float64],
     CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply one-point configurable SHAGA crossover with fitness-proportional parent choice.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. The parent used for crossover is sampled
+        from this array.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. They define the proportional
+        sampling weights.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. Not used.
+    CR : np.float64
+        Probability of applying crossover. If crossover is not applied,
+        ``individ`` is returned.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by one-point crossover, or ``individ`` if crossover
+        is not applied.
+
+    Notes
+    -----
+    If crossover is triggered by ``CR``, a crossover point is sampled and the
+    second chromosome is chosen with probability proportional to ``fitness``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import one_point_prop_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = one_point_prop_crossover_selfcshaga(individ, parents, fitness, rank, 1.0)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     if flip_coin(CR):
         cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
         choosen = random_weighted_sample(weights=fitness, quantity=1, replace=True)[0]
@@ -1146,6 +1296,51 @@ def one_point_rank_crossover_selfcshaga(
     rank: NDArray[np.float64],
     CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply one-point configurable SHAGA crossover with rank-proportional parent choice.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. The parent used for crossover is sampled
+        from this array.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. Not used.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. They define the proportional sampling
+        weights.
+    CR : np.float64
+        Probability of applying crossover. If crossover is not applied,
+        ``individ`` is returned.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by one-point crossover, or ``individ`` if crossover
+        is not applied.
+
+    Notes
+    -----
+    If crossover is triggered by ``CR``, a crossover point is sampled and the
+    second chromosome is chosen with probability proportional to ``rank``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import one_point_rank_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = one_point_rank_crossover_selfcshaga(individ, parents, fitness, rank, 1.0)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     if flip_coin(CR):
         cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
         choosen = random_weighted_sample(weights=rank, quantity=1, replace=True)[0]
@@ -1173,6 +1368,51 @@ def one_point_tour_crossover_selfcshaga(
     rank: NDArray[np.float64],
     CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply one-point configurable SHAGA crossover with tournament parent choice.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. The parent used for crossover is chosen
+        from this array.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. Tournament winners are selected by
+        higher fitness.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. Not used by tournament selection.
+    CR : np.float64
+        Probability of applying crossover. If crossover is not applied,
+        ``individ`` is returned.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by one-point crossover, or ``individ`` if crossover
+        is not applied.
+
+    Notes
+    -----
+    If crossover is triggered by ``CR``, a crossover point is sampled and the
+    second chromosome is chosen by a binary tournament over ``fitness``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import one_point_tour_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = one_point_tour_crossover_selfcshaga(individ, parents, fitness, rank, 1.0)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     if flip_coin(CR):
         cross_point = random_sample(range_size=len(individs[0]), quantity=1, replace=True)[0]
         choosen = tournament_selection(fitness, rank, 2, 1)[0]
@@ -1229,10 +1469,55 @@ def two_point_crossover_selfcshaga(
 def two_point_rank_crossover_selfcshaga(
     individ: NDArray[np.byte],
     individs: NDArray[np.byte],
-    fitness: NDArray[np.float32],
-    rank: NDArray[np.float32],
-    CR: np.float32,
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply two-point configurable SHAGA crossover with rank-proportional parent choice.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. The parent used for crossover is sampled
+        from this array.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. Not used.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. They define the proportional sampling
+        weights.
+    CR : np.float64
+        Probability of applying crossover. If crossover is not applied,
+        ``individ`` is returned.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by two-point crossover, or ``individ`` if crossover
+        is not applied.
+
+    Notes
+    -----
+    If crossover is triggered by ``CR``, two crossover points are sampled and
+    the segment between them is exchanged with a parent sampled by ``rank``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import two_point_rank_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = two_point_rank_crossover_selfcshaga(individ, parents, fitness, rank, 1.0)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     if flip_coin(CR):
         size = len(individs[0])
         c_points = random_sample(range_size=len(individs[0]), quantity=2, replace=False)
@@ -1257,10 +1542,55 @@ def two_point_rank_crossover_selfcshaga(
 def two_point_prop_crossover_selfcshaga(
     individ: NDArray[np.byte],
     individs: NDArray[np.byte],
-    fitness: NDArray[np.float32],
-    rank: NDArray[np.float32],
-    CR: np.float32,
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply two-point configurable SHAGA crossover with fitness-proportional parent choice.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. The parent used for crossover is sampled
+        from this array.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. They define the proportional
+        sampling weights.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. Not used.
+    CR : np.float64
+        Probability of applying crossover. If crossover is not applied,
+        ``individ`` is returned.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by two-point crossover, or ``individ`` if crossover
+        is not applied.
+
+    Notes
+    -----
+    If crossover is triggered by ``CR``, two crossover points are sampled and
+    the segment between them is exchanged with a parent sampled by ``fitness``.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import two_point_prop_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = two_point_prop_crossover_selfcshaga(individ, parents, fitness, rank, 1.0)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     if flip_coin(CR):
         size = len(individs[0])
         c_points = random_sample(range_size=len(individs[0]), quantity=2, replace=False)
@@ -1285,10 +1615,55 @@ def two_point_prop_crossover_selfcshaga(
 def two_point_tour_crossover_selfcshaga(
     individ: NDArray[np.byte],
     individs: NDArray[np.byte],
-    fitness: NDArray[np.float32],
-    rank: NDArray[np.float32],
-    CR: np.float32,
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply two-point configurable SHAGA crossover with tournament parent choice.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. The parent used for crossover is chosen
+        from this array.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. Tournament winners are selected by
+        higher fitness.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. Not used by tournament selection.
+    CR : np.float64
+        Probability of applying crossover. If crossover is not applied,
+        ``individ`` is returned.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by two-point crossover, or ``individ`` if crossover
+        is not applied.
+
+    Notes
+    -----
+    If crossover is triggered by ``CR``, two crossover points are sampled and
+    the segment between them is exchanged with a tournament-selected parent.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import two_point_tour_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = two_point_tour_crossover_selfcshaga(individ, parents, fitness, rank, 1.0)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     if flip_coin(CR):
         size = len(individs[0])
         c_points = random_sample(range_size=len(individs[0]), quantity=2, replace=False)
@@ -1317,6 +1692,50 @@ def uniform_crossover_selfcshaga(
     rank: NDArray[np.float64],
     CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply uniform configurable SHAGA crossover with uniformly selected parents.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. A parent is sampled uniformly for each
+        gene.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. Not used.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. Not used.
+    CR : np.float64
+        Probability of replacing each target gene by the corresponding sampled
+        parent gene.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by uniform crossover.
+
+    Notes
+    -----
+    For each gene, a parent is sampled uniformly from ``individs``. The sampled
+    gene replaces the target gene with probability ``CR``; one random gene is
+    always replaced to ensure that crossover changes at least one position.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import uniform_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = uniform_crossover_selfcshaga(individ, parents, fitness, rank, 0.7)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     size = len(individ)
     offspring = individ.copy()
     j = randint(0, size, 1)[0]
@@ -1336,6 +1755,50 @@ def uniform_prop_crossover_selfcshaga(
     rank: NDArray[np.float64],
     CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply uniform configurable SHAGA crossover with fitness-proportional parents.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. A parent is sampled for each gene.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. They define the proportional
+        sampling weights.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. Not used.
+    CR : np.float64
+        Probability of replacing each target gene by the corresponding sampled
+        parent gene.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by uniform crossover.
+
+    Notes
+    -----
+    For each gene, a parent is sampled from ``individs`` with probability
+    proportional to ``fitness``. The sampled gene replaces the target gene with
+    probability ``CR``; one random gene is always replaced.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import uniform_prop_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = uniform_prop_crossover_selfcshaga(individ, parents, fitness, rank, 0.7)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     size = len(individ)
     offspring = individ.copy()
     j = randint(0, size, 1)[0]
@@ -1352,10 +1815,54 @@ def uniform_prop_crossover_selfcshaga(
 def uniform_rank_crossover_selfcshaga(
     individ: NDArray[np.byte],
     individs: NDArray[np.byte],
-    fitness: NDArray[np.float32],
-    rank: NDArray[np.float32],
-    CR: np.float32,
+    fitness: NDArray[np.float64],
+    rank: NDArray[np.float64],
+    CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply uniform configurable SHAGA crossover with rank-proportional parents.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. A parent is sampled for each gene.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. Not used.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. They define the proportional sampling
+        weights.
+    CR : np.float64
+        Probability of replacing each target gene by the corresponding sampled
+        parent gene.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by uniform crossover.
+
+    Notes
+    -----
+    For each gene, a parent is sampled from ``individs`` with probability
+    proportional to ``rank``. The sampled gene replaces the target gene with
+    probability ``CR``; one random gene is always replaced.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import uniform_rank_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = uniform_rank_crossover_selfcshaga(individ, parents, fitness, rank, 0.7)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     size = len(individ)
     offspring = individ.copy()
     j = randint(0, size, 1)[0]
@@ -1375,6 +1882,50 @@ def uniform_tour_crossover_selfcshaga(
     rank: NDArray[np.float64],
     CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply uniform configurable SHAGA crossover with tournament-selected parents.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. A parent is selected for each gene.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. Tournament winners are selected by
+        higher fitness.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. Not used by tournament selection.
+    CR : np.float64
+        Probability of replacing each target gene by the corresponding selected
+        parent gene.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by uniform crossover.
+
+    Notes
+    -----
+    For each gene, a parent is selected by binary tournament over ``fitness``.
+    The selected gene replaces the target gene with probability ``CR``; one
+    random gene is always replaced.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import uniform_tour_crossover_selfcshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = uniform_tour_crossover_selfcshaga(individ, parents, fitness, rank, 0.7)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     size = len(individ)
     offspring = individ.copy()
     j = randint(0, size, 1)[0]
@@ -1394,6 +1945,49 @@ def binomial_selfshaga(
     rank: NDArray[np.float64],
     CR: np.float64,
 ) -> NDArray[np.byte]:
+    """
+    Apply binomial configurable SHAGA crossover against the first selected parent.
+
+    Parameters
+    ----------
+    individ : NDArray[np.byte]
+        Target chromosome from the current population.
+    individs : NDArray[np.byte]
+        Selected parent chromosomes. The first row, ``individs[0]``, is used as
+        the donor chromosome.
+    fitness : NDArray[np.float64]
+        Fitness values of selected parents. Not used.
+    rank : NDArray[np.float64]
+        Rank values of selected parents. Not used.
+    CR : np.float64
+        Probability of replacing each target gene by the corresponding donor
+        gene.
+
+    Returns
+    -------
+    NDArray[np.byte]
+        Offspring produced by binomial crossover.
+
+    Notes
+    -----
+    Each target gene is replaced by the corresponding gene from ``individs[0]``
+    with probability ``CR``; one random gene is always replaced.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from thefittest.utils.crossovers import binomial_selfshaga
+    >>>
+    >>> individ = np.array([1, 0, 1, 0], dtype=np.byte)
+    >>> parents = np.array([[0, 1, 0, 1], [1, 1, 0, 0]], dtype=np.byte)
+    >>> fitness = np.array([0.2, 0.8], dtype=np.float64)
+    >>> rank = np.array([1.0, 2.0], dtype=np.float64)
+    >>> offspring = binomial_selfshaga(individ, parents, fitness, rank, 0.7)
+    >>> offspring.shape == individ.shape
+    True
+    >>> offspring.dtype == individ.dtype
+    True
+    """
     size = len(individ)
     offspring = individ.copy()
     j = randint(0, size, 1)[0]

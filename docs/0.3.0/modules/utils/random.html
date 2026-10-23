@@ -1,0 +1,738 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>random &mdash; Thefittest 0.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=be11cbbf" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=e259d695"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script data-current-version="0.3.0" data-versions="0.3.0" src="../../_static/version-switcher.js?v=af62013a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="transformations" href="transformations.html" />
+    <link rel="prev" title="mutations" href="mutations.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Thefittest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../base.html">base</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../base.html#thefittest.base.Tree"><code class="docutils literal notranslate"><span class="pre">Tree</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.__init__"><code class="docutils literal notranslate"><span class="pre">Tree.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.concat"><code class="docutils literal notranslate"><span class="pre">Tree.concat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.copy"><code class="docutils literal notranslate"><span class="pre">Tree.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.full_growing_method"><code class="docutils literal notranslate"><span class="pre">Tree.full_growing_method()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.get_args_id"><code class="docutils literal notranslate"><span class="pre">Tree.get_args_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.get_common_region"><code class="docutils literal notranslate"><span class="pre">Tree.get_common_region()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.get_graph"><code class="docutils literal notranslate"><span class="pre">Tree.get_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.get_levels"><code class="docutils literal notranslate"><span class="pre">Tree.get_levels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.get_max_level"><code class="docutils literal notranslate"><span class="pre">Tree.get_max_level()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.growing_method"><code class="docutils literal notranslate"><span class="pre">Tree.growing_method()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.plot"><code class="docutils literal notranslate"><span class="pre">Tree.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.random_tree"><code class="docutils literal notranslate"><span class="pre">Tree.random_tree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.set_terminals"><code class="docutils literal notranslate"><span class="pre">Tree.set_terminals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.signature"><code class="docutils literal notranslate"><span class="pre">Tree.signature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.subtree"><code class="docutils literal notranslate"><span class="pre">Tree.subtree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Tree.subtree_id"><code class="docutils literal notranslate"><span class="pre">Tree.subtree_id()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../base.html#thefittest.base.FunctionalNode"><code class="docutils literal notranslate"><span class="pre">FunctionalNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.FunctionalNode.__init__"><code class="docutils literal notranslate"><span class="pre">FunctionalNode.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../base.html#thefittest.base.TerminalNode"><code class="docutils literal notranslate"><span class="pre">TerminalNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.TerminalNode.__init__"><code class="docutils literal notranslate"><span class="pre">TerminalNode.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../base.html#thefittest.base.EphemeralNode"><code class="docutils literal notranslate"><span class="pre">EphemeralNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.EphemeralNode.__init__"><code class="docutils literal notranslate"><span class="pre">EphemeralNode.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../base.html#thefittest.base.UniversalSet"><code class="docutils literal notranslate"><span class="pre">UniversalSet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.UniversalSet.__init__"><code class="docutils literal notranslate"><span class="pre">UniversalSet.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../base.html#thefittest.base.Net"><code class="docutils literal notranslate"><span class="pre">Net</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.__init__"><code class="docutils literal notranslate"><span class="pre">Net.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.compile_torch"><code class="docutils literal notranslate"><span class="pre">Net.compile_torch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.copy"><code class="docutils literal notranslate"><span class="pre">Net.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.cpu"><code class="docutils literal notranslate"><span class="pre">Net.cpu()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.cuda"><code class="docutils literal notranslate"><span class="pre">Net.cuda()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.ensure_compiled"><code class="docutils literal notranslate"><span class="pre">Net.ensure_compiled()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.forward"><code class="docutils literal notranslate"><span class="pre">Net.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.get_graph"><code class="docutils literal notranslate"><span class="pre">Net.get_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.plot"><code class="docutils literal notranslate"><span class="pre">Net.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.signature"><code class="docutils literal notranslate"><span class="pre">Net.signature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../base.html#thefittest.base.Net.to"><code class="docutils literal notranslate"><span class="pre">Net.to()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../base.html#thefittest.base.init_symbolic_regression_uniset"><code class="docutils literal notranslate"><span class="pre">init_symbolic_regression_uniset()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../benchmarks.html">Benchmarks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#ml-datasets">ML Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#irisdataset">IrisDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#winedataset">WineDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#breastcancerdataset">BreastCancerDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#digitsdataset">DigitsDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#creditriskdataset">CreditRiskDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#userknowladgedataset">UserKnowladgeDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#banknotedataset">BanknoteDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#optimization-functions">Optimization Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#sphere">Sphere</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#rosenbrock">Rosenbrock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#rastrigin">Rastrigin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#ackley">Ackley</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#griewank">Griewank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#weierstrass">Weierstrass</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#schwefe1-2">Schwefe1_2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#highconditionedelliptic">HighConditionedElliptic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#onemax">OneMax</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmarks.html#benchmark-suites">Benchmark Suites</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#cec2005">CEC2005</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../benchmarks.html#symbolic-regression">Symbolic Regression</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../classifiers.html">classifiers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#genetic-programming-classifiers">Genetic Programming Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#geneticprogrammingclassifier">GeneticProgrammingClassifier</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../classifiers.html#neural-network-classifiers">Neural Network Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#mlpeaclassifier">MLPEAClassifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../classifiers.html#geneticprogrammingneuralnetclassifier">GeneticProgrammingNeuralNetClassifier</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../optimizers.html">optimizers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#differential-evolution-optimizers">Differential Evolution Optimizers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#differentialevolution">DifferentialEvolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#jde">jDE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#shade">SHADE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#genetic-algorithms">Genetic Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#geneticalgorithm">GeneticAlgorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#shaga">SHAGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#selfcga">SelfCGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#pdpga">PDPGA</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../optimizers.html#genetic-programming">Genetic Programming</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#geneticprogramming">GeneticProgramming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#pdpgp">PDPGP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optimizers.html#selfcgp">SelfCGP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../regressors.html">regressors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#genetic-programming-regressors">Genetic Programming Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#geneticprogrammingregressor">GeneticProgrammingRegressor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../regressors.html#neural-network-regressors">Neural Network Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#mlpearegressor">MLPEARegressor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../regressors.html#geneticprogrammingneuralnetregressor">GeneticProgrammingNeuralNetRegressor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="selections.html">selections</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="selections.html#thefittest.utils.selections.proportional_selection"><code class="docutils literal notranslate"><span class="pre">proportional_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="selections.html#thefittest.utils.selections.rank_selection"><code class="docutils literal notranslate"><span class="pre">rank_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="selections.html#thefittest.utils.selections.tournament_selection"><code class="docutils literal notranslate"><span class="pre">tournament_selection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="crossovers.html">crossovers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.empty_crossover"><code class="docutils literal notranslate"><span class="pre">empty_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.binomialGA"><code class="docutils literal notranslate"><span class="pre">binomialGA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.one_point_crossover"><code class="docutils literal notranslate"><span class="pre">one_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.two_point_crossover"><code class="docutils literal notranslate"><span class="pre">two_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.binomial"><code class="docutils literal notranslate"><span class="pre">binomial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.empty_crossoverGP"><code class="docutils literal notranslate"><span class="pre">empty_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.standard_crossover"><code class="docutils literal notranslate"><span class="pre">standard_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.one_point_crossoverGP"><code class="docutils literal notranslate"><span class="pre">one_point_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_crossoverGP"><code class="docutils literal notranslate"><span class="pre">uniform_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.empty_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">empty_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.one_point_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">one_point_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.one_point_prop_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">one_point_prop_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.one_point_rank_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">one_point_rank_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.one_point_tour_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">one_point_tour_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.two_point_rank_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">two_point_rank_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.two_point_prop_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">two_point_prop_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.two_point_tour_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">two_point_tour_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">uniform_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_prop_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">uniform_prop_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.uniform_tour_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">uniform_tour_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="crossovers.html#thefittest.utils.crossovers.binomial_selfshaga"><code class="docutils literal notranslate"><span class="pre">binomial_selfshaga()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mutations.html">mutations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.flip_mutation"><code class="docutils literal notranslate"><span class="pre">flip_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.best_1"><code class="docutils literal notranslate"><span class="pre">best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.rand_1"><code class="docutils literal notranslate"><span class="pre">rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.rand_to_best1"><code class="docutils literal notranslate"><span class="pre">rand_to_best1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.current_to_best_1"><code class="docutils literal notranslate"><span class="pre">current_to_best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.best_2"><code class="docutils literal notranslate"><span class="pre">best_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.rand_2"><code class="docutils literal notranslate"><span class="pre">rand_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.current_to_rand_1"><code class="docutils literal notranslate"><span class="pre">current_to_rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive_p_min"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive_p_min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.point_mutation"><code class="docutils literal notranslate"><span class="pre">point_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.growing_mutation"><code class="docutils literal notranslate"><span class="pre">growing_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.swap_mutation"><code class="docutils literal notranslate"><span class="pre">swap_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mutations.html#thefittest.utils.mutations.shrink_mutation"><code class="docutils literal notranslate"><span class="pre">shrink_mutation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">random</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.sattolo_shuffle"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.sattolo_shuffle_2d"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle_2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.numba_seed"><code class="docutils literal notranslate"><span class="pre">numba_seed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.cauchy_distribution"><code class="docutils literal notranslate"><span class="pre">cauchy_distribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.random_weighted_sample"><code class="docutils literal notranslate"><span class="pre">random_weighted_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.random_sample"><code class="docutils literal notranslate"><span class="pre">random_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.flip_coin"><code class="docutils literal notranslate"><span class="pre">flip_coin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.uniform"><code class="docutils literal notranslate"><span class="pre">uniform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.randint"><code class="docutils literal notranslate"><span class="pre">randint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.check_random_state"><code class="docutils literal notranslate"><span class="pre">check_random_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.generator1"><code class="docutils literal notranslate"><span class="pre">generator1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thefittest.utils.random.generator2"><code class="docutils literal notranslate"><span class="pre">generator2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="transformations.html">transformations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="transformations.html#thefittest.utils.transformations.minmax_scale"><code class="docutils literal notranslate"><span class="pre">minmax_scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="transformations.html#thefittest.utils.transformations.SamplingGrid"><code class="docutils literal notranslate"><span class="pre">SamplingGrid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="transformations.html#thefittest.utils.transformations.GrayCode"><code class="docutils literal notranslate"><span class="pre">GrayCode</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Thefittest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+          <li class="breadcrumb-item"><a href="index.html">utils</a></li>
+      <li class="breadcrumb-item active">random</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/utils/random.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-thefittest.utils.random">
+<span id="random"></span><h1>random<a class="headerlink" href="#module-thefittest.utils.random" title="Link to this heading"></a></h1>
+<p>Random-number helpers used by evolutionary operators.</p>
+<p>The module wraps Python, NumPy, and Numba-compatible random routines used by
+selection, crossover, mutation, and optimizer code.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.sattolo_shuffle">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">sattolo_shuffle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.sattolo_shuffle" title="Link to this definition"></a></dt>
+<dd><p>Return a shuffled copy of a 1D array using Sattolo’s algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>arr</strong><span class="classifier">int64[:]</span></dt><dd><p>Input array to shuffle. The input array is not modified.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>int64[:]</dt><dd><p>Shuffled copy of <code class="docutils literal notranslate"><span class="pre">arr</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Sattolo’s algorithm generates a random cyclic permutation of a given array.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">jit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">sattolo_shuffle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of using Sattolo&#39;s shuffle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shuffled Array:&quot;</span><span class="p">,</span> <span class="n">sattolo_shuffle</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
+<span class="go">Shuffled Array: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.sattolo_shuffle_2d">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">sattolo_shuffle_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.sattolo_shuffle_2d" title="Link to this definition"></a></dt>
+<dd><p>Return a row-shuffled copy of a 2D array using Sattolo’s algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>arr</strong><span class="classifier">int64[:, :]</span></dt><dd><p>Input 2D array to shuffle. The input array is not modified.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>int64[:, :]</dt><dd><p>Row-shuffled copy of <code class="docutils literal notranslate"><span class="pre">arr</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Sattolo’s algorithm generates a random cyclic permutation of rows in a 2D array.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">jit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">sattolo_shuffle_2d</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of using Sattolo&#39;s shuffle for a 2D array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr_2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shuffled 2D Array:&quot;</span><span class="p">,</span> <span class="n">sattolo_shuffle_2d</span><span class="p">(</span><span class="n">arr_2d</span><span class="p">))</span>
+<span class="go">Shuffled 2D Array: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.numba_seed">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">numba_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed_value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.numba_seed" title="Link to this definition"></a></dt>
+<dd><p>Seed Python and NumPy random generators inside Numba-compiled code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>seed_value</strong><span class="classifier">int</span></dt><dd><p>Seed value passed to <code class="docutils literal notranslate"><span class="pre">random.seed</span></code> and <code class="docutils literal notranslate"><span class="pre">np.random.seed</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd><p>The function updates random-generator state and returns <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">numba_seed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">randint</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">numba_seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">values</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">values</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(3,)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.cauchy_distribution">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">cauchy_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.random.cauchy_distribution" title="Link to this definition"></a></dt>
+<dd><p>Generate an array of random numbers from a Cauchy distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>loc</strong><span class="classifier">np.float64</span></dt><dd><p>The location parameter of the Cauchy distribution.</p>
+</dd>
+<dt><strong>scale</strong><span class="classifier">np.float64</span></dt><dd><p>The scale parameter of the Cauchy distribution.</p>
+</dd>
+<dt><strong>size</strong><span class="classifier">np.int64</span></dt><dd><p>The size of the array to generate.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>An array of random numbers drawn from a Cauchy distribution.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">cauchy_distribution</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate an array of 10 random numbers from a Cauchy distribution</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loc_value</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scale_value</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">size_value</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cauchy_result</span> <span class="o">=</span> <span class="n">cauchy_distribution</span><span class="p">(</span><span class="n">loc_value</span><span class="p">,</span> <span class="n">scale_value</span><span class="p">,</span> <span class="n">size_value</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cauchy Distribution Result:&quot;</span><span class="p">,</span> <span class="n">cauchy_result</span><span class="p">)</span>
+<span class="go">Cauchy Distribution Result: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.random_weighted_sample">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">random_weighted_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int64</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.random.random_weighted_sample" title="Link to this definition"></a></dt>
+<dd><p>Generate a random weighted sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>weights</strong><span class="classifier">NDArray[np.float64]</span></dt><dd><p>1D array of weights representing the probability of each element being selected.</p>
+</dd>
+<dt><strong>quantity</strong><span class="classifier">Union[np.int64, int]</span></dt><dd><p>The number of elements to sample. Default is 1.</p>
+</dd>
+<dt><strong>replace</strong><span class="classifier">bool</span></dt><dd><p>Whether sampling is done with replacement. Default is True.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.int64]</dt><dd><p>An array of sampled indices.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">random_weighted_sample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example with replacement</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampled_indices</span> <span class="o">=</span> <span class="n">random_weighted_sample</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sampled Indices:&quot;</span><span class="p">,</span> <span class="n">sampled_indices</span><span class="p">)</span>
+<span class="go">Sampled Indices: ...</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example without replacement</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampled_indices_no_replace</span> <span class="o">=</span> <span class="n">random_weighted_sample</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sampled Indices (No Replace):&quot;</span><span class="p">,</span> <span class="n">sampled_indices_no_replace</span><span class="p">)</span>
+<span class="go">Sampled Indices (No Replace): ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.random_sample">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">random_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">int64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.utils.random.random_sample" title="Link to this definition"></a></dt>
+<dd><p>Generate a random sample from a range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>range_size</strong><span class="classifier">np.int64</span></dt><dd><p>The size of the range to sample from.</p>
+</dd>
+<dt><strong>quantity</strong><span class="classifier">np.int64</span></dt><dd><p>The number of elements to sample.</p>
+</dd>
+<dt><strong>replace</strong><span class="classifier">bool</span></dt><dd><p>Whether sampling is done with replacement. Default is True.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.int64]</dt><dd><p>An array of sampled indices.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">random_sample</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example with replacement</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampled_indices</span> <span class="o">=</span> <span class="n">random_sample</span><span class="p">(</span><span class="n">range_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sampled Indices:&quot;</span><span class="p">,</span> <span class="n">sampled_indices</span><span class="p">)</span>
+<span class="go">Sampled Indices: ...</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example without replacement</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sampled_indices_no_replace</span> <span class="o">=</span> <span class="n">random_sample</span><span class="p">(</span><span class="n">range_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sampled Indices (No Replace):&quot;</span><span class="p">,</span> <span class="n">sampled_indices_no_replace</span><span class="p">)</span>
+<span class="go">Sampled Indices (No Replace): ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.flip_coin">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">flip_coin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.flip_coin" title="Link to this definition"></a></dt>
+<dd><p>Simulate a biased coin flip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>threshold</strong><span class="classifier">float64</span></dt><dd><p>The threshold for the biased coin flip. Should be in the range [0, 1].</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>boolean</dt><dd><p>Returns True with a probability equal to the given threshold and
+False with a complementary probability.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function simulates a biased coin flip with a specified threshold.
+If the threshold is 0.5, it behaves like a fair coin flip.
+A threshold greater than 0.5 biases the result towards True,
+while a threshold less than 0.5 biases the result towards False.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">flip_coin</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of a biased coin flip with a threshold of 0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">flip_coin</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Coin Flip Result:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="go">Coin Flip Result: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.uniform">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">uniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">low</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int64</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.uniform" title="Link to this definition"></a></dt>
+<dd><p>Generate an array of random samples from a uniform distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>low</strong><span class="classifier">np.float64</span></dt><dd><p>The lower boundary of the output interval. All values generated will be
+greater than or equal to <cite>low</cite>.</p>
+</dd>
+<dt><strong>high</strong><span class="classifier">np.float64</span></dt><dd><p>The upper boundary of the output interval. Values are sampled from
+<code class="docutils literal notranslate"><span class="pre">[low,</span> <span class="pre">high)</span></code>.</p>
+</dd>
+<dt><strong>size</strong><span class="classifier">np.int64</span></dt><dd><p>The number of elements to generate.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[np.float64]</dt><dd><p>An 1D array of random samples drawn from the uniform distribution.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The generated samples follow a continuous uniform distribution over
+<code class="docutils literal notranslate"><span class="pre">[low,</span> <span class="pre">high)</span></code>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">uniform</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of generating random samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Random Samples:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="go">Random Samples: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.randint">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">randint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">low</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.randint" title="Link to this definition"></a></dt>
+<dd><p>Generate an array of random integers from a discrete uniform distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>low</strong><span class="classifier">int</span></dt><dd><p>The lowest integer to be drawn from the distribution.</p>
+</dd>
+<dt><strong>high</strong><span class="classifier">int</span></dt><dd><p>Exclusive upper bound of the generated integers.</p>
+</dd>
+<dt><strong>size</strong><span class="classifier">int</span></dt><dd><p>The number of integers to generate.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>NDArray[int64]</dt><dd><p>An array of random integers.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The generated integers follow a discrete uniform distribution over
+<code class="docutils literal notranslate"><span class="pre">[low,</span> <span class="pre">high)</span></code>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">jit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">randint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example of generating random integers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Random Integers:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+<span class="go">Random Integers: ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.check_random_state">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">check_random_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">RandomState</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.utils.random.check_random_state" title="Link to this definition"></a></dt>
+<dd><p>Turn seed into a <code class="docutils literal notranslate"><span class="pre">np.random.RandomState</span></code> instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>seed</strong><span class="classifier">None | int | instance of RandomState</span></dt><dd><p>If seed is None, return the RandomState singleton used by np.random.
+If seed is an int, return a new RandomState instance seeded with seed.
+If seed is already a RandomState instance, return it.
+Otherwise raise ValueError.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>np.random.RandomState</dt><dd><p>Random state resolved from <code class="docutils literal notranslate"><span class="pre">seed</span></code>. Integer and <code class="docutils literal notranslate"><span class="pre">RandomState</span></code> inputs
+also seed the Numba-compatible random generators used in this module.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_random_state</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+<span class="go">&#39;RandomState&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.generator1">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">generator1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#thefittest.utils.random.generator1" title="Link to this definition"></a></dt>
+<dd><p>Generate a rounded random float in the interval <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">10)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>None</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>Random value rounded to four decimal places.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">generator1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="n">generator1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thefittest.utils.random.generator2">
+<span class="sig-prename descclassname"><span class="pre">thefittest.utils.random.</span></span><span class="sig-name descname"><span class="pre">generator2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#thefittest.utils.random.generator2" title="Link to this definition"></a></dt>
+<dd><p>Generate a random integer in the interval <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">10)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>None</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>int</dt><dd><p>Random integer value.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.utils.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">generator2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="n">generator2</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mutations.html" class="btn btn-neutral float-left" title="mutations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="transformations.html" class="btn btn-neutral float-right" title="transformations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pavel Sherstnev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

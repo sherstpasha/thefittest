@@ -22,6 +22,8 @@ def _mock_validate_data(estimator, X, y=None, reset=True, **kwargs):
     return X
 
 
+autodoc_mock_imports = []
+
 # Patch sklearn.utils.validation before importing thefittest
 try:
     import sklearn.utils.validation
@@ -29,13 +31,12 @@ try:
     if not hasattr(sklearn.utils.validation, "validate_data"):
         sklearn.utils.validation.validate_data = _mock_validate_data
 except ImportError:
-    pass
+    autodoc_mock_imports.append("sklearn")
 
-path_list = os.getcwd().split("\\")
-path = "\\".join(path_list[:-2]) + "\\src"
-sys.path.insert(0, path)
-sys.path.insert(0, os.path.abspath("."))
-sys.path.insert(0, os.path.abspath("../../src"))
+source_dir = os.path.abspath(os.path.dirname(__file__))
+project_root = os.path.abspath(os.path.join(source_dir, "..", ".."))
+sys.path.insert(0, os.path.join(project_root, "src"))
+sys.path.insert(0, source_dir)
 # -- Project information -----------------------------------------------------
 
 project = "Thefittest"
@@ -43,7 +44,14 @@ copyright = "2026, Pavel Sherstnev"
 author = "Pavel Sherstnev"
 
 # The full version, including alpha/beta/rc tags
-release = "0.2.7"
+documentation_version = os.environ.get("DOC_VERSION", "0.3.0")
+documentation_versions = [
+    version.strip()
+    for version in os.environ.get("DOC_VERSIONS", documentation_version).split(",")
+    if version.strip()
+]
+version = documentation_version
+release = documentation_version
 
 
 # -- General configuration ---------------------------------------------------
@@ -110,8 +118,22 @@ html_css_files = [
     "custom.css",
 ]
 
+html_js_files = [
+    (
+        "version-switcher.js",
+        {
+            "data-current-version": documentation_version,
+            "data-versions": ",".join(documentation_versions),
+        },
+    ),
+]
+
 # Add meta tags to prevent browser caching
-html_context = {"default_mode": "light"}
+html_context = {
+    "default_mode": "light",
+    "current_version": documentation_version,
+    "versions": documentation_versions,
+}
 
 # Add cache-busting meta tags
 html_meta = {
@@ -119,11 +141,5 @@ html_meta = {
     "pragma": "no-cache",
     "expires": "0",
 }
-
-# Path to the build directory
-html_build_dir = os.path.join(os.path.dirname(__file__), "..", "docs")
-
-# Output directory for the build html
-html_output = os.path.join(html_build_dir, "html")
 
 autosummary_generate = True

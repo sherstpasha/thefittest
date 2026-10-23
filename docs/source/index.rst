@@ -16,7 +16,7 @@ Thefittest Documentation
       </div>
    </div>
 
-.. image:: logos/logo1.png
+.. image:: ../logos/logo1.png
    :align: center
    :class: logo-image
 

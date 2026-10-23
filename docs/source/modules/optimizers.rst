@@ -73,7 +73,7 @@ Genetic Algorithms are search heuristics inspired by natural selection. They wor
    * - :class:`~thefittest.optimizers.GeneticAlgorithm`
      - Classical Genetic Algorithm with binary string representation
    * - :class:`~thefittest.optimizers.SelfCGA`
-     - Self-configuring Genetic Algorithm with automatic parameter tuning (`Semenkin & Semenkina, 2012 <https://doi.org/10.1007/978-3-642-30976-2_50>`_)
+     - Self-configuring Genetic Algorithm with automatic parameter tuning (`Semenkin & Semenkina, 2012 <https://doi.org/10.1007/978-3-642-30976-2_50>`__)
    * - :class:`~thefittest.optimizers.PDPGA`
      - Population-level Dynamic Probabilities Genetic Algorithm with operator probability adaptation (`Niehaus & Banzhaf, 2001 <https://doi.org/10.1007/3-540-45355-5_26>`_)
    * - :class:`~thefittest.optimizers.SHAGA`
@@ -131,7 +131,7 @@ Genetic Programming evolves computer programs to solve problems. It uses tree-ba
    * - :class:`~thefittest.optimizers.GeneticProgramming`
      - Genetic Programming for symbolic regression and program synthesis
    * - :class:`~thefittest.optimizers.SelfCGP`
-     - Self-configuring Genetic Programming (`Semenkin & Semenkina, 2012 <http://dx.doi.org/10.1109/CEC.2012.6256587>`_)
+     - Self-configuring Genetic Programming (`Semenkin & Semenkina, 2012 <http://dx.doi.org/10.1109/CEC.2012.6256587>`__)
    * - :class:`~thefittest.optimizers.PDPGP`
      - Population-level Dynamic Probabilities Genetic Programming (`Niehaus & Banzhaf, 2001 <https://doi.org/10.1007/3-540-45355-5_26>`_)
 

@@ -4,6 +4,8 @@ dist/
 
 .vscode/
 .pytest_cache/
+docs/.doctrees/*/
+docs/_build/
 __pycache__/
 env/
 *.egg-info/

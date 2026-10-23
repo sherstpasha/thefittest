@@ -1,0 +1,887 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>classifiers &mdash; Thefittest 0.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=be11cbbf" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=e259d695"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script data-current-version="0.3.0" data-versions="0.3.0" src="../_static/version-switcher.js?v=af62013a"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="optimizers" href="optimizers.html" />
+    <link rel="prev" title="Benchmarks" href="benchmarks.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Thefittest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">base</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="base.html#thefittest.base.Tree"><code class="docutils literal notranslate"><span class="pre">Tree</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.__init__"><code class="docutils literal notranslate"><span class="pre">Tree.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.concat"><code class="docutils literal notranslate"><span class="pre">Tree.concat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.copy"><code class="docutils literal notranslate"><span class="pre">Tree.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.full_growing_method"><code class="docutils literal notranslate"><span class="pre">Tree.full_growing_method()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.get_args_id"><code class="docutils literal notranslate"><span class="pre">Tree.get_args_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.get_common_region"><code class="docutils literal notranslate"><span class="pre">Tree.get_common_region()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.get_graph"><code class="docutils literal notranslate"><span class="pre">Tree.get_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.get_levels"><code class="docutils literal notranslate"><span class="pre">Tree.get_levels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.get_max_level"><code class="docutils literal notranslate"><span class="pre">Tree.get_max_level()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.growing_method"><code class="docutils literal notranslate"><span class="pre">Tree.growing_method()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.plot"><code class="docutils literal notranslate"><span class="pre">Tree.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.random_tree"><code class="docutils literal notranslate"><span class="pre">Tree.random_tree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.set_terminals"><code class="docutils literal notranslate"><span class="pre">Tree.set_terminals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.signature"><code class="docutils literal notranslate"><span class="pre">Tree.signature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.subtree"><code class="docutils literal notranslate"><span class="pre">Tree.subtree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Tree.subtree_id"><code class="docutils literal notranslate"><span class="pre">Tree.subtree_id()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#thefittest.base.FunctionalNode"><code class="docutils literal notranslate"><span class="pre">FunctionalNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.FunctionalNode.__init__"><code class="docutils literal notranslate"><span class="pre">FunctionalNode.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#thefittest.base.TerminalNode"><code class="docutils literal notranslate"><span class="pre">TerminalNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.TerminalNode.__init__"><code class="docutils literal notranslate"><span class="pre">TerminalNode.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#thefittest.base.EphemeralNode"><code class="docutils literal notranslate"><span class="pre">EphemeralNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.EphemeralNode.__init__"><code class="docutils literal notranslate"><span class="pre">EphemeralNode.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#thefittest.base.UniversalSet"><code class="docutils literal notranslate"><span class="pre">UniversalSet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.UniversalSet.__init__"><code class="docutils literal notranslate"><span class="pre">UniversalSet.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#thefittest.base.Net"><code class="docutils literal notranslate"><span class="pre">Net</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.__init__"><code class="docutils literal notranslate"><span class="pre">Net.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.compile_torch"><code class="docutils literal notranslate"><span class="pre">Net.compile_torch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.copy"><code class="docutils literal notranslate"><span class="pre">Net.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.cpu"><code class="docutils literal notranslate"><span class="pre">Net.cpu()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.cuda"><code class="docutils literal notranslate"><span class="pre">Net.cuda()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.ensure_compiled"><code class="docutils literal notranslate"><span class="pre">Net.ensure_compiled()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.forward"><code class="docutils literal notranslate"><span class="pre">Net.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.get_graph"><code class="docutils literal notranslate"><span class="pre">Net.get_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.plot"><code class="docutils literal notranslate"><span class="pre">Net.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.signature"><code class="docutils literal notranslate"><span class="pre">Net.signature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="base.html#thefittest.base.Net.to"><code class="docutils literal notranslate"><span class="pre">Net.to()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#thefittest.base.init_symbolic_regression_uniset"><code class="docutils literal notranslate"><span class="pre">init_symbolic_regression_uniset()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="benchmarks.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="benchmarks.html#ml-datasets">ML Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#irisdataset">IrisDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#winedataset">WineDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#breastcancerdataset">BreastCancerDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#digitsdataset">DigitsDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#creditriskdataset">CreditRiskDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#userknowladgedataset">UserKnowladgeDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#banknotedataset">BanknoteDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="benchmarks.html#optimization-functions">Optimization Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#sphere">Sphere</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#rosenbrock">Rosenbrock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#rastrigin">Rastrigin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#ackley">Ackley</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#griewank">Griewank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#weierstrass">Weierstrass</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#schwefe1-2">Schwefe1_2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#highconditionedelliptic">HighConditionedElliptic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#onemax">OneMax</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="benchmarks.html#benchmark-suites">Benchmark Suites</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#cec2005">CEC2005</a></li>
+<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#symbolic-regression">Symbolic Regression</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">classifiers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#genetic-programming-classifiers">Genetic Programming Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#geneticprogrammingclassifier">GeneticProgrammingClassifier</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#neural-network-classifiers">Neural Network Classifiers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mlpeaclassifier">MLPEAClassifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#geneticprogrammingneuralnetclassifier">GeneticProgrammingNeuralNetClassifier</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimizers.html">optimizers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimizers.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimizers.html#differential-evolution-optimizers">Differential Evolution Optimizers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimizers.html#differentialevolution">DifferentialEvolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizers.html#jde">jDE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizers.html#shade">SHADE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimizers.html#genetic-algorithms">Genetic Algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimizers.html#geneticalgorithm">GeneticAlgorithm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizers.html#shaga">SHAGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizers.html#selfcga">SelfCGA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizers.html#pdpga">PDPGA</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimizers.html#genetic-programming">Genetic Programming</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimizers.html#geneticprogramming">GeneticProgramming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizers.html#pdpgp">PDPGP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimizers.html#selfcgp">SelfCGP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="regressors.html">regressors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="regressors.html#contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="regressors.html#genetic-programming-regressors">Genetic Programming Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="regressors.html#geneticprogrammingregressor">GeneticProgrammingRegressor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="regressors.html#neural-network-regressors">Neural Network Regressors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="regressors.html#mlpearegressor">MLPEARegressor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="regressors.html#geneticprogrammingneuralnetregressor">GeneticProgrammingNeuralNetRegressor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils/index.html">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils/selections.html">selections</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils/selections.html#thefittest.utils.selections.proportional_selection"><code class="docutils literal notranslate"><span class="pre">proportional_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/selections.html#thefittest.utils.selections.rank_selection"><code class="docutils literal notranslate"><span class="pre">rank_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/selections.html#thefittest.utils.selections.tournament_selection"><code class="docutils literal notranslate"><span class="pre">tournament_selection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils/crossovers.html">crossovers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.empty_crossover"><code class="docutils literal notranslate"><span class="pre">empty_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.binomialGA"><code class="docutils literal notranslate"><span class="pre">binomialGA()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.one_point_crossover"><code class="docutils literal notranslate"><span class="pre">one_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.two_point_crossover"><code class="docutils literal notranslate"><span class="pre">two_point_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.binomial"><code class="docutils literal notranslate"><span class="pre">binomial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.empty_crossoverGP"><code class="docutils literal notranslate"><span class="pre">empty_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.standard_crossover"><code class="docutils literal notranslate"><span class="pre">standard_crossover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.one_point_crossoverGP"><code class="docutils literal notranslate"><span class="pre">one_point_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_crossoverGP"><code class="docutils literal notranslate"><span class="pre">uniform_crossoverGP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_proportional_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_proportional_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_tournament_crossover_GP"><code class="docutils literal notranslate"><span class="pre">uniform_tournament_crossover_GP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.empty_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">empty_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.one_point_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">one_point_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.one_point_prop_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">one_point_prop_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.one_point_rank_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">one_point_rank_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.one_point_tour_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">one_point_tour_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.two_point_rank_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">two_point_rank_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.two_point_prop_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">two_point_prop_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.two_point_tour_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">two_point_tour_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">uniform_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_prop_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">uniform_prop_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_rank_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">uniform_rank_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.uniform_tour_crossover_selfcshaga"><code class="docutils literal notranslate"><span class="pre">uniform_tour_crossover_selfcshaga()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/crossovers.html#thefittest.utils.crossovers.binomial_selfshaga"><code class="docutils literal notranslate"><span class="pre">binomial_selfshaga()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils/mutations.html">mutations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.flip_mutation"><code class="docutils literal notranslate"><span class="pre">flip_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.best_1"><code class="docutils literal notranslate"><span class="pre">best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.rand_1"><code class="docutils literal notranslate"><span class="pre">rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.rand_to_best1"><code class="docutils literal notranslate"><span class="pre">rand_to_best1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.current_to_best_1"><code class="docutils literal notranslate"><span class="pre">current_to_best_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.best_2"><code class="docutils literal notranslate"><span class="pre">best_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.rand_2"><code class="docutils literal notranslate"><span class="pre">rand_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.current_to_rand_1"><code class="docutils literal notranslate"><span class="pre">current_to_rand_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.current_to_pbest_1_archive_p_min"><code class="docutils literal notranslate"><span class="pre">current_to_pbest_1_archive_p_min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.point_mutation"><code class="docutils literal notranslate"><span class="pre">point_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.growing_mutation"><code class="docutils literal notranslate"><span class="pre">growing_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.swap_mutation"><code class="docutils literal notranslate"><span class="pre">swap_mutation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/mutations.html#thefittest.utils.mutations.shrink_mutation"><code class="docutils literal notranslate"><span class="pre">shrink_mutation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils/random.html">random</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.sattolo_shuffle"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.sattolo_shuffle_2d"><code class="docutils literal notranslate"><span class="pre">sattolo_shuffle_2d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.numba_seed"><code class="docutils literal notranslate"><span class="pre">numba_seed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.cauchy_distribution"><code class="docutils literal notranslate"><span class="pre">cauchy_distribution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.random_weighted_sample"><code class="docutils literal notranslate"><span class="pre">random_weighted_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.random_sample"><code class="docutils literal notranslate"><span class="pre">random_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.flip_coin"><code class="docutils literal notranslate"><span class="pre">flip_coin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.uniform"><code class="docutils literal notranslate"><span class="pre">uniform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.randint"><code class="docutils literal notranslate"><span class="pre">randint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.check_random_state"><code class="docutils literal notranslate"><span class="pre">check_random_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.generator1"><code class="docutils literal notranslate"><span class="pre">generator1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/random.html#thefittest.utils.random.generator2"><code class="docutils literal notranslate"><span class="pre">generator2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils/transformations.html">transformations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils/transformations.html#thefittest.utils.transformations.minmax_scale"><code class="docutils literal notranslate"><span class="pre">minmax_scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/transformations.html#thefittest.utils.transformations.SamplingGrid"><code class="docutils literal notranslate"><span class="pre">SamplingGrid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils/transformations.html#thefittest.utils.transformations.GrayCode"><code class="docutils literal notranslate"><span class="pre">GrayCode</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Thefittest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Modules</a></li>
+      <li class="breadcrumb-item active">classifiers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/classifiers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="classifiers">
+<h1>classifiers<a class="headerlink" href="#classifiers" title="Link to this heading"></a></h1>
+<p>The library provides several classifier implementations based on evolutionary algorithms. These classifiers can learn complex decision boundaries, evolve neural network architectures, and optimize network weights using evolutionary strategies.</p>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
+</section>
+<section id="genetic-programming-classifiers">
+<h2>Genetic Programming Classifiers<a class="headerlink" href="#genetic-programming-classifiers" title="Link to this heading"></a></h2>
+<p>Genetic Programming classifiers evolve symbolic expressions or tree structures to perform classification. They can discover interpretable decision rules and handle non-linear separations.</p>
+<p><em>Reference:</em> Koza, J. R. (1993). Genetic Programming - On the Programming of Computers by Means of Natural Selection. Complex Adaptive Systems.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Classifier</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#thefittest.classifiers.GeneticProgrammingClassifier" title="thefittest.classifiers.GeneticProgrammingClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticProgrammingClassifier</span></code></a></p></td>
+<td><p>GP-based classifier evolving symbolic expressions for decision boundaries</p></td>
+</tr>
+</tbody>
+</table>
+<section id="geneticprogrammingclassifier">
+<h3>GeneticProgrammingClassifier<a class="headerlink" href="#geneticprogrammingclassifier" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.classifiers.</span></span><span class="sig-name descname"><span class="pre">GeneticProgrammingClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingClassifier" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ClassifierMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGP</span></code></p>
+<p>Genetic Programming-based classifier using evolved symbolic expressions.</p>
+<p>This classifier evolves mathematical expressions (trees) to perform classification
+by learning symbolic representations of decision boundaries. It can handle both
+binary and multi-class classification problems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_iter</strong><span class="classifier">int, optional (default=300)</span></dt><dd><p>Number of iterations (generations) for the GP optimization.</p>
+</dd>
+<dt><strong>pop_size</strong><span class="classifier">int, optional (default=1000)</span></dt><dd><p>Population size for the genetic programming algorithm.</p>
+</dd>
+<dt><strong>functional_set_names</strong><span class="classifier">Tuple[str, …], optional</span></dt><dd><p>Tuple of function names to use in evolved expressions.
+Default: (‘cos’, ‘sin’, ‘add’, ‘sub’, ‘mul’, ‘div’)
+Available functions: ‘cos’, ‘sin’, ‘add’, ‘sub’, ‘mul’, ‘div’,
+‘abs’, ‘logabs’, ‘exp’, ‘sqrtabs’.</p>
+</dd>
+<dt><strong>optimizer</strong><span class="classifier">Type[Union[SelfCGP, GeneticProgramming, PDPGP]], optional (default=SelfCGP)</span></dt><dd><p>Genetic programming optimizer class to use.
+Available: SelfCGP (self-configuring), GeneticProgramming (standard),
+or PDPGP (with dynamic operator probabilities).</p>
+</dd>
+<dt><strong>optimizer_args</strong><span class="classifier">Optional[dict], optional (default=None)</span></dt><dd><p>Additional arguments passed to the optimizer (excluding n_iter and pop_size).
+Common args: {‘show_progress_each’: 10, ‘max_level’: 5}</p>
+</dd>
+<dt><strong>random_state</strong><span class="classifier">Optional[Union[int, np.random.RandomState]], optional (default=None)</span></dt><dd><p>Random state for reproducibility.</p>
+</dd>
+<dt><strong>use_fitness_cache</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If True, caches fitness evaluations to avoid redundant computations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The classifier evolves symbolic expressions that map input features to class
+probabilities using sigmoid activation. For multi-class problems, it evolves
+one tree per class using one-vs-rest approach.</p>
+<p class="rubric">Examples</p>
+<p><strong>Binary Classification</strong></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.classifiers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeneticProgrammingClassifier</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelfCGP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_classification</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate binary classification data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_classification</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create and train classifier</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">GeneticProgrammingClassifier</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">pop_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">optimizer</span><span class="o">=</span><span class="n">SelfCGP</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">optimizer_args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;show_progress_each&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;max_level&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Make predictions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">probabilities</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Evolved expression:&#39;</span><span class="p">,</span> <span class="n">tree</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functional_set_names:</span> <span class="pre">~typing.Tuple[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]</span> <span class="pre">=</span> <span class="pre">('cos'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'sin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'add'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'sub'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'mul'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'div')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcgp.SelfCGP]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticprogramming.GeneticProgramming]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._selfcgp.SelfCGP'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fitness_cache:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingClassifier.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier.predict_proba">
+<span class="sig-name descname"><span class="pre">predict_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingClassifier.predict_proba" title="Link to this definition"></a></dt>
+<dd><p>Predict class probabilities for X.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">NDArray[np.float64], shape (n_samples, n_features)</span></dt><dd><p>Input samples.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>proba</strong><span class="classifier">NDArray[np.float64], shape (n_samples, n_classes)</span></dt><dd><p>Class probabilities for each sample.
+For binary classification: [[P(class=0), P(class=1)], …]
+For multi-class: [[P(class=0), …, P(class=K-1)], …]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingClassifier.predict" title="Link to this definition"></a></dt>
+<dd><p>Predict class labels for X.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">NDArray[np.float64], shape (n_samples, n_features)</span></dt><dd><p>Input samples.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>y_pred</strong><span class="classifier">ndarray, shape (n_samples,)</span></dt><dd><p>Predicted class labels.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingClassifier.fit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier.get_stats">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Statistics</span></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingClassifier.get_stats" title="Link to this definition"></a></dt>
+<dd><p>Get optimization statistics from the training process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats</strong><span class="classifier">Statistics</span></dt><dd><p>Statistics object containing fitness history and other metrics
+collected during the evolutionary optimization process.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingClassifier.get_tree">
+<span class="sig-name descname"><span class="pre">get_tree</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingClassifier.get_tree" title="Link to this definition"></a></dt>
+<dd><p>Get the evolved tree expression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tree</strong><span class="classifier">Tree</span></dt><dd><p>The best evolved tree representing the symbolic expression.
+For classification, this is the decision tree.
+For regression, this is the functional approximation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="neural-network-classifiers">
+<h2>Neural Network Classifiers<a class="headerlink" href="#neural-network-classifiers" title="Link to this heading"></a></h2>
+<p>Neural network classifiers combine traditional neural architectures with evolutionary optimization. Instead of gradient descent, they use evolutionary algorithms to train networks or evolve architectures.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Classifier</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#thefittest.classifiers.MLPEAClassifier" title="thefittest.classifiers.MLPEAClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLPEAClassifier</span></code></a></p></td>
+<td><p>Multi-Layer Perceptron with evolutionary algorithm-based weight optimization (<a class="reference external" href="http://dx.doi.org/10.1007/978-1-4615-1539-5_18">Cotta et al., 2002</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier" title="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneticProgrammingNeuralNetClassifier</span></code></a></p></td>
+<td><p>Neural network with GP-evolved architecture and EA-optimized weights (Lipinsky &amp; Semenkin, 2006)</p></td>
+</tr>
+</tbody>
+</table>
+<section id="mlpeaclassifier">
+<h3>MLPEAClassifier<a class="headerlink" href="#mlpeaclassifier" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.classifiers.</span></span><span class="sig-name descname"><span class="pre">MLPEAClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ClassifierMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseMLPEA</span></code></p>
+<p>Multi-Layer Perceptron classifier with Evolutionary Algorithm-based training.</p>
+<p>This classifier uses evolutionary algorithms to optimize neural network weights
+instead of traditional gradient-based methods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_iter</strong><span class="classifier">int, optional (default=100)</span></dt><dd><p>Number of iterations (generations) for weight optimization.</p>
+</dd>
+<dt><strong>pop_size</strong><span class="classifier">int, optional (default=500)</span></dt><dd><p>Population size for the evolutionary algorithm.</p>
+</dd>
+<dt><strong>hidden_layers</strong><span class="classifier">Tuple[int, …], optional (default=(0,))</span></dt><dd><p>Tuple specifying the number of neurons in each hidden layer.
+Empty tuple or (0,) means no hidden layers (linear model).
+Example: (5, 5) creates two hidden layers with 5 neurons each.</p>
+</dd>
+<dt><strong>activation</strong><span class="classifier">str, optional (default=”sigma”)</span></dt><dd><p>Activation function for hidden layers.
+Available: ‘sigma’ (sigmoid), ‘relu’, ‘gauss’ (Gaussian), ‘tanh’,
+‘ln’ (natural logarithm normalization), ‘softmax’.</p>
+</dd>
+<dt><strong>offset</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, adds bias terms to the network.</p>
+</dd>
+<dt><strong>weights_optimizer</strong><span class="classifier">Type, optional (default=SHADE)</span></dt><dd><p>Evolutionary algorithm class for optimizing weights, or PyTorch optimizer.
+Available EA: SHADE, jDE, DifferentialEvolution, SHAGA, etc.
+Available torch.optim: Adam, SGD, RMSprop, etc.
+Note: When using torch.optim optimizers, pop_size parameter is ignored.</p>
+</dd>
+<dt><strong>weights_optimizer_args</strong><span class="classifier">Optional[dict], optional (default=None)</span></dt><dd><p>Additional arguments passed to the weights optimizer (excluding n_iter and pop_size).
+For EA optimizers: {‘show_progress_each’: 10}
+For torch.optim: {‘lr’: 0.01, ‘weight_decay’: 0.0001}
+Note: Use ‘epochs’ or ‘iters’ to set training iterations for torch.optim.</p>
+</dd>
+<dt><strong>random_state</strong><span class="classifier">Optional[Union[int, np.random.RandomState]], optional (default=None)</span></dt><dd><p>Random state for reproducibility.</p>
+</dd>
+<dt><strong>device</strong><span class="classifier">str, optional (default=”cpu”)</span></dt><dd><p>Device for PyTorch computations: ‘cpu’ or ‘cuda’.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Requires PyTorch. Install with: pip install thefittest[torch]</p>
+<p>The classifier uses evolutionary algorithms to find optimal network weights,
+which can be more robust to local minima compared to gradient descent but
+may require more function evaluations.</p>
+<p class="rubric">Examples</p>
+<p><strong>Multi-class Classification with Iris Dataset</strong></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">SHAGA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.benchmarks</span><span class="w"> </span><span class="kn">import</span> <span class="n">IrisDataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.classifiers</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLPEAClassifier</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">minmax_scale</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">confusion_matrix</span><span class="p">,</span> <span class="n">f1_score</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load and prepare data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">IrisDataset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_X</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_y</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_scaled</span> <span class="o">=</span> <span class="n">minmax_scale</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">X_scaled</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.1</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create and train classifier</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">MLPEAClassifier</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">n_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">pop_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">hidden_layers</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">weights_optimizer</span><span class="o">=</span><span class="n">SHAGA</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">weights_optimizer_args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;show_progress_each&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predict</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Confusion matrix:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;F1 score:&quot;</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s2">&quot;macro&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers:</span> <span class="pre">~typing.Tuple[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]</span> <span class="pre">=</span> <span class="pre">(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'sigma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.predict_proba">
+<span class="sig-name descname"><span class="pre">predict_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier.predict_proba" title="Link to this definition"></a></dt>
+<dd><p>Predict class probabilities for X using the trained neural network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">ArrayLike, shape (n_samples, n_features)</span></dt><dd><p>Input samples.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>proba</strong><span class="classifier">NDArray[np.float64], shape (n_samples, n_classes)</span></dt><dd><p>Class probabilities for each sample.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier.predict" title="Link to this definition"></a></dt>
+<dd><p>Predict class labels for X.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">ArrayLike, shape (n_samples, n_features)</span></dt><dd><p>Input samples.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>y_pred</strong><span class="classifier">ndarray, shape (n_samples,)</span></dt><dd><p>Predicted class labels.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier.fit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.get_net">
+<span class="sig-name descname"><span class="pre">get_net</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Net" title="thefittest.base._net.Net"><span class="pre">Net</span></a></span></span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier.get_net" title="Link to this definition"></a></dt>
+<dd><p>Get the trained neural network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>net</strong><span class="classifier">Net</span></dt><dd><p>The trained neural network with optimized weights.
+Can be used for visualization or further analysis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.MLPEAClassifier.get_stats">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Statistics</span></span></span><a class="headerlink" href="#thefittest.classifiers.MLPEAClassifier.get_stats" title="Link to this definition"></a></dt>
+<dd><p>Get optimization statistics from the weight training process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats</strong><span class="classifier">Statistics</span></dt><dd><p>Statistics object containing fitness history and other metrics
+collected during the weight optimization process.
+Returns None if torch.optim optimizer was used.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="geneticprogrammingneuralnetclassifier">
+<h3>GeneticProgrammingNeuralNetClassifier<a class="headerlink" href="#geneticprogrammingneuralnetclassifier" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thefittest.classifiers.</span></span><span class="sig-name descname"><span class="pre">GeneticProgrammingNeuralNetClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ClassifierMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGPNN</span></code></p>
+<p>Genetic Programming-based Neural Network classifier with evolved architecture.</p>
+<p>This classifier evolves both the neural network architecture and weights using
+genetic programming. The network structure is represented as a tree, and weights
+are optimized using evolutionary algorithms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_iter</strong><span class="classifier">int, optional (default=15)</span></dt><dd><p>Number of iterations (generations) for architecture evolution.</p>
+</dd>
+<dt><strong>pop_size</strong><span class="classifier">int, optional (default=50)</span></dt><dd><p>Population size for the architecture evolution.</p>
+</dd>
+<dt><strong>input_block_size</strong><span class="classifier">int, optional (default=1)</span></dt><dd><p>Size of input processing blocks.</p>
+</dd>
+<dt><strong>max_hidden_block_size</strong><span class="classifier">int, optional (default=9)</span></dt><dd><p>Maximum size of hidden layer blocks.</p>
+</dd>
+<dt><strong>offset</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, adds bias terms to the network.</p>
+</dd>
+<dt><strong>test_sample_ratio</strong><span class="classifier">float, optional (default=0.5)</span></dt><dd><p>Ratio of data to use for validation during evolution.</p>
+</dd>
+<dt><strong>optimizer</strong><span class="classifier">Type[Union[SelfCGP, GeneticProgramming, PDPGP]], optional (default=SelfCGP)</span></dt><dd><p>Genetic programming optimizer for evolving architecture.
+Available: SelfCGP, GeneticProgramming, or PDPGP.</p>
+</dd>
+<dt><strong>optimizer_args</strong><span class="classifier">Optional[dict], optional (default=None)</span></dt><dd><p>Additional arguments for the architecture optimizer (excluding n_iter and pop_size).</p>
+</dd>
+<dt><strong>weights_optimizer</strong><span class="classifier">Type, optional (default=SHADE)</span></dt><dd><p>Evolutionary algorithm for optimizing network weights.</p>
+</dd>
+<dt><strong>weights_optimizer_args</strong><span class="classifier">Optional[dict], optional (default=None)</span></dt><dd><p>Additional arguments for the weights optimizer.
+Note: Use ‘iters’ and ‘pop_size’ keys for setting iterations and population size.
+Example: {‘iters’: 150, ‘pop_size’: 150, ‘show_progress_each’: 10}</p>
+</dd>
+<dt><strong>net_size_penalty</strong><span class="classifier">float, optional (default=0.0)</span></dt><dd><p>Penalty coefficient for network complexity (larger = simpler networks).</p>
+</dd>
+<dt><strong>random_state</strong><span class="classifier">Optional[Union[int, np.random.RandomState]], optional (default=None)</span></dt><dd><p>Random state for reproducibility.</p>
+</dd>
+<dt><strong>device</strong><span class="classifier">str, optional (default=”cpu”)</span></dt><dd><p>Device for PyTorch computations: ‘cpu’ or ‘cuda’.</p>
+</dd>
+<dt><strong>use_fitness_cache</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If True, caches fitness evaluations.</p>
+</dd>
+<dt><strong>fitness_cache_size</strong><span class="classifier">int, optional (default=1000)</span></dt><dd><p>Maximum size of fitness cache.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Requires PyTorch. Install with: pip install thefittest[torch]</p>
+<p>This is a two-stage optimization: first, GP evolves the network architecture,
+then for each architecture, an EA optimizes the weights. This can discover
+novel network structures but is computationally intensive.</p>
+<p class="rubric">Examples</p>
+<p><strong>Multi-class Classification with Evolved Architecture</strong></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelfCGP</span><span class="p">,</span> <span class="n">SHAGA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.benchmarks</span><span class="w"> </span><span class="kn">import</span> <span class="n">IrisDataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">thefittest.classifiers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeneticProgrammingNeuralNetClassifier</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">minmax_scale</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">confusion_matrix</span><span class="p">,</span> <span class="n">f1_score</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load and prepare data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">IrisDataset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_X</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_y</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_scaled</span> <span class="o">=</span> <span class="n">minmax_scale</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">X_scaled</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.1</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create classifier with evolved architecture</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">GeneticProgrammingNeuralNetClassifier</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">n_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">pop_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">optimizer</span><span class="o">=</span><span class="n">SelfCGP</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">optimizer_args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;show_progress_each&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">weights_optimizer</span><span class="o">=</span><span class="n">SHAGA</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">weights_optimizer_args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;iters&#39;</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span> <span class="s1">&#39;pop_size&#39;</span><span class="p">:</span> <span class="mi">150</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predict</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Confusion matrix:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;F1 score:&quot;</span><span class="p">,</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predict</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s2">&quot;macro&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_hidden_block_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_sample_ratio:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcgp.SelfCGP]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticprogramming.GeneticProgramming]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._selfcgp.SelfCGP'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer:</span> <span class="pre">~typing.Type[~thefittest.optimizers._differentialevolution.DifferentialEvolution]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._jde.jDE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shade.SHADE]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._geneticalgorithm.GeneticAlgorithm]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._selfcga.SelfCGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~thefittest.optimizers._shaga.SHAGA]</span> <span class="pre">|</span> <span class="pre">~typing.Type[~torch.optim.optimizer.Optimizer]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'thefittest.optimizers._shade.SHADE'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_optimizer_args:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_size_penalty:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">~numpy.random.mtrand.RandomState</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fitness_cache:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_cache_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.predict_proba">
+<span class="sig-name descname"><span class="pre">predict_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.predict_proba" title="Link to this definition"></a></dt>
+<dd><p>Predict class probabilities using the evolved neural network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">ArrayLike, shape (n_samples, n_features)</span></dt><dd><p>Input samples.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>proba</strong><span class="classifier">NDArray[np.float64], shape (n_samples, n_classes)</span></dt><dd><p>Class probabilities for each sample.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.predict" title="Link to this definition"></a></dt>
+<dd><p>Predict class labels for X.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">ArrayLike, shape (n_samples, n_features)</span></dt><dd><p>Input samples.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>y_pred</strong><span class="classifier">ndarray, shape (n_samples,)</span></dt><dd><p>Predicted class labels.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Buffer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">_SupportsArray</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">_NestedSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">complex</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.fit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.genotype_to_phenotype_tree">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">genotype_to_phenotype_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_activation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Net" title="thefittest.base._net.Net"><span class="pre">Net</span></a></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.genotype_to_phenotype_tree" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_net">
+<span class="sig-name descname"><span class="pre">get_net</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Net" title="thefittest.base._net.Net"><span class="pre">Net</span></a></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_net" title="Link to this definition"></a></dt>
+<dd><p>Get the evolved and trained neural network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>net</strong><span class="classifier">Net</span></dt><dd><p>The neural network with GP-evolved architecture and optimized weights.
+Can be used for visualization or further analysis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_stats">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Statistics</span></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_stats" title="Link to this definition"></a></dt>
+<dd><p>Get optimization statistics from the architecture evolution process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stats</strong><span class="classifier">Statistics</span></dt><dd><p>Statistics object containing fitness history and other metrics
+collected during the architecture evolution process.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_tree">
+<span class="sig-name descname"><span class="pre">get_tree</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base.html#thefittest.base.Tree" title="thefittest.base._tree.Tree"><span class="pre">Tree</span></a></span></span><a class="headerlink" href="#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier.get_tree" title="Link to this definition"></a></dt>
+<dd><p>Get the evolved tree representing the network architecture.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tree</strong><span class="classifier">Tree</span></dt><dd><p>The tree expression that encodes the evolved neural network structure.
+Each node represents network layers and connections.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="benchmarks.html" class="btn btn-neutral float-left" title="Benchmarks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="optimizers.html" class="btn btn-neutral float-right" title="optimizers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pavel Sherstnev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,3 +1,10 @@
+"""Mutation operators used by evolutionary algorithms.
+
+The module contains binary-string mutation for genetic algorithms,
+real-valued differential-evolution mutation strategies, and tree mutation
+operators for genetic programming.
+"""
+
 from __future__ import annotations
 
 from typing import Union
@@ -125,7 +132,7 @@ def rand_1(
     F: np.float64,
 ) -> NDArray[np.float64]:
     """
-    Perform Best-1 mutation on an individual in a population for differential evolution.
+    Perform Rand-1 mutation on an individual in a population for differential evolution.
 
     Parameters
     ----------
@@ -166,7 +173,7 @@ def rand_1(
     """
     size = np.int64(len(population))
     r1, r2, r3 = random_sample(range_size=size, quantity=np.int64(3), replace=False)
-    mutated_individual = population[r3] + F * (population[r1] - population[r2])
+    mutated_individual = population[r1] + F * (population[r2] - population[r3])
     return mutated_individual
 
 
@@ -199,7 +206,8 @@ def rand_to_best1(
     Notes
     -----
     Rand-to-best-1 mutation combines one randomly chosen individual with a scaled difference between the best individual
-    and two other randomly chosen individuals from the population.
+    and that random individual, then adds the scaled difference between two other randomly chosen individuals:
+    ``x_r1 + F * (x_best - x_r1) + F * (x_r2 - x_r3)``.
 
     Examples
     --------
@@ -221,7 +229,7 @@ def rand_to_best1(
     r1, r2, r3 = random_sample(range_size=size, quantity=np.int64(3), replace=False)
     mutated_individual = (
         population[r1]
-        + F * (population[r1] - best_individual)
+        + F * (best_individual - population[r1])
         + F * (population[r2] - population[r3])
     )
     return mutated_individual
@@ -370,7 +378,8 @@ def rand_2(
     Notes
     -----
     Rand-2 mutation combines one randomly chosen individual with the difference between two pairs of randomly
-    chosen individuals, each pair contributing to the mutation with a scaled difference, scaled by the mutation factor F.
+    chosen individuals, each pair contributing to the mutation with a scaled difference:
+    ``x_r1 + F * (x_r2 - x_r3) + F * (x_r4 - x_r5)``.
 
     Examples
     --------
@@ -391,9 +400,9 @@ def rand_2(
     size = np.int64(len(population))
     r1, r2, r3, r4, r5 = random_sample(range_size=size, quantity=np.int64(5), replace=False)
     mutated_individual = (
-        population[r5]
-        + F * (population[r1] - population[r2])
-        + F * (population[r3] - population[r4])
+        population[r1]
+        + F * (population[r2] - population[r3])
+        + F * (population[r4] - population[r5])
     )
     return mutated_individual
 
@@ -426,8 +435,9 @@ def current_to_rand_1(
 
     Notes
     -----
-    Current-to-rand-1 mutation combines the current individual with a scaled difference between one randomly chosen
-    individual and the difference of two other randomly chosen individuals from the population.
+    Current-to-rand-1 mutation moves the current individual toward a randomly chosen individual and adds the scaled
+    difference between two other randomly chosen individuals:
+    ``x_i + F * (x_r1 - x_i) + F * (x_r2 - x_r3)``.
 
     Examples
     --------
@@ -447,9 +457,9 @@ def current_to_rand_1(
     size = np.int64(len(population))
     r1, r2, r3 = random_sample(range_size=size, quantity=np.int64(3), replace=False)
     mutated_individual = (
-        population[r1]
-        + F * (population[r3] - current_individual)
-        + F * (population[r1] - population[r2])
+        current_individual
+        + F * (population[r1] - current_individual)
+        + F * (population[r2] - population[r3])
     )
     return mutated_individual
 
@@ -592,7 +602,7 @@ def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: in
     uniset : UniversalSet
         The universal set containing functional and terminal nodes for mutation.
     proba : float
-        The probability of performing a point mutation at each node.
+        The probability of applying one point mutation to the tree.
     max_level : int
         The maximum depth/level of the tree. (Unused in this mutation)
 
@@ -603,8 +613,8 @@ def point_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: in
 
     Notes
     -----
-    Point mutation randomly selects a node in the tree, and with the given probability, replaces it with a new node
-    randomly chosen from the universal set.
+    Point mutation copies the input tree. With probability ``proba``, it selects one node and replaces it with a
+    compatible node randomly chosen from the universal set.
 
     Examples
     --------
@@ -653,7 +663,7 @@ def growing_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: 
     uniset : UniversalSet
         The universal set containing functional and terminal nodes for mutation.
     proba : float
-        The probability of performing a growing mutation at each node.
+        The probability of applying one growing mutation to the tree.
     max_level : int
         The maximum depth/level of the tree. (Unused in this mutation)
 
@@ -664,8 +674,8 @@ def growing_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: 
 
     Notes
     -----
-    Growing mutation randomly selects a node in the tree, and with the given probability, replaces it with a new subtree
-    generated by the growing method from the universal set. The growing method creates a tree with a random structure.
+    Growing mutation copies the input tree. With probability ``proba``, it selects one node and replaces it with a new
+    subtree generated by the growing method from the universal set.
 
     Examples
     --------
@@ -697,7 +707,7 @@ def growing_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: 
     return mutated_tree
 
 
-def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_leve: int) -> Tree:
+def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: int) -> Tree:
     """
     Perform swap mutation for a tree in genetic programming.
 
@@ -708,7 +718,7 @@ def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_leve: int)
     uniset : UniversalSet
         The universal set containing functional and terminal nodes for mutation. (Unused in this mutation)
     proba : float
-        The probability of performing a swap mutation at each node.
+        The probability of applying one swap mutation to the tree.
     max_level : int
         The maximum depth/level of the tree. (Unused in this mutation)
 
@@ -719,8 +729,8 @@ def swap_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_leve: int)
 
     Notes
     -----
-    Swap mutation randomly selects a node in the tree, and with the given probability, swaps the positions of its
-    subtrees, effectively changing the structure of the tree.
+    Swap mutation copies the input tree. With probability ``proba``, it selects one node with at least two children
+    and applies Sattolo's shuffle to the order of its child subtrees.
 
     Examples
     --------
@@ -771,7 +781,7 @@ def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: i
     uniset : UniversalSet
         The universal set containing functional and terminal nodes for mutation. (Unused in this mutation)
     proba : float
-        The probability of performing a shrink mutation at each node.
+        The probability of applying one shrink mutation to the tree.
     max_level : int
         The maximum depth/level of the tree. (Unused in this mutation)
 
@@ -782,8 +792,8 @@ def shrink_mutation(tree: Tree, uniset: UniversalSet, proba: float, max_level: i
 
     Notes
     -----
-    Shrink mutation randomly selects a node in the tree, and with the given probability, replaces it with one of its
-    terminal nodes, effectively pruning the subtree rooted at the selected node.
+    Shrink mutation copies the input tree. With probability ``proba``, it selects one non-terminal node and replaces
+    its subtree with one of its direct child subtrees.
 
     Examples
     --------
