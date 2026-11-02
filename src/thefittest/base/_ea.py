@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from copy import deepcopy
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -17,6 +18,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..utils.random import check_random_state
+from ..utils.multiobjective import fast_non_dominated_sort
+from ..utils.multiobjective import crowding_distance_assignment
 
 
 class TheFittest:
@@ -55,6 +58,117 @@ class TheFittest:
             "genotype": self._genotype.copy(),
             "phenotype": self._phenotype.copy(),
             "fitness": self._fitness,
+        }
+
+
+class ParetoFront:
+    """Store a snapshot of the first front of the most recently supplied population.
+
+    All fitness objectives are maximized. Updates replace the current front;
+    this class does not maintain an archive across generations or calculate
+    crowding distances. Equal fitness vectors are retained as separate solutions.
+    Numeric arrays and mutable individuals in object arrays are copied both
+    when storing data and when returning it.
+
+    ``_no_update_counter`` counts consecutive updates with an unchanged set
+    of fitness vectors, ignoring row order, duplicates, genotypes, and phenotypes.
+    With a positive ``eps``, every vector in each compared front must have a
+    counterpart within absolute tolerance in every objective. Comparison uses
+    the last significantly changed front, so small shifts can accumulate.
+    """
+
+    def __init__(self) -> None:
+        self._genotype: NDArray[Any] = np.empty(0)
+        self._phenotype: NDArray[Any] = np.empty(0)
+        self._fitness: NDArray[np.float64] = np.empty((0, 0), dtype=np.float64)
+        self._indices: NDArray[np.int64] = np.empty(0, dtype=np.int64)
+        self._no_update_counter: int = 0
+        self._reference_fitness: NDArray[np.float64] = np.empty((0, 0), dtype=np.float64)
+
+    def _update(
+        self,
+        population_g: NDArray[Any],
+        population_ph: NDArray[Any],
+        fitness: NDArray[np.float64],
+        ranks: Optional[NDArray[np.int64]] = None,
+        eps: float = 0.0,
+    ) -> None:
+        """Replace the snapshot using rows whose nondomination rank is 1.
+
+        ``fitness`` must have shape (N, M), with M >= 1 and no NaN values.
+        Both populations must have N rows. Optional ``ranks`` must contain
+        N positive integers aligned with these exact population rows. When
+        supplied, ranks are trusted and nondominated sorting is skipped.
+        Otherwise, ranks are computed using ``fast_non_dominated_sort``.
+        ``eps`` is a non-negative absolute tolerance for stability comparison,
+        shared by all objectives. Zero requires exact set equality.
+        """
+        if not np.isfinite(eps) or eps < 0:
+            raise ValueError("eps must be finite and non-negative.")
+        fitness = np.asarray(fitness, dtype=np.float64)
+        if fitness.ndim != 2 or fitness.shape[1] == 0:
+            raise ValueError("fitness must be a matrix with at least one objective.")
+        if np.isnan(fitness).any():
+            raise ValueError("fitness must not contain NaN values.")
+        if population_g.ndim == 0 or population_ph.ndim == 0:
+            raise ValueError("populations must have a population axis.")
+        if len(population_g) != len(fitness) or len(population_ph) != len(fitness):
+            raise ValueError("populations and fitness must have the same number of rows.")
+
+        if ranks is None:
+            ranks = fast_non_dominated_sort(fitness)
+        else:
+            ranks = np.asarray(ranks)
+            if ranks.ndim != 1 or len(ranks) != len(fitness):
+                raise ValueError("ranks must be a vector with one entry per individual.")
+            if not np.issubdtype(ranks.dtype, np.integer) or np.any(ranks < 1):
+                raise ValueError("ranks must contain positive integers starting at 1.")
+            if len(ranks) and not np.any(ranks == 1):
+                raise ValueError("a nonempty population must contain a rank-1 solution.")
+
+        indices = np.flatnonzero(ranks == 1)
+        genotype = deepcopy(population_g[indices])
+        phenotype = deepcopy(population_ph[indices])
+        front_fitness = fitness[indices].copy()
+        previous_values = self._reference_fitness
+        current_values = np.unique(front_fitness, axis=0)
+        unchanged = np.array_equal(previous_values, current_values)
+        if not unchanged and eps > 0 and previous_values.shape[1] == current_values.shape[1]:
+            unchanged = True
+            for source, target in (
+                (previous_values, current_values),
+                (current_values, previous_values),
+            ):
+                for value in source:
+                    close = np.isclose(target, value, atol=eps, rtol=0.0)
+                    if not np.any(np.all(close, axis=1)):
+                        unchanged = False
+                        break
+                if not unchanged:
+                    break
+        if unchanged:
+            self._no_update_counter += 1
+        else:
+            self._no_update_counter = 0
+            self._reference_fitness = current_values
+        self._genotype = genotype
+        self._phenotype = phenotype
+        self._fitness = front_fitness
+        self._indices = indices
+
+    def get(self) -> Dict[str, Any]:
+        """Return copies of genotype, phenotype, fitness, and population indices.
+
+        Indices refer to the population passed to the most recent update,
+        with the original row order preserved. Before any update, arrays
+        are empty and fitness has shape (0, 0). An empty-population update
+        preserves the supplied arrays' trailing dimensions.
+        """
+        return {
+            "genotype": deepcopy(self._genotype),
+            "phenotype": deepcopy(self._phenotype),
+            "fitness": self._fitness.copy(),
+            "indices": self._indices.copy(),
         }
 
 
@@ -536,3 +650,174 @@ class EvolutionaryAlgorithm:
                     self._on_generation(self)
 
         return self
+
+
+class MultiObjectiveEvolutionaryAlgorithm(EvolutionaryAlgorithm):
+    """Shared configuration and state for multiobjective optimizers.
+
+    Each entry in ``minimization`` specifies whether the corresponding objective
+    is minimized. Objective signs encode conversion to the internal maximization
+    convention.
+
+    ``no_increase_num`` optionally stops evolution after that many consecutive
+    updates with an unchanged set of first-front fitness vectors, using the
+    absolute tolerance ``fitness_update_eps``. ``optimal_value`` specifies
+    targets in the original objective directions. A single solution must
+    reach every target within ``termination_error_value`` to stop evolution.
+    """
+
+    def __init__(
+        self,
+        fitness_function: Callable[[NDArray[Any]], NDArray[np.float64]],
+        iters: int,
+        pop_size: int,
+        minimization: Tuple[bool, ...],
+        no_increase_num: Optional[int] = None,
+        init_population: Optional[
+            Union[NDArray[Any], NDArray[np.byte], NDArray[np.float64]]
+        ] = None,
+        genotype_to_phenotype: Optional[Callable[[NDArray[Any]], NDArray[Any]]] = None,
+        show_progress_each: Optional[int] = None,
+        keep_history: bool = False,
+        n_jobs: int = 1,
+        fitness_function_args: Optional[Dict] = None,
+        genotype_to_phenotype_args: Optional[Dict] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
+        on_generation: Optional[Callable] = None,
+        optimal_value: Optional[Tuple[float, ...]] = None,
+        termination_error_value: float = 0.0,
+        fitness_update_eps: float = 0.0,
+    ) -> None:
+        minimization = tuple(minimization)
+        if not np.isfinite(fitness_update_eps) or fitness_update_eps < 0:
+            raise ValueError("fitness_update_eps must be finite and non-negative.")
+        if not np.isfinite(termination_error_value) or termination_error_value < 0:
+            raise ValueError("termination_error_value must be finite and non-negative.")
+        if no_increase_num is not None and (
+            isinstance(no_increase_num, (bool, np.bool_))
+            or not isinstance(no_increase_num, (int, np.integer))
+            or no_increase_num < 1
+        ):
+            raise ValueError("no_increase_num must be a positive integer or None.")
+        if not minimization or any(
+            not isinstance(value, (bool, np.bool_)) for value in minimization
+        ):
+            raise ValueError("minimization must contain at least one boolean entry.")
+
+        super().__init__(
+            fitness_function=fitness_function,
+            iters=iters,
+            pop_size=pop_size,
+            elitism=False,
+            no_increase_num=no_increase_num,
+            init_population=init_population,
+            genotype_to_phenotype=genotype_to_phenotype,
+            show_progress_each=show_progress_each,
+            keep_history=keep_history,
+            n_jobs=n_jobs,
+            fitness_function_args=fitness_function_args,
+            genotype_to_phenotype_args=genotype_to_phenotype_args,
+            random_state=random_state,
+            on_generation=on_generation,
+            fitness_update_eps=fitness_update_eps,
+        )
+        self._minimization: Tuple[bool, ...] = minimization
+        self._n_objectives: int = len(minimization)
+        self._objective_signs: NDArray[np.float64] = np.array(
+            [-1.0 if value else 1.0 for value in minimization],
+            dtype=np.float64,
+        )
+        self._objective_aim: Optional[NDArray[np.float64]] = None
+        if optimal_value is not None:
+            targets = np.asarray(optimal_value, dtype=np.float64)
+            if targets.shape != (self._n_objectives,) or not np.all(np.isfinite(targets)):
+                raise ValueError("optimal_value must contain one finite target per objective.")
+            self._objective_aim = targets * self._objective_signs - termination_error_value
+        self._pareto_front: ParetoFront = ParetoFront()
+        self._pareto_rank_i: NDArray[np.int64] = np.empty(0, dtype=np.int64)
+        self._crowding_distance_i: NDArray[np.float64] = np.empty(0, dtype=np.float64)
+
+    def _get_fitness(self, population_ph: NDArray[Any]) -> NDArray[np.float64]:
+        """Evaluate an (N, M) objective matrix and convert it to maximization.
+
+        Rows must correspond to the supplied population and columns to
+        ``minimization``. The evaluation counter counts individuals, not
+        objective components, after the result shape has been validated.
+        """
+        if self._n_jobs > 1:
+            populations_ph = self._split_population(population_ph)
+            values = self._parallel(
+                delayed(self._fitness_function)(populations_ph_i, **self._fitness_function_args)
+                for populations_ph_i in populations_ph
+            )
+            value = np.concatenate(values, axis=0)
+        else:
+            value = self._fitness_function(population_ph, **self._fitness_function_args)
+
+        objectives = np.asarray(value, dtype=np.float64)
+        expected_shape = (len(population_ph), self._n_objectives)
+        if objectives.shape != expected_shape:
+            raise ValueError(
+                f"fitness_function must return shape {expected_shape}, got {objectives.shape}."
+            )
+
+        self._calls += len(population_ph)
+        return objectives * self._objective_signs
+
+    def _update_data(self) -> None:
+        self._pareto_rank_i = fast_non_dominated_sort(self._fitness_i)
+        self._crowding_distance_i = np.empty(len(self._fitness_i), dtype=np.float64)
+        for rank in np.unique(self._pareto_rank_i):
+            indices = np.flatnonzero(self._pareto_rank_i == rank)
+            self._crowding_distance_i[indices] = crowding_distance_assignment(
+                self._fitness_i[indices]
+            )
+
+        self._pareto_front._update(
+            self._population_g_i,
+            self._population_ph_i,
+            self._fitness_i,
+            ranks=self._pareto_rank_i,
+            eps=self._fitness_update_eps,
+        )
+        self._update_stats(
+            fitness=self._fitness_i,
+            population_g=self._population_g_i,
+            population_ph=self._population_ph_i,
+            pareto_rank=self._pareto_rank_i,
+            crowding_distance=self._crowding_distance_i,
+        )
+
+    def _termitation_check(self) -> bool:
+        cond_aim = self._objective_aim is not None and np.any(
+            np.all(self._fitness_i >= self._objective_aim, axis=1)
+        )
+        cond_no_increase = (
+            self._no_increase_num is not None
+            and self._pareto_front._no_update_counter >= self._no_increase_num
+        )
+        return bool(cond_aim or cond_no_increase)
+
+    def _show_progress(self, current_iter: int) -> None:
+        if self._show_progress_each is not None:
+            if current_iter % self._show_progress_each == 0:
+                front_size = np.count_nonzero(self._pareto_rank_i == 1)
+                print(f"{current_iter}-th iteration with Pareto front size = {front_size}")
+
+    def get_pareto_front(self) -> Dict[str, Any]:
+        """Return a copy of the current first front in original objective directions.
+
+        The dictionary contains ``genotype``, ``phenotype``, ``fitness``, and
+        ``indices``. Fitness has one column per entry in ``minimization``;
+        indices refer to rows of the current population. Before an evaluated
+        population is recorded, fitness has shape (0, n_objectives).
+        """
+        front = self._pareto_front.get()
+        front["fitness"] = front["fitness"].reshape(-1, self._n_objectives) * self._objective_signs
+        return front
+
+    def get_fittest(self) -> Dict:
+        """Reject single-solution retrieval without a rule for choosing a compromise."""
+        raise NotImplementedError(
+            "Multiobjective optimization has no single best solution. Use get_pareto_front()."
+        )

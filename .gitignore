@@ -1,5 +1,6 @@
 # folders to ignore
 dist/
+/output/
 
 
 .vscode/
@@ -8,6 +9,7 @@ docs/.doctrees/*/
 docs/_build/
 __pycache__/
 env/
+.venv/
 *.egg-info/
 
 # files to ignore

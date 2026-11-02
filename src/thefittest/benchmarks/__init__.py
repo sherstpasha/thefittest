@@ -14,6 +14,15 @@ from ._optproblems import Rosenbrock
 from ._optproblems import Schwefe1_2
 from ._optproblems import Sphere
 from ._optproblems import Weierstrass
+from ._multiobjective import SCH
+from ._multiobjective import FON
+from ._multiobjective import POL
+from ._multiobjective import KUR
+from ._multiobjective import ZDT1
+from ._multiobjective import ZDT2
+from ._multiobjective import ZDT3
+from ._multiobjective import ZDT4
+from ._multiobjective import ZDT6
 
 
 __all__ = [
@@ -33,4 +42,13 @@ __all__ = [
     "Schwefe1_2",
     "Sphere",
     "Weierstrass",
+    "SCH",
+    "FON",
+    "POL",
+    "KUR",
+    "ZDT1",
+    "ZDT2",
+    "ZDT3",
+    "ZDT4",
+    "ZDT6",
 ]

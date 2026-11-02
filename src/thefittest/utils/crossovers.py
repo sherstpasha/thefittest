@@ -7,7 +7,6 @@ and tree-based individuals used by evolutionary optimizers in ``thefittest``.
 from __future__ import annotations
 
 from numba import float64
-from numba import int64
 from numba import int8
 from numba import njit
 
@@ -21,6 +20,7 @@ from .random import flip_coin
 from ..base import Tree
 
 from .selections import tournament_selection
+from .selections import rank_crowding_tournament_selection
 
 
 def empty_crossover(
@@ -415,6 +415,27 @@ def uniform_rank_crossover(
     offspring = np.empty_like(individs[0])
     for i in range(individs.shape[1]):
         offspring[i] = individs[choosen[i]][i]
+    return offspring
+
+
+@njit
+def uniform_rank_crowding_crossover(
+    individs: NDArray[np.byte],
+    crowding_distance: NDArray[np.float64],
+    rank: NDArray[np.int64],
+) -> NDArray[np.byte]:
+    """Choose each gene by a binary rank-and-crowding tournament.
+
+    Notes
+    -----
+    Metadata is aligned with the supplied parents. Each gene uses two
+    distinct parent positions; lower rank wins, then larger crowding
+    distance. Exact ties are resolved randomly. Inputs are not modified.
+    """
+    chosen = rank_crowding_tournament_selection(rank, crowding_distance, 2, individs.shape[1])
+    offspring = np.empty_like(individs[0])
+    for gene in range(individs.shape[1]):
+        offspring[gene] = individs[chosen[gene], gene]
     return offspring
 
 

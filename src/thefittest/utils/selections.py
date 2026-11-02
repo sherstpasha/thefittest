@@ -1,8 +1,9 @@
 """Selection operators used by evolutionary algorithms.
 
-The functions in this module choose parent indexes from a population. They
-share the same ``(fitness, rank, tour_size, quantity)`` signature so optimizers
-can switch between selection strategies through a common interface.
+The functions in this module choose parent indexes from a population. Scalar
+fitness operators share the ``(fitness, rank, tour_size, quantity)`` signature.
+Multiobjective tournaments accept either nondomination ranks or objective
+vectors, plus precomputed crowding distances. They return index arrays too.
 """
 
 from __future__ import annotations
@@ -16,6 +17,9 @@ from numpy.typing import NDArray
 
 from .random import random_sample
 from .random import random_weighted_sample
+from .random import flip_coin
+from .multiobjective import compare_rank_and_crowding
+from .multiobjective import compare_dominance_and_crowding
 
 
 @njit(int64[:](float64[:], float64[:], int64, int64))
@@ -165,3 +169,143 @@ def tournament_selection(
         argmax = np.argmax(fitness[tournament])
         to_return[i] = tournament[argmax]
     return to_return
+
+
+@njit
+def rank_crowding_tournament_selection(
+    rank: NDArray[np.int64],
+    crowding_distance: NDArray[np.float64],
+    tour_size: int,
+    quantity: int,
+) -> NDArray[np.int64]:
+    """Select parent indexes by nondomination rank and crowding distance.
+
+    Parameters
+    ----------
+    rank : NDArray[np.int64]
+        Precomputed nondomination ranks for the current population. Lower
+        ranks are better; rank 1 is the first front.
+    crowding_distance : NDArray[np.float64]
+        Precomputed distances, calculated separately within each front and
+        aligned with ``rank`` by population index. Larger values are better.
+        Positive infinity is allowed; NaN is not supported.
+    tour_size : int
+        Number of distinct candidates per tournament, between 2 and the
+        population size. Use 2 for the NSGA-II binary tournament.
+    quantity : int
+        Non-negative number of parent indexes to return.
+
+    Returns
+    -------
+    NDArray[np.int64]
+        Selected population indexes. An individual may win several tournaments.
+
+    Notes
+    -----
+    Candidates are sampled without replacement within each tournament;
+    different tournaments are independent. Lower rank wins regardless of
+    distance. At equal ranks, greater distance wins. Exact ties choose either
+    candidate with equal probability, including for two infinite distances.
+    This matches pymoo's feasible-solution rank-and-crowding comparison.
+    Constraint violations are not handled. Candidate sampling and random
+    generators differ from pymoo, so equal seeds do not imply equal samples.
+
+    Compute ranks and distances once per population update, before calling
+    this function. No fitness evaluation, sorting, or distance calculation
+    occurs during selection. Comparison work is O(quantity * tour_size).
+    The input arrays are not modified.
+
+    Examples
+    --------
+    >>> rank = np.array([1, 1, 2], dtype=np.int64)
+    >>> distances = np.array([np.inf, 0.5, np.inf])
+    >>> selected = rank_crowding_tournament_selection(rank, distances, 2, 10)
+    >>> selected.shape
+    (10,)
+    >>> bool(np.all(rank[selected] == 1))
+    True
+    """
+    if rank.ndim != 1 or crowding_distance.ndim != 1:
+        raise ValueError("rank and crowding_distance must be one-dimensional arrays.")
+    if len(rank) != len(crowding_distance):
+        raise ValueError("rank and crowding_distance must have the same length.")
+    if tour_size < 2 or tour_size > len(rank):
+        raise ValueError("tour_size must be between 2 and the population size.")
+    if quantity < 0:
+        raise ValueError("quantity must be non-negative.")
+
+    selected = np.empty(quantity, dtype=np.int64)
+    for i in range(quantity):
+        candidates = random_sample(range_size=len(rank), quantity=tour_size, replace=False)
+        winner = candidates[0]
+        for j in range(1, tour_size):
+            candidate = candidates[j]
+            comparison = compare_rank_and_crowding(
+                rank[candidate],
+                crowding_distance[candidate],
+                rank[winner],
+                crowding_distance[winner],
+            )
+            if comparison > 0 or (comparison == 0 and flip_coin(0.5)):
+                winner = candidate
+        selected[i] = winner
+    return selected
+
+
+# Alias for rank-based crowded tournament selection.
+crowded_tournament_selection = rank_crowding_tournament_selection
+
+
+@njit
+def dominance_crowding_tournament_selection(
+    fitness: NDArray[np.float64],
+    crowding_distance: NDArray[np.float64],
+    tour_size: int,
+    quantity: int,
+) -> NDArray[np.int64]:
+    """Select indexes by direct dominance, then crowding distance.
+
+    ``fitness`` is a matrix of shape (N, M), with all objectives maximized.
+    ``crowding_distance`` contains N precomputed distances, calculated
+    separately within each front. Neither input may contain NaN.
+
+    A dominating candidate wins regardless of distance. If neither candidate
+    dominates the other, greater distance wins; exact ties choose either
+    candidate with equal probability. Use ``tour_size=2`` for pymoo's
+    feasible-solution dominance-and-crowding binary tournament. Constraint
+    violations are not handled here. Candidate sampling uses this library's
+    random_sample, so matching seeds do not imply matching pymoo samples.
+
+    Candidates are distinct within a tournament; winners may repeat across
+    the ``quantity`` independent tournaments. Return an int64 index array.
+    For sizes above 2, candidates compete sequentially in sampled order;
+    this is an extension, not pymoo's binary tournament. Comparison work is
+    O(quantity * tour_size * M). Inputs are not modified.
+    """
+    if fitness.ndim != 2 or crowding_distance.ndim != 1:
+        raise ValueError("fitness must be a matrix and crowding_distance a vector.")
+    if fitness.shape[1] == 0:
+        raise ValueError("fitness must contain at least one objective.")
+    if len(fitness) != len(crowding_distance):
+        raise ValueError("fitness and crowding_distance must have the same length.")
+    if tour_size < 2 or tour_size > len(fitness):
+        raise ValueError("tour_size must be between 2 and the population size.")
+    if quantity < 0:
+        raise ValueError("quantity must be non-negative.")
+
+    selected = np.empty(quantity, dtype=np.int64)
+    for i in range(quantity):
+        candidates = random_sample(range_size=len(fitness), quantity=tour_size, replace=False)
+        winner = candidates[0]
+        for j in range(1, tour_size):
+            candidate = candidates[j]
+            comparison = compare_dominance_and_crowding(
+                fitness[candidate],
+                crowding_distance[candidate],
+                fitness[winner],
+                crowding_distance[winner],
+            )
+            if comparison > 0 or (comparison == 0 and flip_coin(0.5)):
+                winner = candidate
+        selected[i] = winner
+    return selected

@@ -10,6 +10,7 @@ from ._pdpga import PDPGA
 from ._pdpgp import PDPGP
 from ._selfcshaga import SelfCSHAGA
 from ._pdpshaga import PDPSHAGA
+from ._nsgaii import NSGAII
 
 __all__ = [
     "DifferentialEvolution",
@@ -24,4 +25,5 @@ __all__ = [
     "PDPGP",
     "SelfCSHAGA",
     "PDPSHAGA",
+    "NSGAII",
 ]

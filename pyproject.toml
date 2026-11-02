@@ -48,6 +48,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+benchmarks = ["pymoo==0.6.2", "matplotlib"]
 dev = [
     "pytest",
     "pytest-cov",
