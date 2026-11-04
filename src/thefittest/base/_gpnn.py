@@ -10,6 +10,7 @@ from typing import Union
 from typing import TYPE_CHECKING
 
 from collections import OrderedDict
+from copy import deepcopy
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -21,7 +22,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.multiclass import check_classification_targets
-from sklearn.utils.validation import validate_data
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 try:
     import torch
@@ -47,6 +48,7 @@ from ..base._tree import init_net_uniset
 from ..optimizers import GeneticProgramming
 from ..optimizers import SHAGA
 from ..optimizers import SelfCGP
+from ..optimizers import NSGPII
 from ..utils import array_like_to_numpy_X_y
 from ..utils.random import check_random_state
 from ..utils._metrics import _ce_from_probs_torch, _rmse_torch
@@ -63,6 +65,29 @@ class LimitedSizeDict(OrderedDict):
         elif len(self) >= self.max_size:
             self.popitem(last=False)
         super().__setitem__(key, value)
+
+
+def net_complexity(net: Net, criterion: str = "n_connections") -> int:
+    """Measure the structure of a network phenotype.
+
+    Parameters
+    ----------
+    net : Net
+        Network whose structure is measured.
+    criterion : str
+        "n_neurons" counts hidden and output neurons; "n_connections" counts
+        connections; "n_layers" counts nonempty hidden layers and the output
+        layer; "n_inputs" counts input nodes, including a bias input if present.
+    """
+    if criterion == "n_neurons":
+        return len(set().union(net._outputs, *net._hidden_layers))
+    if criterion == "n_connections":
+        return len(net._connects)
+    if criterion == "n_layers":
+        return sum(bool(layer) for layer in net._hidden_layers) + bool(net._outputs)
+    if criterion == "n_inputs":
+        return len(net._inputs)
+    raise ValueError(f"Unknown network complexity criterion: {criterion}.")
 
 
 def fitness_function_structure(
@@ -105,6 +130,30 @@ def fitness_function_structure(
                 fitness_cache[sig]["weights"] = net._weights.detach().cpu().clone()
 
     return losses
+
+
+def fitness_function_structure_multiobjective(
+    population: NDArray[Any],
+    X: torch.Tensor,
+    targets: torch.Tensor,
+    net_size_penalty: float,
+    complexity: str = "n_connections",
+    task_type: str = "regression",
+    fitness_cache: Optional[dict[str, dict]] = None,
+) -> NDArray[np.float64]:
+    """Return penalized prediction loss and network complexity as minimization objectives."""
+    complexities = np.array(
+        [net_complexity(net, complexity) for net in population], dtype=np.float64
+    )
+    losses = fitness_function_structure(
+        population,
+        X,
+        targets,
+        net_size_penalty,
+        task_type=task_type,
+        fitness_cache=fitness_cache,
+    )
+    return np.column_stack((losses, complexities))
 
 
 def genotype_to_phenotype_tree(
@@ -207,13 +256,23 @@ def train_net_structure(
     n_outputs: int,
     task_type: str = "regression",
     fitness_cache: Optional[dict[str, dict]] = None,
-):
+    complexity: str = "n_connections",
+    model_selection: str = "best_error",
+) -> tuple[Net, Tree, Statistics, Optional[dict[str, Any]], Optional[int]]:
+    multiobjective = issubclass(optimizer, NSGPII)
+    if multiobjective:
+        if complexity not in ("n_neurons", "n_connections", "n_layers", "n_inputs"):
+            raise ValueError(f"Unknown network complexity criterion: {complexity}.")
+        if model_selection not in ("best_error", "simplest"):
+            raise ValueError('model_selection must be "best_error" or "simplest".')
     if task_type == "regression":
         output_activation = "ln"
     else:
         output_activation = "softmax"
 
-    optimizer_args["fitness_function"] = fitness_function_structure
+    optimizer_args["fitness_function"] = (
+        fitness_function_structure_multiobjective if multiobjective else fitness_function_structure
+    )
     optimizer_args["fitness_function_args"] = {
         "X": X_test,
         "targets": y_test,
@@ -236,16 +295,35 @@ def train_net_structure(
     }
 
     optimizer_args["uniset"] = uniset
-    optimizer_args["minimization"] = True
+    if multiobjective:
+        optimizer_args["fitness_function_args"]["complexity"] = complexity
+        optimizer_args["minimization"] = (True, True)
+    else:
+        optimizer_args["minimization"] = True
 
     optimizer = optimizer(**optimizer_args)
 
     optimizer.fit()
 
-    net = optimizer.get_fittest()["phenotype"].copy()
-    tree = optimizer.get_fittest()["genotype"].copy()
+    pareto_front = None
+    selected_index = None
+    if multiobjective:
+        pareto_front = optimizer.get_pareto_front()
+        errors, complexities = pareto_front["fitness"].T
+        order = (
+            np.lexsort((complexities, errors))
+            if model_selection == "best_error"
+            else np.lexsort((errors, complexities))
+        )
+        selected_index = int(order[0])
+        net = pareto_front["phenotype"][selected_index].copy()
+        tree = pareto_front["genotype"][selected_index].copy()
+    else:
+        fittest = optimizer.get_fittest()
+        net = fittest["phenotype"].copy()
+        tree = fittest["genotype"].copy()
 
-    return net, tree, optimizer._stats
+    return net, tree, optimizer.get_stats(), pareto_front, selected_index
 
 
 class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
@@ -259,7 +337,7 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         max_hidden_block_size: int = 9,
         offset: bool = True,
         test_sample_ratio: float = 0.5,
-        optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,
+        optimizer: Union[Type[SelfCGP], Type[GeneticProgramming], Type[NSGPII]] = SelfCGP,
         optimizer_args: Optional[dict[str, Any]] = None,
         weights_optimizer: weights_type_optimizer_alias = SHAGA,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
@@ -268,7 +346,9 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         device: str = "cpu",
         use_fitness_cache: bool = False,
         fitness_cache_size: int = 1000,
-    ):
+        complexity: str = "n_connections",
+        model_selection: str = "best_error",
+    ) -> None:
         super().__init__()
         self.n_iter = n_iter
         self.pop_size = pop_size
@@ -285,6 +365,8 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
         self.device = device
         self.use_fitness_cache = use_fitness_cache
         self.fitness_cache_size = fitness_cache_size
+        self.complexity = complexity
+        self.model_selection = model_selection
 
     def get_net(self) -> Net:
         """
@@ -321,6 +403,37 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             collected during the architecture evolution process.
         """
         return self.optimizer_stats_
+
+    def get_pareto_front(self) -> dict[str, Any]:
+        """Return a detached copy of the fitted Pareto networks, trees and objectives."""
+        check_is_fitted(self, ["net_", "tree_"])
+        if not hasattr(self, "pareto_front_"):
+            raise ValueError("A Pareto front is available only after fitting with NSGPII.")
+        return deepcopy(self.pareto_front_)
+
+    def select_net(self, index: int) -> BaseGPNN:
+        """Activate a Pareto network and its tree without retraining weights.
+
+        Parameters
+        ----------
+        index : int
+            Zero-based position in the fitted Pareto front.
+        """
+        check_is_fitted(self, ["net_", "tree_"])
+        if not hasattr(self, "pareto_front_"):
+            raise ValueError("A Pareto front is available only after fitting with NSGPII.")
+        if isinstance(index, (bool, np.bool_)) or not isinstance(index, (int, np.integer)):
+            raise TypeError("index must be an integer.")
+        if not 0 <= index < len(self.pareto_front_["fitness"]):
+            raise IndexError("index is outside the Pareto front.")
+
+        net = self.pareto_front_["phenotype"][index].copy()
+        tree = self.pareto_front_["genotype"][index].copy()
+        net.compile_torch()
+        self.net_ = net
+        self.tree_ = tree
+        self.selected_net_index_ = int(index)
+        return self
 
     @staticmethod
     def genotype_to_phenotype_tree(
@@ -457,22 +570,32 @@ class BaseGPNN(BaseEstimator, metaclass=ABCMeta):
             task_type = "regression"
             n_outputs = 1
 
-        self.net_, self.tree_, self.optimizer_stats_ = train_net_structure(
-            uniset=uniset,
-            X_train=X_train,
-            y_train=y_train,
-            X_test=X_test,
-            y_test=y_test,
-            optimizer_args=optimizer_args,
-            optimizer=self.optimizer,
-            fitness_function_structure=fitness_function_structure,
-            net_size_penalty=self.net_size_penalty,
-            weights_optimizer_args=weights_optimizer_args,
-            weights_optimizer=self.weights_optimizer,
-            offset=self.offset,
-            n_outputs=n_outputs,
-            task_type=task_type,
-            fitness_cache=self._fitness_cache,
+        self.net_, self.tree_, self.optimizer_stats_, pareto_front, selected_index = (
+            train_net_structure(
+                uniset=uniset,
+                X_train=X_train,
+                y_train=y_train,
+                X_test=X_test,
+                y_test=y_test,
+                optimizer_args=optimizer_args,
+                optimizer=self.optimizer,
+                fitness_function_structure=fitness_function_structure,
+                net_size_penalty=self.net_size_penalty,
+                weights_optimizer_args=weights_optimizer_args,
+                weights_optimizer=self.weights_optimizer,
+                offset=self.offset,
+                n_outputs=n_outputs,
+                task_type=task_type,
+                fitness_cache=self._fitness_cache,
+                complexity=self.complexity,
+                model_selection=self.model_selection,
+            )
         )
+        if pareto_front is not None:
+            self.pareto_front_ = pareto_front
+            self.selected_net_index_ = selected_index
+        else:
+            self.__dict__.pop("pareto_front_", None)
+            self.__dict__.pop("selected_net_index_", None)
         self.net_.compile_torch()
         return self
