@@ -31,6 +31,7 @@
 - Create README files, guides, and other standalone instructions only when explicitly requested by the user.
 - Do not leave temporary comments, documentation placeholders, `TODO` markers, or explanations of the obvious. Omit unnecessary explanations; keep necessary ones concise and relevant.
 - Comments and docstrings must describe lasting purpose, contracts, or non-obvious implementation decisions. Do not record iteration progress, unfinished work, or future implementation steps in source documentation (for example, "currently only initialization is implemented" or "still needs implementation"). Report such status in the conversation instead. Do not describe planned behavior as already implemented.
+- Do not turn a class or function docstring into a description of the latest change. Document the component's stable contract, not the current task, recently added parameter, or implementation walkthrough. Before finishing, review added comments and docstrings against this rule; put change explanations in the conversation.
 - Class, function, and method docstrings are optional. Add them when they explain purpose, behavior, limitations, or non-obvious parameters.
 - Do not create docstrings that merely restate a function's name, signature, or obvious actions.
 - When a docstring is necessary, use NumPy-style (numpydoc) exclusively in English.

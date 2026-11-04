@@ -71,6 +71,8 @@ class NSGAII(MultiObjectiveEvolutionaryAlgorithm):
         on_generation: Optional[Callable] = None,
         fitness_update_eps: float = 0.0,
         crossover_rate: float = 1.0,
+        use_fitness_cache: bool = False,
+        fitness_cache_size: Optional[int] = 1000,
     ) -> None:
         if not 0.0 <= crossover_rate <= 1.0:
             raise ValueError("crossover_rate must be between 0 and 1.")
@@ -95,6 +97,8 @@ class NSGAII(MultiObjectiveEvolutionaryAlgorithm):
             random_state=random_state,
             on_generation=on_generation,
             fitness_update_eps=fitness_update_eps,
+            use_fitness_cache=use_fitness_cache,
+            fitness_cache_size=fitness_cache_size,
         )
         self._str_len: int = str_len
         self._specified_selection: str = selection
@@ -108,6 +112,13 @@ class NSGAII(MultiObjectiveEvolutionaryAlgorithm):
             "rank_crowding": (rank_crowding_tournament_selection, 2),
             "dominance_crowding": (dominance_crowding_tournament_selection, 2),
         }
+        self._init_variation_pools()
+        if crossover not in self._crossover_pool:
+            raise ValueError(f"Unknown crossover: {crossover}.")
+        if mutation not in self._mutation_pool:
+            raise ValueError(f"Unknown mutation: {mutation}.")
+
+    def _init_variation_pools(self) -> None:
         self._crossover_pool: Dict[str, Tuple[Callable, int]] = {
             "empty": (empty_crossover, 1),
             "one_point": (one_point_crossover, 2),
@@ -124,10 +135,6 @@ class NSGAII(MultiObjectiveEvolutionaryAlgorithm):
             "strong": (flip_mutation, 3, False),
             "custom_rate": (flip_mutation, self._mutation_rate, True),
         }
-        if crossover not in self._crossover_pool:
-            raise ValueError(f"Unknown binary crossover: {crossover}.")
-        if mutation not in self._mutation_pool:
-            raise ValueError(f"Unknown binary mutation: {mutation}.")
 
     def _first_generation(self) -> None:
         if self._init_population is None:
@@ -140,7 +147,9 @@ class NSGAII(MultiObjectiveEvolutionaryAlgorithm):
     def _get_init_population(self) -> None:
         super()._get_init_population()
         self._population_ph_i, self._fitness_i = self._evaluate_population(self._population_g_i)
-        self._pareto_rank_i, self._crowding_distance_i = self._rank_and_crowding(self._fitness_i)
+        self._pareto_rank_i, self._crowding_distance_i = self._rank_and_crowding(
+            self._fitness_i, self._population_g_i
+        )
 
     def _from_population_g_to_fitness(self) -> None:
         self._update_data()
@@ -148,6 +157,7 @@ class NSGAII(MultiObjectiveEvolutionaryAlgorithm):
     @staticmethod
     def _rank_and_crowding(
         fitness: NDArray[np.float64],
+        population_g: Optional[NDArray[Any]] = None,
     ) -> Tuple[NDArray[np.int64], NDArray[np.float64]]:
         ranks = fast_non_dominated_sort(fitness)
         distances = np.empty(len(fitness), dtype=np.float64)
@@ -179,18 +189,18 @@ class NSGAII(MultiObjectiveEvolutionaryAlgorithm):
         specified_crossover: str,
         specified_mutation: str,
     ) -> NDArray[np.byte]:
+        if specified_selection == "rank_crowding":
+            selection_data = self._pareto_rank_i
+        elif specified_selection == "dominance_crowding":
+            selection_data = self._fitness_i
+        else:
+            raise ValueError(f"Unsupported selection: {specified_selection}.")
+
         selection_func, tour_size = self._selection_pool[specified_selection]
         crossover_func, quantity = self._crossover_pool[specified_crossover]
         mutation_func, proba, is_constant_rate = self._mutation_pool[specified_mutation]
 
-        if specified_selection == "rank_crowding":
-            selected_id = selection_func(
-                self._pareto_rank_i, self._crowding_distance_i, tour_size, quantity
-            )
-        else:
-            selected_id = selection_func(
-                self._fitness_i, self._crowding_distance_i, tour_size, quantity
-            )
+        selected_id = selection_func(selection_data, self._crowding_distance_i, tour_size, quantity)
 
         if self._crossover_rate == 1.0 or flip_coin(self._crossover_rate):
             ranks = self._pareto_rank_i[selected_id]
@@ -209,7 +219,7 @@ class NSGAII(MultiObjectiveEvolutionaryAlgorithm):
         offspring = mutation_func(offspring_no_mutated, np.float64(proba))
         return offspring
 
-    def _get_offspring_population(self) -> NDArray[np.byte]:
+    def _get_offspring_population(self) -> NDArray[Any]:
         offspring = np.array(
             [
                 self._get_new_individ_g(
@@ -219,7 +229,7 @@ class NSGAII(MultiObjectiveEvolutionaryAlgorithm):
                 )
                 for _ in range(self._pop_size)
             ],
-            dtype=np.byte,
+            dtype=self._population_g_i.dtype,
         )
         return offspring
 
@@ -229,7 +239,7 @@ class NSGAII(MultiObjectiveEvolutionaryAlgorithm):
         population_g = np.concatenate((self._population_g_i, offspring_g), axis=0)
         population_ph = np.concatenate((self._population_ph_i, offspring_ph), axis=0)
         fitness = np.concatenate((self._fitness_i, offspring_fitness), axis=0)
-        ranks, distances = self._rank_and_crowding(fitness)
+        ranks, distances = self._rank_and_crowding(fitness, population_g)
         survivors = self._get_survivor_indices(ranks, distances)
         self._replace_population(population_g, population_ph, fitness, ranks, distances, survivors)
 

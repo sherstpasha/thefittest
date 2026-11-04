@@ -27,6 +27,7 @@ from ..base._mlp import check_optimizer_args
 from ..base._tree import init_symbolic_regression_uniset
 from ..optimizers import GeneticProgramming
 from ..optimizers import SelfCGP
+from ..optimizers import NSGPII
 from ..utils import array_like_to_numpy_X_y
 from ..utils._metrics import categorical_crossentropy
 from ..utils._metrics import root_mean_square_error
@@ -71,6 +72,47 @@ def fitness_function_gp(
     return np.array(fitness, dtype=np.float64)
 
 
+def tree_complexity(tree: Tree, criterion: str = "n_nodes") -> int:
+    """Measure tree size or structure.
+
+    Parameters
+    ----------
+    tree : Tree
+        Expression to measure.
+    criterion : str
+        "n_nodes" counts all nodes; "n_levels" counts levels including the
+        root; "n_functions" counts function nodes; "n_terminals" counts
+        leaves, including constants. A single terminal has one level.
+    """
+    if criterion == "n_nodes":
+        return len(tree)
+    if criterion == "n_levels":
+        return int(tree.get_max_level()) + 1
+    if criterion == "n_functions":
+        return int(np.count_nonzero(tree._n_args > 0))
+    if criterion == "n_terminals":
+        return int(np.count_nonzero(tree._n_args == 0))
+    raise ValueError(f"Unknown tree complexity criterion: {criterion}.")
+
+
+def fitness_function_gp_multiobjective(
+    trees: NDArray,
+    y: NDArray[np.float64],
+    complexity: str = "n_nodes",
+    fitness_cache: Optional[dict[str, float]] = None,
+) -> NDArray[np.float64]:
+    """Return RMSE and tree complexity as two minimization objectives.
+
+    Notes
+    -----
+    The result has shape (number of trees, 2). The cache contains only
+    scalar regression errors and can be reused across complexity criteria.
+    """
+    complexities = np.array([tree_complexity(tree, complexity) for tree in trees], dtype=np.float64)
+    errors = fitness_function_gp(trees, y, task_type="regression", fitness_cache=fitness_cache)
+    return np.column_stack((errors, complexities))
+
+
 class BaseGP(BaseEstimator, metaclass=ABCMeta):
 
     @abstractmethod
@@ -80,7 +122,7 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
         n_iter: int = 500,
         pop_size: int = 1000,
         functional_set_names: Tuple[str, ...] = ("cos", "sin", "add", "sub", "mul", "div"),
-        optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,
+        optimizer: Union[Type[SelfCGP], Type[GeneticProgramming], Type[NSGPII]] = SelfCGP,
         optimizer_args: Optional[dict[str, Any]] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         use_fitness_cache: bool = False,
@@ -118,6 +160,17 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
             collected during the evolutionary optimization process.
         """
         return self.optimizer_stats_
+
+    def _fit_regression(self, optimizer_args: dict[str, Any], y: NDArray[np.float64]) -> None:
+        optimizer_args["fitness_function_args"] = {
+            "y": y,
+            "task_type": "regression",
+            "fitness_cache": self._fitness_cache,
+        }
+        optimizer_ = self.optimizer(**optimizer_args)
+        optimizer_.fit()
+        self.tree_ = optimizer_.get_fittest()["phenotype"]
+        self.optimizer_stats_ = optimizer_.get_stats()
 
     def fit(self, X: ArrayLike, y: ArrayLike):
 
@@ -225,14 +278,6 @@ class BaseGP(BaseEstimator, metaclass=ABCMeta):
                 self.tree_ = self.trees_[0]
                 self.optimizer_stats_ = last_stats
         else:
-            optimizer_args["fitness_function_args"] = {
-                "y": y,
-                "task_type": "regression",
-                "fitness_cache": self._fitness_cache,
-            }
-            optimizer_ = self.optimizer(**optimizer_args)
-            optimizer_.fit()
-            self.tree_ = optimizer_.get_fittest()["phenotype"]
-            self.optimizer_stats_ = optimizer_.get_stats()
+            self._fit_regression(optimizer_args, y)
 
         return self

@@ -144,8 +144,8 @@ def test_inherited_fit_uses_multiobjective_progress_and_iteration_limit(
         assert output == ""
     else:
         assert output.splitlines() == [
-            "0-th iteration with Pareto front size = 3",
-            "2-th iteration with Pareto front size = 3",
+            "0-th iteration with Pareto front size = 3; best objectives = [f1=3, f2=5]",
+            "2-th iteration with Pareto front size = 3; best objectives = [f1=3, f2=5]",
         ]
 
 

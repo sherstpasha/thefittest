@@ -228,7 +228,10 @@ class EvolutionaryAlgorithm:
         if fitness_cache_size is not None and fitness_cache_size < 0:
             raise ValueError("Parameter fitness_cache_size must be non-negative or None.")
         self._fitness_cache_size: Optional[int] = fitness_cache_size
-        self._fitness_cache: OrderedDict[Any, Tuple[Any, float]] = OrderedDict()
+        self._fitness_cache: OrderedDict[Any, Tuple[Any, Union[float, NDArray[np.float64]]]] = (
+            OrderedDict()
+        )
+        self._fitness_shape: Tuple[int, ...] = ()
 
         if fitness_function_args is not None:
             self._fitness_function_args = fitness_function_args
@@ -364,14 +367,15 @@ class EvolutionaryAlgorithm:
         self: EvolutionaryAlgorithm,
         key: Any,
         phenotype: Any,
-        fitness: float,
+        fitness: Union[float, NDArray[np.float64]],
     ) -> None:
         try:
             cached_phenotype = phenotype.copy()
         except AttributeError:
             cached_phenotype = phenotype
 
-        self._fitness_cache[key] = (cached_phenotype, float(fitness))
+        cached_fitness = fitness.copy() if isinstance(fitness, np.ndarray) else float(fitness)
+        self._fitness_cache[key] = (cached_phenotype, cached_fitness)
         self._fitness_cache.move_to_end(key)
 
         if self._fitness_cache_size is not None:
@@ -388,7 +392,7 @@ class EvolutionaryAlgorithm:
 
         population_size = len(population_g)
         population_ph_list: List[Any] = [None] * population_size
-        fitness = np.empty(population_size, dtype=np.float64)
+        fitness = np.empty((population_size,) + self._fitness_shape, dtype=np.float64)
         missing_indexes: List[int] = []
         missing_keys: List[Any] = []
         pending_indexes: Dict[Any, List[int]] = {}
@@ -429,7 +433,7 @@ class EvolutionaryAlgorithm:
                 self._save_fitness_cache(
                     missing_keys[local_i],
                     phenotype,
-                    float(fitness_value),
+                    fitness_value,
                 )
 
         population_ph = np.array(population_ph_list)
@@ -687,6 +691,8 @@ class MultiObjectiveEvolutionaryAlgorithm(EvolutionaryAlgorithm):
         optimal_value: Optional[Tuple[float, ...]] = None,
         termination_error_value: float = 0.0,
         fitness_update_eps: float = 0.0,
+        use_fitness_cache: bool = False,
+        fitness_cache_size: Optional[int] = 1000,
     ) -> None:
         minimization = tuple(minimization)
         if not np.isfinite(fitness_update_eps) or fitness_update_eps < 0:
@@ -720,9 +726,12 @@ class MultiObjectiveEvolutionaryAlgorithm(EvolutionaryAlgorithm):
             random_state=random_state,
             on_generation=on_generation,
             fitness_update_eps=fitness_update_eps,
+            use_fitness_cache=use_fitness_cache,
+            fitness_cache_size=fitness_cache_size,
         )
         self._minimization: Tuple[bool, ...] = minimization
         self._n_objectives: int = len(minimization)
+        self._fitness_shape = (self._n_objectives,)
         self._objective_signs: NDArray[np.float64] = np.array(
             [-1.0 if value else 1.0 for value in minimization],
             dtype=np.float64,
@@ -802,7 +811,14 @@ class MultiObjectiveEvolutionaryAlgorithm(EvolutionaryAlgorithm):
         if self._show_progress_each is not None:
             if current_iter % self._show_progress_each == 0:
                 front_size = np.count_nonzero(self._pareto_rank_i == 1)
-                print(f"{current_iter}-th iteration with Pareto front size = {front_size}")
+                best_values = self._fitness_i.max(axis=0) * self._objective_signs
+                objectives = ", ".join(
+                    f"f{i + 1}={value:.6g}" for i, value in enumerate(best_values)
+                )
+                print(
+                    f"{current_iter}-th iteration with Pareto front size = {front_size}; "
+                    f"best objectives = [{objectives}]"
+                )
 
     def get_pareto_front(self) -> Dict[str, Any]:
         """Return a copy of the current first front in original objective directions.

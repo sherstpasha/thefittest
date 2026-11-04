@@ -1,7 +1,10 @@
 import inspect
 
 import numpy as np
+import pytest
 
+from ..base import Tree
+from ..base import init_symbolic_regression_uniset
 from ..utils import mutations
 
 
@@ -43,7 +46,9 @@ def test_differential_evolution_mutation_formulas(monkeypatch):
         (mutations.rand_1, population[0] + scale * (population[1] - population[2])),
         (
             mutations.rand_to_best1,
-            population[0] + scale * (best - population[0]) + scale * (population[1] - population[2]),
+            population[0]
+            + scale * (best - population[0])
+            + scale * (population[1] - population[2]),
         ),
         (
             mutations.current_to_best_1,
@@ -51,11 +56,15 @@ def test_differential_evolution_mutation_formulas(monkeypatch):
         ),
         (
             mutations.best_2,
-            best + scale * (population[0] - population[1]) + scale * (population[2] - population[3]),
+            best
+            + scale * (population[0] - population[1])
+            + scale * (population[2] - population[3]),
         ),
         (
             mutations.rand_2,
-            population[0] + scale * (population[1] - population[2]) + scale * (population[3] - population[4]),
+            population[0]
+            + scale * (population[1] - population[2])
+            + scale * (population[3] - population[4]),
         ),
         (
             mutations.current_to_rand_1,
@@ -96,7 +105,9 @@ def test_current_to_pbest_1_archive_formula(monkeypatch):
     monkeypatch.setattr(mutations, "randint", fixed_randint)
     monkeypatch.setattr(mutations, "random_sample", fixed_random_sample)
 
-    mutated = mutations.current_to_pbest_1_archive.py_func(current, population, pbest, scale, archive)
+    mutated = mutations.current_to_pbest_1_archive.py_func(
+        current, population, pbest, scale, archive
+    )
     expected = current + scale * (population[2] - current) + scale * (population[1] - archive[0])
 
     assert np.allclose(mutated, expected)
@@ -105,3 +116,35 @@ def test_current_to_pbest_1_archive_formula(monkeypatch):
 
 def test_swap_mutation_uses_documented_max_level_parameter_name():
     assert "max_level" in inspect.signature(mutations.swap_mutation).parameters
+
+
+def test_growing_mutation_can_expand_a_terminal() -> None:
+    uniset = init_symbolic_regression_uniset(np.ones((3, 1)), ("sin",))
+    tree = Tree([uniset._terminal_set[0]])
+
+    mutated = mutations.growing_mutation(tree, uniset, 1.0, 3)
+
+    assert len(mutated) > 1
+    assert 0 < mutated.get_max_level() <= 3
+    assert len(tree) == 1
+
+
+@pytest.mark.parametrize("selected_node", [0, 1, 2])
+def test_growing_mutation_respects_remaining_depth(
+    monkeypatch: pytest.MonkeyPatch, selected_node: int
+) -> None:
+    uniset = init_symbolic_regression_uniset(np.ones((3, 1)), ("sin",))
+    function = uniset._functional_set[1][0]
+    tree = Tree([function, function, uniset._terminal_set[0]])
+    original = str(tree)
+
+    def select_node(low: int, high: int, size: int) -> np.ndarray:
+        return np.array([selected_node], dtype=np.int64)
+
+    monkeypatch.setattr(mutations, "randint", select_node)
+    mutated = mutations.growing_mutation(tree, uniset, 1.0, 2)
+
+    assert mutated.get_max_level() <= 2
+    assert str(tree) == original
+    if selected_node == 2:
+        assert len(mutated.subtree(selected_node)) == 1
