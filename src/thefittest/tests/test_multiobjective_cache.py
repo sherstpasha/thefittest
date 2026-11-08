@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -36,7 +36,7 @@ def test_vector_cache_reuses_results_preserves_directions_and_copies(n_jobs: int
     "enabled,limit,expected_calls", [(False, 1000, 6), (True, 0, 4), (True, None, 2)]
 )
 def test_vector_cache_enablement_and_zero_or_unlimited_capacity(
-    enabled: bool, limit: int | None, expected_calls: int
+    enabled: bool, limit: Optional[int], expected_calls: int
 ) -> None:
     optimizer = MultiObjectiveEvolutionaryAlgorithm(
         objectives,
