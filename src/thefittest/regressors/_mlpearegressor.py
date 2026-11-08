@@ -31,9 +31,8 @@ class MLPEARegressor(RegressorMixin, BaseMLPEA):
     """
     Multi-Layer Perceptron regressor with Evolutionary Algorithm-based training.
 
-    This regressor uses evolutionary algorithms to optimize neural network weights
-    instead of traditional gradient-based methods. It's particularly useful when
-    gradient information is unavailable or unreliable.
+    This regressor optimizes neural network weights using evolutionary algorithms
+    or gradient-based PyTorch optimizers.
 
     Parameters
     ----------
@@ -48,7 +47,7 @@ class MLPEARegressor(RegressorMixin, BaseMLPEA):
     activation : str, optional (default="sigma")
         Activation function for hidden layers.
         Available: 'sigma' (sigmoid), 'relu', 'gauss' (Gaussian), 'tanh',
-        'ln' (natural logarithm normalization), 'softmax'.
+        'ln' (linear identity), 'softmax'.
     offset : bool, optional (default=True)
         If True, adds bias terms to the network.
     weights_optimizer : Type, optional (default=SHADE)
@@ -68,7 +67,7 @@ class MLPEARegressor(RegressorMixin, BaseMLPEA):
 
     Attributes
     ----------
-    net_ : torch.nn.Module
+    net_ : Net
         The trained neural network.
     n_features_in_ : int
         Number of features seen during fit.

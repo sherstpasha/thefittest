@@ -10,7 +10,6 @@ Thefittest Documentation
          <a href="https://pypi.org/project/thefittest/"><img src="https://img.shields.io/pypi/v/thefittest?label=PyPI" alt="PyPI version"></a>
          <a href="https://pepy.tech/project/thefittest"><img src="https://static.pepy.tech/badge/thefittest" alt="Downloads"></a>
          <img src="https://komarev.com/ghpvc/?username=thefittest" alt="Profile views">
-         <a href="https://codecov.io/github/sherstpasha/thefittest"><img src="https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master" alt="codecov.io"></a>
          <a href="https://app.codacy.com/gh/sherstpasha/thefittest/dashboard"><img src="https://app.codacy.com/project/badge/Grade/4c47b6de61c4422180529bbc360262c4" alt="Codacy Badge"></a>
          <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
       </div>
@@ -40,7 +39,15 @@ Thefittest Documentation
             <a href="modules/optimizers.html#thefittest.optimizers.GeneticProgramming">GeneticProgramming</a>, 
             <a href="modules/optimizers.html#thefittest.optimizers.SelfCGP">SelfCGP</a>, 
             <a href="modules/optimizers.html#thefittest.optimizers.PDPGP">PDPGP</a>, 
-            <a href="modules/optimizers.html#thefittest.optimizers.SHAGA">SHAGA</a>
+            <a href="modules/optimizers.html#thefittest.optimizers.SHAGA">SHAGA</a>,
+            <a href="modules/optimizers.html#thefittest.optimizers.SelfCSHAGA">SelfCSHAGA</a>,
+            <a href="modules/optimizers.html#thefittest.optimizers.PDPSHAGA">PDPSHAGA</a>,
+            <a href="modules/optimizers.html#thefittest.optimizers.NSGAII">NSGAII</a>,
+            <a href="modules/optimizers.html#thefittest.optimizers.SelfCNSGAII">SelfCNSGAII</a>,
+            <a href="modules/optimizers.html#thefittest.optimizers.PDPNSGAII">PDPNSGAII</a>,
+            <a href="modules/optimizers.html#thefittest.optimizers.NSGPII">NSGPII</a>,
+            <a href="modules/optimizers.html#thefittest.optimizers.SelfCNSGPII">SelfCNSGPII</a>,
+            <a href="modules/optimizers.html#thefittest.optimizers.PDPNSGPII">PDPNSGPII</a>
          </p>
          <a href="modules/optimizers.html" class="module-card-arrow">View documentation →</a>
       </div>
@@ -48,9 +55,9 @@ Thefittest Documentation
       <div class="module-card">
          <h3>Classifiers</h3>
          <p class="module-items">
-            <a href="modules/classifiers.html#thefittest.classifiers.GPClassifier">GeneticProgrammingClassifier</a>, 
+            <a href="modules/classifiers.html#thefittest.classifiers.GeneticProgrammingClassifier">GeneticProgrammingClassifier</a>,
             <a href="modules/classifiers.html#thefittest.classifiers.MLPEAClassifier">MLPEAClassifier</a>, 
-            <a href="modules/classifiers.html#thefittest.classifiers.GPNNClassifier">GeneticProgrammingClassifier</a>
+            <a href="modules/classifiers.html#thefittest.classifiers.GeneticProgrammingNeuralNetClassifier">GeneticProgrammingNeuralNetClassifier</a>
          </p>
          <a href="modules/classifiers.html" class="module-card-arrow">View documentation →</a>
       </div>
@@ -58,9 +65,9 @@ Thefittest Documentation
       <div class="module-card">
          <h3>Regressors</h3>
          <p class="module-items">
-            <a href="modules/regressors.html#thefittest.regressors.GPRegressor">GeneticProgrammingRegressor</a>, 
+            <a href="modules/regressors.html#thefittest.regressors.GeneticProgrammingRegressor">GeneticProgrammingRegressor</a>,
             <a href="modules/regressors.html#thefittest.regressors.MLPEARegressor">MLPEARegressor</a>, 
-            <a href="modules/regressors.html#thefittest.regressors.GPNNRegressor">GeneticProgrammingRegressor</a>
+            <a href="modules/regressors.html#thefittest.regressors.GeneticProgrammingNeuralNetRegressor">GeneticProgrammingNeuralNetRegressor</a>
          </p>
          <a href="modules/regressors.html" class="module-card-arrow">View documentation →</a>
       </div>
@@ -70,7 +77,8 @@ Thefittest Documentation
          <p class="module-items">
             <a href="modules/benchmarks.html#ml-datasets">ML Datasets</a>, 
             <a href="modules/benchmarks.html#optimization-functions">Optimization Functions</a>, 
-            <a href="modules/benchmarks.html#benchmark-suites">Benchmark Suites</a>
+            <a href="modules/benchmarks.html#benchmark-suites">Benchmark Suites</a>,
+            <a href="modules/benchmarks.html#multiobjective-problems">Multiobjective Problems</a>
          </p>
          <a href="modules/benchmarks.html" class="module-card-arrow">View documentation →</a>
       </div>
@@ -82,7 +90,8 @@ Thefittest Documentation
             <a href="modules/utils/crossovers.html">crossovers</a>, 
             <a href="modules/utils/mutations.html">mutations</a>, 
             <a href="modules/utils/transformations.html">transformations</a>, 
-            <a href="modules/utils/random.html">random</a>
+            <a href="modules/utils/random.html">random</a>,
+            <a href="modules/utils/multiobjective.html">multiobjective</a>
          </p>
          <a href="modules/utils/index.html" class="module-card-arrow">View documentation →</a>
       </div>
@@ -98,14 +107,25 @@ Thefittest Documentation
 
     pip install thefittest
 
-**Full installation with neural networks** (requires GPU with CUDA):
-
-First, install PyTorch with CUDA support: https://pytorch.org/get-started/locally/
+**Neural networks on CPU or GPU**:
 
 .. code-block:: bash
 
-    pip3 install torch --index-url https://download.pytorch.org/whl/cu124
-    pip install thefittest
+    python -m pip install "thefittest[torch]"
+
+PyTorch is optional for optimization and symbolic regression. Neural estimators
+use ``device="cpu"`` by default; CUDA is not required. For a CUDA installation,
+follow the `official PyTorch instructions <https://pytorch.org/get-started/locally/>`_
+and select ``device="cuda"`` on a compatible machine.
+
+For tree/network plots, also install Matplotlib and NetworkX:
+
+.. code-block:: bash
+
+    python -m pip install matplotlib networkx
+
+See :doc:`modules/optimizers` for the available algorithms and
+:doc:`release_notes` for changes in 0.3.0.
 
 .. raw:: html
 
@@ -146,22 +166,27 @@ First, install PyTorch with CUDA support: https://pytorch.org/get-started/locall
     from thefittest.benchmarks import IrisDataset
     from thefittest.classifiers import MLPEAClassifier
     from sklearn.model_selection import train_test_split
-    from sklearn.preprocessing import minmax_scale
+    from sklearn.preprocessing import MinMaxScaler
     from sklearn.metrics import f1_score
 
     # Load and prepare data
     data = IrisDataset()
-    X = minmax_scale(data.get_X())
+    X = data.get_X()
     y = data.get_y()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, stratify=y, random_state=42
+    )
+    scaler = MinMaxScaler().fit(X_train)
+    X_train, X_test = scaler.transform(X_train), scaler.transform(X_test)
 
     # Train model
     model = MLPEAClassifier(
-        n_iter=500,
-        pop_size=500,
+        n_iter=5,
+        pop_size=20,
         hidden_layers=[5, 5],
         weights_optimizer=SHAGA,
-        weights_optimizer_args={"show_progress_each": 10}
+        weights_optimizer_args={"show_progress_each": 1},
+        random_state=42,
     )
     model.fit(X_train, y_train)
     
@@ -180,7 +205,7 @@ First, install PyTorch with CUDA support: https://pytorch.org/get-started/locall
          <h3>Required</h3>
          <ul>
             <li>
-               <strong>Python</strong> ≥ 3.7, ≤ 3.13
+               <strong>Python</strong> 3.9–3.13
                <br/>
                <span class="dependency-note">
                   Core runtime environment supported across a wide range of Python versions
@@ -208,7 +233,7 @@ First, install PyTorch with CUDA support: https://pytorch.org/get-started/locall
                </span>
             </li>
             <li>
-               <strong>scikit-learn</strong> ≥ 1.4
+               <strong>scikit-learn</strong> ≥ 1.6
                <br/>
                <span class="dependency-note">
                   Dataset utilities, preprocessing, metrics, and sklearn-compatible API design
@@ -235,7 +260,7 @@ First, install PyTorch with CUDA support: https://pytorch.org/get-started/locall
                </span>
             </li>
             <li>
-               <strong>PyTorch</strong> ≥ 2.0 (CUDA)
+               <strong>PyTorch</strong> ≥ 2.0 (CPU or CUDA)
                <br/>
                <span class="dependency-note">
                   Evolutionary training of neural networks with optional GPU acceleration
@@ -245,118 +270,11 @@ First, install PyTorch with CUDA support: https://pytorch.org/get-started/locall
       </div>
    </div>
 
-.. raw:: html
-
-   <div class="examples-section">
-      <h2>Learning Materials</h2>
-      <div class="example-grid">
-
-         <div class="example-card">
-            <span class="card-category">Notebook</span>
-            <h3>
-               <a class="example-link" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_algorithm_binary_rastrigin_custom_problems.ipynb" target="_blank">
-                  Solving Binary and Real-Valued Optimization Problems with Genetic Algorithms
-               </a>
-            </h3>
-            <p class="example-meta">GitHub Notebook</p>
-         </div>
-
-         <div class="example-card">
-            <span class="card-category">Notebook</span>
-            <h3>
-               <a class="example-link" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/differential_evolution_griewank_custom_problems.ipynb" target="_blank">
-                  Solving Real-Valued Optimization Problems with Differential Evolution
-               </a>
-            </h3>
-            <p class="example-meta">GitHub Notebook</p>
-         </div>
-
-         <div class="example-card">
-            <span class="card-category">Notebook</span>
-            <h3>
-               <a class="example-link" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/genetic_programming_symbolic_regression_problem.ipynb" target="_blank">
-                  Solving Symbolic Regression Problems Using Genetic Programming Algorithms
-               </a>
-            </h3>
-            <p class="example-meta">GitHub Notebook</p>
-         </div>
-
-         <div class="example-card">
-            <span class="card-category">Notebook</span>
-            <h3>
-               <a class="example-link" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/mlpea_regression_classification_problem.ipynb" target="_blank">
-                  Training Neural Networks Using Evolutionary Algorithms for Regression and Classification Problems
-               </a>
-            </h3>
-            <p class="example-meta">GitHub Notebook</p>
-         </div>
-
-         <div class="example-card">
-            <span class="card-category">Notebook</span>
-            <h3>
-               <a class="example-link" href="https://github.com/sherstpasha/thefittest-notebooks/blob/main/gpnn_regression_classification_problems.ipynb" target="_blank">
-                  Optimizing Neural Network Structure Using Genetic Programming
-               </a>
-            </h3>
-            <p class="example-meta">GitHub Notebook</p>
-         </div>
-
-         <div class="example-card">
-            <span class="card-category">Kaggle</span>
-            <h3>
-               <a class="example-link" href="https://www.kaggle.com/code/pashasherst/can-evolution-guide-us-to-better-machine-learning" target="_blank">
-                  Can Evolution Guide Us to Better Machine Learning?
-               </a>
-            </h3>
-            <p class="example-meta">Kaggle</p>
-         </div>
-
-         <div class="example-card">
-            <span class="card-category">Article</span>
-            <h3>
-               <a class="example-link" href="https://doi.org/10.1051/itmconf/20245902020" target="_blank">
-                  Thefittest: evolutionary machine learning in Python
-               </a>
-            </h3>
-            <p class="example-meta">Article</p>
-         </div>
-
-         <div class="example-card">
-            <span class="card-category">Article</span>
-            <h3>
-               <a class="example-link" href="https://habr.com/ru/articles/961924/" target="_blank">
-                  Thefittest: зачем я пишу свою open-source библиотеку эволюционных алгоритмов
-               </a>
-            </h3>
-            <p class="example-meta">Habr</p>
-         </div>
-
-         <div class="example-card">
-            <span class="card-category">Youtube</span>
-            <h3>
-               <a class="example-link" href="https://youtu.be/R46b1tt5qUo?si=ZxGIcX2-sWJEWCbt&t=4550" target="_blank">
-                  Paper presentation: "Thefittest: Evolutionary Machine Learning in Python"
-               </a>
-            </h3>
-            <p class="example-meta">IWMMA'2023 by Pavel Sherstnev</p>
-         </div>
-
-         <div class="example-card">
-            <span class="card-category">Youtube</span>
-            <h3>
-               <a class="example-link" href="https://www.youtube.com/watch?v=PtDahwMstuw" target="_blank">
-                  Tutorial "Thefittest Library: Evolutionary Algorithms and Automation of Machine Learning Models Design in Python"
-               </a>
-            </h3>
-            <p class="example-meta">IWMMA'2024 by Pavel Sherstnev</p>
-         </div>
-
-      </div>
-   </div>
-
 .. toctree::
    :maxdepth: 2
    :hidden:
 
    modules/index
+   learning_materials
+   release_notes
    references

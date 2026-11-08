@@ -34,9 +34,8 @@ class GeneticProgrammingNeuralNetRegressor(RegressorMixin, BaseGPNN):
     """
     Genetic Programming-based Neural Network regressor with evolved architecture.
 
-    This regressor evolves both the neural network architecture and weights using
-    genetic programming. The network structure is represented as a tree, and weights
-    are optimized using evolutionary algorithms or gradient-based optimizers.
+    This regressor evolves tree-encoded neural network architectures using genetic
+    programming. Network weights are trained with evolutionary algorithms or gradient-based optimizers.
 
     Parameters
     ----------
@@ -83,7 +82,7 @@ class GeneticProgrammingNeuralNetRegressor(RegressorMixin, BaseGPNN):
 
     Attributes
     ----------
-    net_ : torch.nn.Module
+    net_ : Net
         The evolved and trained neural network.
     tree_ : Tree
         Tree representation of the evolved architecture.

@@ -65,7 +65,7 @@ class GeneticProgrammingRegressor(RegressorMixin, BaseGP):
     pareto_front_ : dict
         Pareto trees and their RMSE and complexity values, available with NSGPII.
     selected_tree_index_ : int
-        Index of the active model in pareto_front_, available with NSGPII.
+        Index of the active model in ``pareto_front_``, available with NSGPII.
     n_features_in_ : int
         Number of features seen during fit.
 

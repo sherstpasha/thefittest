@@ -420,7 +420,7 @@ def init_symbolic_regression_uniset(
         "abs": create_operator("abs({})", "abs", "abs", abs),
         "logabs": create_operator("log(abs({}))", "log(abs)", "log(abs)", logabs),
         "exp": create_operator("exp({})", "exp", "exp", save_exp),
-        "logabs": create_operator("sqrt(abs({}))", "sqrt(abs)", "sqrt(abs)", sqrtabs),
+        "sqrtabs": create_operator("sqrt(abs({}))", "sqrt(abs)", "sqrt(abs)", sqrtabs),
     }
 
     for func_name in functional_set_names:

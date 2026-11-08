@@ -76,6 +76,10 @@ Genetic Algorithms are search heuristics inspired by natural selection. They wor
      - Self-configuring Genetic Algorithm with automatic parameter tuning (`Semenkin & Semenkina, 2012 <https://doi.org/10.1007/978-3-642-30976-2_50>`__)
    * - :class:`~thefittest.optimizers.PDPGA`
      - Population-level Dynamic Probabilities Genetic Algorithm with operator probability adaptation (`Niehaus & Banzhaf, 2001 <https://doi.org/10.1007/3-540-45355-5_26>`_)
+   * - :class:`~thefittest.optimizers.SelfCSHAGA`
+     - SHAGA with self-configuring selection and crossover probabilities
+   * - :class:`~thefittest.optimizers.PDPSHAGA`
+     - SHAGA with success-based dynamic operator probabilities
    * - :class:`~thefittest.optimizers.SHAGA`
      - Success-History based Adaptive Genetic Algorithm (`Stanovov et al., 2019 <http://dx.doi.org/10.5220/0008071201800187>`_)
 
@@ -157,6 +161,91 @@ SelfCGP
 ~~~~~~~
 
 .. autoclass:: thefittest.optimizers.SelfCGP
+   :members:
+   :inherited-members:
+   :show-inheritance:
+   :special-members: __init__
+
+
+Additional adaptive genetic algorithms
+--------------------------------------
+
+SelfCSHAGA combines operator selection with success-history parameter adaptation.
+PDPSHAGA uses population-level dynamic operator probabilities with SHAGA.
+
+SelfCSHAGA
+~~~~~~~~~~
+
+.. autoclass:: thefittest.optimizers.SelfCSHAGA
+   :members:
+   :inherited-members:
+   :special-members: __init__
+
+PDPSHAGA
+~~~~~~~~
+
+.. autoclass:: thefittest.optimizers.PDPSHAGA
+   :members:
+   :inherited-members:
+   :special-members: __init__
+
+Multiobjective optimizers
+-------------------------
+
+These optimizers accept a matrix of objective values and return a Pareto front
+through ``get_pareto_front()``. Use ``minimization`` to set the direction of each
+objective. NSGA-II uses nondominated sorting and crowding-based survival
+:ref:`Deb et al. (2002) <Deb2002>`. Binary and tree-based variants are listed below.
+
+NSGAII
+~~~~~~
+
+.. autoclass:: thefittest.optimizers.NSGAII
+   :members:
+   :inherited-members:
+   :show-inheritance:
+   :special-members: __init__
+
+SelfCNSGAII
+~~~~~~~~~~~
+
+.. autoclass:: thefittest.optimizers.SelfCNSGAII
+   :members:
+   :inherited-members:
+   :show-inheritance:
+   :special-members: __init__
+
+PDPNSGAII
+~~~~~~~~~
+
+.. autoclass:: thefittest.optimizers.PDPNSGAII
+   :members:
+   :inherited-members:
+   :show-inheritance:
+   :special-members: __init__
+
+NSGPII
+~~~~~~
+
+.. autoclass:: thefittest.optimizers.NSGPII
+   :members:
+   :inherited-members:
+   :show-inheritance:
+   :special-members: __init__
+
+SelfCNSGPII
+~~~~~~~~~~~
+
+.. autoclass:: thefittest.optimizers.SelfCNSGPII
+   :members:
+   :inherited-members:
+   :show-inheritance:
+   :special-members: __init__
+
+PDPNSGPII
+~~~~~~~~~
+
+.. autoclass:: thefittest.optimizers.PDPNSGPII
    :members:
    :inherited-members:
    :show-inheritance:

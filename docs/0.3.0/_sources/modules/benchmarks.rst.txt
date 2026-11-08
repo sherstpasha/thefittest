@@ -254,3 +254,82 @@ A collection of 17 test functions for symbolic regression and genetic programmin
     # Generate data
     X = np.random.uniform(*f5_config["bounds"], size=(100, 2))
     y = function(X)
+
+Multiobjective problems
+-----------------------
+
+SCH, FON, POL, KUR and ZDT1/2/3/4/6 provide two minimization objectives.
+Each problem exposes ``n_variables``, ``left_border`` and ``right_border``.
+Calling it with an ``(N, n_variables)`` array returns an ``(N, 2)`` objective matrix.
+
+SCH
+~~~
+
+.. autoclass:: thefittest.benchmarks.SCH
+   :members:
+   :inherited-members:
+   :special-members: __init__
+
+FON
+~~~
+
+.. autoclass:: thefittest.benchmarks.FON
+   :members:
+   :inherited-members:
+   :special-members: __init__
+
+POL
+~~~
+
+.. autoclass:: thefittest.benchmarks.POL
+   :members:
+   :inherited-members:
+   :special-members: __init__
+
+KUR
+~~~
+
+.. autoclass:: thefittest.benchmarks.KUR
+   :members:
+   :inherited-members:
+   :special-members: __init__
+
+ZDT1
+~~~~
+
+.. autoclass:: thefittest.benchmarks.ZDT1
+   :members:
+   :inherited-members:
+   :special-members: __init__
+
+ZDT2
+~~~~
+
+.. autoclass:: thefittest.benchmarks.ZDT2
+   :members:
+   :inherited-members:
+   :special-members: __init__
+
+ZDT3
+~~~~
+
+.. autoclass:: thefittest.benchmarks.ZDT3
+   :members:
+   :inherited-members:
+   :special-members: __init__
+
+ZDT4
+~~~~
+
+.. autoclass:: thefittest.benchmarks.ZDT4
+   :members:
+   :inherited-members:
+   :special-members: __init__
+
+ZDT6
+~~~~
+
+.. autoclass:: thefittest.benchmarks.ZDT6
+   :members:
+   :inherited-members:
+   :special-members: __init__

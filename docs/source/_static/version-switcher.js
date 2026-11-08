@@ -1,77 +1,61 @@
 (function () {
-    function scriptData() {
-        var scripts = document.querySelectorAll("script[data-current-version]");
-        return scripts[scripts.length - 1] || {};
+    var script = document.querySelector("script[data-current-version][data-version-map]");
+    if (!script) {
+        return;
     }
 
-    function splitVersions(value) {
-        return (value || "")
-            .split(",")
-            .map(function (version) {
-                return version.trim();
-            })
-            .filter(Boolean);
+    var currentVersion = script.dataset.currentVersion;
+    var versions = JSON.parse(script.dataset.versionMap);
+    var current = versions[currentVersion];
+    if (!current) {
+        return;
     }
 
-    function pageForVersion(targetVersion, versions) {
-        var path = window.location.pathname;
-        var suffix = window.location.search + window.location.hash;
+    var currentRoot = new URL("../", script.src);
+    var siteRoot = new URL("../".repeat(current.path.split("/").length), currentRoot);
+    var page = decodeURI(window.location.pathname.slice(currentRoot.pathname.length));
+    page = page || "index.html";
 
-        for (var i = 0; i < versions.length; i += 1) {
-            var marker = "/" + versions[i] + "/";
-            var markerIndex = path.indexOf(marker);
-            if (markerIndex !== -1) {
-                return (
-                    path.slice(0, markerIndex + 1) +
-                    targetVersion +
-                    "/" +
-                    path.slice(markerIndex + marker.length) +
-                    suffix
-                );
-            }
-        }
-
-        return targetVersion + "/index.html" + suffix;
+    function targetFor(version) {
+        var target = versions[version];
+        var targetPage = target.pages.indexOf(page) !== -1 ? page : "index.html";
+        var url = new URL(target.path + "/" + targetPage, siteRoot);
+        url.search = window.location.search;
+        url.hash = version === currentVersion ? window.location.hash : "";
+        return url.href;
     }
 
     function buildSwitcher() {
-        var data = scriptData();
-        var currentVersion = data.dataset ? data.dataset.currentVersion : "";
-        var versions = splitVersions(data.dataset ? data.dataset.versions : "");
-        var mount = document.querySelector(".wy-side-nav-search");
-
-        if (!mount || versions.length === 0) {
+        var menu = document.querySelector(".wy-menu.wy-menu-vertical");
+        if (!menu || menu.querySelector(".version-nav-section")) {
             return;
         }
 
-        var wrapper = document.createElement("div");
-        wrapper.className = "version-switcher";
+        var caption = document.createElement("p");
+        caption.className = "caption version-nav-section";
+        caption.setAttribute("role", "heading");
+        var title = document.createElement("span");
+        title.className = "caption-text";
+        title.textContent = "Versions:";
+        caption.appendChild(title);
 
-        var label = document.createElement("label");
-        label.className = "version-switcher-label";
-        label.setAttribute("for", "version-switcher-select");
-        label.textContent = "Documentation version";
-
-        var select = document.createElement("select");
-        select.id = "version-switcher-select";
-        select.className = "version-switcher-select";
-        select.setAttribute("aria-label", "Documentation version");
-
-        versions.forEach(function (version) {
-            var option = document.createElement("option");
-            option.value = version;
-            option.textContent = version;
-            option.selected = version === currentVersion;
-            select.appendChild(option);
+        var list = document.createElement("ul");
+        list.className = "version-nav-list";
+        Object.keys(versions).forEach(function (version) {
+            var item = document.createElement("li");
+            item.className = "toctree-l1";
+            var link = document.createElement("a");
+            link.className = "reference internal";
+            link.href = targetFor(version);
+            link.textContent = version + (version === currentVersion ? " (current)" : "");
+            if (version === currentVersion) {
+                link.setAttribute("aria-current", "page");
+            }
+            item.appendChild(link);
+            list.appendChild(item);
         });
-
-        select.addEventListener("change", function () {
-            window.location.href = pageForVersion(select.value, versions);
-        });
-
-        wrapper.appendChild(label);
-        wrapper.appendChild(select);
-        mount.appendChild(wrapper);
+        menu.appendChild(caption);
+        menu.appendChild(list);
     }
 
     if (document.readyState === "loading") {

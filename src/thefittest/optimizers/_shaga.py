@@ -42,11 +42,13 @@ from ..utils.transformations import minmax_scale
 class SHAGA(EvolutionaryAlgorithm):
     """
     - Stanovov, Vladimir & Akhmedova, Shakhnaz & Semenkin, Eugene. (2019).
-    Genetic Algorithm with Success History based Parameter Adaptation. 180-187.
-    10.5220/0008071201800187.
+      Genetic Algorithm with Success History based Parameter Adaptation. 180-187.
+      10.5220/0008071201800187.
+
     - Sherstnev P.A., Semenkin E.S. SelfCSHAGA: Self-configuring genetic optimization
-    algorithm with adaptation based on success history // Vestnik MGTU im. N.E. Baumana.
-    Ser. Priborostroenie. — 2025. — No. 2 (151). — P. 8."""
+      algorithm with adaptation based on success history // Vestnik MGTU im. N.E. Baumana.
+      Ser. Priborostroenie. — 2025. — No. 2 (151). — P. 8.
+    """
 
     def __init__(
         self,

@@ -21,6 +21,7 @@ N_RUNS = int(os.environ.get("SELFCSHAGA_N_RUNS", "100"))
 MAX_PROBLEMS = int(os.environ.get("SELFCSHAGA_MAX_PROBLEMS", "25"))
 PROCESSES = int(os.environ.get("SELFCSHAGA_PROCESSES", "10"))
 EXECUTOR = os.environ.get("SELFCSHAGA_EXECUTOR", "thread").lower()
+CROSSOVER_THRESHOLD_PROBA = float(os.environ.get("SELFCSHAGA_CROSSOVER_THRESHOLD_PROBA", "0.05"))
 EPS = 0.01
 
 
@@ -32,7 +33,9 @@ def find_solution_with_precision(solution_list, true_solution, precision):
     return None
 
 
-def run_optimization_selfcshaga(function, eps, iters, pop_size):
+def run_optimization_selfcshaga(
+    function, eps, iters, pop_size, crossover_threshold_proba=CROSSOVER_THRESHOLD_PROBA
+):
     dimension = function["dimention"]
     left = function["bounds"][0]
     right = function["bounds"][1]
@@ -59,6 +62,7 @@ def run_optimization_selfcshaga(function, eps, iters, pop_size):
         str_len=str_len,
         elitism=False,
         K=2,
+        crossover_threshold_proba=crossover_threshold_proba,
         selections=(
             "proportional",
             "rank",
@@ -142,7 +146,7 @@ def process_problem(problem):
 
 
 if __name__ == "__main__":
-    results_file = "selfcshaga_cec2005_new2.csv"
+    results_file = f"selfcshaga_cec2005_crossover_threshold_{CROSSOVER_THRESHOLD_PROBA:.2f}.csv"
     columns = [
         "Function",
         "Dimensions",

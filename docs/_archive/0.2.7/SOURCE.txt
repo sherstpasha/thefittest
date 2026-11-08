@@ -1,0 +1,15 @@
+Thefittest documentation 0.2.7
+Source repository: https://github.com/sherstpasha/thefittest.git
+Source branch: main
+Commit: 815cc021c02bc7be00451f434a966154dfeaa510
+Source paths: docs/ generated HTML and site resources
+Last entry-page change: b48fa3bbc904609bf37a911be2cd7b2b91da3d74
+Language: en
+Preservation: copied from Git without rebuilding documentation content.
+Navigation additions: version-switcher.js and one script element in each HTML
+page allow switching between the archive and current documentation. Removing
+that added script element restores each original HTML page byte-for-byte.
+The entry page and Sphinx release setting identify documentation 0.2.7.
+Some other pages and documentation_options.js retain older version labels;
+these inconsistencies are preserved from main. This is an archive of its
+committed documentation, not a reconstructed uniform release build.

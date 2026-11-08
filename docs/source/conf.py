@@ -12,6 +12,8 @@
 #
 import os
 import sys
+import json
+from pathlib import Path
 
 
 # Mock validate_data before any imports
@@ -47,11 +49,29 @@ author = "Pavel Sherstnev"
 documentation_version = os.environ.get("DOC_VERSION", "0.3.0")
 documentation_versions = [
     version.strip()
-    for version in os.environ.get("DOC_VERSIONS", documentation_version).split(",")
+    for version in os.environ.get("DOC_VERSIONS", f"{documentation_version},0.2.7").split(",")
     if version.strip()
 ]
 version = documentation_version
 release = documentation_version
+
+documentation_navigation = {}
+for doc_version in documentation_versions:
+    archive_path = Path("_archive") / doc_version / "en"
+    if (Path(project_root) / "docs" / archive_path / "index.html").is_file():
+        doc_path = archive_path
+        page_root = Path(project_root) / "docs" / doc_path
+        pages = page_root.rglob("*.html")
+    else:
+        doc_path = Path(doc_version)
+        page_root = Path(source_dir)
+        pages = page_root.rglob("*.rst")
+    page_names = {page.relative_to(page_root).with_suffix(".html").as_posix() for page in pages}
+    page_names.update(("genindex.html", "py-modindex.html", "search.html"))
+    documentation_navigation[doc_version] = {
+        "path": doc_path.as_posix(),
+        "pages": sorted(page_names),
+    }
 
 
 # -- General configuration ---------------------------------------------------
@@ -61,9 +81,12 @@ release = documentation_version
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
     # "sphinx.ext.doctest",  # Disabled - examples are for documentation only
     "numpydoc",
 ]
+
+intersphinx_mapping = {"sklearn": ("https://scikit-learn.org/stable/", None)}
 
 # Numpydoc configuration - disable doctest
 numpydoc_show_class_members = False
@@ -79,11 +102,6 @@ autodoc_default_options = {
     "inherited-members": True,
     "show-inheritance": True,
 }
-
-# Suppress warnings during import
-import warnings
-
-warnings.filterwarnings("ignore")
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -123,7 +141,7 @@ html_js_files = [
         "version-switcher.js",
         {
             "data-current-version": documentation_version,
-            "data-versions": ",".join(documentation_versions),
+            "data-version-map": json.dumps(documentation_navigation),
         },
     ),
 ]

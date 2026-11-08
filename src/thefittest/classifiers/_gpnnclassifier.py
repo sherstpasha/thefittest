@@ -35,9 +35,8 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
     """
     Genetic Programming-based Neural Network classifier with evolved architecture.
 
-    This classifier evolves both the neural network architecture and weights using
-    genetic programming. The network structure is represented as a tree, and weights
-    are optimized using evolutionary algorithms.
+    This classifier evolves tree-encoded neural network architectures using genetic
+    programming. Network weights are trained with evolutionary algorithms or gradient-based optimizers.
 
     Parameters
     ----------
@@ -59,11 +58,11 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
     optimizer_args : Optional[dict], optional (default=None)
         Additional arguments for the architecture optimizer (excluding n_iter and pop_size).
     weights_optimizer : Type, optional (default=SHADE)
-        Evolutionary algorithm for optimizing network weights.
+        Evolutionary algorithm or PyTorch optimizer for network weights.
     weights_optimizer_args : Optional[dict], optional (default=None)
         Additional arguments for the weights optimizer.
-        Note: Use 'iters' and 'pop_size' keys for setting iterations and population size.
-        Example: {'iters': 150, 'pop_size': 150, 'show_progress_each': 10}
+        For evolutionary optimizers: {'iters': 150, 'pop_size': 150}.
+        For torch.optim: {'iters': 100, 'lr': 0.01}; pop_size is ignored.
     net_size_penalty : float, optional (default=0.0)
         Penalty coefficient for network complexity (larger = simpler networks).
     random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
