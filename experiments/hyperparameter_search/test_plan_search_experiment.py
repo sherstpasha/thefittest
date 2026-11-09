@@ -10,7 +10,7 @@ import pytest
 from experiments.hyperparameter_search.plan_search_experiment import SearchPlan, optimizer_catalog
 
 
-def test_all_optimizer_configurations_can_be_constructed() -> None:
+def test_all_optimizer_configurations_follow_budget() -> None:
     optimizers = import_module("thefittest.optimizers")
     catalog = optimizer_catalog()
     assert Counter(c["method"] for c in catalog) == {
@@ -23,7 +23,10 @@ def test_all_optimizer_configurations_can_be_constructed() -> None:
 
     for configuration in catalog:
         optimizer = getattr(optimizers, configuration["optimizer"])
-        optimizer(fitness, 1, 10, 24, **configuration["args"])
+        search = optimizer(fitness, 3, 10, 24, random_state=42, **configuration["args"])
+        search.fit()
+        assert search.get_calls() == 30, configuration["id"]
+        assert np.isfinite(search.get_fittest()["fitness"]), configuration["id"]
 
 
 def test_task_sources_and_complete_job_counts() -> None:

@@ -52,6 +52,7 @@ torch = ["torch>=2.0"]
 benchmarks = ["pymoo==0.6.2", "matplotlib"]
 dev = [
     "tqdm",
+    "joblib>=1.4",
     "pytest",
     "pytest-cov",
     "flake8",

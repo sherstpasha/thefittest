@@ -21,8 +21,14 @@ def evaluator(output: Path, n_jobs: int = 1) -> search_runtime.CandidateEvaluato
     X = np.arange(60, dtype=float).reshape(30, 2)
     y = np.sin(X[:, 0])
     return search_runtime.CandidateEvaluator(
-        WarningRegressor(), X, y, list(KFold(3, shuffle=True, random_state=42).split(X)),
-        {"score": "neg_root_mean_squared_error"}, output, n_jobs=n_jobs, progress=False,
+        WarningRegressor(),
+        X,
+        y,
+        list(KFold(3, shuffle=True, random_state=42).split(X)),
+        {"score": "neg_root_mean_squared_error"},
+        output,
+        n_jobs=n_jobs,
+        progress=False,
     )
 
 
@@ -64,10 +70,15 @@ def test_resume_after_interruption_and_silent_warning_capture(
         assert resumed.evaluate(candidates) == results
         assert resumed.last_stats["cached_folds"] == 6
         assert resumed.last_stats["evaluated_folds"] == 0
+        X = np.arange(60, dtype=float).reshape(30, 2)
+        y = np.sin(X[:, 0])
+        first_refit = resumed.refit(candidates[0], X, y, np.arange(20), np.arange(20, 30))
+        assert first_refit["model_fits"]["completed"]
+        assert resumed.refit(candidates[0], X, y, np.arange(20), np.arange(20, 30)) == first_refit
     finally:
         resumed.close()
     records = [json.loads(line) for line in (tmp_path / "warnings.jsonl").read_text().splitlines()]
-    assert sum(r["message"] == "Training warning for the journal" for r in records) == 6
+    assert sum(r["message"] == "Training warning for the journal" for r in records) == 7
 
 
 def test_cache_deduplicates_candidates_and_rejects_changed_context(tmp_path: Path) -> None:
@@ -79,8 +90,12 @@ def test_cache_deduplicates_candidates_and_rejects_changed_context(tmp_path: Pat
         X = np.arange(60, dtype=float).reshape(30, 2)
         with pytest.raises(ValueError, match="different data"):
             search_runtime.CandidateEvaluator(
-                WarningRegressor(), X, np.zeros(30), list(KFold(3).split(X)),
-                {"score": "neg_root_mean_squared_error"}, tmp_path,
+                WarningRegressor(),
+                X,
+                np.zeros(30),
+                list(KFold(3).split(X)),
+                {"score": "neg_root_mean_squared_error"},
+                tmp_path,
             )
     finally:
         current.close()
