@@ -41,6 +41,7 @@ from experiments.hyperparameter_search.experiment_setup import (
 from experiments.hyperparameter_search.plan_search_experiment import FAMILIES, SearchPlan
 from experiments.hyperparameter_search.search_execution import SearchRun
 from experiments.hyperparameter_search.grid_cache import GridEvaluationCache
+from experiments.hyperparameter_search.grid_progress import GridProgress
 from experiments.hyperparameter_search.search_runtime import search_scoring
 
 ROOT = Path(__file__).resolve().parent
@@ -351,6 +352,7 @@ class Experiment:
         worker_limit = self.n_jobs if self.n_jobs > 0 else (os.cpu_count() or 1)
         cases = iter(groupby(self.jobs(), key=lambda job: (job["task"], job["family"])))
         active: list[BaseProcess] = []
+        grid_progress: dict[str, GridProgress] = {}
         exhausted = False
         last_row = connection.execute("SELECT COALESCE(max(rowid),0) FROM runs").fetchone()[0]
         with tqdm(
@@ -382,6 +384,14 @@ class Experiment:
                         )
                         process.start()
                         active.append(process)
+                        if self.progress:
+                            positions = {progress.position for progress in grid_progress.values()}
+                            position = next(
+                                i for i in range(1, len(active) + 1) if i not in positions
+                            )
+                            grid_progress[process.name] = GridProgress(
+                                self.output / "cache" / process.name, position
+                            )
                         logging.info(
                             "CASE_SCHEDULED %s pid=%s active=%s",
                             process.name,
@@ -389,6 +399,8 @@ class Experiment:
                             len(active),
                         )
                     for process in active[:]:
+                        if process.name in grid_progress:
+                            grid_progress[process.name].refresh()
                         if process.is_alive():
                             continue
                         process.join()
@@ -398,6 +410,8 @@ class Experiment:
                             )
                         logging.info("CASE_DONE %s", process.name)
                         active.remove(process)
+                        if process.name in grid_progress:
+                            grid_progress.pop(process.name).close()
                         process.close()
                     rows = connection.execute(
                         "SELECT rowid,result FROM runs WHERE rowid>? ORDER BY rowid", (last_row,)
@@ -410,6 +424,8 @@ class Experiment:
                     if active:
                         sleep(0.2)
             finally:
+                for progress in grid_progress.values():
+                    progress.close()
                 for process in active:
                     if process.is_alive():
                         process.terminate()
