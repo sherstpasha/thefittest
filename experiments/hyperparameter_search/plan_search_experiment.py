@@ -158,7 +158,7 @@ class SearchPlan:
         self.n_jobs = n_jobs
         self.tasks = task_catalog()
         self.configurations = optimizer_catalog()
-        self.budgets = tuple(range(25, 201, 25))
+        self.budgets = tuple(range(10, 101, 10))
 
     def summary(self) -> dict[str, Any]:
         pairs = len(self.tasks) * len(FAMILIES)

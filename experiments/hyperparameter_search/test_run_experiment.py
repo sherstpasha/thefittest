@@ -28,11 +28,11 @@ from experiments.hyperparameter_search.search_runtime import FeatureGroupCV
 @pytest.mark.parametrize("classification", [True, False])
 def test_full_spaces_and_serialization(classification: bool) -> None:
     expected = {
-        "svm": 393216,
-        "forest": 829440 if classification else 414720,
-        "boosting": 829440,
-        "mlp": 442368,
-        "stacking": 167936,
+        "svm": 38400,
+        "forest": 77760 if classification else 38880,
+        "boosting": 76800,
+        "mlp": 46656,
+        "stacking": 15744,
     }
     for family, count in expected.items():
         estimator, grid = search_space(family, 4, classification)
@@ -45,7 +45,7 @@ def test_full_spaces_and_serialization(classification: bool) -> None:
         json.dumps(describe({"estimator": estimator, "grid": grid}), allow_nan=False)
     estimator, grid = search_space("svm", 1, classification)
     assert len(grid) == 1
-    assert len(ParameterGrid(grid)) == 32768
+    assert len(ParameterGrid(grid)) == 3200
 
 
 def test_all_30_task_snapshots(tmp_path: Path) -> None:

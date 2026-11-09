@@ -39,30 +39,30 @@ def test_task_sources_and_complete_job_counts() -> None:
         assert callable(getattr(import_module(module), name))
     assert plan.summary()["classification_tasks"] == 11
     assert plan.summary()["regression_tasks"] == 19
-    assert plan.budgets == (25, 50, 75, 100, 125, 150, 175, 200)
+    assert plan.budgets == tuple(range(10, 101, 10))
     counts = Counter(job["method"] for job in plan.jobs())
     assert counts == {
-        "GA": 198000,
-        "SHAGA": 72000,
-        "PDPGA": 1200,
-        "SelfCGA": 1200,
-        "SelfCSHAGA": 1200,
-        "PDPSHAGA": 1200,
-        "Random": 1200,
+        "GA": 247500,
+        "SHAGA": 90000,
+        "PDPGA": 1500,
+        "SelfCGA": 1500,
+        "SelfCSHAGA": 1500,
+        "PDPSHAGA": 1500,
+        "Random": 1500,
         "Grid": 150,
     }
-    assert sum(counts.values()) == plan.summary()["total_searches"] == 276150
+    assert sum(counts.values()) == plan.summary()["total_searches"] == 345150
     assert next(plan.jobs())["method"] == "Grid"
     jobs = list(islice((job for job in plan.jobs() if job["method"] != "Grid"), 230))
     assert len({job["id"] for job in jobs}) == 230
-    assert all(job["nominal_budget"] == 625 for job in jobs)
+    assert all(job["nominal_budget"] == 100 for job in jobs)
 
 
 def test_seed_validation() -> None:
     for seeds in [(), (42, 42), (-1,), (2**32,)]:
         with pytest.raises(ValueError):
             SearchPlan(seeds)
-    assert SearchPlan((42, 43, 44)).summary()["total_searches"] == 828150
+    assert SearchPlan((42, 43, 44)).summary()["total_searches"] == 1035150
 
 
 @pytest.mark.parametrize("n_jobs", [1, 24, -1])
@@ -70,7 +70,7 @@ def test_parallelism_settings(n_jobs: int) -> None:
     plan = SearchPlan((42,), n_jobs=n_jobs)
     summary = plan.summary()
     assert summary["search_n_jobs"] == n_jobs
-    assert summary["total_searches"] == 276150
+    assert summary["total_searches"] == 345150
 
 
 @pytest.mark.parametrize("n_jobs", [0, -2])

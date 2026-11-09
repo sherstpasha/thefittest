@@ -294,7 +294,7 @@ def _stacking(classification: bool, smoke: bool) -> tuple[BaseEstimator, list[di
         }
         parameter = "C" if classification else "alpha"
         branch[f"final_estimator__model__{parameter}"] = np.logspace(
-            -4 if classification else -5, 4 if classification else 5, 32
+            -4 if classification else -5, 4 if classification else 5, 3
         ).tolist()
         branch["passthrough"] = [False, True]
         grid.append(branch)
@@ -314,8 +314,8 @@ def search_space(
         if family == "svm":
             model = SVC(cache_size=200, random_state=0) if classification else SVR(cache_size=200)
             parameters = {
-                "C": np.logspace(-3, 4, 64 if classification else 32).tolist(),
-                "gamma": np.logspace(-6, 0, 64 if classification else 32).tolist(),
+                "C": np.logspace(-3, 4, 20 if classification else 10).tolist(),
+                "gamma": np.logspace(-6, 0, 20 if classification else 10).tolist(),
             }
             parameters.update(
                 {"class_weight": [None, "balanced"]}
@@ -327,10 +327,10 @@ def search_space(
             model = model_type(random_state=0, n_jobs=1)
             parameters = {
                 "n_estimators": [50, 100, 200, 400, 800],
-                "max_depth": [None, 3, 5, 8, 12, 16, 24, 32],
-                "min_samples_split": [2, 3, 5, 8, 13, 21],
-                "min_samples_leaf": [1, 2, 3, 5, 8, 13],
-                "max_features": [0.25, 0.4, 0.55, 0.7, 0.85, 1.0],
+                "max_depth": [None, 3, 8, 16, 24, 32],
+                "min_samples_split": [2, 8, 21],
+                "min_samples_leaf": [1, 5, 13],
+                "max_features": [0.25, 0.55, 1.0],
                 "bootstrap": [False, True],
                 "ccp_alpha": [0, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2],
             }
@@ -342,11 +342,11 @@ def search_space(
             )
             model = model_type(random_state=0, early_stopping=False)
             parameters = {
-                "learning_rate": np.logspace(-2, -0.4, 8).tolist(),
-                "max_iter": [50, 100, 200, 400, 600, 800],
-                "max_leaf_nodes": [7, 15, 31, 63, 95, 127],
-                "min_samples_leaf": [3, 5, 10, 20, 40, 80],
-                "l2_regularization": [0, 1e-3, 1e-2, 0.1, 1, 10, 100, 1000],
+                "learning_rate": np.logspace(-2, -0.4, 4).tolist(),
+                "max_iter": [50, 200, 400, 800],
+                "max_leaf_nodes": [7, 31, 63, 127],
+                "min_samples_leaf": [3, 5, 20, 40, 80],
+                "l2_regularization": [0, 0.01, 1, 1000],
                 "max_depth": [None, 3, 5, 8, 12],
                 "max_bins": [63, 127, 255],
             }
@@ -377,9 +377,9 @@ def search_space(
                     (128, 64, 32),
                 ],
                 "activation": ["relu", "tanh", "logistic"],
-                "alpha": np.logspace(-7, -1, 8).tolist(),
-                "learning_rate_init": np.logspace(-5, -2, 8).tolist(),
-                "batch_size": [16, 32, 64, 128],
+                "alpha": np.logspace(-7, -1, 3).tolist(),
+                "learning_rate_init": np.logspace(-5, -2, 3).tolist(),
+                "batch_size": [16, 64, 128],
             }
         else:
             raise ValueError(f"Unknown family: {family}")

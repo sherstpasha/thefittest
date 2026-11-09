@@ -49,11 +49,11 @@ Seed генерации функции Fi равен `data_seed+i`, по умо�
 
 | Семейство | Классификация | Комбинаций, до | Регрессия | Комбинаций, до |
 |---|---|---:|---|---:|
-| SVM | `SVC` | 393 216 | `SVR` | 393 216 |
-| Случайный лес | `RandomForestClassifier` | 829 440 | `RandomForestRegressor` | 414 720 |
-| Гистограммный бустинг | `HistGradientBoostingClassifier` | 829 440 | `HistGradientBoostingRegressor` | 829 440 |
-| Нейронная сеть | `MLPClassifier` | 442 368 | `MLPRegressor` | 442 368 |
-| Stacking | `StackingClassifier` | 167 936 | `StackingRegressor` | 167 936 |
+| SVM | `SVC` | 38 400 | `SVR` | 38 400 |
+| Случайный лес | `RandomForestClassifier` | 77 760 | `RandomForestRegressor` | 38 880 |
+| Гистограммный бустинг | `HistGradientBoostingClassifier` | 76 800 | `HistGradientBoostingRegressor` | 76 800 |
+| Нейронная сеть | `MLPClassifier` | 46 656 | `MLPRegressor` | 46 656 |
+| Stacking | `StackingClassifier` | 15 744 | `StackingRegressor` | 15 744 |
 
 Все методы поиска используют одну и ту же сетку для данной пары «задача × семейство».
 GridSearchCV выполняет полный перебор сетки.
@@ -104,8 +104,8 @@ GridSearchCV выполняет полный перебор сетки.
 
 ```python
 {
-    "C": logspace(-3, 4, 64),
-    "gamma": logspace(-6, 0, 64),
+    "C": logspace(-3, 4, 20),
+    "gamma": logspace(-6, 0, 20),
     "class_weight": [None, "balanced"],
 }
 ```
@@ -114,8 +114,8 @@ GridSearchCV выполняет полный перебор сетки.
 
 ```python
 {
-    "C": logspace(-3, 4, 32),
-    "gamma": logspace(-6, 0, 32),
+    "C": logspace(-3, 4, 10),
+    "gamma": logspace(-6, 0, 10),
     "epsilon": logspace(-3, -0.3, 8),
 }
 ```
@@ -130,10 +130,10 @@ GridSearchCV выполняет полный перебор сетки.
 ```python
 {
     "n_estimators": [50, 100, 200, 400, 800],
-    "max_depth": [None, 3, 5, 8, 12, 16, 24, 32],
-    "min_samples_split": [2, 3, 5, 8, 13, 21],
-    "min_samples_leaf": [1, 2, 3, 5, 8, 13],
-    "max_features": [0.25, 0.4, 0.55, 0.7, 0.85, 1.0],
+    "max_depth": [None, 3, 8, 16, 24, 32],
+    "min_samples_split": [2, 8, 21],
+    "min_samples_leaf": [1, 5, 13],
+    "max_features": [0.25, 0.55, 1.0],
     "bootstrap": [False, True],
     "ccp_alpha": [0.0, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2],
 }
@@ -153,11 +153,11 @@ GridSearchCV выполняет полный перебор сетки.
 
 ```python
 {
-    "learning_rate": logspace(-2, -0.4, 8),
-    "max_iter": [50, 100, 200, 400, 600, 800],
-    "max_leaf_nodes": [7, 15, 31, 63, 95, 127],
-    "min_samples_leaf": [3, 5, 10, 20, 40, 80],
-    "l2_regularization": [0.0, 1e-3, 1e-2, 0.1, 1.0, 10.0, 100.0, 1000.0],
+    "learning_rate": logspace(-2, -0.4, 4),
+    "max_iter": [50, 200, 400, 800],
+    "max_leaf_nodes": [7, 31, 63, 127],
+    "min_samples_leaf": [3, 5, 20, 40, 80],
+    "l2_regularization": [0.0, 0.01, 1.0, 1000.0],
     "max_depth": [None, 3, 5, 8, 12],
     "max_bins": [63, 127, 255],
 }
@@ -178,9 +178,9 @@ GridSearchCV выполняет полный перебор сетки.
         (64, 32, 16), (128, 64, 32),
     ],
     "activation": ["relu", "tanh", "logistic"],
-    "alpha": logspace(-7, -1, 8),
-    "learning_rate_init": logspace(-5, -2, 8),
-    "batch_size": [16, 32, 64, 128],
+    "alpha": logspace(-7, -1, 3),
+    "learning_rate_init": logspace(-5, -2, 3),
+    "batch_size": [16, 64, 128],
 }
 ```
 
@@ -215,9 +215,9 @@ GridSearchCV выполняет полный перебор сетки.
 
 Параметры метамодели:
 
-- Классификация: `LogisticRegression(C=...)`, `C=logspace(-4, 4, 32)`,
+- Классификация: `LogisticRegression(C=...)`, `C=logspace(-4, 4, 3)`,
   фиксируются `solver="lbfgs"`, `max_iter=2000`.
-- Регрессия: `Ridge(alpha=...)`, `alpha=logspace(-5, 5, 32)`.
+- Регрессия: `Ridge(alpha=...)`, `alpha=logspace(-5, 5, 3)`.
 - Для обеих метамоделей перед моделью стоит `StandardScaler`.
 - Для обоих ансамблей оптимизируется `passthrough=[False, True]`.
 
@@ -246,16 +246,16 @@ GridSearchCV выполняет полный перебор сетки.
 
 ### Бюджеты
 
-Для эволюционных методов используются восемь отдельных запусков:
+Для эволюционных методов используются десять отдельных запусков:
 
 ```python
-[(q, q) for q in range(25, 201, 25)]
+[(q, q) for q in range(10, 101, 10)]
 ```
 
 Первая координата — `pop_size=P`, вторая — `iters=G`:
-25×25, 50×50, 75×75, 100×100, 125×125, 150×150, 175×175, 200×200.
+10×10, 20×20, 30×30, 40×40, 50×50, 60×60, 70×70, 80×80, 90×90, 100×100.
 Начальная популяция считается первым поколением. Номинальный ресурс запуска `B=P×G`:
-от 625 до 40 000 предложений кандидатов.
+от 100 до 10 000 предложений кандидатов.
 Досрочная остановка эволюции по стагнации или достижению целевой оценки отключена.
 Каждый ресурс запускается независимо, без продолжения предыдущего запуска.
 
@@ -350,8 +350,8 @@ GridSearchCV выполняет полный перебор сетки.
 
 ### Размер серии
 
-На бюджет и seed — 230 стохастических поисков; на восемь бюджетов — 1 840 на пару.
-Общее число запусков при `R` seed: `150 × (1 840 × R + 1)`.
+На бюджет и seed — 230 стохастических поисков; на десять бюджетов — 2 300 на пару.
+Общее число запусков при `R` seed: `150 × (2 300 × R + 1)`.
 
 ### План запуска
 
