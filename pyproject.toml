@@ -9,7 +9,7 @@ include-package-data = true
 where = ["src"]
 
 [tool.setuptools.package-data]
-"*" = ["*.txt"]
+"*" = ["*.txt", "*.csv"]
 
 [tool.black]
 line-length = 100
@@ -51,6 +51,7 @@ classifiers = [
 torch = ["torch>=2.0"]
 benchmarks = ["pymoo==0.6.2", "matplotlib"]
 dev = [
+    "tqdm",
     "pytest",
     "pytest-cov",
     "flake8",

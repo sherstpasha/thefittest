@@ -1,6 +1,7 @@
 # folders to ignore
 dist/
 /output/
+/experiments/hyperparameter_search/output/
 
 
 .vscode/

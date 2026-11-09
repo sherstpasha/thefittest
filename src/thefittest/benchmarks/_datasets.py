@@ -15,6 +15,13 @@ digits_data = np.loadtxt(path + "handwritten_digits_data.txt", delimiter=",")
 credit_data = np.loadtxt(path + "credit_risk_data.txt", delimiter=",")
 know_data = np.loadtxt(path + "user_knowledge_data.txt", delimiter=",")
 banknote_data = np.loadtxt(path + "banknote_dataset.txt", delimiter=",")
+twonorm_data = np.loadtxt(path + "twonorm_dataset.txt", delimiter=",")
+ringnorm_data = np.loadtxt(path + "ringnorm_dataset.txt", delimiter="\t")
+texture_data = np.loadtxt(path + "texture_dataset.txt", delimiter=",")
+adult_data = np.loadtxt(path + "processed_adult_data.txt", delimiter="\t", skiprows=1)
+energy_data = np.loadtxt(path + "Folds_pp_cut.csv", delimiter="\t")
+with open(path + "processed_adult_data.txt", encoding="utf-8") as adult_file:
+    adult_feature_names = adult_file.readline().strip().split("\t")[:-1]
 
 
 class Dataset:
@@ -364,4 +371,70 @@ class BanknoteDataset(Dataset):
                 3: "entropy of image (continuous)",
             },
             y_names={0: "not original", 1: "original"},
+        )
+
+
+class TwoNormDataset(Dataset):
+    """Two-class TwoNorm dataset with 20 numeric features."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            X=twonorm_data[:, :-1].astype(np.float64),
+            y=twonorm_data[:, -1].astype(np.int64),
+            X_names={i: f"A{i + 1}" for i in range(20)},
+            y_names={0: "Class 1", 1: "Class 2"},
+        )
+
+
+class RingNormDataset(Dataset):
+    """Two-class RingNorm dataset with 20 numeric features."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            X=ringnorm_data[:, :-1].astype(np.float64),
+            y=ringnorm_data[:, -1].astype(np.int64),
+            X_names={i: f"A{i + 1}" for i in range(20)},
+            y_names={0: "Class 1", 1: "Class 2"},
+        )
+
+
+class TextureDataset(Dataset):
+    """Texture classification dataset with labels mapped to consecutive integers."""
+
+    def __init__(self) -> None:
+        labels, encoded_labels = np.unique(texture_data[:, -1].astype(np.int64), return_inverse=True)
+        super().__init__(
+            X=texture_data[:, :-1].astype(np.float64),
+            y=encoded_labels.astype(np.int64),
+            X_names={i: f"A{i + 1}" for i in range(40)},
+            y_names={i: f"Class {label}" for i, label in enumerate(labels)},
+        )
+
+
+class AdultCensusDataset(Dataset):
+    """Adult income classification dataset with pre-encoded categorical features."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            X=adult_data[:, :-1].astype(np.float64),
+            y=adult_data[:, -1].astype(np.int64),
+            X_names=dict(enumerate(adult_feature_names)),
+            y_names={0: "<=50K", 1: ">50K"},
+        )
+
+
+class CombinedCycleDataset(Dataset):
+    """Combined-cycle power output regression dataset, a 680-sample subset."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            X=energy_data[:, :4].astype(np.float64),
+            y=energy_data[:, 4].astype(np.float64),
+            X_names={
+                0: "AT (Temperature, °C)",
+                1: "V (Exhaust Vacuum, cm Hg)",
+                2: "AP (Ambient Pressure, milibar)",
+                3: "RH (Relative Humidity, %)",
+            },
+            y_names={0: "PE (Energy Output, MW)"},
         )
