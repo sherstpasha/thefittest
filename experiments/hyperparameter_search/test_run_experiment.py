@@ -196,6 +196,20 @@ def test_experiment_one_command_and_skip_completed(
         batch_size=4,
     )
     assert Experiment(**settings).run() == {"ok": 6}
+    with sqlite3.connect(tmp_path / "results.sqlite") as connection:
+        results = [
+            json.loads(row[0])
+            for row in connection.execute("SELECT result FROM runs ORDER BY rowid")
+        ]
+    for task in settings["tasks"]:
+        assert [r["method"] for r in results if r["task"] == task] == ["Grid", "GA", "Random"]
+    assert len({r["worker_pid"] for r in results}) == 2
+    assert all(r["cv_n_jobs"] == 1 for r in results)
+    for result in results:
+        assert result["logical_cv_fits"] == 3 * result["unique_candidates"]
+        assert result["cv_fits"] == (result["logical_cv_fits"] if result["method"] == "Grid" else 0)
+        assert result["cache_hits"] == result["proposals"] - result["unique_candidates"]
+        assert result["cv_seconds_estimate"] > 0
 
     def forbidden(*args: object, **kwargs: object) -> None:
         raise AssertionError("Completed search must not be rerun")
@@ -211,3 +225,194 @@ def test_experiment_one_command_and_skip_completed(
     settings["noise"] = 0.1
     with pytest.raises(ValueError, match="settings"):
         Experiment(**settings).run()
+
+
+@pytest.mark.parametrize("classification", [True, False])
+@pytest.mark.parametrize(
+    "method", ["GA", "SHAGA", "PDPGA", "SelfCGA", "SelfCSHAGA", "PDPSHAGA", "Random"]
+)
+def test_shared_cache_search_matches_independent_search(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, classification: bool, method: str
+) -> None:
+    import joblib
+    from experiments.hyperparameter_search import grid_cache
+    from experiments.hyperparameter_search.search_execution import _unpack
+
+    data = _data(classification)
+    estimator, grid = search_space("svm", data.X.shape[1], classification, smoke=True)
+    configuration = next(
+        (c for c in SearchPlan((42,)).configurations if c["method"] == method), None
+    )
+    job = dict(id="compare", method=method, seed=42, pop_size=10, iters=5, nominal_budget=50)
+    direct = SearchRun(job, estimator, grid, data, configuration, tmp_path / "direct", 1, False, 4)
+    try:
+        expected = direct.execute()
+        cache = grid_cache.GridEvaluationCache(
+            estimator,
+            grid,
+            data.X[data.train],
+            data.y[data.train],
+            data.splits,
+            direct.evaluator._scoring,
+            tmp_path / "cache",
+            n_jobs=2,
+        )
+    finally:
+        direct.close("ok")
+
+    def forbidden(*args: object, **kwargs: object) -> None:
+        raise AssertionError("A search must only read the prepared CV cache")
+
+    try:
+        cache.populate()
+        monkeypatch.setattr(grid_cache, "_evaluate_fold", forbidden)
+        search = SearchRun(
+            job, estimator, grid, data, configuration, tmp_path / "cached", 1, False, 4, cache=cache
+        )
+        try:
+            actual = search.execute()
+        finally:
+            search.close("ok")
+        for field in (
+            "best_cv",
+            "test_score",
+            "best_parameters",
+            "unique_candidates",
+            "proposals",
+            "coverage",
+            "cache_hits",
+        ):
+            assert actual[field] == expected[field]
+        assert actual["cv_fits"] == 0
+        assert actual["logical_cv_fits"] == expected["cv_fits"]
+        traces = []
+        for directory in ("direct", "cached"):
+            with sqlite3.connect(tmp_path / directory / "search.sqlite") as connection:
+                traces.append(
+                    [
+                        _unpack(row[0])
+                        for row in connection.execute(
+                            "SELECT payload FROM generations WHERE kind='proposals' ORDER BY batch"
+                        )
+                    ]
+                )
+        for reference, cached in zip(*traces):
+            np.testing.assert_array_equal(reference["scores"], cached["scores"])
+            np.testing.assert_array_equal(reference["fitness"], cached["fitness"])
+            np.testing.assert_array_equal(reference["genotypes"], cached["genotypes"])
+            assert reference["candidate_ids"] == [
+                joblib.hash(cache.grid[int(index)]) for index in cached["candidate_ids"]
+            ]
+    finally:
+        cache.close()
+
+
+def test_shared_search_resumes_its_own_history(tmp_path: Path) -> None:
+    from experiments.hyperparameter_search.grid_cache import GridEvaluationCache
+
+    data = _data(True)
+    estimator, grid = search_space("svm", 4, True, smoke=True)
+    configuration = next(c for c in SearchPlan((42,)).configurations if c["method"] == "SelfCSHAGA")
+    job = dict(id="resume", method="SelfCSHAGA", seed=42, pop_size=10, iters=5, nominal_budget=50)
+    cache = GridEvaluationCache(
+        estimator,
+        grid,
+        data.X[data.train],
+        data.y[data.train],
+        data.splits,
+        {"accuracy": "accuracy", "balanced_accuracy": "balanced_accuracy", "f1_macro": "f1_macro"},
+        tmp_path / "cache",
+    )
+
+    def stop(optimizer: object) -> None:
+        raise KeyboardInterrupt
+
+    try:
+        cache.populate()
+        first = SearchRun(
+            job, estimator, grid, data, configuration, tmp_path / "run", 1, False, 4, cache=cache
+        )
+        first._generation = stop
+        try:
+            with pytest.raises(KeyboardInterrupt):
+                first.execute()
+        finally:
+            first.close("interrupted")
+        results = []
+        for directory in ("run", "clean"):
+            run = SearchRun(
+                job,
+                estimator,
+                grid,
+                data,
+                configuration,
+                tmp_path / directory,
+                1,
+                False,
+                4,
+                cache=cache,
+            )
+            try:
+                results.append(run.execute())
+            finally:
+                run.close("ok")
+        for field in (
+            "best_cv",
+            "best_parameters",
+            "proposals",
+            "unique_candidates",
+            "cache_hits",
+            "cv_seconds_estimate",
+        ):
+            assert results[0][field] == results[1][field]
+        assert results[0]["proposals"] == 50
+        assert results[0]["coverage"] < 1
+    finally:
+        cache.close()
+
+
+def test_case_parallelism_preserves_results(tmp_path: Path) -> None:
+    results = []
+    for workers in (1, 2):
+        output = tmp_path / str(workers)
+        experiment = Experiment(
+            output=output,
+            n_jobs=workers,
+            seeds=(42,),
+            tasks=["IrisDataset", "Diabetes"],
+            families=["svm"],
+            methods=["Random"],
+            budgets=(10,),
+            samples=120,
+            noise=0,
+            data_seed=42,
+            max_samples=120,
+            smoke=True,
+            progress=False,
+            batch_size=4,
+        )
+        assert experiment.run() == {"ok": 4}
+        with sqlite3.connect(output / "results.sqlite") as connection:
+            rows = {
+                json.loads(row[0])["id"]: json.loads(row[0])
+                for row in connection.execute("SELECT result FROM runs")
+            }
+        assert len({row["worker_pid"] for row in rows.values()}) == 2
+        assert all(row["cv_n_jobs"] == 1 for row in rows.values())
+        log = (output / "run.log").read_text()
+        assert f"active={workers}" in log
+        results.append(rows)
+    assert results[0].keys() == results[1].keys()
+    for job_id in results[0]:
+        for field in (
+            "best_cv",
+            "test_score",
+            "best_parameters",
+            "unique_candidates",
+            "proposals",
+            "coverage",
+            "cache_hits",
+            "cv_fits",
+            "logical_cv_fits",
+        ):
+            assert results[0][job_id][field] == results[1][job_id][field]

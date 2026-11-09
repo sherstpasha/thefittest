@@ -40,10 +40,7 @@ from sklearn.svm import SVC, SVR
 import thefittest.benchmarks as benchmarks
 from thefittest.benchmarks.symbolicregression17 import problems_dict
 
-if __package__:
-    from .search_runtime import FeatureGroupCV
-else:
-    from search_runtime import FeatureGroupCV
+from .search_runtime import FeatureGroupCV
 
 
 @dataclass

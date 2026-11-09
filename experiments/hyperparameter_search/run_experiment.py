@@ -5,24 +5,29 @@ import csv
 import hashlib
 import json
 import logging
+import multiprocessing as mp
 import os
 import platform
 import socket
 import sqlite3
+import signal
 import sys
 import traceback
 import warnings
 import subprocess
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from importlib.metadata import version
+from itertools import groupby
+from multiprocessing.process import BaseProcess
 from pathlib import Path
-from time import perf_counter, time
+from time import perf_counter, sleep, time
 from typing import Any, Iterator
 
 import joblib
 import numpy as np
 from sklearn.model_selection import ParameterGrid
 from tqdm.auto import tqdm
+from threadpoolctl import threadpool_limits
 
 if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -35,6 +40,8 @@ from experiments.hyperparameter_search.experiment_setup import (
 )
 from experiments.hyperparameter_search.plan_search_experiment import FAMILIES, SearchPlan
 from experiments.hyperparameter_search.search_execution import SearchRun
+from experiments.hyperparameter_search.grid_cache import GridEvaluationCache
+from experiments.hyperparameter_search.search_runtime import search_scoring
 
 ROOT = Path(__file__).resolve().parent
 METHODS = ("GA", "PDPGA", "SelfCGA", "SelfCSHAGA", "PDPSHAGA", "SHAGA", "Random", "Grid")
@@ -102,7 +109,7 @@ class Experiment:
             self.plan.configurations = list(selected.values())
         self.configurations = {c["id"]: c for c in self.plan.configurations}
         self.families = families
-        self.methods = methods
+        self.methods = list(dict.fromkeys([*methods, "Grid"]))
         self.samples, self.noise, self.data_seed = samples, noise, data_seed
         self.max_samples = max_samples
         self.smoke, self.progress, self.batch_size = smoke, progress, batch_size
@@ -111,7 +118,7 @@ class Experiment:
             * len(families)
             * (
                 len(seeds) * len(budgets) * (len(self.configurations) + int("Random" in methods))
-                + int("Grid" in methods)
+                + 1
             )
         )
 
@@ -142,7 +149,8 @@ class Experiment:
         )
         return describe(
             {
-                "schema": 1,
+                "schema": 2,
+                "evaluation_mode": "grid_first_shared_indexed_cache",
                 "spec_sha256": hashlib.sha256(
                     (ROOT / "EXPERIMENT_SPEC.md").read_text(encoding="utf-8").encode()
                 ).hexdigest(),
@@ -181,13 +189,15 @@ class Experiment:
                 "total_searches": self.total,
                 "resume_mode": "deterministic_seed_replay_with_fold_cache",
                 "fitness_transform": "2 + (2/pi)*atan(primary_cv_score); nonfinite -> 0",
-                "backend": "loky",
+                "backend": "multiprocessing_spawn",
+                "parallel_unit": "dataset_model_pair",
+                "cv_n_jobs": 1,
                 "inner_max_num_threads": 1,
             }
         )
 
     def _prepare(self) -> None:
-        for directory in ["data", "cases", "runs"]:
+        for directory in ["data", "cases", "runs", "cache"]:
             (self.output / directory).mkdir(parents=True, exist_ok=True)
         manifest = self._manifest()
         path = self.output / "manifest.json"
@@ -283,6 +293,9 @@ class Experiment:
             "cache_hits",
             "coverage",
             "cv_fits",
+            "logical_cv_fits",
+            "cv_seconds_estimate",
+            "evaluation_mode",
             "best_cv",
             "test_score",
             "seconds",
@@ -334,35 +347,107 @@ class Experiment:
             return counts
 
     def _execute(self, connection: sqlite3.Connection, complete: int) -> None:
-        task_lookup = {task["id"]: task for task in self.plan.tasks}
-        active_case = None
-        data = estimator = grid = None
+        context = mp.get_context("spawn")
+        worker_limit = self.n_jobs if self.n_jobs > 0 else (os.cpu_count() or 1)
+        cases = iter(groupby(self.jobs(), key=lambda job: (job["task"], job["family"])))
+        active: list[BaseProcess] = []
+        exhausted = False
+        last_row = connection.execute("SELECT COALESCE(max(rowid),0) FROM runs").fetchone()[0]
         with tqdm(
             total=self.total,
             initial=complete,
             desc="Searches",
             unit="search",
-            position=0,
             disable=not self.progress,
         ) as bar:
-            for job in self.jobs():
+            try:
+                while active or not exhausted:
+                    while len(active) < worker_limit and not exhausted:
+                        try:
+                            case, group = next(cases)
+                        except StopIteration:
+                            exhausted = True
+                            break
+                        jobs = list(group)
+                        if all(
+                            connection.execute(
+                                "SELECT status FROM runs WHERE id=?", (job["id"],)
+                            ).fetchone()
+                            == ("ok",)
+                            for job in jobs
+                        ):
+                            continue
+                        process: BaseProcess = context.Process(
+                            target=_run_case, args=(self, jobs), name="__".join(case)
+                        )
+                        process.start()
+                        active.append(process)
+                        logging.info(
+                            "CASE_SCHEDULED %s pid=%s active=%s",
+                            process.name,
+                            process.pid,
+                            len(active),
+                        )
+                    for process in active[:]:
+                        if process.is_alive():
+                            continue
+                        process.join()
+                        if process.exitcode != 0:
+                            raise RuntimeError(
+                                f"Case {process.name} exited with code {process.exitcode}; inspect cases/{process.name}.log"
+                            )
+                        logging.info("CASE_DONE %s", process.name)
+                        active.remove(process)
+                        process.close()
+                    rows = connection.execute(
+                        "SELECT rowid,result FROM runs WHERE rowid>? ORDER BY rowid", (last_row,)
+                    ).fetchall()
+                    for row_id, payload in rows:
+                        self._append_csv(json.loads(payload))
+                        last_row = row_id
+                        bar.update(1)
+                    bar.set_postfix(active_pairs=len(active))
+                    if active:
+                        sleep(0.2)
+            finally:
+                for process in active:
+                    if process.is_alive():
+                        process.terminate()
+                deadline = perf_counter() + 10
+                for process in active:
+                    process.join(timeout=max(0, deadline - perf_counter()))
+                    if process.is_alive():
+                        process.kill()
+                        process.join()
+                    process.close()
+
+    def _execute_case(self, connection: sqlite3.Connection, jobs: list[dict[str, Any]]) -> None:
+        task_id, family = jobs[0]["task"], jobs[0]["family"]
+        task = next(task for task in self.plan.tasks if task["id"] == task_id)
+        data = self._task(task)
+        estimator, grid = joblib.load(self.output / "cases" / f"{task_id}__{family}.joblib")
+        with closing(
+            GridEvaluationCache(
+                estimator,
+                grid,
+                data.X[data.train],
+                data.y[data.train],
+                data.splits,
+                search_scoring(data.classification),
+                self.output / "cache" / f"{task_id}__{family}",
+                n_jobs=1,
+            )
+        ) as cache:
+            for job in jobs:
                 previous = connection.execute(
                     "SELECT status FROM runs WHERE id=?", (job["id"],)
                 ).fetchone()
                 if previous is not None and previous[0] == "ok":
                     continue
-                case = (job["task"], job["family"])
-                if case != active_case:
-                    data = self._task(task_lookup[job["task"]])
-                    estimator, grid = joblib.load(
-                        self.output / "cases" / f"{job['task']}__{job['family']}.joblib"
-                    )
-                    active_case = case
                 run_dir = self.output / "runs" / hashlib.sha256(job["id"].encode()).hexdigest()[:24]
                 run_dir.mkdir(exist_ok=True)
                 atomic_json(run_dir / "job.json", job)
                 logging.info("START %s", job["id"])
-                bar.set_postfix_str(f"{job['task']} / {job['family']} / {job['method']}")
                 search = None
                 status = "failed"
                 start = perf_counter()
@@ -376,9 +461,10 @@ class Experiment:
                             data,
                             self.configurations.get(job.get("configuration")),
                             run_dir,
-                            self.n_jobs,
-                            self.progress,
+                            1,
+                            False,
                             self.batch_size,
+                            cache=cache,
                         )
                         result = search.execute()
                         status = "ok"
@@ -412,6 +498,8 @@ class Experiment:
                                         + "\n"
                                     )
                 result["directory"] = str(run_dir.relative_to(self.output))
+                result["worker_pid"] = os.getpid()
+                result["cv_n_jobs"] = 1
                 atomic_json(run_dir / "result.json", result)
                 payload = json.dumps(describe(result), ensure_ascii=False)
                 connection.execute(
@@ -419,7 +507,6 @@ class Experiment:
                     (job["id"], result["status"], payload),
                 )
                 connection.commit()
-                self._append_csv(describe(result))
                 logging.info(
                     "DONE %s status=%s CV=%s test=%s seconds=%.3f",
                     job["id"],
@@ -428,7 +515,39 @@ class Experiment:
                     result.get("test_score"),
                     result["seconds"],
                 )
-                bar.update(1)
+
+
+def _interrupt_case(signum: int, frame: object) -> None:
+    raise KeyboardInterrupt
+
+
+def _run_case(experiment: Experiment, jobs: list[dict[str, Any]]) -> None:
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    if sys.platform != "win32":
+        signal.signal(signal.SIGTERM, _interrupt_case)
+    case_name = f"{jobs[0]['task']}__{jobs[0]['family']}"
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(message)s",
+        handlers=[
+            logging.FileHandler(experiment.output / "cases" / f"{case_name}.log", encoding="utf-8")
+        ],
+        force=True,
+    )
+    logging.info("CASE_START pid=%s cv_n_jobs=1", os.getpid())
+    try:
+        with (
+            closing(
+                sqlite3.connect(experiment.output / "results.sqlite", timeout=60)
+            ) as connection,
+            threadpool_limits(limits=1),
+        ):
+            experiment._execute_case(connection, jobs)
+    except KeyboardInterrupt:
+        raise SystemExit(130)
+    except Exception:
+        logging.exception("CASE_FAILED %s", case_name)
+        raise SystemExit(1)
 
 
 def main() -> None:

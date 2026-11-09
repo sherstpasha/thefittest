@@ -17,12 +17,9 @@ from tqdm.auto import tqdm
 import thefittest.optimizers as optimizers
 from thefittest.model_selection._search import _ParameterGridEncoder
 
-if __package__:
-    from .experiment_setup import TaskData, describe
-    from .search_runtime import CandidateEvaluator
-else:
-    from experiment_setup import TaskData, describe
-    from search_runtime import CandidateEvaluator
+from .experiment_setup import TaskData, describe
+from .grid_cache import GridEvaluationCache, GridIndexEncoder
+from .search_runtime import CandidateEvaluator, search_scoring
 
 
 def _pack(value: Any) -> bytes:
@@ -45,6 +42,7 @@ class SearchRun:
         n_jobs: int,
         progress: bool,
         batch_size: int,
+        cache: Optional[GridEvaluationCache] = None,
     ) -> None:
         self.job = job
         self.grid = ParameterGrid(grid)
@@ -52,26 +50,16 @@ class SearchRun:
         self.configuration = configuration
         self.output = output
         self.batch_size = batch_size
+        self.cache = cache
+        if cache is not None and job["method"] != "Grid" and not cache.is_complete():
+            raise ValueError("Complete the shared Grid cache before running other searches.")
         self.primary = "accuracy" if data.classification else "rmse"
-        scoring = (
-            {
-                "accuracy": "accuracy",
-                "balanced_accuracy": "balanced_accuracy",
-                "f1_macro": "f1_macro",
-            }
-            if data.classification
-            else {
-                "rmse": "neg_root_mean_squared_error",
-                "mae": "neg_mean_absolute_error",
-                "r2": "r2",
-            }
-        )
         self.evaluator = CandidateEvaluator(
             estimator,
             data.X[data.train],
             data.y[data.train],
             data.splits,
-            scoring,
+            search_scoring(data.classification),
             output,
             n_jobs=n_jobs,
             progress=progress,
@@ -88,6 +76,13 @@ class SearchRun:
             "id INTEGER PRIMARY KEY, started REAL, seconds REAL, status TEXT);"
         )
         self.connection.commit()
+        self._visited: np.ndarray = np.zeros(len(self.grid), dtype=bool)
+        self._best_score = -np.inf
+        if cache is not None:
+            for key, score in self.connection.execute("SELECT id,score FROM candidates"):
+                self._visited[int(key)] = True
+                if score is not None:
+                    self._best_score = max(self._best_score, score)
         self.attempt = self.connection.execute(
             "INSERT INTO attempts (started,status) VALUES (?, 'running')", (time(),)
         ).lastrowid
@@ -189,6 +184,35 @@ class SearchRun:
                 ),
             )
         self.connection.commit()
+        return self._record_proposals(keys, scores)
+
+    def _evaluate_indices(self, indices: list[int]) -> np.ndarray:
+        assert self.cache is not None
+        self.batch += 1
+        records = self.cache.evaluate(indices)
+        primary = self.cache.metrics.index(self.primary)
+        scores = records["test_scores"].mean(axis=1)[:, primary]
+        for position, (index, score) in enumerate(zip(indices, scores)):
+            if self._visited[index]:
+                continue
+            self.connection.execute(
+                "INSERT INTO candidates "
+                "(id,first_batch,first_position,first_seen,score) VALUES (?,?,?,?,?)",
+                (
+                    str(index),
+                    self.batch,
+                    position,
+                    time(),
+                    float(score) if np.isfinite(score) else None,
+                ),
+            )
+            self._visited[index] = True
+        self.connection.commit()
+        if np.isfinite(scores).any():
+            self._best_score = max(self._best_score, np.max(scores[np.isfinite(scores)]))
+        return self._record_proposals([str(index) for index in indices], scores)
+
+    def _record_proposals(self, keys: list[str], scores: np.ndarray) -> np.ndarray:
         fitness = 2.0 + (2.0 / np.pi) * np.arctan(scores)
         fitness[~np.isfinite(scores)] = 0.0
         unique_genotypes = (
@@ -207,8 +231,12 @@ class SearchRun:
                 "state": self._state(),
             },
         )
-        self.bar.update(len(candidates))
-        best = self.connection.execute("SELECT max(score) FROM candidates").fetchone()[0]
+        self.bar.update(len(keys))
+        best = (
+            (self._best_score if np.isfinite(self._best_score) else None)
+            if self.cache is not None
+            else self.connection.execute("SELECT max(score) FROM candidates").fetchone()[0]
+        )
         if best is not None:
             self.bar.set_postfix(best=round(best if self.data.classification else -best, 6))
         return fitness
@@ -230,17 +258,26 @@ class SearchRun:
                     : min(len(self.grid), self.job["nominal_budget"])
                 ]
             for start in range(0, len(indices), self.batch_size):
-                self.evaluate([self.grid[int(i)] for i in indices[start : start + self.batch_size]])
+                batch = [int(i) for i in indices[start : start + self.batch_size]]
+                if self.cache is None:
+                    self.evaluate([self.grid[i] for i in batch])
+                else:
+                    self._evaluate_indices(batch)
         else:
             if self.configuration is None:
                 raise ValueError("An evolutionary search requires an optimizer configuration.")
-            encoder = _ParameterGridEncoder(self.grid.param_grid)
+            encoder = (
+                _ParameterGridEncoder(self.grid.param_grid)
+                if self.cache is None
+                else GridIndexEncoder(self.grid.param_grid)
+            )
+            evaluate = self.evaluate if self.cache is None else self._evaluate_indices
             if encoder.str_len == 0:
-                self.evaluate(encoder.transform(np.empty((1, 0), dtype=np.int8)).tolist())
+                evaluate(encoder.transform(np.empty((1, 0), dtype=np.int8)).tolist())
             else:
                 optimizer_type = getattr(optimizers, self.configuration["optimizer"])
                 self.optimizer = optimizer_type(
-                    fitness_function=lambda population: self.evaluate(population.tolist()),
+                    fitness_function=lambda population: evaluate(population.tolist()),
                     genotype_to_phenotype=lambda population: self._decode(population, encoder),
                     str_len=encoder.str_len,
                     iters=self.job["iters"],
@@ -263,7 +300,7 @@ class SearchRun:
             raise RuntimeError(
                 "All candidates failed; inspect evaluations.sqlite and warnings.jsonl."
             )
-        parameters = _unpack(best[1])
+        parameters = _unpack(best[1]) if self.cache is None else self.grid[int(best[0])]
         self.bar.set_description("Refit best")
         refit = self.evaluator.refit(
             parameters, self.data.X, self.data.y, self.data.train, self.data.test
@@ -284,6 +321,30 @@ class SearchRun:
                 fits = json.loads(result).get("model_fits", {})
                 for kind in model_fits:
                     model_fits[kind] += sum(fits.get(kind, {}).values())
+        cv_seconds_estimate = 0.0
+        cv_metrics = json.loads(best[3]) if self.cache is None else {}
+        logical_cv_fits = cv_fits
+        if self.cache is not None:
+            logical_cv_fits = count * len(self.data.splits)
+            cv_fits = logical_cv_fits if self.job["method"] == "Grid" else 0
+            model_fits = {"started": 0, "completed": 0}
+            visited = np.flatnonzero(self._visited)
+            for start in range(0, len(visited), self.batch_size):
+                records = self.cache.evaluate(visited[start : start + self.batch_size])
+                cv_seconds_estimate += float(np.nansum(records["fit_seconds"]))
+                cv_seconds_estimate += float(np.nansum(records["score_seconds"]))
+                if self.job["method"] == "Grid":
+                    for row, kind in enumerate(("started", "completed")):
+                        model_fits[kind] += int(records["model_fits"][:, :, row].sum())
+            selected = self.cache.evaluate([int(best[0])])
+            cv_metrics = {
+                f"{stat}_{split}_scores": {
+                    name: float(getattr(selected[f"{split}_scores"][0, :, metric], stat)())
+                    for metric, name in enumerate(self.cache.metrics)
+                }
+                for stat in ("mean", "std")
+                for split in ("train", "test")
+            }
         sign = 1 if self.data.classification else -1
         return {
             **self.job,
@@ -297,10 +358,13 @@ class SearchRun:
             "cache_hits": total_proposals - count,
             "coverage": count / len(self.grid),
             "cv_fits": cv_fits,
+            "logical_cv_fits": logical_cv_fits,
+            "cv_seconds_estimate": cv_seconds_estimate if self.cache is not None else None,
+            "evaluation_mode": "shared_grid_cache" if self.cache is not None else "independent_cv",
             "cv_model_fits": model_fits,
             "refit_model_fits": refit["model_fits"],
             "best_cv": sign * best[2],
-            "cv_metrics": json.loads(best[3]),
+            "cv_metrics": cv_metrics,
             "test_score": sign * refit["test_scores"][self.primary],
             "test_metrics": refit["test_scores"],
             "best_parameters": describe(parameters),

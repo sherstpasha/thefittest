@@ -30,6 +30,20 @@ from threadpoolctl import threadpool_limits
 from tqdm.auto import tqdm
 
 
+def search_scoring(classification: bool) -> dict[str, str]:
+    if classification:
+        return {
+            "accuracy": "accuracy",
+            "balanced_accuracy": "balanced_accuracy",
+            "f1_macro": "f1_macro",
+        }
+    return {
+        "rmse": "neg_root_mean_squared_error",
+        "mae": "neg_mean_absolute_error",
+        "r2": "r2",
+    }
+
+
 class FeatureGroupCV(BaseCrossValidator):
     def __init__(self, classification: bool, n_splits: int = 3, random_state: int = 42) -> None:
         self.classification = classification
