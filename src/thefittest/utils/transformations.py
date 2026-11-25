@@ -1,3 +1,5 @@
+"""Transformations between numeric, binary, and Gray-code representations."""
+
 from __future__ import annotations
 
 from typing import Optional
@@ -76,8 +78,8 @@ class SamplingGrid:
         Step size for each variable in the sampling grid.
     _bits_per_variable : NDArray[np.int64]
         Number of bits for each variable in the sampling grid.
-    _reversed_powers : NDArray[np.int64]
-        Reversed powers of 2 used for converting binary representations to integers.
+    _powers : NDArray[np.int64]
+        Powers of 2 used for converting binary and Gray-code representations.
 
     Examples
     --------
@@ -148,21 +150,51 @@ class SamplingGrid:
     def __init__(
         self,
     ) -> None:
+        """
+        Initialize an unfitted sampling grid.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+            The instance is initialized without fitted grid parameters.
+
+        Examples
+        --------
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>> grid = SamplingGrid()
+        >>> isinstance(grid, SamplingGrid)
+        True
+        """
         self._left_border: NDArray[np.float64]
         self._right_border: NDArray[np.float64]
         self._num_variables: int
         self._h_per_variable: NDArray[np.float64]
         self._bits_per_variable: NDArray[np.int64]
-        self._reversed_powers: NDArray[np.int64]
+        self._powers: NDArray[np.int64]
 
     def get_left_border(self) -> NDArray[np.float64]:
         """
         Get the left border values for each variable.
 
+        Parameters
+        ----------
+        None
+
         Returns
         -------
         NDArray[np.float64]
             Left border values for each variable.
+
+        Examples
+        --------
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>> grid = SamplingGrid().fit(-1.0, 1.0, num_variables=2, bits_per_variable=4)
+        >>> grid.get_left_border()
+        array([-1., -1.])
         """
         return self._left_border
 
@@ -170,10 +202,21 @@ class SamplingGrid:
         """
         Get the right border values for each variable.
 
+        Parameters
+        ----------
+        None
+
         Returns
         -------
         NDArray[np.float64]
             Right border values for each variable.
+
+        Examples
+        --------
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>> grid = SamplingGrid().fit(-1.0, 1.0, num_variables=2, bits_per_variable=4)
+        >>> grid.get_right_border()
+        array([1., 1.])
         """
         return self._right_border
 
@@ -181,10 +224,21 @@ class SamplingGrid:
         """
         Get the number of variables.
 
+        Parameters
+        ----------
+        None
+
         Returns
         -------
         int
             Number of variables.
+
+        Examples
+        --------
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>> grid = SamplingGrid().fit(-1.0, 1.0, num_variables=2, bits_per_variable=4)
+        >>> grid.get_num_variables()
+        2
         """
         return self._num_variables
 
@@ -192,10 +246,21 @@ class SamplingGrid:
         """
         Get the step size values for each variable.
 
+        Parameters
+        ----------
+        None
+
         Returns
         -------
         NDArray[np.float64]
             Step size values for each variable.
+
+        Examples
+        --------
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>> grid = SamplingGrid().fit(0.0, 1.0, num_variables=2, bits_per_variable=2)
+        >>> grid.get_h_per_variable()
+        array([0.33333333, 0.33333333])
         """
         return self._h_per_variable
 
@@ -203,27 +268,49 @@ class SamplingGrid:
         """
         Get the number of bits per variable.
 
+        Parameters
+        ----------
+        None
+
         Returns
         -------
         NDArray[np.int64]
             Number of bits per variable.
+
+        Examples
+        --------
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>> grid = SamplingGrid().fit(0.0, 1.0, num_variables=2, bits_per_variable=4)
+        >>> grid.get_bits_per_variable()
+        array([4, 4])
         """
         return self._bits_per_variable
-    
+
     def get_str_len(self) -> np.int64:
         """
         Get the total number of bits required to represent the entire population in binary.
 
-        This method sums the number of bits for each variable, providing the total length 
+        This method sums the number of bits for each variable, providing the total length
         of the binary string needed to represent a single individual in the population.
+
+        Parameters
+        ----------
+        None
 
         Returns
         -------
         np.int64
             Total number of bits required for binary representation of an individual.
+
+        Examples
+        --------
+        >>> from thefittest.utils.transformations import SamplingGrid
+        >>> grid = SamplingGrid().fit(0.0, 1.0, num_variables=2, bits_per_variable=4)
+        >>> grid.get_str_len()
+        np.int64(8)
         """
         return self._bits_per_variable.sum()
-    
+
     def fit(
         self,
         left_border: Union[float, NDArray[np.float64]],
@@ -255,8 +342,8 @@ class SamplingGrid:
 
         Raises
         ------
-        AssertionError
-            If both `h_per_variable` and `bits_per_variable` are provided or if neither is provided.
+        ValueError
+            If both ``h_per_variable`` and ``bits_per_variable`` are provided or if neither is provided.
 
         Notes
         -----
@@ -469,11 +556,13 @@ class SamplingGrid:
         >>> print("Converted Binary Array (Define Powers):", result_custom_powers)
         Converted Binary Array (Define Powers): ...
         """
-        num_bits = int(np.ceil(np.log2(np.max(int_array) + 1)))
-        bit_array = np.empty(shape=(int_array.shape[0], num_bits), dtype=np.int8)
-
         if powers is None:
+            num_bits = max(1, int(np.ceil(np.log2(np.max(int_array) + 1))))
             powers = 2 ** np.arange(num_bits, dtype=np.int64)
+        else:
+            num_bits = len(powers)
+
+        bit_array = np.empty(shape=(int_array.shape[0], num_bits), dtype=np.int8)
 
         reversed_powers = np.flip(powers[:num_bits])
 
@@ -484,7 +573,11 @@ class SamplingGrid:
         return bit_array
 
     def _float_to_bit(
-        self, float_array: NDArray[np.float64], left: NDArray[np.float64], h: NDArray[np.float64]
+        self,
+        float_array: NDArray[np.float64],
+        left: NDArray[np.float64],
+        h: NDArray[np.float64],
+        powers: Optional[NDArray[np.int64]] = None,
     ) -> NDArray[np.int8]:
         """
         Convert a 1D floating-point array to a 2D binary array based on the SamplingGrid parameters.
@@ -497,6 +590,8 @@ class SamplingGrid:
             1D array representing the left boundary of the sampling grid used in the conversion process.
         h : NDArray[np.float64]
             1D array representing the step size of the sampling grid used in the conversion process.
+        powers : Optional[NDArray[np.int64]], optional
+            Powers of 2 for the variable being encoded. If provided, defines the output bit width.
 
         Returns
         -------
@@ -509,7 +604,7 @@ class SamplingGrid:
         """
         grid_number = (float_array - left) / h
         int_array = np.rint(grid_number)
-        bit_array = self.int_to_bit(int_array, self._powers)
+        bit_array = self.int_to_bit(int_array, powers if powers is not None else self._powers)
         return bit_array
 
     def _decode(self, bit_array_i: NDArray[np.byte]) -> NDArray[np.int64]:
@@ -617,8 +712,21 @@ class SamplingGrid:
         >>> print("Inverse Transformed Population:", grid.inverse_transform(floating_population))
         Inverse Transformed Population: ...
         """
-        map_ = map(self._float_to_bit, population.T, self._left_border, self._h_per_variable)
-        bit_array = np.hstack(list(map_))
+        bit_parts = [
+            self._float_to_bit(
+                float_array,
+                left,
+                h,
+                self._powers[:bits],
+            )
+            for float_array, left, h, bits in zip(
+                population.T,
+                self._left_border,
+                self._h_per_variable,
+                self._bits_per_variable,
+            )
+        ]
+        bit_array = np.hstack(bit_parts)
         return bit_array
 
 
@@ -679,6 +787,25 @@ class GrayCode(SamplingGrid):
     """
 
     def __init__(self) -> None:
+        """
+        Initialize an unfitted Gray-code sampling grid.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+            The instance is initialized without fitted grid parameters.
+
+        Examples
+        --------
+        >>> from thefittest.utils.transformations import GrayCode
+        >>> grid = GrayCode()
+        >>> isinstance(grid, GrayCode)
+        True
+        """
         SamplingGrid.__init__(self)
 
     @staticmethod
@@ -737,7 +864,7 @@ class GrayCode(SamplingGrid):
         Converted Gray Code Array: ...
         """
         cut_gray = np.logical_xor(bit_array[:, :-1], bit_array[:, 1:])
-        gray_array = np.hstack([bit_array[:, 0].reshape(-1, 1), cut_gray])
+        gray_array = np.hstack([bit_array[:, 0].reshape(-1, 1), cut_gray]).astype(np.byte)
         return gray_array
 
     def _decode(self, gray_array_i: NDArray[np.byte]) -> NDArray[np.int64]:
@@ -760,7 +887,11 @@ class GrayCode(SamplingGrid):
         return int_convert
 
     def _float_to_bit(
-        self, float_array: NDArray[np.float64], left: NDArray[np.float64], h: NDArray[np.float64]
+        self,
+        float_array: NDArray[np.float64],
+        left: NDArray[np.float64],
+        h: NDArray[np.float64],
+        powers: Optional[NDArray[np.int64]] = None,
     ) -> NDArray[np.byte]:
         """
         Convert a 1D floating-point array to a 2D gray code array based on the GrayCode parameters.
@@ -773,6 +904,8 @@ class GrayCode(SamplingGrid):
             1D array representing the left boundary of the sampling grid used in the conversion process.
         h : NDArray[np.float64]
             1D array representing the step size of the sampling grid used in the conversion process.
+        powers : Optional[NDArray[np.int64]], optional
+            Powers of 2 for the variable being encoded. If provided, defines the output bit width.
 
         Returns
         -------
@@ -781,6 +914,6 @@ class GrayCode(SamplingGrid):
         """
         grid_number = (float_array - left) / h
         int_array = np.rint(grid_number)
-        bit_array = self.int_to_bit(int_array)
+        bit_array = self.int_to_bit(int_array, powers if powers is not None else self._powers)
         gray_array = self.bit_to_gray(bit_array)
         return gray_array

@@ -1,35 +1,19 @@
 @ECHO OFF
-
+setlocal
 pushd %~dp0
-
-REM Command file for Sphinx documentation
-
-if "%SPHINXBUILD%" == "" (
-	set SPHINXBUILD=sphinx-build
-)
-set SOURCEDIR=source
-set BUILDDIR=build
-
-if "%1" == "" goto help
-
-%SPHINXBUILD% >NUL 2>NUL
-if errorlevel 9009 (
-	echo.
-	echo.The 'sphinx-build' command was not found. Make sure you have Sphinx
-	echo.installed, then set the SPHINXBUILD environment variable to point
-	echo.to the full path of the 'sphinx-build' executable. Alternatively you
-	echo.may add the Sphinx directory to PATH.
-	echo.
-	echo.If you don't have Sphinx installed, grab it from
-	echo.https://www.sphinx-doc.org/
-	exit /b 1
-)
-
-%SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
-goto end
-
+if "%DOC_VERSION%"=="" set DOC_VERSION=0.3.0
+if "%DOC_VERSIONS%"=="" set DOC_VERSIONS=%DOC_VERSION%,0.2.7
+if "%PYTHON%"=="" set PYTHON=python
+if "%1"=="" goto help
+if "%1"=="html" goto html
+%PYTHON% -m sphinx -M %1 source _build %SPHINXOPTS%
+goto finish
 :help
-%SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
-
-:end
+%PYTHON% -m sphinx -M help source _build
+goto finish
+:html
+%PYTHON% build.py %SPHINXOPTS%
+:finish
+set result=%ERRORLEVEL%
 popd
+exit /b %result%

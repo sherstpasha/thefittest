@@ -28,15 +28,15 @@ from ..base._mlp import weights_type_optimizer_alias
 from ..optimizers import GeneticProgramming
 from ..optimizers import SHADE
 from ..optimizers import SelfCGP
+from ..optimizers import NSGPII
 
 
 class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
     """
     Genetic Programming-based Neural Network classifier with evolved architecture.
 
-    This classifier evolves both the neural network architecture and weights using
-    genetic programming. The network structure is represented as a tree, and weights
-    are optimized using evolutionary algorithms.
+    This classifier evolves tree-encoded neural network architectures using genetic
+    programming. Network weights are trained with evolutionary algorithms or gradient-based optimizers.
 
     Parameters
     ----------
@@ -52,17 +52,17 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
         If True, adds bias terms to the network.
     test_sample_ratio : float, optional (default=0.5)
         Ratio of data to use for validation during evolution.
-    optimizer : Type[Union[SelfCGP, GeneticProgramming, PDPGP]], optional (default=SelfCGP)
+    optimizer : Type[Union[SelfCGP, GeneticProgramming, PDPGP, NSGPII]], optional (default=SelfCGP)
         Genetic programming optimizer for evolving architecture.
-        Available: SelfCGP, GeneticProgramming, or PDPGP.
+        Available: SelfCGP, GeneticProgramming, PDPGP, or NSGPII and its subclasses.
     optimizer_args : Optional[dict], optional (default=None)
         Additional arguments for the architecture optimizer (excluding n_iter and pop_size).
     weights_optimizer : Type, optional (default=SHADE)
-        Evolutionary algorithm for optimizing network weights.
+        Evolutionary algorithm or PyTorch optimizer for network weights.
     weights_optimizer_args : Optional[dict], optional (default=None)
         Additional arguments for the weights optimizer.
-        Note: Use 'iters' and 'pop_size' keys for setting iterations and population size.
-        Example: {'iters': 150, 'pop_size': 150, 'show_progress_each': 10}
+        For evolutionary optimizers: {'iters': 150, 'pop_size': 150}.
+        For torch.optim: {'iters': 100, 'lr': 0.01}; pop_size is ignored.
     net_size_penalty : float, optional (default=0.0)
         Penalty coefficient for network complexity (larger = simpler networks).
     random_state : Optional[Union[int, np.random.RandomState]], optional (default=None)
@@ -73,6 +73,12 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
         If True, caches fitness evaluations.
     fitness_cache_size : int, optional (default=1000)
         Maximum size of fitness cache.
+    complexity : str, optional (default="n_connections")
+        Second minimization objective for NSGPII: "n_neurons", "n_connections",
+        "n_layers", or "n_inputs". Ignored by single-objective optimizers.
+    model_selection : str, optional (default="best_error")
+        Select a Pareto network by "best_error" or "simplest", breaking ties
+        by the other objective. Ignored by single-objective optimizers.
 
     Examples
     --------
@@ -129,7 +135,7 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
         max_hidden_block_size: int = 9,
         offset: bool = True,
         test_sample_ratio: float = 0.5,
-        optimizer: Union[Type[SelfCGP], Type[GeneticProgramming]] = SelfCGP,
+        optimizer: Union[Type[SelfCGP], Type[GeneticProgramming], Type[NSGPII]] = SelfCGP,
         optimizer_args: Optional[dict[str, Any]] = None,
         weights_optimizer: weights_type_optimizer_alias = SHADE,
         weights_optimizer_args: Optional[dict[str, Any]] = None,
@@ -138,7 +144,9 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
         device: str = "cpu",
         use_fitness_cache: bool = False,
         fitness_cache_size: int = 1000,
-    ):
+        complexity: str = "n_connections",
+        model_selection: str = "best_error",
+    ) -> None:
         if not TORCH_AVAILABLE:
             raise ImportError(
                 "GeneticProgrammingNeuralNetClassifier requires PyTorch. "
@@ -160,6 +168,8 @@ class GeneticProgrammingNeuralNetClassifier(ClassifierMixin, BaseGPNN):
             device=device,
             use_fitness_cache=use_fitness_cache,
             fitness_cache_size=fitness_cache_size,
+            complexity=complexity,
+            model_selection=model_selection,
         )
 
     def predict_proba(self, X: ArrayLike) -> NDArray[np.float64]:

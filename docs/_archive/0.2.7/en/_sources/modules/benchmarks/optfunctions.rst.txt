@@ -1,0 +1,98 @@
+Optimization Functions
+=====================
+
+Basic Test Functions
+--------------------
+
+These are classic benchmark functions for testing continuous optimization algorithms.
+Each function has different characteristics (unimodal/multimodal, separable/non-separable)
+that challenge different aspects of optimization algorithms.
+
+OneMax
+^^^^^^
+
+.. autoclass:: thefittest.benchmarks.OneMax
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+Sphere
+^^^^^^
+
+.. autoclass:: thefittest.benchmarks.Sphere
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+Schwefe1_2
+^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.Schwefe1_2
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+HighConditionedElliptic
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.HighConditionedElliptic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+Rosenbrock
+^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.Rosenbrock
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+Rastrigin
+^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.Rastrigin
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+Griewank
+^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.Griewank
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+Ackley
+^^^^^^
+
+.. autoclass:: thefittest.benchmarks.Ackley
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+----
+
+Weierstrass
+^^^^^^^^^^^
+
+.. autoclass:: thefittest.benchmarks.Weierstrass
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

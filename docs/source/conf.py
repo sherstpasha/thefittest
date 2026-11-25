@@ -12,6 +12,8 @@
 #
 import os
 import sys
+import json
+from pathlib import Path
 
 
 # Mock validate_data before any imports
@@ -22,6 +24,8 @@ def _mock_validate_data(estimator, X, y=None, reset=True, **kwargs):
     return X
 
 
+autodoc_mock_imports = []
+
 # Patch sklearn.utils.validation before importing thefittest
 try:
     import sklearn.utils.validation
@@ -29,13 +33,12 @@ try:
     if not hasattr(sklearn.utils.validation, "validate_data"):
         sklearn.utils.validation.validate_data = _mock_validate_data
 except ImportError:
-    pass
+    autodoc_mock_imports.append("sklearn")
 
-path_list = os.getcwd().split("\\")
-path = "\\".join(path_list[:-2]) + "\\src"
-sys.path.insert(0, path)
-sys.path.insert(0, os.path.abspath("."))
-sys.path.insert(0, os.path.abspath("../../src"))
+source_dir = os.path.abspath(os.path.dirname(__file__))
+project_root = os.path.abspath(os.path.join(source_dir, "..", ".."))
+sys.path.insert(0, os.path.join(project_root, "src"))
+sys.path.insert(0, source_dir)
 # -- Project information -----------------------------------------------------
 
 project = "Thefittest"
@@ -43,7 +46,32 @@ copyright = "2026, Pavel Sherstnev"
 author = "Pavel Sherstnev"
 
 # The full version, including alpha/beta/rc tags
-release = "0.2.7"
+documentation_version = os.environ.get("DOC_VERSION", "0.3.0")
+documentation_versions = [
+    version.strip()
+    for version in os.environ.get("DOC_VERSIONS", f"{documentation_version},0.2.7").split(",")
+    if version.strip()
+]
+version = documentation_version
+release = documentation_version
+
+documentation_navigation = {}
+for doc_version in documentation_versions:
+    archive_path = Path("_archive") / doc_version / "en"
+    if (Path(project_root) / "docs" / archive_path / "index.html").is_file():
+        doc_path = archive_path
+        page_root = Path(project_root) / "docs" / doc_path
+        pages = page_root.rglob("*.html")
+    else:
+        doc_path = Path(doc_version)
+        page_root = Path(source_dir)
+        pages = page_root.rglob("*.rst")
+    page_names = {page.relative_to(page_root).with_suffix(".html").as_posix() for page in pages}
+    page_names.update(("genindex.html", "py-modindex.html", "search.html"))
+    documentation_navigation[doc_version] = {
+        "path": doc_path.as_posix(),
+        "pages": sorted(page_names),
+    }
 
 
 # -- General configuration ---------------------------------------------------
@@ -53,9 +81,12 @@ release = "0.2.7"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
     # "sphinx.ext.doctest",  # Disabled - examples are for documentation only
     "numpydoc",
 ]
+
+intersphinx_mapping = {"sklearn": ("https://scikit-learn.org/stable/", None)}
 
 # Numpydoc configuration - disable doctest
 numpydoc_show_class_members = False
@@ -71,11 +102,6 @@ autodoc_default_options = {
     "inherited-members": True,
     "show-inheritance": True,
 }
-
-# Suppress warnings during import
-import warnings
-
-warnings.filterwarnings("ignore")
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -110,8 +136,22 @@ html_css_files = [
     "custom.css",
 ]
 
+html_js_files = [
+    (
+        "version-switcher.js",
+        {
+            "data-current-version": documentation_version,
+            "data-version-map": json.dumps(documentation_navigation),
+        },
+    ),
+]
+
 # Add meta tags to prevent browser caching
-html_context = {"default_mode": "light"}
+html_context = {
+    "default_mode": "light",
+    "current_version": documentation_version,
+    "versions": documentation_versions,
+}
 
 # Add cache-busting meta tags
 html_meta = {
@@ -119,11 +159,5 @@ html_meta = {
     "pragma": "no-cache",
     "expires": "0",
 }
-
-# Path to the build directory
-html_build_dir = os.path.join(os.path.dirname(__file__), "..", "docs")
-
-# Output directory for the build html
-html_output = os.path.join(html_build_dir, "html")
 
 autosummary_generate = True

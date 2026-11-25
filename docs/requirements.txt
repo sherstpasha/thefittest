@@ -4,5 +4,5 @@ numpydoc
 numba
 numpy
 scipy
-scikit-learn
+scikit-learn>=1.6
 joblib

@@ -3,4 +3,4 @@ from ._mlpearegressor import MLPEARegressor
 from ._gpregressor import GeneticProgrammingRegressor
 
 
-__all__ = ["SymbolicRegressionGP", "GeneticProgrammingNeuralNetRegressor", "MLPEARegressor"]
+__all__ = ["GeneticProgrammingRegressor", "GeneticProgrammingNeuralNetRegressor", "MLPEARegressor"]

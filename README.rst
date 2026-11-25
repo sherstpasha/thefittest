@@ -42,6 +42,27 @@ Features of ``thefittest``
 **PyTorch support**
   ``thefittest`` supports `PyTorch <https://pytorch.org/>`_ for efficient neural network computations and evolutionary optimization of neural network weights and architectures, including GPU acceleration with CUDA.
 
+Installation
+------------
+
+**Basic installation** (for evolutionary algorithms and symbolic regression):
+
+.. code-block:: bash
+
+    pip install thefittest
+
+This installation includes all evolutionary optimizers (GA, DE, SHADE, etc.) and symbolic regression with GP.
+
+**Neural networks on CPU or GPU**:
+
+.. code-block:: bash
+
+    python -m pip install "thefittest[torch]"
+
+Neural estimators default to ``device="cpu"``. For CUDA, install the appropriate
+PyTorch build using https://pytorch.org/get-started/locally/ and select
+``device="cuda"``. CUDA is optional.
+
 Usage Example
 -------------
 
@@ -112,7 +133,7 @@ This example demonstrates how to train a machine learning model on the Iris data
 
     # Train the model
     model.fit(X_train, y_train)
-    
+
     # Make predictions on the test set
     predict = model.predict(X_test)
 
@@ -120,52 +141,10 @@ This example demonstrates how to train a machine learning model on the Iris data
     print("confusion_matrix: \n", confusion_matrix(y_test, predict))
     print("f1_score: \n", f1_score(y_test, predict, average="macro"))
 
-Installation
-------------
+Documentation
+-------------
 
-Install ``thefittest`` from PyPI:
-
-.. code-block:: bash
-
-    pip install thefittest
-
-``thefittest`` contains methods
--------------------------------
-
-- **Genetic algorithm** (Holland, J. H. (1992). Genetic algorithms. Scientific American, 267(1), 66-72):
-
-  - **Self-configuring genetic algorithm** (`Semenkin, E.S., Semenkina, M.E. Self-configuring Genetic Algorithm with Modified Uniform Crossover Operator. LNCS, 7331, 2012, pp. 414-421. <https://doi.org/10.1007/978-3-642-30976-2_50>`_);
-  - **SHAGA** (`Stanovov, Vladimir & Akhmedova, Shakhnaz & Semenkin, Eugene. (2019). Genetic Algorithm with Success History based Parameter Adaptation. 180-187. <http://dx.doi.org/10.5220/0008071201800187>`_);
-  - **PDPGA** (`Niehaus, J., Banzhaf, W. (2001); Adaption of Operator Probabilities in Genetic Programming. In: Miller, J., Tomassini, M., Lanzi, P.L., Ryan, C., Tettamanzi, A.G.B., Langdon, W.B. (eds) Genetic Programming. EuroGP 2001. Lecture Notes in Computer Science, vol 2038. Springer, Berlin, Heidelberg. <https://doi.org/10.1007/3-540-45355-5_26>`_).
-
-- **Differential evolution** (Storn, Rainer & Price, Kenneth. (1995). Differential Evolution: A Simple and Efficient Adaptive Scheme for Global Optimization Over Continuous Spaces. Journal of Global Optimization. 23)
-
-  - **jDE** (`Brest, Janez & Greiner, Sao & Bošković, Borko & Mernik, Marjan & Zumer, Viljem. (2007). Self-Adapting Control Parameters in Differential Evolution: A Comparative 13. 945 - 958. <http://dx.doi.org/10.1109/TEVC.2009.2014613>`_);
-  - **SHADE** (`Tanabe, Ryoji & Fukunaga, Alex. (2013). Success-history based parameter adaptation for Differential Evolution. 2013 IEEE Congress on Evolutionary Computation, CEC 2013. 71-78. <https://doi.org/10.1109/CEC.2013.6557555>`_).
-
-- **Genetic programming** (Koza, John R.. “Genetic programming - on the programming of computers by means of natural selection.” Complex Adaptive Systems (1993)):
-
-  - **Self-configuring genetic programming** (`Semenkin, Eugene & Semenkina, Maria. (2012). Self-configuring genetic programming algorithm with modified uniform crossover. 1-6. <http://dx.doi.org/10.1109/CEC.2012.6256587>`_).
-  - **PDPGP** (`Niehaus, J., Banzhaf, W. (2001); Adaption of Operator Probabilities in Genetic Programming. In: Miller, J., Tomassini, M., Lanzi, P.L., Ryan, C., Tettamanzi, A.G.B., Langdon, W.B. (eds) Genetic Programming. EuroGP 2001. Lecture Notes in Computer Science, vol 2038. Springer, Berlin, Heidelberg. <https://doi.org/10.1007/3-540-45355-5_26>`_).
-
-- **Genetic programming of neural networks (GPNN)** (`Lipinsky L., Semenkin E., Bulletin of the Siberian State Aerospace University., 3(10), 22-26 (2006). In Russian`_);
-- **Multilayer perceptron trained by evolutionary algorithms** (`Cotta, Carlos & Alba, Enrique & Sagarna, R. & Larranaga, Pedro. (2002). Adjusting Weights in Artificial Neural Networks using Evolutionary Algorithms. <http://dx.doi.org/10.1007/978-1-4615-1539-5_18>`_);
-
-Articles
---------
-
-Publications where ``thefittest`` has been used:
-
-- *Thefittest: evolutionary machine learning in Python*, January 2024, ITM Web of Conferences 59.
-  DOI: 10.1051/itmconf/20245902020. Licensed under CC BY 4.0. Authored by Pavel Sherstnev.
-  Available at: https://doi.org/10.1051/itmconf/20245902020
-- (in Russian) Демидов Н. Аспекты реализации генетического алгоритма в задачах смешанной оптимизации в пространстве переменной размерности // *International Journal of Open Information Technologies*. — 2026. — Т. 14, № 5. — С. 110–123.
-  Available at: http://injoit.ru/index.php/j1/article/view/2562
-  (transliteration) Demidov N. Aspekty realizatsii geneticheskogo algoritma v zadachakh smeshannoy optimizatsii v prostranstve peremennoy razmernosti // *International Journal of Open Information Technologies*. — 2026. — Vol. 14, No. 5. — P. 110–123.
-- (in Russian) Масленников В. В. Квантово-инспирированный генетический алгоритм вещественной однокритериальной оптимизации с адаптацией значений параметров на основе истории успеха // *ИТ-Стандарт*. — 2025. — № 4(45). — С. 81–101. — EDN KJRSYX.
-  (transliteration) Maslennikov V. V. Kvantovo-inspirovannyy geneticheskiy algoritm veshchestvennoy odnokriterial'noy optimizatsii s adaptatsiyey znacheniy parametrov na osnove istorii uspekha // *IT-Standart*. — 2025. — No. 4(45). — P. 81–101.
-- (in Russian) Демидов Н. А. Решение задачи одноклассовой классификации в пространстве проектирования переменной размерности на примере наборов регулярных выражений // *Вестник Рязанского государственного радиотехнического университета*. — 2026. — № 96-1. — С. 98–114.
-  (transliteration) Demidov N. A. Reshenie zadachi odnoklassovoy klassifikatsii v prostranstve proektirovaniya peremennoy razmernosti na primere naborov regulyarnykh vyrazheniy // *Vestnik Ryazanskogo gosudarstvennogo radiotekhnicheskogo universiteta*. — 2026. — No. 96-1. — P. 98–114.
+For detailed installation instructions, usage examples, API reference, and additional information, see the `official documentation <https://sherstpasha.github.io/thefittest/>`_.
 
 Awards and Presentations
 -------------------------
@@ -176,8 +155,3 @@ Awards and Presentations
 - **2nd place**, Youth IT Project Competition "Soft-Parade 2025". `More details <https://www.soft-parade.ru/archive>`_
 - **2nd place**, GitVerse, Cloud.ru and Habr Open Source Grant Program "Code Without Borders" 2025. `More details <https://gitverse.ru/blog/articles/open-source/1172-pozdravlyaem-pobeditelej-grantovoj-programmy-kod-bez-granic>`_
 - **International University Award "Gravitation" 2025** in the category *"Algorithms and Software Solutions in AI and Big Data"*, awarded by the Presidential Academy, Tomsk State University, and the Association *"University Consortium of Big Data Researchers"*. `More details <https://gravitation.ai/2025>`_
-
-Documentation
--------------
-
-For detailed installation instructions, usage examples, API reference, and additional information, see the `official documentation <https://sherstpasha.github.io/thefittest/>`_.

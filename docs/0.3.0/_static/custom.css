@@ -1,0 +1,286 @@
+/* =========================================================
+   Custom minimal styles for thefittest documentation
+   Unified, static cards (no hover effects)
+   ========================================================= */
+
+/* -------------------------
+   Header section
+------------------------- */
+.header-section {
+    text-align: center;
+    padding: 2rem 0 1rem;
+    margin-bottom: 2rem;
+}
+
+.header-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.badges {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+}
+
+/* -------------------------
+   Section headers
+------------------------- */
+.centered-header {
+    text-align: center;
+    color: #2c3e50;
+    margin: 3rem 0 2rem;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+/* -------------------------
+   Module cards grid
+------------------------- */
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin: 2.5rem 0;
+}
+
+.module-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+}
+
+.module-card h3 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.35rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.module-card p {
+    margin: 0;
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.module-items a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.module-items a:hover {
+    text-decoration: underline;
+}
+
+.module-card-arrow {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #3498db;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+/* -------------------------
+   Dependencies cards
+------------------------- */
+.dependencies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.dependency-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+}
+
+.dependency-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.dependency-card ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.dependency-card li {
+    margin-bottom: 10px;
+}
+
+.dependency-note {
+    font-size: 0.85em;
+    opacity: 0.7;
+}
+
+/* -------------------------
+   Examples section (Learning Materials) — как на скрине
+------------------------- */
+.examples-section {
+    margin: 3rem 0;
+}
+
+.examples-section h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.example-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin: 2rem 0;
+}
+
+/* карточка — простая, без кнопок */
+.example-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+    text-align: left; /* важно */
+}
+
+/* весь текст кликабельный */
+.example-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+/* заголовок как на скрине */
+.example-link h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+/* подпись снизу (GitHub Notebook / Kaggle / DOI ...) */
+.example-meta {
+    margin: 8px 0 0 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* старый бейдж скрываем, чтобы не мешал */
+.examples-section .card-category {
+    display: none;
+}
+
+/* -------------------------
+   Code blocks
+------------------------- */
+.highlight {
+    border-radius: 6px;
+    margin: 1rem 0;
+}
+
+/* -------------------------
+   Tables
+------------------------- */
+.wy-table-responsive table {
+    border: none !important;
+    border-collapse: collapse !important;
+}
+
+.wy-table-responsive table td,
+.wy-table-responsive table th {
+    border: 1px solid #e8e8e8 !important;
+    padding: 0.75rem !important;
+}
+
+.wy-table-responsive table thead {
+    background: #f8f9fa !important;
+}
+
+.wy-table-responsive table thead th {
+    color: #2c3e50 !important;
+    font-weight: 600 !important;
+}
+
+/* -------------------------
+   Logo styling
+------------------------- */
+.logo-image {
+    max-width: 400px;
+    margin: 1rem auto;
+    display: block;
+}
+
+/* -------------------------
+   Links
+------------------------- */
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* -------------------------
+   Documentation version switcher
+------------------------- */
+.version-switcher {
+    margin: 0.75rem auto 0;
+    max-width: 240px;
+    text-align: left;
+}
+
+.version-switcher-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.version-switcher-select {
+    width: 100%;
+    min-height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 4px;
+    background: #ffffff;
+    color: #2c3e50;
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+/* -------------------------
+   Responsive
+------------------------- */
+@media (max-width: 768px) {
+    .header-section h1 {
+        font-size: 2rem;
+    }
+
+    .module-grid,
+    .example-grid,
+    .dependencies-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .badges {
+        flex-direction: column;
+        align-items: center;
+    }
+}

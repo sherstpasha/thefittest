@@ -37,7 +37,7 @@ GeneticProgrammingRegressor
 Neural Network Regressors
 --------------------------
 
-Neural network regressors combine traditional neural architectures with evolutionary optimization. Instead of gradient descent, they use evolutionary algorithms to train networks or evolve architectures.
+Neural network regressors combine traditional neural architectures with evolutionary optimization. Weights can be trained by evolutionary algorithms or gradient-based PyTorch optimizers; GPNN estimators also evolve architectures.
 
 .. list-table::
    :widths: 30 70
@@ -65,3 +65,11 @@ GeneticProgrammingNeuralNetRegressor
    :members:
    :inherited-members:
    :show-inheritance:
+
+Multiobjective architecture search
+----------------------------------
+
+GPNN estimators support a validation-loss/complexity Pareto front through NSGPII
+and its adaptive subclasses. ``complexity`` selects the second criterion;
+``model_selection`` chooses the default model. ``get_pareto_front()`` returns
+the front and ``select_net(index)`` changes the active network without retraining.

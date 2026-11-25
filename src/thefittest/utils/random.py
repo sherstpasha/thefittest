@@ -1,6 +1,10 @@
+"""Random-number helpers used by evolutionary operators.
+
+The module wraps Python, NumPy, and Numba-compatible random routines used by
+selection, crossover, mutation, and optimizer code.
+"""
+
 import random
-from typing import List
-from typing import Tuple
 from typing import Union
 from typing import Optional
 import numbers
@@ -20,17 +24,17 @@ from ..utils import check_for_value
 @njit(int64[:](int64[:]))
 def sattolo_shuffle(arr):
     """
-    Perform Sattolo's algorithm for in-place array shuffling.
+    Return a shuffled copy of a 1D array using Sattolo's algorithm.
 
     Parameters
     ----------
     arr : int64[:]
-        Input array to be shuffled.
+        Input array to shuffle. The input array is not modified.
 
     Returns
     -------
     int64[:]
-        Shuffled array.
+        Shuffled copy of ``arr``.
 
     Examples
     --------
@@ -59,17 +63,17 @@ def sattolo_shuffle(arr):
 @njit
 def sattolo_shuffle_2d(arr):
     """
-    Perform Sattolo's algorithm for in-place shuffling of rows in a 2D array.
+    Return a row-shuffled copy of a 2D array using Sattolo's algorithm.
 
     Parameters
     ----------
     arr : int64[:, :]
-        Input 2D array to be shuffled.
+        Input 2D array to shuffle. The input array is not modified.
 
     Returns
     -------
     int64[:, :]
-        Shuffled 2D array.
+        Row-shuffled copy of ``arr``.
 
     Examples
     --------
@@ -97,6 +101,29 @@ def sattolo_shuffle_2d(arr):
 
 @njit
 def numba_seed(seed_value):
+    """
+    Seed Python and NumPy random generators inside Numba-compiled code.
+
+    Parameters
+    ----------
+    seed_value : int
+        Seed value passed to ``random.seed`` and ``np.random.seed``.
+
+    Returns
+    -------
+    None
+        The function updates random-generator state and returns ``None``.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import numba_seed
+    >>> from thefittest.utils.random import randint
+    >>>
+    >>> numba_seed(1)
+    >>> values = randint(0, 10, 3)
+    >>> values.shape
+    (3,)
+    """
     random.seed(seed_value)
     np.random.seed(seed_value)
 
@@ -296,8 +323,8 @@ def uniform(low: np.float64, high: np.float64, size: np.int64):
         The lower boundary of the output interval. All values generated will be
         greater than or equal to `low`.
     high : np.float64
-        The upper boundary of the output interval. All values generated will be
-        less or equal to `high`.
+        The upper boundary of the output interval. Values are sampled from
+        ``[low, high)``.
     size : np.int64
         The number of elements to generate.
 
@@ -317,8 +344,8 @@ def uniform(low: np.float64, high: np.float64, size: np.int64):
 
     Notes
     -----
-    The generated samples follow a uniform distribution, where each value within
-    the specified range has an equal probability of being selected.
+    The generated samples follow a continuous uniform distribution over
+    ``[low, high)``.
 
     """
     return np.random.uniform(low=low, high=high, size=size)
@@ -334,7 +361,7 @@ def randint(low, high, size):
     low : int
         The lowest integer to be drawn from the distribution.
     high : int
-        The highest integer to be drawn from the distribution.
+        Exclusive upper bound of the generated integers.
     size : int
         The number of integers to generate.
 
@@ -355,7 +382,8 @@ def randint(low, high, size):
 
     Notes
     -----
-    The generated integers follow a discrete uniform distribution.
+    The generated integers follow a discrete uniform distribution over
+    ``[low, high)``.
     """
     result = np.empty(size, dtype=np.int64)
 
@@ -366,7 +394,8 @@ def randint(low, high, size):
 
 
 def check_random_state(seed: Optional[Union[int, np.random.RandomState]] = None):
-    """Turn seed into a np.random.RandomState instance
+    """
+    Turn seed into a ``np.random.RandomState`` instance.
 
     Parameters
     ----------
@@ -376,6 +405,18 @@ def check_random_state(seed: Optional[Union[int, np.random.RandomState]] = None)
         If seed is already a RandomState instance, return it.
         Otherwise raise ValueError.
 
+    Returns
+    -------
+    np.random.RandomState
+        Random state resolved from ``seed``. Integer and ``RandomState`` inputs
+        also seed the Numba-compatible random generators used in this module.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import check_random_state
+    >>> random_state = check_random_state(1)
+    >>> type(random_state).__name__
+    'RandomState'
     """
     if seed is None:
         random_state = np.random.mtrand._rand
@@ -394,10 +435,53 @@ def check_random_state(seed: Optional[Union[int, np.random.RandomState]] = None)
 
 
 def generator1() -> float:
+    """
+    Generate a rounded random float in the interval ``[0, 10)``.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    float
+        Random value rounded to four decimal places.
+
+    Examples
+    --------
+    >>> from thefittest.utils.random import generator1
+    >>> value = generator1()
+    >>> isinstance(value, float)
+    True
+    >>> bool(0 <= value < 10)
+    True
+    """
     value = np.round(uniform(0, 10, 1)[0], 4)
     return value
 
 
 def generator2() -> int:
+    """
+    Generate a random integer in the interval ``[0, 10)``.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    int
+        Random integer value.
+
+    Examples
+    --------
+    >>> import numbers
+    >>> from thefittest.utils.random import generator2
+    >>> value = generator2()
+    >>> isinstance(value, numbers.Integral)
+    True
+    >>> bool(0 <= value < 10)
+    True
+    """
     value = randint(0, 10, 1)[0]
     return value

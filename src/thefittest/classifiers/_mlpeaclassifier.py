@@ -6,8 +6,6 @@ from typing import Tuple
 from typing import Union
 from typing import TYPE_CHECKING
 
-import warnings
-
 import numpy as np
 from numpy.typing import NDArray
 from numpy.typing import ArrayLike
@@ -34,8 +32,8 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
     """
     Multi-Layer Perceptron classifier with Evolutionary Algorithm-based training.
 
-    This classifier uses evolutionary algorithms to optimize neural network weights
-    instead of traditional gradient-based methods.
+    This classifier optimizes neural network weights using evolutionary algorithms
+    or gradient-based PyTorch optimizers.
 
     Parameters
     ----------
@@ -50,7 +48,7 @@ class MLPEAClassifier(ClassifierMixin, BaseMLPEA):
     activation : str, optional (default="sigma")
         Activation function for hidden layers.
         Available: 'sigma' (sigmoid), 'relu', 'gauss' (Gaussian), 'tanh',
-        'ln' (natural logarithm normalization), 'softmax'.
+        'ln' (linear identity), 'softmax'.
     offset : bool, optional (default=True)
         If True, adds bias terms to the network.
     weights_optimizer : Type, optional (default=SHADE)

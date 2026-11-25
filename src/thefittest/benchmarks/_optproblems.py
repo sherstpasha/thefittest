@@ -518,8 +518,11 @@ class Weierstrass(TestFunction):
     It is highly multimodal with many local optima. The global minimum is
     at x = [0, 0, ..., 0].
 
-    Formula: f(x) = sum_{i=1}^n sum_{k=0}^{k_max} [a^k * cos(2*pi*b^k*(x_i+0.5))]
-             - n*sum_{k=0}^{k_max} [a^k * cos(2*pi*b^k*0.5)]
+    Formula::
+
+        f(x) = sum_{i=1}^n sum_{k=0}^{k_max} [a^k * cos(2*pi*b^k*(x_i+0.5))]
+               - n*sum_{k=0}^{k_max} [a^k * cos(2*pi*b^k*0.5)]
+
     where a=0.5, b=3, k_max=20
 
     Parameters

@@ -212,6 +212,8 @@ class PDPGA(SelfCGA):
         random_state: Optional[Union[int, np.random.RandomState]] = None,
         on_generation: Optional[Callable] = None,
         fitness_update_eps: float = 0.0,
+        use_fitness_cache: bool = False,
+        fitness_cache_size: Optional[int] = 1000,
     ):
         SelfCGA.__init__(
             self,
@@ -243,6 +245,8 @@ class PDPGA(SelfCGA):
             random_state=random_state,
             on_generation=on_generation,
             fitness_update_eps=fitness_update_eps,
+            use_fitness_cache=use_fitness_cache,
+            fitness_cache_size=fitness_cache_size,
         )
 
         self._previous_fitness_i: List = []
@@ -296,6 +300,10 @@ class PDPGA(SelfCGA):
             )
 
             self._previous_fitness_i = []
+
+            self._selection_operators = self._choice_operators(proba_dict=self._selection_proba)
+            self._crossover_operators = self._choice_operators(proba_dict=self._crossover_proba)
+            self._mutation_operators = self._choice_operators(proba_dict=self._mutation_proba)
 
     def _get_new_individ_g(
         self: PDPGA,

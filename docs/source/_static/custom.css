@@ -238,6 +238,34 @@ a:hover {
 }
 
 /* -------------------------
+   Documentation version switcher
+------------------------- */
+.version-switcher {
+    margin: 0.75rem auto 0;
+    max-width: 240px;
+    text-align: left;
+}
+
+.version-switcher-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.version-switcher-select {
+    width: 100%;
+    min-height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 4px;
+    background: #ffffff;
+    color: #2c3e50;
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+/* -------------------------
    Responsive
 ------------------------- */
 @media (max-width: 768px) {
