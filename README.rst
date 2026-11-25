@@ -1,46 +1,27 @@
-|pypi|_ |downloads|_ |views| |coverage|_ |codacy|_ |black|_ |docs|_
-
-.. |pypi| image:: https://img.shields.io/pypi/v/thefittest?label=PyPI%20version
-.. _pypi: https://pypi.org/project/thefittest/
-
-.. |downloads| image:: https://static.pepy.tech/badge/thefittest
-.. _downloads: https://pepy.tech/project/thefittest
-
-.. |views| image:: https://komarev.com/ghpvc/?username=thefittest
-
-.. |coverage| image:: https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master
-.. _coverage: https://codecov.io/github/sherstpasha/thefittest
-
-.. |codacy| image:: https://app.codacy.com/project/badge/Grade/4c47b6de61c4422180529bbc360262c4
-.. _codacy: https://app.codacy.com/gh/sherstpasha/thefittest/dashboard
-
-.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-.. _black: https://github.com/psf/black
-
-.. |docs| image:: https://img.shields.io/badge/docs-online-brightgreen
-.. _docs: https://sherstpasha.github.io/thefittest/
-
+.. image:: https://img.shields.io/pypi/v/thefittest?label=PyPI%20-%20Package%20version
+    :target: https://pypi.org/project/thefittest/
+    :alt: PyPI - Package version
+.. image:: https://static.pepy.tech/badge/thefittest
+    :target: https://pepy.tech/project/thefittest
+    :alt: Downloads
+.. image:: https://komarev.com/ghpvc/?username=thefittest
+    :alt: Profile views
+.. image:: https://codecov.io/github/sherstpasha/thefittest/coverage.svg?branch=master
+    :alt: codecov.io
+.. image:: https://app.codacy.com/project/badge/Grade/4c47b6de61c4422180529bbc360262c4
+    :target: https://app.codacy.com/gh/sherstpasha/thefittest/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
+    :alt: Codacy Badge
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+    :alt: Code style: black
+.. image:: https://readthedocs.com/projects/sherstpasha-pavel/badge/?version=latest&token=71adf5d63b55f0def96b09e1ce4c60f8d57cbdaed7db777117f34e4718d5a1ea
+    :target: https://sherstpasha-pavel.readthedocs-hosted.com/ru/latest/?badge=latest
+    :alt: Documentation Status
+    
 .. image:: docs/logos/logo1.png
    :align: center
-   :alt: thefittest logo
-
 
 ``thefittest`` is an open-source library designed for the efficient application of classical evolutionary algorithms and their effective modifications in optimization and machine learning. Our project aims to provide performance, accessibility, and ease of use, opening up the world of advanced evolutionary methods to you.
-
-Features of ``thefittest``
---------------------------
-
-**Performance**
-  Our library is developed using advanced coding practices and delivers high performance through integration with `NumPy <https://numpy.org/>`_, `SciPy <https://scipy.org/>`_, and `Numba <https://numba.pydata.org/>`_.
-
-**Versatility**
-  ``thefittest`` offers a wide range of classical evolutionary algorithms and effective modifications, making it suitable for a variety of optimization and machine learning tasks.
-
-**Integration with scikit-learn**
-  Machine learning models from ``thefittest`` follow the familiar `scikit-learn <https://scikit-learn.org/>`_ interface and can be used with its preprocessing, model selection, and evaluation tools.
-
-**PyTorch support**
-  ``thefittest`` supports `PyTorch <https://pytorch.org/>`_ for efficient neural network computations and evolutionary optimization of neural network weights and architectures, including GPU acceleration with CUDA.
 
 Installation
 ------------
@@ -133,7 +114,7 @@ This example demonstrates how to train a machine learning model on the Iris data
 
     # Train the model
     model.fit(X_train, y_train)
-
+    
     # Make predictions on the test set
     predict = model.predict(X_test)
 
